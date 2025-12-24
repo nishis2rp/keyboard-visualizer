@@ -1,7 +1,13 @@
 import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getSingleKeyShortcuts } from '../../utils'
-import { isSystemProtected } from '../../constants'
+import ShortcutCard from '../ShortcutCard'
+
+// 修飾キーの表示順序
+const MODIFIER_DISPLAY_ORDER = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
+
+// 修飾キーのリスト
+const MODIFIER_KEYS = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
 
 const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, description, availableShortcuts, selectedApp, shortcutDescriptions }) => {
   if (pressedKeys.size === 0) {
@@ -23,32 +29,14 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
           <div style={{ width: '100%' }}>
             <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '15px' }}>利用可能な単独キーショートカット</h3>
             <div className="shortcuts-grid">
-              {singleKeyShortcuts.map((item, index) => {
-                const isProtected = isSystemProtected(item.shortcut)
-                // デバッグ用ログ（開発時のみ）
-                if (isProtected) {
-                  console.log(`🔒 システム保護ショートカット検出（単独キー）: ${item.shortcut}`)
-                }
-                return (
-                  <div
-                    key={index}
-                    className="shortcut-card"
-                    style={isProtected ? {
-                      borderColor: '#e74c3c',
-                      backgroundColor: 'rgba(231, 76, 60, 0.1)'
-                    } : {}}
-                    title={isProtected ? '⚠️ このショートカットはOSレベルで保護されており、ブラウザでキャプチャできません' : ''}
-                  >
-                    <div className="shortcut-combo" style={isProtected ? { color: '#e74c3c' } : {}}>
-                      {isProtected && '🔒 '}
-                      {item.shortcut}
-                    </div>
-                    <div className="shortcut-desc" style={isProtected ? { color: '#c0392b' } : {}}>
-                      {item.description}
-                    </div>
-                  </div>
-                )
-              })}
+              {singleKeyShortcuts.map((item, index) => (
+                <ShortcutCard
+                  key={index}
+                  shortcut={item.shortcut}
+                  description={item.description}
+                  showDebugLog={true}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -63,9 +51,8 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
   }
 
   const sortedKeys = Array.from(pressedKeys).sort((a, b) => {
-    const specialOrder = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
-    const aIndex = specialOrder.indexOf(a)
-    const bIndex = specialOrder.indexOf(b)
+    const aIndex = MODIFIER_DISPLAY_ORDER.indexOf(a)
+    const bIndex = MODIFIER_DISPLAY_ORDER.indexOf(b)
 
     if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
     if (aIndex !== -1) return -1
@@ -74,8 +61,7 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
   })
 
   // 修飾キーのみが押されているかチェック
-  const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
-  const isOnlyModifierKeys = sortedKeys.every(key => modifierKeys.includes(key))
+  const isOnlyModifierKeys = sortedKeys.every(key => MODIFIER_KEYS.includes(key))
 
   // 完全なショートカットが押されている場合（説明がある）
   // ただし、修飾キーのみの場合は、利用可能なショートカット一覧も表示
@@ -125,32 +111,14 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
         <div style={{ width: '100%' }}>
           <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '15px' }}>利用可能なショートカット</h3>
           <div className="shortcuts-grid">
-            {availableShortcuts.map((item, index) => {
-              const isProtected = isSystemProtected(item.shortcut)
-              // デバッグ用ログ（開発時のみ）
-              if (isProtected) {
-                console.log(`🔒 システム保護ショートカット検出: ${item.shortcut}`)
-              }
-              return (
-                <div
-                  key={index}
-                  className="shortcut-card"
-                  style={isProtected ? {
-                    borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)'
-                  } : {}}
-                  title={isProtected ? '⚠️ このショートカットはOSレベルで保護されており、ブラウザでキャプチャできません' : ''}
-                >
-                  <div className="shortcut-combo" style={isProtected ? { color: '#e74c3c' } : {}}>
-                    {isProtected && '🔒 '}
-                    {item.shortcut}
-                  </div>
-                  <div className="shortcut-desc" style={isProtected ? { color: '#c0392b' } : {}}>
-                    {item.description}
-                  </div>
-                </div>
-              )
-            })}
+            {availableShortcuts.map((item, index) => (
+              <ShortcutCard
+                key={index}
+                shortcut={item.shortcut}
+                description={item.description}
+                showDebugLog={true}
+              />
+            ))}
           </div>
         </div>
       )}

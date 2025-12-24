@@ -182,6 +182,31 @@ const getLastKey = (shortcut) => {
 }
 
 /**
+ * 修飾キーのリスト
+ * ショートカット文字列に含まれる修飾キーを判定するために使用
+ */
+const MODIFIER_KEY_NAMES = new Set([
+  'Ctrl', 'Control', 'Shift', 'Alt', 'Meta', 'Win', 'Cmd', 'Option', 'OS'
+])
+
+/**
+ * ショートカットに含まれる修飾キーの数をカウント
+ * @param {string} shortcut - ショートカット文字列（例: "Win + Shift + S"）
+ * @returns {number} 修飾キーの数（例: 2）
+ */
+const countModifierKeys = (shortcut) => {
+  const parts = shortcut.split(' + ')
+  const modifierCount = parts.filter(key => MODIFIER_KEY_NAMES.has(key)).length
+
+  // デバッグログ（開発モードのみ）
+  if (import.meta.env.DEV && modifierCount > 0) {
+    console.log(`[DEBUG] "${shortcut}" → 修飾キー: ${modifierCount}個 (${parts.filter(key => MODIFIER_KEY_NAMES.has(key)).join(', ')})`)
+  }
+
+  return modifierCount
+}
+
+/**
  * 利用可能なショートカット一覧を取得（代替表現にも対応）
  * 現在押されているキーで始まるショートカットをすべて取得
  * キーの順序に関係なくマッチング（Win + Shift = Shift + Win）
@@ -227,8 +252,22 @@ export const getAvailableShortcuts = (keys, keyNameMap, shortcutDescriptions) =>
     .filter((item, index, self) =>
       index === self.findIndex(t => t.shortcut === item.shortcut)
     )
-    // QWERTY順でソート（ファンクションキー優先）
+    // ソート: 修飾キーの数 → ファンクションキー → 数字キー → QWERTY順
     .sort((a, b) => {
+      // 1. 修飾キーの数でグループ化（少ない順）
+      const aModifierCount = countModifierKeys(a.shortcut)
+      const bModifierCount = countModifierKeys(b.shortcut)
+
+      // デバッグログ（開発モードのみ、最初の数件のみ）
+      if (import.meta.env.DEV && Math.random() < 0.05) {
+        console.log(`[SORT] "${a.shortcut}"(修飾:${aModifierCount}) vs "${b.shortcut}"(修飾:${bModifierCount})`)
+      }
+
+      if (aModifierCount !== bModifierCount) {
+        return aModifierCount - bModifierCount
+      }
+
+      // 2. 同じ修飾キー数の場合、最後のキーでソート
       const aLastKey = getLastKey(a.shortcut)
       const bLastKey = getLastKey(b.shortcut)
 
@@ -273,6 +312,19 @@ export const getAvailableShortcuts = (keys, keyNameMap, shortcutDescriptions) =>
       // QWERTY配列にない場合はアルファベット順
       return aLastKey.localeCompare(bLastKey)
     })
+
+  // デバッグログ: ソート後の結果を表示（開発モードのみ）
+  if (import.meta.env.DEV && shortcuts.length > 0) {
+    console.group('📋 利用可能なショートカット一覧（ソート後）')
+    shortcuts.slice(0, 15).forEach((item, index) => {
+      const modCount = countModifierKeys(item.shortcut)
+      console.log(`${index + 1}. [修飾:${modCount}個] ${item.shortcut} - ${item.description}`)
+    })
+    if (shortcuts.length > 15) {
+      console.log(`... 他 ${shortcuts.length - 15}件`)
+    }
+    console.groupEnd()
+  }
 
   return shortcuts
 }
