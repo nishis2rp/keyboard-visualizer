@@ -20,6 +20,7 @@ export const getKeyNameMap = (keyboardLayout) => {
     return {
       'Control': 'Ctrl',
       'Meta': 'Win',
+      'OS': 'Win',  // 一部のブラウザでWinキーがOSとして検出される
       'ArrowUp': '↑',
       'ArrowDown': '↓',
       'ArrowLeft': '←',

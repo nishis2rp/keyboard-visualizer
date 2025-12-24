@@ -4,29 +4,32 @@ import { getSingleKeyShortcuts } from '../../utils'
 
 const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, description, availableShortcuts, selectedApp, shortcutDescriptions }) => {
   if (pressedKeys.size === 0) {
-    // Gmailモードの場合は単独キーショートカットを表示
-    if (selectedApp === 'gmail') {
-      const singleKeyShortcuts = getSingleKeyShortcuts(shortcutDescriptions)
+    // すべてのアプリケーションで単独キーショートカットを表示
+    const singleKeyShortcuts = getSingleKeyShortcuts(shortcutDescriptions)
+
+    if (singleKeyShortcuts.length > 0) {
       return (
         <div className="display-area active" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
             <div className="shortcut-description-inline">
-              <span className="description-icon">📧</span> Gmailの単独キーショートカット - キーを押すだけで操作できます
+              <span className="description-icon">{selectedApp === 'gmail' ? '📧' : '⌨️'}</span>
+              {selectedApp === 'gmail'
+                ? 'Gmailの単独キーショートカット - キーを押すだけで操作できます'
+                : '単独キーショートカット - ファンクションキーなど、単独で使用できるショートカット'
+              }
             </div>
           </div>
-          {singleKeyShortcuts.length > 0 && (
-            <div style={{ width: '100%' }}>
-              <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '15px' }}>利用可能な単独キーショートカット</h3>
-              <div className="shortcuts-grid">
-                {singleKeyShortcuts.map((item, index) => (
-                  <div key={index} className="shortcut-card">
-                    <div className="shortcut-combo">{item.shortcut}</div>
-                    <div className="shortcut-desc">{item.description}</div>
-                  </div>
-                ))}
-              </div>
+          <div style={{ width: '100%' }}>
+            <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '15px' }}>利用可能な単独キーショートカット</h3>
+            <div className="shortcuts-grid">
+              {singleKeyShortcuts.map((item, index) => (
+                <div key={index} className="shortcut-card">
+                  <div className="shortcut-combo">{item.shortcut}</div>
+                  <div className="shortcut-desc">{item.description}</div>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
         </div>
       )
     }
@@ -39,7 +42,7 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
   }
 
   const sortedKeys = Array.from(pressedKeys).sort((a, b) => {
-    const specialOrder = ['Control', 'Shift', 'Alt', 'Meta']
+    const specialOrder = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
     const aIndex = specialOrder.indexOf(a)
     const bIndex = specialOrder.indexOf(b)
 
@@ -49,8 +52,13 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
     return 0
   })
 
+  // 修飾キーのみが押されているかチェック
+  const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
+  const isOnlyModifierKeys = sortedKeys.every(key => modifierKeys.includes(key))
+
   // 完全なショートカットが押されている場合（説明がある）
-  if (description) {
+  // ただし、修飾キーのみの場合は、利用可能なショートカット一覧も表示
+  if (description && (!isOnlyModifierKeys || availableShortcuts.length === 0)) {
     return (
       <div className="display-area active">
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center', width: '100%' }}>

@@ -4,6 +4,39 @@
  */
 
 /**
+ * キーボードロックを有効化（全画面モード時のみ）
+ * Winキーなどのシステムキーをブラウザがキャプチャできるようにする
+ * @returns {Promise<void>}
+ */
+const lockKeyboard = async () => {
+  try {
+    // Keyboard Lock APIがサポートされているかチェック
+    if (navigator.keyboard && navigator.keyboard.lock) {
+      // MetaLeft/MetaRight（Winキー）をロック
+      await navigator.keyboard.lock(['MetaLeft', 'MetaRight'])
+      console.log('キーボードロックが有効化されました（Winキーをキャプチャできます）')
+    }
+  } catch (error) {
+    console.warn('キーボードロックに失敗:', error)
+  }
+}
+
+/**
+ * キーボードロックを解除
+ * @returns {void}
+ */
+const unlockKeyboard = () => {
+  try {
+    if (navigator.keyboard && navigator.keyboard.unlock) {
+      navigator.keyboard.unlock()
+      console.log('キーボードロックが解除されました')
+    }
+  } catch (error) {
+    console.warn('キーボードロック解除に失敗:', error)
+  }
+}
+
+/**
  * フルスクリーンモードに入る
  * @returns {Promise<void>}
  */
@@ -18,6 +51,9 @@ export const enterFullscreen = async () => {
     } else if (element.msRequestFullscreen) { // IE11
       await element.msRequestFullscreen()
     }
+
+    // フルスクリーン移行後にキーボードをロック
+    await lockKeyboard()
   } catch (error) {
     console.error('フルスクリーンモードへの移行に失敗:', error)
   }
@@ -29,6 +65,9 @@ export const enterFullscreen = async () => {
  */
 export const exitFullscreen = async () => {
   try {
+    // キーボードロックを解除
+    unlockKeyboard()
+
     if (document.exitFullscreen) {
       await document.exitFullscreen()
     } else if (document.webkitExitFullscreen) { // Safari

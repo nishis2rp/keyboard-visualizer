@@ -3,7 +3,7 @@
  * これらのキーは見た目が異なる表示になる
  */
 export const specialKeys = new Set([
-  'Control', 'Shift', 'Alt', 'Meta', 'Tab', 'Enter', 'Escape',
+  'Control', 'Shift', 'Alt', 'Meta', 'OS', 'Tab', 'Enter', 'Escape',
   'CapsLock', 'Backspace', 'Delete', 'ArrowUp', 'ArrowDown',
   'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'
 ])

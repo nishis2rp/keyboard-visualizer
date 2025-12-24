@@ -55,7 +55,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       }
 
       // すべての修飾キー自体もpreventDefault
-      const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta']
+      const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
       if (modifierKeys.includes(key)) {
         e.preventDefault()
         e.stopPropagation()
