@@ -24,30 +24,22 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     const handleKeyDown = (e) => {
       const key = e.key
 
-      setPressedKeys(prev => {
-        if (!prev.has(key)) {
-          const newSet = new Set(prev)
-          newSet.add(key)
+      // 重複キー押下を防ぐ
+      if (pressedKeys.has(key)) {
+        return
+      }
 
-          // 現在のショートカットの説明を更新
-          const comboText = getKeyComboText(Array.from(newSet), keyNameMap)
-          const description = getShortcutDescription(comboText, shortcutDescriptions)
-          setCurrentDescription(description)
+      // 新しいキーセットを作成してショートカットをチェック
+      const newKeys = new Set(pressedKeys)
+      newKeys.add(key)
+      const comboText = getKeyComboText(Array.from(newKeys), keyNameMap)
+      const description = getShortcutDescription(comboText, shortcutDescriptions)
 
-          // ショートカットが登録されている場合はpreventDefault
-          if (description) {
-            e.preventDefault()
-            e.stopPropagation()
-          }
-
-          // 利用可能なショートカット一覧を更新
-          const shortcuts = getAvailableShortcuts(Array.from(newSet), keyNameMap, shortcutDescriptions)
-          setAvailableShortcuts(shortcuts)
-
-          return newSet
-        }
-        return prev
-      })
+      // ショートカットが登録されている場合はpreventDefault
+      if (description) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
 
       // F5とCtrl+Rはページリロードを防ぐために特別に処理
       if (key === 'F5' || (e.ctrlKey && key === 'r')) {
@@ -74,6 +66,23 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
         e.preventDefault()
         e.stopPropagation()
       }
+
+      // 状態更新
+      setPressedKeys(prev => {
+        const newSet = new Set(prev)
+        newSet.add(key)
+
+        // 現在のショートカットの説明を更新
+        const comboText = getKeyComboText(Array.from(newSet), keyNameMap)
+        const description = getShortcutDescription(comboText, shortcutDescriptions)
+        setCurrentDescription(description)
+
+        // 利用可能なショートカット一覧を更新
+        const shortcuts = getAvailableShortcuts(Array.from(newSet), keyNameMap, shortcutDescriptions)
+        setAvailableShortcuts(shortcuts)
+
+        return newSet
+      })
     }
 
     const handleKeyUp = (e) => {
