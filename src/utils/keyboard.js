@@ -136,6 +136,7 @@ const getKeyComboAlternatives = (comboText) => {
 /**
  * ショートカットの説明を取得（代替表現にも対応）
  * Ctrl+Shift+1とCtrl+Shift+!を同一のものとして扱う
+ * 単一文字の大文字小文字も考慮（AとaをマッチングOK）
  * @param {string} comboText - キーの組み合わせ文字列
  * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト
  * @returns {string|null} ショートカットの説明、見つからない場合はnull
@@ -144,6 +145,18 @@ export const getShortcutDescription = (comboText, shortcutDescriptions) => {
   // まず元のキーコンボで検索
   if (shortcutDescriptions[comboText]) {
     return shortcutDescriptions[comboText]
+  }
+
+  // 単一文字の場合、小文字でも検索（'A' → 'a'）
+  if (comboText.length === 1 && /[A-Z]/i.test(comboText)) {
+    const lowerCase = comboText.toLowerCase()
+    if (shortcutDescriptions[lowerCase]) {
+      return shortcutDescriptions[lowerCase]
+    }
+    const upperCase = comboText.toUpperCase()
+    if (shortcutDescriptions[upperCase]) {
+      return shortcutDescriptions[upperCase]
+    }
   }
 
   // 代替表現で検索
