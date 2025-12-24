@@ -24,6 +24,18 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     const handleKeyDown = (e) => {
       const key = e.key
 
+      // 現在押されているキーの組み合わせを取得
+      const currentKeys = new Set(pressedKeys)
+      currentKeys.add(key)
+      const comboText = getKeyComboText(Array.from(currentKeys), keyNameMap)
+      const hasShortcut = getShortcutDescription(comboText, shortcutDescriptions)
+
+      // ショートカットが登録されている場合はpreventDefault
+      if (hasShortcut) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+
       // F5とCtrl+Rはページリロードを防ぐために特別に処理
       if (key === 'F5' || (e.ctrlKey && key === 'r')) {
         e.preventDefault()
@@ -32,7 +44,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
 
       // 修飾キー（Ctrl、Alt、Shift、Meta/Win）が押されている場合は
       // ブラウザのデフォルト動作を無効化
-      if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
+      if (e.ctrlKey || e.altKey || e.metaKey) {
         e.preventDefault()
         e.stopPropagation()
       }
