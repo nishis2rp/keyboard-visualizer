@@ -1,4 +1,7 @@
-const KeyDisplay = ({ pressedKeys, specialKeys, getKeyDisplayName, description, availableShortcuts }) => {
+import PropTypes from 'prop-types'
+import { memo } from 'react'
+
+const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, description, availableShortcuts }) => {
   if (pressedKeys.size === 0) {
     return (
       <div className="display-area">
@@ -41,7 +44,7 @@ const KeyDisplay = ({ pressedKeys, specialKeys, getKeyDisplayName, description, 
     )
   }
 
-  // 修飾キーのみが押されている場合（利用可能なショートカット一覧を表示）
+  // 修飾キーのみが押されている場合、または利用可能なショートカット一覧を表示
   return (
     <div className="display-area active" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
       <div style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center', marginBottom: availableShortcuts.length > 0 ? '20px' : '0' }}>
@@ -55,6 +58,11 @@ const KeyDisplay = ({ pressedKeys, specialKeys, getKeyDisplayName, description, 
             </div>
           ))}
         </div>
+        {availableShortcuts.length === 0 && (
+          <div className="shortcut-description-inline" style={{ opacity: 0.6 }}>
+            <span className="description-icon">ℹ️</span> このキーの組み合わせにショートカットは登録されていません
+          </div>
+        )}
       </div>
       {availableShortcuts.length > 0 && (
         <div style={{ width: '100%' }}>
@@ -71,6 +79,21 @@ const KeyDisplay = ({ pressedKeys, specialKeys, getKeyDisplayName, description, 
       )}
     </div>
   )
+})
+
+KeyDisplay.displayName = 'KeyDisplay'
+
+KeyDisplay.propTypes = {
+  pressedKeys: PropTypes.instanceOf(Set).isRequired,
+  specialKeys: PropTypes.instanceOf(Set).isRequired,
+  getKeyDisplayName: PropTypes.func.isRequired,
+  description: PropTypes.string,
+  availableShortcuts: PropTypes.arrayOf(
+    PropTypes.shape({
+      shortcut: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired
+    })
+  ).isRequired
 }
 
 export default KeyDisplay

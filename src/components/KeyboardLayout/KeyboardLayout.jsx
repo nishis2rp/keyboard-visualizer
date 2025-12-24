@@ -1,6 +1,8 @@
-import { getKeyboardLayoutByName, getLayoutDisplayName } from '../data/layouts'
+import PropTypes from 'prop-types'
+import { memo } from 'react'
+import { getKeyboardLayoutByName, getLayoutDisplayName } from '../../data/layouts'
 
-const KeyboardLayout = ({ pressedKeys, specialKeys, getKeyDisplayName, shortcutDescriptions, keyboardLayout = 'windows-jis' }) => {
+const KeyboardLayout = memo(({ pressedKeys, specialKeys, getKeyDisplayName, shortcutDescriptions, keyboardLayout = 'windows-jis' }) => {
   // 現在のレイアウトを取得
   const keyboardRows = getKeyboardLayoutByName(keyboardLayout)
   const layoutName = getLayoutDisplayName(keyboardLayout)
@@ -32,7 +34,7 @@ const KeyboardLayout = ({ pressedKeys, specialKeys, getKeyDisplayName, shortcutD
       }
     })
 
-    return shortcuts.slice(0, 5) // 最大5件表示
+    return shortcuts // すべてのショートカットを表示
   }
 
   return (
@@ -85,6 +87,16 @@ const KeyboardLayout = ({ pressedKeys, specialKeys, getKeyDisplayName, shortcutD
       </div>
     </div>
   )
+})
+
+KeyboardLayout.displayName = 'KeyboardLayout'
+
+KeyboardLayout.propTypes = {
+  pressedKeys: PropTypes.instanceOf(Set).isRequired,
+  specialKeys: PropTypes.instanceOf(Set).isRequired,
+  getKeyDisplayName: PropTypes.func.isRequired,
+  shortcutDescriptions: PropTypes.objectOf(PropTypes.string).isRequired,
+  keyboardLayout: PropTypes.string
 }
 
 export default KeyboardLayout

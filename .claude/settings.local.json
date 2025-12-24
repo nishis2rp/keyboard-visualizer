@@ -13,7 +13,18 @@
       "Bash(del shortcuts.js keyboardLayouts.js)",
       "Bash(git init:*)",
       "Bash(git add:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: Keyboard Visualizer\n\n- アプリケーション別のショートカット表示機能\n- Windows 11, Chrome, Excel, Slack, Gmail, macOS対応\n- 3種類のキーボードレイアウト (Windows JIS, Mac JIS, Mac US)\n- リアルタイムキー入力ビジュアライゼーション\n- リファクタリング済み: データをアプリケーション別に整理\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git config:*)",
+      "Bash(gh:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run deploy:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nConfigure GitHub Pages deployment\n\n- Add base path configuration for GitHub Pages in vite.config.js\n- Install gh-pages package for deployment\n- Add deploy scripts to package.json\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(tree:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,11 +1,9 @@
-// 特殊キーの定義
-export const specialKeys = new Set([
-  'Control', 'Shift', 'Alt', 'Meta', 'Tab', 'Enter', 'Escape',
-  'CapsLock', 'Backspace', 'Delete', 'ArrowUp', 'ArrowDown',
-  'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'
-])
-
-// キーボードレイアウト別のキー名マッピング
+/**
+ * キーボードレイアウト別のキー名マッピングを取得
+ * MacとWindowsで異なるキー名（Cmd/Win、Option/Altなど）を適切に表示
+ * @param {string} keyboardLayout - キーボードレイアウトID（'mac-jis', 'mac-us', 'windows-jis'）
+ * @returns {Object} キー名のマッピングオブジェクト
+ */
 export const getKeyNameMap = (keyboardLayout) => {
   if (keyboardLayout.startsWith('mac')) {
     return {

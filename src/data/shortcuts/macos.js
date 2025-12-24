@@ -87,4 +87,80 @@ export const macosShortcuts = {
   'Cmd + Shift + Q': 'ログアウト',
   'Cmd + Ctrl + Power': '再起動',
   'Option + Cmd + Power': 'スリープ',
+
+  // Dock
+  'Cmd + Option + D': 'Dockの表示/非表示',
+  'Option + クリック': 'アプリを隠す',
+
+  // Spotlight・検索
+  'Cmd + Option + Space': 'Finderの検索ウィンドウを表示',
+
+  // メニューバー
+  'Ctrl + F2': 'メニューバーにフォーカス',
+  'Ctrl + F3': 'Dockにフォーカス',
+  'Cmd + Shift + /': 'ヘルプメニューを検索',
+
+  // 通知センター
+  'Cmd + Shift + N': '通知センターを表示',
+
+  // Pages・Numbers・Keynote
+  'Cmd + Shift + P': 'ページ設定',
+  'Cmd + Return': 'ページ区切りを挿入',
+  'Cmd + K': 'リンクを追加',
+
+  // Mail
+  'Cmd + Shift + D': 'メールを送信',
+  'Cmd + Shift + R': '全員に返信',
+  'Cmd + Shift + F': '転送',
+  'Cmd + Shift + U': '既読/未読を切り替え',
+  'Cmd + Shift + L': 'フラグを設定',
+  'Cmd + Shift + J': '迷惑メール',
+
+  // Safari（追加）
+  'Cmd + Shift + R': 'キャッシュなしで再読み込み',
+  'Cmd + Shift + \\': 'すべてのタブを表示',
+  'Cmd + Option + L': 'ダウンロードを表示',
+  'Cmd + Shift + N': 'プライベートブラウズ',
+  'Cmd + Y': '履歴を表示',
+  'Cmd + Option + B': 'すべてのブックマークを編集',
+  'Cmd + Option + 1': 'サイドバーを表示',
+  'Cmd + Option + 2': 'リーディングリストを表示',
+
+  // システム環境設定
+  'Cmd + ,': '環境設定を開く',
+
+  // ユニバーサルアクセス
+  'Cmd + Option + F5': 'アクセシビリティオプション',
+  'Cmd + Option + 8': 'ズーム機能のオン/オフ',
+  'Cmd + Option + =': 'ズームイン',
+  'Cmd + Option + -': 'ズームアウト',
+  'Ctrl + Option + Cmd + 8': '色を反転',
+
+  // スクリーンショット（追加）
+  'Cmd + Shift + 3': 'スクリーン全体をキャプチャ',
+  'Cmd + Shift + 4': '選択範囲をキャプチャ',
+  'Cmd + Shift + 4 + Space': 'ウィンドウをキャプチャ',
+  'Cmd + Shift + 5': 'スクリーンショット・録画ツール',
+
+  // Time Machine
+  'Cmd + Option + Shift + Delete': 'ゴミ箱を空にする（確認なし）',
+
+  // その他の便利なショートカット
+  'Cmd + Shift + A': 'アプリケーションフォルダを開く',
+  'Cmd + Shift + U': 'ユーティリティフォルダを開く',
+  'Cmd + Shift + I': 'iCloudドライブを開く',
+  'Cmd + Shift + O': '書類フォルダを開く',
+  'Cmd + Shift + D': 'デスクトップフォルダを開く',
+  'Cmd + Shift + H': 'ホームフォルダを開く',
+  'Cmd + Shift + K': 'ネットワークを開く',
+  'Cmd + Shift + R': 'AirDropウィンドウを開く',
+
+  // ディクテーション
+  'Fn Fn (2回)': '音声入力を開始',
+
+  // Launchpad
+  'Fn + F4': 'Launchpadを表示',
+
+  // Dashboard（古いmacOS）
+  'Fn + F12': 'Dashboardを表示',
 }

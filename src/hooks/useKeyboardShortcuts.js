@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getKeyComboText, getShortcutDescription, getAvailableShortcuts } from '../utils/keyboardUtils'
+import { getKeyComboText, getShortcutDescription, getAvailableShortcuts } from '../utils'
 
 export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
   const [pressedKeys, setPressedKeys] = useState(new Set())
@@ -22,30 +22,32 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Ctrl、Alt、Metaキーが押されている場合は即座にpreventDefault
-      if (e.ctrlKey || e.altKey || e.metaKey) {
-        e.preventDefault()
-      }
-
       const key = e.key
 
-      // すべての修飾キーとその組み合わせでpreventDefaultを実行
-      const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta']
-      const isModifierKey = modifierKeys.includes(key)
-
-      // 修飾キー自体もpreventDefault
-      if (isModifierKey) {
+      // F5とCtrl+Rはページリロードを防ぐために特別に処理
+      if (key === 'F5' || (e.ctrlKey && key === 'r')) {
         e.preventDefault()
+        e.stopPropagation()
       }
 
-      // Shiftキーとの組み合わせもチェック
-      if (e.shiftKey && !isModifierKey) {
-        const tempSet = new Set(pressedKeys)
-        tempSet.add(key)
-        const comboText = getKeyComboText(Array.from(tempSet), keyNameMap)
-        if (shortcutDescriptions[comboText]) {
-          e.preventDefault()
-        }
+      // 修飾キー（Ctrl、Alt、Shift、Meta/Win）が押されている場合は
+      // ブラウザのデフォルト動作を無効化
+      if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+
+      // すべての修飾キー自体もpreventDefault
+      const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta']
+      if (modifierKeys.includes(key)) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+
+      // Fキー（F1-F12）も全てpreventDefault
+      if (key.startsWith('F') && key.length <= 3) {
+        e.preventDefault()
+        e.stopPropagation()
       }
 
       setPressedKeys(prev => {

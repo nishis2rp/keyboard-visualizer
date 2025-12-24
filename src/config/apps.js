@@ -1,4 +1,8 @@
-// アプリケーション設定
+/**
+ * サポートされているアプリケーションの一覧
+ * 各アプリケーションには専用のショートカット定義がある
+ * @type {Array<{id: string, name: string, icon: string}>}
+ */
 export const apps = [
   { id: 'windows11', name: 'Windows 11', icon: '🪟' },
   { id: 'chrome', name: 'Chrome', icon: '🌐' },
@@ -8,7 +12,11 @@ export const apps = [
   { id: 'macos', name: 'macOS', icon: '🍎' },
 ]
 
-// キーボードレイアウト設定
+/**
+ * サポートされているキーボードレイアウトの一覧
+ * レイアウトによってキー配置と表示名が異なる
+ * @type {Array<{id: string, name: string, icon: string}>}
+ */
 export const keyboardLayouts = [
   { id: 'windows-jis', name: 'Windows JIS', icon: '🪟' },
   { id: 'mac-jis', name: 'Mac JIS', icon: '🍎' },
