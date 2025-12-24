@@ -1,8 +1,36 @@
 import PropTypes from 'prop-types'
 import { memo } from 'react'
+import { getSingleKeyShortcuts } from '../../utils'
 
-const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, description, availableShortcuts }) => {
+const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, description, availableShortcuts, selectedApp, shortcutDescriptions }) => {
   if (pressedKeys.size === 0) {
+    // Gmailモードの場合は単独キーショートカットを表示
+    if (selectedApp === 'gmail') {
+      const singleKeyShortcuts = getSingleKeyShortcuts(shortcutDescriptions)
+      return (
+        <div className="display-area active" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+            <div className="shortcut-description-inline">
+              <span className="description-icon">📧</span> Gmailの単独キーショートカット - キーを押すだけで操作できます
+            </div>
+          </div>
+          {singleKeyShortcuts.length > 0 && (
+            <div style={{ width: '100%' }}>
+              <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '15px' }}>利用可能な単独キーショートカット</h3>
+              <div className="shortcuts-grid">
+                {singleKeyShortcuts.map((item, index) => (
+                  <div key={index} className="shortcut-card">
+                    <div className="shortcut-combo">{item.shortcut}</div>
+                    <div className="shortcut-desc">{item.description}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )
+    }
+
     return (
       <div className="display-area">
         <p className="instruction">キーを押してください...</p>
@@ -93,7 +121,9 @@ KeyDisplay.propTypes = {
       shortcut: PropTypes.string.isRequired,
       description: PropTypes.string.isRequired
     })
-  ).isRequired
+  ).isRequired,
+  selectedApp: PropTypes.string.isRequired,
+  shortcutDescriptions: PropTypes.objectOf(PropTypes.string).isRequired
 }
 
 export default KeyDisplay

@@ -193,3 +193,16 @@ export const getAvailableShortcuts = (keys, keyNameMap, shortcutDescriptions) =>
 
   return shortcuts
 }
+
+/**
+ * 単独キー（修飾キーなし）のショートカット一覧を取得
+ * Gmailなどの単独キーショートカットを表示するために使用
+ * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト
+ * @returns {Array<{shortcut: string, description: string}>} 単独キーショートカット一覧
+ */
+export const getSingleKeyShortcuts = (shortcutDescriptions) => {
+  return Object.entries(shortcutDescriptions)
+    .filter(([shortcut]) => !shortcut.includes(' + '))
+    .map(([shortcut, description]) => ({ shortcut, description }))
+    .slice(0, MAX_SHORTCUTS_DISPLAY)
+}

@@ -128,6 +128,8 @@ function App() {
         getKeyDisplayName={getKeyDisplayNameWithMap}
         description={currentDescription}
         availableShortcuts={availableShortcuts}
+        selectedApp={selectedApp}
+        shortcutDescriptions={shortcutDescriptions}
       />
     </div>
   )

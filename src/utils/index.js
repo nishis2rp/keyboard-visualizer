@@ -6,7 +6,8 @@ export {
   sortKeys,
   getKeyComboText,
   getShortcutDescription,
-  getAvailableShortcuts
+  getAvailableShortcuts,
+  getSingleKeyShortcuts
 } from './keyboard'
 
 export {
