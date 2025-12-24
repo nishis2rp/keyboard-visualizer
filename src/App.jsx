@@ -68,7 +68,7 @@ function App() {
           }}
           onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
           onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-          title="フルスクリーンモードでCtrl+WやWinキーなどのショートカット競合を軽減（Keyboard Lock API対応ブラウザではWinキーもキャプチャ可能）"
+          title="フルスクリーンモードでショートカット競合を軽減。Keyboard Lock APIによりほとんどのWinキーショートカットをキャプチャできますが、Win+L（ロック）などのセキュリティ関連はOSレベルで保護されています"
         >
           {fullscreenMode ? '🔲 全画面を終了' : '⛶ 全画面モード'}
         </button>

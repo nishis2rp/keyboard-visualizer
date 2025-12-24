@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getSingleKeyShortcuts } from '../../utils'
+import { isSystemProtected } from '../../constants'
 
 const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, description, availableShortcuts, selectedApp, shortcutDescriptions }) => {
   if (pressedKeys.size === 0) {
@@ -22,12 +23,32 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
           <div style={{ width: '100%' }}>
             <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '15px' }}>利用可能な単独キーショートカット</h3>
             <div className="shortcuts-grid">
-              {singleKeyShortcuts.map((item, index) => (
-                <div key={index} className="shortcut-card">
-                  <div className="shortcut-combo">{item.shortcut}</div>
-                  <div className="shortcut-desc">{item.description}</div>
-                </div>
-              ))}
+              {singleKeyShortcuts.map((item, index) => {
+                const isProtected = isSystemProtected(item.shortcut)
+                // デバッグ用ログ（開発時のみ）
+                if (isProtected) {
+                  console.log(`🔒 システム保護ショートカット検出（単独キー）: ${item.shortcut}`)
+                }
+                return (
+                  <div
+                    key={index}
+                    className="shortcut-card"
+                    style={isProtected ? {
+                      borderColor: '#e74c3c',
+                      backgroundColor: 'rgba(231, 76, 60, 0.1)'
+                    } : {}}
+                    title={isProtected ? '⚠️ このショートカットはOSレベルで保護されており、ブラウザでキャプチャできません' : ''}
+                  >
+                    <div className="shortcut-combo" style={isProtected ? { color: '#e74c3c' } : {}}>
+                      {isProtected && '🔒 '}
+                      {item.shortcut}
+                    </div>
+                    <div className="shortcut-desc" style={isProtected ? { color: '#c0392b' } : {}}>
+                      {item.description}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -104,12 +125,32 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
         <div style={{ width: '100%' }}>
           <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '15px' }}>利用可能なショートカット</h3>
           <div className="shortcuts-grid">
-            {availableShortcuts.map((item, index) => (
-              <div key={index} className="shortcut-card">
-                <div className="shortcut-combo">{item.shortcut}</div>
-                <div className="shortcut-desc">{item.description}</div>
-              </div>
-            ))}
+            {availableShortcuts.map((item, index) => {
+              const isProtected = isSystemProtected(item.shortcut)
+              // デバッグ用ログ（開発時のみ）
+              if (isProtected) {
+                console.log(`🔒 システム保護ショートカット検出: ${item.shortcut}`)
+              }
+              return (
+                <div
+                  key={index}
+                  className="shortcut-card"
+                  style={isProtected ? {
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)'
+                  } : {}}
+                  title={isProtected ? '⚠️ このショートカットはOSレベルで保護されており、ブラウザでキャプチャできません' : ''}
+                >
+                  <div className="shortcut-combo" style={isProtected ? { color: '#e74c3c' } : {}}>
+                    {isProtected && '🔒 '}
+                    {item.shortcut}
+                  </div>
+                  <div className="shortcut-desc" style={isProtected ? { color: '#c0392b' } : {}}>
+                    {item.description}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
