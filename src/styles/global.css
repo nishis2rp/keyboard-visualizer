@@ -528,8 +528,8 @@ h1 {
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   position: absolute;
-  top: 0;
-  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 10;
   box-shadow: var(--shadow-sm);
 }
