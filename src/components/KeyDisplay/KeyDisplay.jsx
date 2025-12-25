@@ -17,7 +17,7 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
     if (singleKeyShortcuts.length > 0) {
       return (
         <div className="display-area active" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
             <div className="shortcut-description-inline">
               <span className="description-icon">{selectedApp === 'gmail' ? '📧' : '⌨️'}</span>
               {selectedApp === 'gmail'
@@ -27,7 +27,7 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
             </div>
           </div>
           <div style={{ width: '100%' }}>
-            <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '10px' }}>利用可能な単独キーショートカット</h3>
+            <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '6px' }}>利用可能な単独キーショートカット</h3>
             <div className="shortcuts-grid">
               {singleKeyShortcuts.map((item, index) => (
                 <ShortcutCard
@@ -90,7 +90,7 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
   // 修飾キーのみが押されている場合、または利用可能なショートカット一覧を表示
   return (
     <div className="display-area active" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'center', marginBottom: availableShortcuts.length > 0 ? '12px' : '0' }}>
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'center', marginBottom: availableShortcuts.length > 0 ? '8px' : '0' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
           {sortedKeys.map((key, index) => (
             <div key={`${key}-${index}`} style={{ display: 'contents' }}>
@@ -109,7 +109,7 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
       </div>
       {availableShortcuts.length > 0 && (
         <div style={{ width: '100%' }}>
-          <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '10px' }}>利用可能なショートカット</h3>
+          <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '6px' }}>利用可能なショートカット</h3>
           <div className="shortcuts-grid">
             {availableShortcuts.map((item, index) => (
               <ShortcutCard
