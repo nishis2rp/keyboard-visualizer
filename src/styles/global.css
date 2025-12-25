@@ -521,15 +521,15 @@ h1 {
   display: flex;
   justify-content: flex-start;
   gap: 24px;
-  margin-top: 0;
+  margin: 16px;
   padding: 16px 20px;
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   position: absolute;
-  bottom: 0;
-  left: 0;
+  top: 0;
+  right: 0;
   z-index: 10;
   box-shadow: var(--shadow-sm);
 }
