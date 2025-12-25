@@ -28,3 +28,9 @@ dist-ssr
 *.backup2
 *.backup3
 nul
+
+# Scripts and temporary files
+scripts/
+
+# Claude Code settings
+.claude/settings.local.json
