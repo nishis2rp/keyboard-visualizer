@@ -118,7 +118,17 @@ h1 {
   display: flex;
   justify-content: center;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.app-selector::-webkit-scrollbar {
+  display: none;
 }
 
 .app-tab {
@@ -134,6 +144,7 @@ h1 {
   transition: all 0.25s ease;
   font-size: 0.875em;
   min-width: 90px;
+  flex-shrink: 0;
   box-shadow: var(--shadow-sm);
 }
 
