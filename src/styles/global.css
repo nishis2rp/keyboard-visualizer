@@ -364,7 +364,7 @@ h1 {
 /* Keyboard Layout - Apple Magic Keyboard Inspired */
 .keyboard-layout {
   margin: 24px 0;
-  padding: 32px;
+  padding: 48px;
   background: linear-gradient(145deg, #E8E8ED 0%, #D1D1D6 100%);
   border-radius: var(--radius-lg);
   box-shadow:
