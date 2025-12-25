@@ -1,4 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
+import AppHeader from './components/AppHeader'
+import AppSelector from './components/AppSelector'
+import KeyboardLayoutSelector from './components/KeyboardLayoutSelector'
 import KeyDisplay from './components/KeyDisplay'
 import KeyboardLayout from './components/KeyboardLayout'
 import { allShortcuts } from './data/shortcuts'
@@ -50,68 +53,23 @@ function App() {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-        <h1 style={{ margin: 0 }}>⌨️ キーボードビジュアライザー</h1>
-        <button
-          onClick={handleToggleFullscreen}
-          style={{
-            padding: '10px 20px',
-            fontSize: '14px',
-            fontWeight: '600',
-            borderRadius: '8px',
-            border: 'none',
-            background: fullscreenMode ? 'linear-gradient(135deg, #f093fb, #f5576c)' : 'linear-gradient(135deg, #667eea, #764ba2)',
-            color: 'white',
-            cursor: 'pointer',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
-            transition: 'all 0.3s ease',
-          }}
-          onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-          onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-          title="フルスクリーンモードでショートカット競合を軽減。Keyboard Lock APIによりほとんどのWinキーショートカットをキャプチャできますが、Win+L（ロック）などのセキュリティ関連はOSレベルで保護されています"
-        >
-          {fullscreenMode ? '🔲 全画面を終了' : '⛶ 全画面モード'}
-        </button>
-      </div>
-      <p className="subtitle">
-        アプリケーション別のショートカットを視覚的に表示します
-        {!fullscreenMode && <span style={{ color: '#e74c3c', fontWeight: '600', marginLeft: '10px' }}>
-          💡 Ctrl+WやWinキーなどの競合を防ぐには全画面モードを使用してください
-        </span>}
-      </p>
+      <AppHeader
+        fullscreenMode={fullscreenMode}
+        onToggleFullscreen={handleToggleFullscreen}
+      />
 
       <div className="selectors-container">
-        <div className="selector-section">
-          <h3 className="selector-title">アプリケーション</h3>
-          <div className="app-selector">
-            {apps.map(app => (
-              <button
-                key={app.id}
-                className={`app-tab ${selectedApp === app.id ? 'active' : ''}`}
-                onClick={() => setSelectedApp(app.id)}
-              >
-                <span className="app-icon">{app.icon}</span>
-                <span className="app-name">{app.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        <AppSelector
+          apps={apps}
+          selectedApp={selectedApp}
+          onSelectApp={setSelectedApp}
+        />
 
-        <div className="selector-section">
-          <h3 className="selector-title">キーボード配列</h3>
-          <div className="app-selector">
-            {keyboardLayouts.map(layout => (
-              <button
-                key={layout.id}
-                className={`app-tab ${keyboardLayout === layout.id ? 'active' : ''}`}
-                onClick={() => setKeyboardLayout(layout.id)}
-              >
-                <span className="app-icon">{layout.icon}</span>
-                <span className="app-name">{layout.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        <KeyboardLayoutSelector
+          layouts={keyboardLayouts}
+          selectedLayout={keyboardLayout}
+          onSelectLayout={setKeyboardLayout}
+        />
       </div>
 
       <KeyboardLayout
