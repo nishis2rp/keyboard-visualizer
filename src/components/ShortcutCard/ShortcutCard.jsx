@@ -21,17 +21,17 @@ const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
     console.log(`🔒 システム保護ショートカット検出: ${shortcut}`)
   }
 
-  // システム保護ショートカットのスタイル
+  // システム保護ショートカットのスタイル（Apple SF Red）
   const protectedStyle = {
     card: {
-      borderColor: '#e74c3c',
-      backgroundColor: 'rgba(231, 76, 60, 0.1)'
+      borderColor: '#FF3B30',
+      backgroundColor: 'rgba(255, 59, 48, 0.08)'
     },
     combo: {
-      color: '#e74c3c'
+      color: '#FF3B30'
     },
     description: {
-      color: '#c0392b'
+      color: '#E62E24'
     }
   }
 

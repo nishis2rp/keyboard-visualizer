@@ -18,27 +18,33 @@ const AppHeader = memo(({ fullscreenMode, onToggleFullscreen }) => {
         <button
           onClick={onToggleFullscreen}
           style={{
-            padding: '10px 20px',
-            fontSize: '14px',
+            padding: '12px 24px',
+            fontSize: '15px',
             fontWeight: '600',
-            borderRadius: '8px',
-            border: 'none',
-            background: fullscreenMode ? 'linear-gradient(135deg, #f093fb, #f5576c)' : 'linear-gradient(135deg, #667eea, #764ba2)',
-            color: 'white',
+            borderRadius: '12px',
+            border: '1px solid ' + (fullscreenMode ? '#FF3B30' : '#007AFF'),
+            background: fullscreenMode ? '#FF3B30' : '#007AFF',
+            color: '#FFFFFF',
             cursor: 'pointer',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
-            transition: 'all 0.3s ease',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+            transition: 'all 0.2s ease',
           }}
-          onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-          onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-1px)'
+            e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.16)'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(0)'
+            e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.12)'
+          }}
           title="フルスクリーンモードでショートカット競合を軽減。Keyboard Lock APIによりほとんどのWinキーショートカットをキャプチャできますが、Win+L（ロック）などのセキュリティ関連はOSレベルで保護されています"
         >
-          {fullscreenMode ? '🔲 全画面を終了' : '⛶ 全画面モード'}
+          {fullscreenMode ? '全画面を終了' : '全画面モード'}
         </button>
       </div>
       <p className="subtitle">
         アプリケーション別のショートカットを視覚的に表示します
-        {!fullscreenMode && <span style={{ color: '#e74c3c', fontWeight: '600', marginLeft: '10px' }}>
+        {!fullscreenMode && <span style={{ color: '#FF3B30', fontWeight: '600', marginLeft: '10px' }}>
           💡 Ctrl+WやWinキーなどの競合を防ぐには全画面モードを使用してください
         </span>}
       </p>
