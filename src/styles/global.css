@@ -105,6 +105,16 @@ h1 {
   max-width: 600px;
 }
 
+.selectors-container .selector-section:first-child {
+  flex: 2;
+  max-width: 800px;
+}
+
+.selectors-container .selector-section:last-child {
+  flex: 1;
+  max-width: 400px;
+}
+
 .selector-title {
   text-align: center;
   font-size: 0.875em;

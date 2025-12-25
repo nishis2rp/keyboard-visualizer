@@ -18,48 +18,84 @@ const AppHeader = memo(({ fullscreenMode, onToggleFullscreen }) => {
           margin: 0,
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
+          gap: '16px',
           fontSize: '2em',
           position: 'relative'
         }}>
-          <span style={{
-            position: 'relative',
-            display: 'inline-flex',
+          <div style={{
+            display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            width: '52px',
-            height: '52px',
-            background: 'linear-gradient(135deg, #007AFF 0%, #5856D6 50%, #FF2D55 100%)',
-            borderRadius: '14px',
-            fontSize: '1.5em',
-            boxShadow: '0 4px 20px rgba(0, 122, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-            transform: 'rotate(-3deg)',
-            transition: 'all 0.3s ease'
-          }}>⌨️</span>
+            gap: '6px'
+          }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '44px',
+              height: '44px',
+              background: 'linear-gradient(135deg, #4A90E2 0%, #357ABD 100%)',
+              borderRadius: '8px',
+              fontSize: '1.2em',
+              fontWeight: '700',
+              color: '#FFFFFF',
+              boxShadow: '0 2px 8px rgba(74, 144, 226, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+              border: '2px solid rgba(255, 255, 255, 0.3)'
+            }}>K</span>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '44px',
+              height: '44px',
+              background: 'linear-gradient(135deg, #50C9C9 0%, #38A3A5 100%)',
+              borderRadius: '8px',
+              fontSize: '1.2em',
+              fontWeight: '700',
+              color: '#FFFFFF',
+              boxShadow: '0 2px 8px rgba(80, 201, 201, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+              border: '2px solid rgba(255, 255, 255, 0.3)'
+            }}>S</span>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '44px',
+              height: '44px',
+              background: 'linear-gradient(135deg, #5FD9C2 0%, #4ABFA8 100%)',
+              borderRadius: '8px',
+              fontSize: '1.2em',
+              fontWeight: '700',
+              color: '#FFFFFF',
+              boxShadow: '0 2px 8px rgba(95, 217, 194, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+              border: '2px solid rgba(255, 255, 255, 0.3)'
+            }}>V</span>
+          </div>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             gap: '2px',
-            lineHeight: '1'
+            lineHeight: '1.1'
           }}>
             <span style={{
-              background: 'linear-gradient(135deg, #007AFF 0%, #5856D6 100%)',
+              background: 'linear-gradient(135deg, #4A90E2 0%, #50C9C9 50%, #5FD9C2 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              fontWeight: '700',
+              fontSize: '0.75em',
+              letterSpacing: '1px',
+              textTransform: 'uppercase'
+            }}>Keyboard Shortcut</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #4A90E2 0%, #50C9C9 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
               fontWeight: '800',
-              fontSize: '1.3em',
-              letterSpacing: '-2px',
+              fontSize: '0.85em',
+              letterSpacing: '2px',
               textTransform: 'uppercase'
-            }}>KeyViz</span>
-            <span style={{
-              color: '#6E6E73',
-              fontWeight: '500',
-              fontSize: '0.4em',
-              letterSpacing: '3px',
-              textTransform: 'uppercase',
-              marginLeft: '2px'
-            }}>Shortcut Visualizer</span>
+            }}>Visualizer</span>
           </div>
         </h1>
         <button
