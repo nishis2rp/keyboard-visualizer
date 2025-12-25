@@ -14,7 +14,35 @@ const AppHeader = memo(({ fullscreenMode, onToggleFullscreen }) => {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-        <h1 style={{ margin: 0 }}>⌨️ キーボードビジュアライザー</h1>
+        <h1 style={{
+          margin: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontSize: '2em'
+        }}>
+          <span style={{
+            fontSize: '1.8em',
+            background: 'linear-gradient(135deg, #007AFF 0%, #0051D5 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            filter: 'drop-shadow(0 2px 4px rgba(0, 122, 255, 0.2))'
+          }}>⌨️</span>
+          <span style={{
+            background: 'linear-gradient(135deg, #007AFF 0%, #0051D5 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            fontWeight: '700',
+            letterSpacing: '-1.5px'
+          }}>Keyboard</span>
+          <span style={{
+            color: '#1D1D1F',
+            fontWeight: '300',
+            letterSpacing: '-0.5px'
+          }}>Visualizer</span>
+        </h1>
         <button
           onClick={onToggleFullscreen}
           style={{
