@@ -1,5 +1,5 @@
 # ⌨️ キーボードビジュアライザー
-
+URL https://nishis2rp.github.io/keyboard-visualizer/
 アプリケーション別のキーボードショートカットをリアルタイムで視覚的に表示するReactアプリケーションです。
 
 ![GitHub Pages](https://img.shields.io/badge/demo-live-success)
