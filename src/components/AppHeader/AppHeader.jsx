@@ -18,30 +18,49 @@ const AppHeader = memo(({ fullscreenMode, onToggleFullscreen }) => {
           margin: 0,
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
-          fontSize: '2em'
+          gap: '8px',
+          fontSize: '2em',
+          position: 'relative'
         }}>
           <span style={{
-            fontSize: '1.8em',
-            background: 'linear-gradient(135deg, #007AFF 0%, #0051D5 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            filter: 'drop-shadow(0 2px 4px rgba(0, 122, 255, 0.2))'
+            position: 'relative',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '52px',
+            height: '52px',
+            background: 'linear-gradient(135deg, #007AFF 0%, #5856D6 50%, #FF2D55 100%)',
+            borderRadius: '14px',
+            fontSize: '1.5em',
+            boxShadow: '0 4px 20px rgba(0, 122, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+            transform: 'rotate(-3deg)',
+            transition: 'all 0.3s ease'
           }}>⌨️</span>
-          <span style={{
-            background: 'linear-gradient(135deg, #007AFF 0%, #0051D5 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            fontWeight: '700',
-            letterSpacing: '-1.5px'
-          }}>Keyboard</span>
-          <span style={{
-            color: '#1D1D1F',
-            fontWeight: '300',
-            letterSpacing: '-0.5px'
-          }}>Visualizer</span>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2px',
+            lineHeight: '1'
+          }}>
+            <span style={{
+              background: 'linear-gradient(135deg, #007AFF 0%, #5856D6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              fontWeight: '800',
+              fontSize: '1.3em',
+              letterSpacing: '-2px',
+              textTransform: 'uppercase'
+            }}>KeyViz</span>
+            <span style={{
+              color: '#6E6E73',
+              fontWeight: '500',
+              fontSize: '0.4em',
+              letterSpacing: '3px',
+              textTransform: 'uppercase',
+              marginLeft: '2px'
+            }}>Shortcut Visualizer</span>
+          </div>
         </h1>
         <button
           onClick={onToggleFullscreen}
