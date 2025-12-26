@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { detectOS, MACOS_CONFIGURABLE_SHORTCUTS } from '../../constants/systemProtectedShortcuts'
+import { detectOS } from '../../constants'
 import './SystemShortcutWarning.css'
 
 const SystemShortcutWarning = () => {
@@ -81,7 +81,7 @@ const SystemShortcutWarning = () => {
               <div className="solution-item">
                 <h4>主な競合ショートカット</h4>
                 <div className="shortcut-list">
-                  {Array.from(MACOS_CONFIGURABLE_SHORTCUTS).slice(0, 10).map((shortcut) => (
+                  {['Ctrl + F2', 'Ctrl + F3', 'F3', 'F4', 'Ctrl + ↑', 'Ctrl + ↓', 'Ctrl + ←', 'Ctrl + →', 'Cmd + Shift + 3', 'Cmd + Shift + 4'].map((shortcut) => (
                     <code key={shortcut} className="shortcut-badge">{shortcut}</code>
                   ))}
                 </div>
