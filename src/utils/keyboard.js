@@ -29,6 +29,7 @@ const SHIFT_NUMBER_MAP = {
 /**
  * Shiftキーが押されている時に、記号キーを元のキーに正規化
  * 例: Shift押下中に'!'が来た場合 → '1'に変換
+ * macOSでCmd+文字キーを押すと大文字小文字が変わることがあるため正規化
  * @param {string} key - キー名
  * @param {boolean} shiftPressed - Shiftキーが押されているか
  * @returns {string} 正規化されたキー名
@@ -38,6 +39,12 @@ export const normalizeKey = (key, shiftPressed) => {
   if (shiftPressed && SHIFT_NUMBER_MAP[key]) {
     return SHIFT_NUMBER_MAP[key]
   }
+
+  // アルファベット1文字の場合は小文字に統一（macOSのCmd+キーの大文字小文字問題対策）
+  if (key.length === 1 && /[a-zA-Z]/.test(key)) {
+    return key.toLowerCase()
+  }
+
   return key
 }
 
