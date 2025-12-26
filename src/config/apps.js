@@ -5,11 +5,11 @@
  */
 export const apps = [
   { id: 'windows11', name: 'Windows 11', icon: '🪟' },
+  { id: 'macos', name: 'macOS', icon: '🍎' },
   { id: 'chrome', name: 'Chrome', icon: '🌐' },
   { id: 'excel', name: 'Excel', icon: '📊' },
   { id: 'slack', name: 'Slack', icon: '💬' },
   { id: 'gmail', name: 'Gmail', icon: '📧' },
-  { id: 'macos', name: 'macOS', icon: '🍎' },
 ]
 
 /**

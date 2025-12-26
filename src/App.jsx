@@ -4,6 +4,7 @@ import AppSelector from './components/AppSelector'
 import KeyboardLayoutSelector from './components/KeyboardLayoutSelector'
 import KeyDisplay from './components/KeyDisplay'
 import KeyboardLayout from './components/KeyboardLayout'
+import SystemShortcutWarning from './components/SystemShortcutWarning'
 import { allShortcuts } from './data/shortcuts'
 import { apps, keyboardLayouts, getKeyNameMap } from './config'
 import { specialKeys } from './constants'
@@ -53,6 +54,9 @@ function App() {
 
   return (
     <div className="container">
+      {/* macOSシステムショートカット警告 */}
+      <SystemShortcutWarning />
+
       <AppHeader
         fullscreenMode={fullscreenMode}
         onToggleFullscreen={handleToggleFullscreen}

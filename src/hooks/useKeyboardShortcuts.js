@@ -20,6 +20,13 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     })
   }
 
+  // すべてのキー状態をクリアする関数
+  const clearAllKeys = () => {
+    setPressedKeys(new Set())
+    setCurrentDescription(null)
+    setAvailableShortcuts([])
+  }
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       const key = e.key
@@ -116,20 +123,91 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       })
     }
 
+    // ウィンドウがフォーカスを失ったときに全キーをクリア
     const handleBlur = () => {
-      setPressedKeys(new Set())
-      setCurrentDescription(null)
-      setAvailableShortcuts([])
+      clearAllKeys()
+    }
+
+    // ページが非表示になったときに全キーをクリア（macOSの不具合対策）
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        clearAllKeys()
+      }
+    }
+
+    // 修飾キーの状態をチェックして、実際には押されていないのに残っているキーをクリア
+    const handleModifierCheck = (e) => {
+      setPressedKeys(prev => {
+        const newSet = new Set(prev)
+        let changed = false
+
+        // Meta/Command キーが押されていない場合、Meta キーを削除
+        if (!e.metaKey && (prev.has('Meta') || prev.has('OS'))) {
+          newSet.delete('Meta')
+          newSet.delete('OS')
+          changed = true
+        }
+
+        // Ctrl キーが押されていない場合、Control キーを削除
+        if (!e.ctrlKey && prev.has('Control')) {
+          newSet.delete('Control')
+          changed = true
+        }
+
+        // Alt キーが押されていない場合、Alt キーを削除
+        if (!e.altKey && prev.has('Alt')) {
+          newSet.delete('Alt')
+          changed = true
+        }
+
+        // Shift キーが押されていない場合、Shift キーを削除
+        if (!e.shiftKey && prev.has('Shift')) {
+          newSet.delete('Shift')
+          changed = true
+        }
+
+        // 修飾キーが全て解放されたら、すべてのキーをクリア
+        if (changed && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+          clearAllKeys()
+          return new Set()
+        }
+
+        if (changed) {
+          // 状態を更新
+          if (newSet.size === 0) {
+            setCurrentDescription(null)
+            setAvailableShortcuts([])
+          } else {
+            const comboText = getKeyComboText(Array.from(newSet), keyNameMap)
+            const description = getShortcutDescription(comboText, shortcutDescriptions)
+            setCurrentDescription(description)
+            const shortcuts = getAvailableShortcuts(Array.from(newSet), keyNameMap, shortcutDescriptions)
+            setAvailableShortcuts(shortcuts)
+          }
+        }
+
+        return changed ? newSet : prev
+      })
     }
 
     document.addEventListener('keydown', handleKeyDown)
     document.addEventListener('keyup', handleKeyUp)
     window.addEventListener('blur', handleBlur)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    // マウス操作時に修飾キーの状態をチェック（macOS対策）
+    document.addEventListener('mousedown', handleModifierCheck)
+    document.addEventListener('mousemove', handleModifierCheck)
+    document.addEventListener('click', handleModifierCheck)
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
       window.removeEventListener('blur', handleBlur)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      document.removeEventListener('mousedown', handleModifierCheck)
+      document.removeEventListener('mousemove', handleModifierCheck)
+      document.removeEventListener('click', handleModifierCheck)
     }
   }, [pressedKeys, shortcutDescriptions, keyNameMap])
 
