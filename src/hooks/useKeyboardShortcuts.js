@@ -118,10 +118,22 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       // デバッグログ（より詳細に）
       console.log(`🔼 [keyup] key="${e.key}" code="${e.code}" normalized="${key}" | meta=${e.metaKey} ctrl=${e.ctrlKey} shift=${e.shiftKey} alt=${e.altKey} | pressedKeys:`, Array.from(pressedKeys))
 
-      // 修飾キーが離された場合は、全ての非修飾キーもクリア（macOS対策）
-      const isModifierKey = ['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(key)
-      if (isModifierKey) {
-        console.log(`✅ [keyup] 修飾キー "${key}" が離されたので、全キーをクリアします`)
+      // 新しいアプローチ: keyup時に実際の修飾キーの状態をチェック
+      // 記録されている修飾キーが実際には押されていない場合は全クリア
+      const hasRecordedMeta = pressedKeys.has('Meta') || pressedKeys.has('OS')
+      const hasRecordedCtrl = pressedKeys.has('Control')
+      const hasRecordedShift = pressedKeys.has('Shift')
+      const hasRecordedAlt = pressedKeys.has('Alt')
+
+      // 記録されているが実際には押されていない修飾キーがある場合
+      const shouldClear =
+        (hasRecordedMeta && !e.metaKey) ||
+        (hasRecordedCtrl && !e.ctrlKey) ||
+        (hasRecordedShift && !e.shiftKey) ||
+        (hasRecordedAlt && !e.altKey)
+
+      if (shouldClear) {
+        console.log(`✅ [keyup] 修飾キーの不一致を検出、全キーをクリアします (recorded: Meta=${hasRecordedMeta}, Ctrl=${hasRecordedCtrl}, Shift=${hasRecordedShift}, Alt=${hasRecordedAlt} | actual: meta=${e.metaKey}, ctrl=${e.ctrlKey}, shift=${e.shiftKey}, alt=${e.altKey})`)
         if (pressedKeys.size > 0) {
           addToHistory(Array.from(pressedKeys))
         }
