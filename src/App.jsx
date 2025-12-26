@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import AppHeader from './components/AppHeader'
 import AppSelector from './components/AppSelector'
 import KeyboardLayoutSelector from './components/KeyboardLayoutSelector'
@@ -8,50 +8,65 @@ import SystemShortcutWarning from './components/SystemShortcutWarning'
 import SetupScreen from './components/SetupScreen'
 import { allShortcuts } from './data/shortcuts'
 import { apps, keyboardLayouts, getKeyNameMap } from './config'
-import { specialKeys } from './constants'
-import { getKeyDisplayName, toggleFullscreen, isFullscreen, onFullscreenChange } from './utils'
-import { useKeyboardShortcuts } from './hooks'
+import { specialKeys, SETUP_VERSION, STORAGE_KEYS, DEFAULTS } from './constants'
+import { getKeyDisplayName } from './utils'
+import { useKeyboardShortcuts, useLocalStorage, useFullscreen } from './hooks'
 import './styles/global.css'
 
-const SETUP_VERSION = 'v2'
-
+/**
+ * メインアプリケーションコンポーネント
+ * キーボードビジュアライザーのルートコンポーネント
+ */
 function App() {
-  const [showSetup, setShowSetup] = useState(true)
-  const [selectedApp, setSelectedApp] = useState('windows11')
-  const [keyboardLayout, setKeyboardLayout] = useState('windows-jis')
-  const [fullscreenMode, setFullscreenMode] = useState(false)
-
-  useEffect(() => {
-    const savedSetup = localStorage.getItem('keyboard-visualizer-setup')
-    if (savedSetup) {
-      try {
-        const setup = JSON.parse(savedSetup)
-        if (setup.setupCompleted && setup.version === SETUP_VERSION) {
-          setSelectedApp(setup.app)
-          setKeyboardLayout(setup.layout)
-          setShowSetup(false)
-        } else {
-          localStorage.removeItem('keyboard-visualizer-setup')
-          setShowSetup(true)
-        }
-      } catch (e) {
-        console.error('Failed to parse saved setup:', e)
-        localStorage.removeItem('keyboard-visualizer-setup')
-        setShowSetup(true)
-      }
+  // セットアップ情報をLocalStorageから読み込み
+  const [setup, setSetup] = useLocalStorage(
+    STORAGE_KEYS.SETUP,
+    { setupCompleted: false, app: DEFAULTS.APP, layout: DEFAULTS.LAYOUT },
+    {
+      version: SETUP_VERSION,
+      validator: (data) => data && typeof data.app === 'string' && typeof data.layout === 'string'
     }
-  }, [])
+  )
 
-  const handleSetupComplete = (app, layout) => {
+  // セットアップ完了状態
+  const [showSetup, setShowSetup] = useState(!setup.setupCompleted)
+
+  // 選択されているアプリとキーボードレイアウト
+  const [selectedApp, setSelectedApp] = useState(setup.app || DEFAULTS.APP)
+  const [keyboardLayout, setKeyboardLayout] = useState(setup.layout || DEFAULTS.LAYOUT)
+
+  // フルスクリーン管理
+  const { isFullscreenMode, toggleFullscreenMode } = useFullscreen()
+
+  /**
+   * セットアップ完了時のハンドラー
+   * @param {string} app - 選択されたアプリ
+   * @param {string} layout - 選択されたキーボードレイアウト
+   */
+  const handleSetupComplete = useCallback((app, layout) => {
     setSelectedApp(app)
     setKeyboardLayout(layout)
+    setSetup({
+      setupCompleted: true,
+      app,
+      layout
+    })
     setShowSetup(false)
-  }
+  }, [setSetup])
 
-  const shortcutDescriptions = useMemo(() => allShortcuts[selectedApp], [selectedApp])
+  // 現在選択されているアプリのショートカット定義
+  const shortcutDescriptions = useMemo(
+    () => allShortcuts[selectedApp],
+    [selectedApp]
+  )
 
-  const keyNameMap = useMemo(() => getKeyNameMap(keyboardLayout), [keyboardLayout])
+  // 現在選択されているキーボードレイアウトのキー名マップ
+  const keyNameMap = useMemo(
+    () => getKeyNameMap(keyboardLayout),
+    [keyboardLayout]
+  )
 
+  // キーボードショートカットフック
   const {
     pressedKeys,
     history,
@@ -60,36 +75,34 @@ function App() {
     handleClear
   } = useKeyboardShortcuts(shortcutDescriptions, keyNameMap)
 
+  /**
+   * キー表示名を取得する関数（メモ化済み）
+   * @param {string} key - キー名
+   * @returns {string} 表示用のキー名
+   */
   const getKeyDisplayNameWithMap = useCallback(
     (key) => getKeyDisplayName(key, keyNameMap),
     [keyNameMap]
   )
 
-  useEffect(() => {
-    setFullscreenMode(isFullscreen())
-    const cleanup = onFullscreenChange((isFs) => {
-      setFullscreenMode(isFs)
-    })
-    return cleanup
-  }, [])
-
-  const handleToggleFullscreen = useCallback(() => {
-    toggleFullscreen()
-  }, [])
-
+  // セットアップ画面を表示
   if (showSetup) {
     return <SetupScreen onSetupComplete={handleSetupComplete} />
   }
 
+  // メインアプリケーション画面
   return (
     <div className="container">
+      {/* macOSシステムショートカット警告 */}
       <SystemShortcutWarning />
 
+      {/* ヘッダー（タイトルとフルスクリーン切り替え） */}
       <AppHeader
-        fullscreenMode={fullscreenMode}
-        onToggleFullscreen={handleToggleFullscreen}
+        fullscreenMode={isFullscreenMode}
+        onToggleFullscreen={toggleFullscreenMode}
       />
 
+      {/* アプリ選択とキーボードレイアウト選択 */}
       <div className="selectors-container">
         <AppSelector
           apps={apps}
@@ -104,6 +117,7 @@ function App() {
         />
       </div>
 
+      {/* キーボードレイアウト表示 */}
       <KeyboardLayout
         pressedKeys={pressedKeys}
         specialKeys={specialKeys}
@@ -112,6 +126,7 @@ function App() {
         keyboardLayout={keyboardLayout}
       />
 
+      {/* キー表示エリア（押下中のキー、説明、利用可能なショートカット） */}
       <KeyDisplay
         pressedKeys={pressedKeys}
         specialKeys={specialKeys}
