@@ -30,9 +30,14 @@ function App() {
           setSelectedApp(setup.app)
           setKeyboardLayout(setup.layout)
           setShowSetup(false)
+        } else {
+          localStorage.removeItem('keyboard-visualizer-setup')
+          setShowSetup(true)
         }
       } catch (e) {
         console.error('Failed to parse saved setup:', e)
+        localStorage.removeItem('keyboard-visualizer-setup')
+        setShowSetup(true)
       }
     }
   }, [])

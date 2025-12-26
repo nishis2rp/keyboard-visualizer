@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { getKeyComboText, getShortcutDescription, getAvailableShortcuts } from '../utils'
 
 export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
@@ -6,7 +6,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
   const [history, setHistory] = useState([])
   const [currentDescription, setCurrentDescription] = useState(null)
   const [availableShortcuts, setAvailableShortcuts] = useState([])
-  const lastKeyEventTime = useRef(Date.now())
 
   const addToHistory = (keys) => {
     const comboText = getKeyComboText(keys, keyNameMap)
@@ -30,7 +29,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       const key = e.key
-      lastKeyEventTime.current = Date.now()
 
       if (pressedKeys.has(key)) {
         return
@@ -84,7 +82,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
 
     const handleKeyUp = (e) => {
       const key = e.key
-      lastKeyEventTime.current = Date.now()
 
       setPressedKeys(prev => {
         if (prev.has(key)) {
@@ -124,65 +121,15 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
 
     const handleFocus = () => {
       setTimeout(() => {
-        setPressedKeys(prev => {
-          if (prev.size > 0) {
-            clearAllKeys()
-            return new Set()
-          }
-          return prev
-        })
+        clearAllKeys()
       }, 50)
     }
-
-    const handleMouseEvent = (e) => {
-      setPressedKeys(prev => {
-        if (prev.size === 0) return prev
-
-        let shouldClear = false
-        const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
-        const hasModifierKeys = Array.from(prev).some(key => modifierKeys.includes(key))
-        const hasNonModifierKeys = Array.from(prev).some(key => !modifierKeys.includes(key))
-
-        if (hasModifierKeys && !hasNonModifierKeys) {
-          if (!e.metaKey && (prev.has('Meta') || prev.has('OS'))) shouldClear = true
-          if (!e.ctrlKey && prev.has('Control')) shouldClear = true
-          if (!e.altKey && prev.has('Alt')) shouldClear = true
-          if (!e.shiftKey && prev.has('Shift')) shouldClear = true
-        }
-
-        if (shouldClear) {
-          clearAllKeys()
-          return new Set()
-        }
-
-        return prev
-      })
-    }
-
-    const intervalId = setInterval(() => {
-      const now = Date.now()
-      const timeSinceLastEvent = now - lastKeyEventTime.current
-      
-      if (timeSinceLastEvent > 2000) {
-        setPressedKeys(prev => {
-          if (prev.size > 0) {
-            clearAllKeys()
-            return new Set()
-          }
-          return prev
-        })
-      }
-    }, 500)
 
     document.addEventListener('keydown', handleKeyDown, true)
     document.addEventListener('keyup', handleKeyUp, true)
     window.addEventListener('blur', handleBlur)
     window.addEventListener('focus', handleFocus)
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    
-    document.addEventListener('mousemove', handleMouseEvent)
-    document.addEventListener('mousedown', handleMouseEvent)
-    document.addEventListener('click', handleMouseEvent)
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown, true)
@@ -190,10 +137,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       window.removeEventListener('blur', handleBlur)
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
-      document.removeEventListener('mousemove', handleMouseEvent)
-      document.removeEventListener('mousedown', handleMouseEvent)
-      document.removeEventListener('click', handleMouseEvent)
-      clearInterval(intervalId)
     }
   }, [pressedKeys, shortcutDescriptions, keyNameMap])
 
