@@ -6,7 +6,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
   const [history, setHistory] = useState([])
   const [currentDescription, setCurrentDescription] = useState(null)
   const [availableShortcuts, setAvailableShortcuts] = useState([])
-  const lastKeyPressTime = useRef(Date.now())
+  const lastKeyEventTime = useRef(Date.now())
 
   const addToHistory = (keys) => {
     const comboText = getKeyComboText(keys, keyNameMap)
@@ -21,7 +21,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     })
   }
 
-  // すべてのキー状態をクリアする関数
   const clearAllKeys = () => {
     setPressedKeys(new Set())
     setCurrentDescription(null)
@@ -31,62 +30,51 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       const key = e.key
-      lastKeyPressTime.current = Date.now()
+      lastKeyEventTime.current = Date.now()
 
-      // 重複キー押下を防ぐ
       if (pressedKeys.has(key)) {
         return
       }
 
-      // 新しいキーセットを作成してショートカットをチェック
       const newKeys = new Set(pressedKeys)
       newKeys.add(key)
       const comboText = getKeyComboText(Array.from(newKeys), keyNameMap)
       const description = getShortcutDescription(comboText, shortcutDescriptions)
 
-      // ショートカットが登録されている場合はpreventDefault
       if (description) {
         e.preventDefault()
         e.stopPropagation()
       }
 
-      // F5とCtrl+Rはページリロードを防ぐために特別に処理
       if (key === 'F5' || (e.ctrlKey && key === 'r')) {
         e.preventDefault()
         e.stopPropagation()
       }
 
-      // 修飾キー（Ctrl、Alt、Shift、Meta/Win）が押されている場合は
-      // ブラウザのデフォルト動作を無効化
       if (e.ctrlKey || e.altKey || e.metaKey) {
         e.preventDefault()
         e.stopPropagation()
       }
 
-      // すべての修飾キー自体もpreventDefault
       const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
       if (modifierKeys.includes(key)) {
         e.preventDefault()
         e.stopPropagation()
       }
 
-      // Fキー（F1-F12）も全てpreventDefault
       if (key.startsWith('F') && key.length <= 3) {
         e.preventDefault()
         e.stopPropagation()
       }
 
-      // 状態更新
       setPressedKeys(prev => {
         const newSet = new Set(prev)
         newSet.add(key)
 
-        // 現在のショートカットの説明を更新
         const comboText = getKeyComboText(Array.from(newSet), keyNameMap)
         const description = getShortcutDescription(comboText, shortcutDescriptions)
         setCurrentDescription(description)
 
-        // 利用可能なショートカット一覧を更新
         const shortcuts = getAvailableShortcuts(Array.from(newSet), keyNameMap, shortcutDescriptions)
         setAvailableShortcuts(shortcuts)
 
@@ -96,6 +84,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
 
     const handleKeyUp = (e) => {
       const key = e.key
+      lastKeyEventTime.current = Date.now()
 
       setPressedKeys(prev => {
         if (prev.has(key)) {
@@ -105,7 +94,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
           const newSet = new Set(prev)
           newSet.delete(key)
 
-          // キーが離されたら説明をクリア、または残りのキーの説明を表示
           if (newSet.size === 0) {
             setCurrentDescription(null)
             setAvailableShortcuts([])
@@ -114,7 +102,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
             const description = getShortcutDescription(comboText, shortcutDescriptions)
             setCurrentDescription(description)
 
-            // 利用可能なショートカット一覧を更新
             const shortcuts = getAvailableShortcuts(Array.from(newSet), keyNameMap, shortcutDescriptions)
             setAvailableShortcuts(shortcuts)
           }
@@ -125,19 +112,16 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       })
     }
 
-    // ウィンドウがフォーカスを失ったときに全キーをクリア
     const handleBlur = () => {
       clearAllKeys()
     }
 
-    // ページが非表示になったときに全キーをクリア
     const handleVisibilityChange = () => {
       if (document.hidden) {
         clearAllKeys()
       }
     }
 
-    // フォーカスが戻ったときにもクリア（念のため）
     const handleFocus = () => {
       setTimeout(() => {
         setPressedKeys(prev => {
@@ -150,28 +134,23 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       }, 50)
     }
 
-    // マウス操作時に修飾キーの状態をチェック（高速レスポンス）
     const handleMouseEvent = (e) => {
       setPressedKeys(prev => {
         if (prev.size === 0) return prev
 
+        let shouldClear = false
         const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
-        const hasModifiers = Array.from(prev).some(key => modifierKeys.includes(key))
+        const hasModifierKeys = Array.from(prev).some(key => modifierKeys.includes(key))
+        const hasNonModifierKeys = Array.from(prev).some(key => !modifierKeys.includes(key))
 
-        // 修飾キーが押されていないのに、キーが残っている場合は即座にクリア
-        if (!e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey && hasModifiers) {
-          clearAllKeys()
-          return new Set()
+        if (hasModifierKeys && !hasNonModifierKeys) {
+          if (!e.metaKey && (prev.has('Meta') || prev.has('OS'))) shouldClear = true
+          if (!e.ctrlKey && prev.has('Control')) shouldClear = true
+          if (!e.altKey && prev.has('Alt')) shouldClear = true
+          if (!e.shiftKey && prev.has('Shift')) shouldClear = true
         }
 
-        // 実際の修飾キー状態とpressedKeysの不一致をチェック
-        let needsClear = false
-        if (!e.metaKey && (prev.has('Meta') || prev.has('OS'))) needsClear = true
-        if (!e.ctrlKey && prev.has('Control')) needsClear = true
-        if (!e.altKey && prev.has('Alt')) needsClear = true
-        if (!e.shiftKey && prev.has('Shift')) needsClear = true
-
-        if (needsClear) {
+        if (shouldClear) {
           clearAllKeys()
           return new Set()
         }
@@ -180,11 +159,11 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       })
     }
 
-    // 定期的にキー状態をチェック（高速化: 200msごと、タイムアウト500ms）
     const intervalId = setInterval(() => {
       const now = Date.now()
-      // 500ms以上キーイベントがない場合、全てクリア
-      if (now - lastKeyPressTime.current > 500) {
+      const timeSinceLastEvent = now - lastKeyEventTime.current
+      
+      if (timeSinceLastEvent > 2000) {
         setPressedKeys(prev => {
           if (prev.size > 0) {
             clearAllKeys()
@@ -193,7 +172,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
           return prev
         })
       }
-    }, 200)
+    }, 500)
 
     document.addEventListener('keydown', handleKeyDown, true)
     document.addEventListener('keyup', handleKeyUp, true)
@@ -201,7 +180,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     window.addEventListener('focus', handleFocus)
     document.addEventListener('visibilitychange', handleVisibilityChange)
     
-    // マウスイベントで即座にチェック（高速レスポンス）
     document.addEventListener('mousemove', handleMouseEvent)
     document.addEventListener('mousedown', handleMouseEvent)
     document.addEventListener('click', handleMouseEvent)
