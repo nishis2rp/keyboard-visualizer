@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './SetupScreen.css'
+const SETUP_VERSION = 'v2'
 
 const SetupScreen = ({ onSetupComplete }) => {
   const [selectedOption, setSelectedOption] = useState(null)
@@ -40,7 +41,8 @@ const SetupScreen = ({ onSetupComplete }) => {
       localStorage.setItem('keyboard-visualizer-setup', JSON.stringify({
         app: selectedOption.app,
         layout: selectedOption.layout,
-        setupCompleted: true
+        setupCompleted: true,
+        version: SETUP_VERSION
       }))
 
       onSetupComplete(selectedOption.app, selectedOption.layout)

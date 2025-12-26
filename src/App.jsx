@@ -13,6 +13,8 @@ import { getKeyDisplayName, toggleFullscreen, isFullscreen, onFullscreenChange }
 import { useKeyboardShortcuts } from './hooks'
 import './styles/global.css'
 
+const SETUP_VERSION = 'v2'
+
 function App() {
   const [showSetup, setShowSetup] = useState(true)
   const [selectedApp, setSelectedApp] = useState('windows11')
@@ -24,7 +26,7 @@ function App() {
     if (savedSetup) {
       try {
         const setup = JSON.parse(savedSetup)
-        if (setup.setupCompleted) {
+        if (setup.setupCompleted && setup.version === SETUP_VERSION) {
           setSelectedApp(setup.app)
           setKeyboardLayout(setup.layout)
           setShowSetup(false)
