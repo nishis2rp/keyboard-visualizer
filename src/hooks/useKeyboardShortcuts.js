@@ -27,20 +27,20 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     setAvailableShortcuts([])
   }
 
-  // 定期的にキー状態をチェック
+  // 定期的にキー状態をチェック（高速化：100ms間隔、200msでクリア）
   useEffect(() => {
     const checkInterval = setInterval(() => {
       const now = Date.now()
       const timeSinceLastKeyPress = now - lastKeyPressTime
 
-      // 何かキーが押されている状態で、かつ最後のキー操作から500ms以上経過している場合
-      if (pressedKeys.size > 0 && timeSinceLastKeyPress > 500) {
+      // 何かキーが押されている状態で、かつ最後のキー操作から200ms以上経過している場合
+      if (pressedKeys.size > 0 && timeSinceLastKeyPress > 200) {
         if (import.meta.env.DEV) {
-          console.log('[定期チェック] キーが500ms以上押されたまま、クリアします:', Array.from(pressedKeys), `経過時間: ${timeSinceLastKeyPress}ms`)
+          console.log('[定期チェック] キーが200ms以上押されたまま、クリアします:', Array.from(pressedKeys), `経過時間: ${timeSinceLastKeyPress}ms`)
         }
         clearAllKeys()
       }
-    }, 200) // 200msごとにチェック
+    }, 100) // 100msごとにチェック（高速化）
 
     return () => clearInterval(checkInterval)
   }, [pressedKeys, lastKeyPressTime])
@@ -164,7 +164,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       }, 50)
     }
 
-    // マウス操作時に修飾キーの状態をチェック
+    // マウス操作時に修飾キーの状態をチェック（即座にクリア）
     const handleMouseEvent = (e) => {
       // キーが何も押されていない場合はスキップ
       if (pressedKeys.size === 0) return
@@ -176,14 +176,20 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       if (e.altKey) actualModifiers.add('Alt')
       if (e.metaKey) actualModifiers.add('Meta')
 
-      // 記録されている修飾キーと実際の状態が異なる場合はクリア
+      // 記録されているキーを確認
       const recordedModifiers = new Set(
         Array.from(pressedKeys).filter(key =>
           ['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(key)
         )
       )
 
+      const recordedNonModifiers = Array.from(pressedKeys).filter(key =>
+        !['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(key)
+      )
+
       let needsClear = false
+
+      // 1. 記録されている修飾キーが実際には押されていない場合
       for (const mod of recordedModifiers) {
         if (!actualModifiers.has(mod)) {
           needsClear = true
@@ -191,21 +197,22 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
         }
       }
 
-      // 修飾キーのみが押されている状態で文字キーが記録されている場合もクリア
-      if (!needsClear && pressedKeys.size > actualModifiers.size) {
-        const hasNonModifierKeys = Array.from(pressedKeys).some(key =>
-          !['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(key)
-        )
-        if (hasNonModifierKeys && actualModifiers.size === 0) {
-          needsClear = true
-        }
+      // 2. 修飾キーが全て離されているのに文字キーが記録されている場合
+      if (!needsClear && recordedNonModifiers.length > 0 && actualModifiers.size === 0) {
+        needsClear = true
+      }
+
+      // 3. 実際の修飾キーより多くのキーが記録されている場合（文字キーが残っている）
+      if (!needsClear && pressedKeys.size > actualModifiers.size && recordedNonModifiers.length > 0) {
+        needsClear = true
       }
 
       if (needsClear) {
         if (import.meta.env.DEV) {
-          console.log('[Mouse Event] キー状態の不一致を検出、クリアします', {
+          console.log('[Mouse Event] キー状態の不一致を即座に検出、クリアします', {
             recorded: Array.from(pressedKeys),
-            actual: Array.from(actualModifiers)
+            actualModifiers: Array.from(actualModifiers),
+            recordedNonModifiers
           })
         }
         clearAllKeys()
