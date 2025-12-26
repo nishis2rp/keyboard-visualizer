@@ -80,7 +80,8 @@ export const windowsJisLayout = [
     { key: '.', display: '.', width: 1 },
     { key: '/', display: '/', width: 1 },
     { key: '_', display: '_', width: 1 },
-    { key: 'Shift', display: 'Shift', width: 1.75 },
+    { key: 'Shift', display: 'Shift', width: 0.75 },
+    { key: 'ArrowUp', display: '↑', width: 1 },
   ],
   // 6行目
   [
@@ -90,11 +91,6 @@ export const windowsJisLayout = [
     { key: ' ', display: 'Space', width: 5 },
     { key: 'Alt', display: 'Alt', width: 1.25 },
     { key: 'Meta', display: 'Win', width: 1.25 },
-    { key: 'Control', display: 'Ctrl', width: 1.5 },
-  ],
-  // 7行目 (カーソルキー)
-  [
-    { key: 'ArrowUp', display: '↑', width: 1 },
     { key: 'ArrowLeft', display: '←', width: 1 },
     { key: 'ArrowDown', display: '↓', width: 1 },
     { key: 'ArrowRight', display: '→', width: 1 },

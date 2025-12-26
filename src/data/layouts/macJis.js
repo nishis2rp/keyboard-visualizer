@@ -80,7 +80,8 @@ export const macJisLayout = [
     { key: '.', display: '.', width: 1 },
     { key: '/', display: '/', width: 1 },
     { key: '_', display: '_', width: 1 },
-    { key: 'Shift', display: 'shift', width: 1.75 },
+    { key: 'Shift', display: 'shift', width: 0.75 },
+    { key: 'ArrowUp', display: '↑', width: 1 },
   ],
   // 6行目
   [
@@ -89,12 +90,7 @@ export const macJisLayout = [
     { key: 'Meta', display: 'command', width: 1.5 },
     { key: ' ', display: '', width: 4.5 },
     { key: 'Meta', display: 'command', width: 1.5 },
-    { key: 'Alt', display: 'option', width: 1.25 },
-    { key: 'Control', display: 'control', width: 1.25 },
-  ],
-  // 7行目 (カーソルキー)
-  [
-    { key: 'ArrowUp', display: '↑', width: 1 },
+    { key: 'Alt', display: 'option', width: 0.25 },
     { key: 'ArrowLeft', display: '←', width: 1 },
     { key: 'ArrowDown', display: '↓', width: 1 },
     { key: 'ArrowRight', display: '→', width: 1 },
