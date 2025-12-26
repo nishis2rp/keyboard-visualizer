@@ -118,30 +118,38 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       // デバッグログ（より詳細に）
       console.log(`🔼 [keyup] key="${e.key}" code="${e.code}" normalized="${key}" | meta=${e.metaKey} ctrl=${e.ctrlKey} shift=${e.shiftKey} alt=${e.altKey} | pressedKeys:`, Array.from(pressedKeys))
 
-      // 新しいアプローチ: keyup時に実際の修飾キーの状態をチェック
-      // 記録されている修飾キーが実際には押されていない場合は全クリア
-      const hasRecordedMeta = pressedKeys.has('Meta') || pressedKeys.has('OS')
-      const hasRecordedCtrl = pressedKeys.has('Control')
-      const hasRecordedShift = pressedKeys.has('Shift')
-      const hasRecordedAlt = pressedKeys.has('Alt')
+      // 修飾キーが離された場合の処理
+      const isModifierKey = ['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(key)
 
-      // 記録されているが実際には押されていない修飾キーがある場合
-      const shouldClear =
-        (hasRecordedMeta && !e.metaKey) ||
-        (hasRecordedCtrl && !e.ctrlKey) ||
-        (hasRecordedShift && !e.shiftKey) ||
-        (hasRecordedAlt && !e.altKey)
+      if (isModifierKey) {
+        console.log(`🔑 [keyup] 修飾キー "${key}" が離されました`)
+        // 修飾キーが離された場合は、そのキーだけを削除（通常処理に進む）
+        // 全クリアはしない
+      } else {
+        // 文字キーが離された場合のみ、修飾キーの不一致をチェック
+        const hasRecordedMeta = pressedKeys.has('Meta') || pressedKeys.has('OS')
+        const hasRecordedCtrl = pressedKeys.has('Control')
+        const hasRecordedShift = pressedKeys.has('Shift')
+        const hasRecordedAlt = pressedKeys.has('Alt')
 
-      if (shouldClear) {
-        console.log(`✅ [keyup] 修飾キーの不一致を検出、全キーをクリアします (recorded: Meta=${hasRecordedMeta}, Ctrl=${hasRecordedCtrl}, Shift=${hasRecordedShift}, Alt=${hasRecordedAlt} | actual: meta=${e.metaKey}, ctrl=${e.ctrlKey}, shift=${e.shiftKey}, alt=${e.altKey})`)
-        if (pressedKeys.size > 0) {
-          addToHistory(Array.from(pressedKeys))
+        // 記録されているが実際には押されていない修飾キーがある場合
+        const shouldClear =
+          (hasRecordedMeta && !e.metaKey) ||
+          (hasRecordedCtrl && !e.ctrlKey) ||
+          (hasRecordedShift && !e.shiftKey) ||
+          (hasRecordedAlt && !e.altKey)
+
+        if (shouldClear) {
+          console.log(`✅ [keyup] 文字キー離し時に修飾キーの不一致を検出、全キーをクリアします (recorded: Meta=${hasRecordedMeta}, Ctrl=${hasRecordedCtrl}, Shift=${hasRecordedShift}, Alt=${hasRecordedAlt} | actual: meta=${e.metaKey}, ctrl=${e.ctrlKey}, shift=${e.shiftKey}, alt=${e.altKey})`)
+          if (pressedKeys.size > 0) {
+            addToHistory(Array.from(pressedKeys))
+          }
+          clearAllKeys()
+          return
         }
-        clearAllKeys()
-        return
       }
 
-      console.log(`ℹ️ [keyup] 通常キー "${key}" のkeyup処理`)
+      console.log(`ℹ️ [keyup] 通常処理: "${key}" を削除`)
 
       setPressedKeys(prev => {
         if (prev.has(key)) {
