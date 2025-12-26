@@ -122,6 +122,19 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
         console.log(`[keyup] original: "${e.key}", normalized: "${key}", metaKey: ${e.metaKey}, ctrlKey: ${e.ctrlKey}, pressedKeys:`, Array.from(pressedKeys))
       }
 
+      // 修飾キーが離された場合は、全ての非修飾キーもクリア（macOS対策）
+      const isModifierKey = ['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(key)
+      if (isModifierKey) {
+        if (import.meta.env.DEV) {
+          console.log(`[keyup] 修飾キー "${key}" が離されたので、全キーをクリアします`)
+        }
+        if (pressedKeys.size > 0) {
+          addToHistory(Array.from(pressedKeys))
+        }
+        clearAllKeys()
+        return
+      }
+
       setPressedKeys(prev => {
         if (prev.has(key)) {
           if (prev.size > 0) {
