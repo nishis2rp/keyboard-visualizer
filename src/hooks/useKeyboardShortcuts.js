@@ -101,8 +101,30 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
 
       if (isModifierKey) {
         console.log(`🔑 [keyup] 修飾キー "${key}" が離されました`)
-        // 修飾キーが離された場合は、そのキーだけを削除（通常処理に進む）
-        // 全クリアはしない
+
+        // 修飾キーが離された後、他に何かキーが残っているかチェック
+        // keyを削除した後の状態をシミュレート
+        const remainingKeys = new Set(pressedKeys)
+        remainingKeys.delete(key)
+
+        // 残りのキーに文字キーがあり、かつ他の修飾キーが押されていない場合はクリア
+        const hasOtherModifiers = Array.from(remainingKeys).some(k =>
+          ['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(k)
+        )
+        const hasNonModifiers = Array.from(remainingKeys).some(k =>
+          !['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(k)
+        )
+
+        if (hasNonModifiers && !hasOtherModifiers) {
+          console.log(`✅ [keyup] 修飾キー "${key}" 離し後に文字キーが残っているのでクリアします`, Array.from(remainingKeys))
+          if (pressedKeys.size > 0) {
+            addToHistory(Array.from(pressedKeys))
+          }
+          clearAllKeys()
+          return
+        }
+
+        // 通常処理に進む（そのキーだけを削除）
       } else {
         // 文字キーが離された場合のみ、修飾キーの不一致をチェック
         const hasRecordedMeta = pressedKeys.has('Meta') || pressedKeys.has('OS')
