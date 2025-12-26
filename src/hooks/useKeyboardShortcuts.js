@@ -54,10 +54,8 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       const shiftPressed = pressedKeys.has('Shift')
       const key = normalizeKey(e.key, shiftPressed)
 
-      // デバッグログ
-      if (import.meta.env.DEV) {
-        console.log(`[keydown] original: "${e.key}", normalized: "${key}", metaKey: ${e.metaKey}, ctrlKey: ${e.ctrlKey}`)
-      }
+      // デバッグログ（より詳細に）
+      console.log(`🔽 [keydown] key="${e.key}" code="${e.code}" normalized="${key}" | meta=${e.metaKey} ctrl=${e.ctrlKey} shift=${e.shiftKey} alt=${e.altKey}`)
 
       if (pressedKeys.has(key)) {
         return
@@ -117,23 +115,21 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       const shiftPressed = e.key !== 'Shift' && pressedKeys.has('Shift')
       const key = normalizeKey(e.key, shiftPressed)
 
-      // デバッグログ
-      if (import.meta.env.DEV) {
-        console.log(`[keyup] original: "${e.key}", normalized: "${key}", metaKey: ${e.metaKey}, ctrlKey: ${e.ctrlKey}, pressedKeys:`, Array.from(pressedKeys))
-      }
+      // デバッグログ（より詳細に）
+      console.log(`🔼 [keyup] key="${e.key}" code="${e.code}" normalized="${key}" | meta=${e.metaKey} ctrl=${e.ctrlKey} shift=${e.shiftKey} alt=${e.altKey} | pressedKeys:`, Array.from(pressedKeys))
 
       // 修飾キーが離された場合は、全ての非修飾キーもクリア（macOS対策）
       const isModifierKey = ['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(key)
       if (isModifierKey) {
-        if (import.meta.env.DEV) {
-          console.log(`[keyup] 修飾キー "${key}" が離されたので、全キーをクリアします`)
-        }
+        console.log(`✅ [keyup] 修飾キー "${key}" が離されたので、全キーをクリアします`)
         if (pressedKeys.size > 0) {
           addToHistory(Array.from(pressedKeys))
         }
         clearAllKeys()
         return
       }
+
+      console.log(`ℹ️ [keyup] 通常キー "${key}" のkeyup処理`)
 
       setPressedKeys(prev => {
         if (prev.has(key)) {
