@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getKeyComboText, getShortcutDescription, getAvailableShortcuts } from '../utils'
+import { getKeyComboText, getShortcutDescription, getAvailableShortcuts, normalizeKey } from '../utils'
 
 export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
   const [pressedKeys, setPressedKeys] = useState(new Set())
@@ -28,7 +28,9 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      const key = e.key
+      // Shiftキーが押されている場合、記号を元のキーに正規化
+      const shiftPressed = pressedKeys.has('Shift')
+      const key = normalizeKey(e.key, shiftPressed)
 
       if (pressedKeys.has(key)) {
         return
@@ -81,7 +83,9 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     }
 
     const handleKeyUp = (e) => {
-      const key = e.key
+      // Shiftキーが押されている場合、記号を元のキーに正規化
+      const shiftPressed = pressedKeys.has('Shift')
+      const key = normalizeKey(e.key, shiftPressed)
 
       setPressedKeys(prev => {
         if (prev.has(key)) {

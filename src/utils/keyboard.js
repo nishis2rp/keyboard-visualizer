@@ -27,6 +27,21 @@ const SHIFT_NUMBER_MAP = {
 }
 
 /**
+ * Shiftキーが押されている時に、記号キーを元のキーに正規化
+ * 例: Shift押下中に'!'が来た場合 → '1'に変換
+ * @param {string} key - キー名
+ * @param {boolean} shiftPressed - Shiftキーが押されているか
+ * @returns {string} 正規化されたキー名
+ */
+export const normalizeKey = (key, shiftPressed) => {
+  // Shiftが押されている場合のみ変換
+  if (shiftPressed && SHIFT_NUMBER_MAP[key]) {
+    return SHIFT_NUMBER_MAP[key]
+  }
+  return key
+}
+
+/**
  * 数字からShift記号への逆マップ
  * 例: '1' → '!', '2' → '@'
  */

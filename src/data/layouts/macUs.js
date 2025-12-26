@@ -91,4 +91,11 @@ export const macUsLayout = [
     { key: 'Alt', display: 'option', width: 1.25 },
     { key: 'Control', display: 'control', width: 1.25 },
   ],
+  // 7行目 (カーソルキー)
+  [
+    { key: 'ArrowUp', display: '↑', width: 1 },
+    { key: 'ArrowLeft', display: '←', width: 1 },
+    { key: 'ArrowDown', display: '↓', width: 1 },
+    { key: 'ArrowRight', display: '→', width: 1 },
+  ],
 ]

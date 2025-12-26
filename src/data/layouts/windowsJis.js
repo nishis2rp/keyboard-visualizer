@@ -92,4 +92,11 @@ export const windowsJisLayout = [
     { key: 'Meta', display: 'Win', width: 1.25 },
     { key: 'Control', display: 'Ctrl', width: 1.5 },
   ],
+  // 7行目 (カーソルキー)
+  [
+    { key: 'ArrowUp', display: '↑', width: 1 },
+    { key: 'ArrowLeft', display: '←', width: 1 },
+    { key: 'ArrowDown', display: '↓', width: 1 },
+    { key: 'ArrowRight', display: '→', width: 1 },
+  ],
 ]

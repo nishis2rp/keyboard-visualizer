@@ -7,7 +7,8 @@ export {
   getKeyComboText,
   getShortcutDescription,
   getAvailableShortcuts,
-  getSingleKeyShortcuts
+  getSingleKeyShortcuts,
+  normalizeKey
 } from './keyboard'
 
 export {
