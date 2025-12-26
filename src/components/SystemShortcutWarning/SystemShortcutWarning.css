@@ -1,28 +1,25 @@
-.warning-toggle-btn {
-  position: fixed;
-  top: 20px;
-  right: 80px;
-  background-color: #ff9800;
-  color: white;
+.warning-text-link {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background: none;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
+  color: #007AFF;
+  font-size: 12px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  transition: all 0.3s ease;
+  text-decoration: underline;
+  padding: 0;
+  transition: color 0.2s ease;
 }
 
-.warning-toggle-btn:hover {
-  background-color: #f57c00;
-  transform: scale(1.1);
+.warning-text-link:hover {
+  color: #0051D5;
+  text-decoration: none;
 }
 
 .system-warning-container {
   position: fixed;
-  top: 70px;
+  top: 100px;
   right: 20px;
   max-width: 500px;
   width: 90%;
@@ -202,21 +199,31 @@
 
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
-  .system-warning-container {
+  .warning-text-link {
     top: 60px;
+    right: 10px;
+    font-size: 11px;
+  }
+
+  .system-warning-container {
+    top: 90px;
     right: 10px;
     left: 10px;
     max-width: none;
     width: auto;
   }
-
-  .warning-toggle-btn {
-    right: 70px;
-  }
 }
 
 /* ダークモード対応 */
 @media (prefers-color-scheme: dark) {
+  .warning-text-link {
+    color: #0A84FF;
+  }
+
+  .warning-text-link:hover {
+    color: #409CFF;
+  }
+
   .system-warning-container {
     background-color: #3e3b2f;
     border-color: #ffc107;

@@ -4,47 +4,34 @@ import './SystemShortcutWarning.css'
 
 const SystemShortcutWarning = () => {
   const [os, setOs] = useState('unknown')
-  const [isVisible, setIsVisible] = useState(true)
-  const [isDismissed, setIsDismissed] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const detectedOS = detectOS()
     setOs(detectedOS)
-    
-    // ローカルストレージから表示設定を読み込む
-    const dismissed = localStorage.getItem('systemShortcutWarning_dismissed')
-    if (dismissed === 'true') {
-      setIsDismissed(true)
-      setIsVisible(false)
-    }
   }, [])
 
-  const handleDismiss = () => {
+  const handleToggle = () => {
+    setIsVisible(!isVisible)
+  }
+
+  const handleClose = () => {
     setIsVisible(false)
-    setIsDismissed(true)
-    localStorage.setItem('systemShortcutWarning_dismissed', 'true')
   }
 
-  const handleShow = () => {
-    setIsVisible(true)
-  }
-
-  // macOS以外では表示しない
   if (os !== 'macos') {
     return null
   }
 
   return (
     <>
-      {!isVisible && isDismissed && (
-        <button 
-          className="warning-toggle-btn"
-          onClick={handleShow}
-          title="システムショートカットの設定を表示"
-        >
-          ⚙️
-        </button>
-      )}
+      <button 
+        className="warning-text-link"
+        onClick={handleToggle}
+        title="macOSシステムショートカットの設定について"
+      >
+        macOSシステムショートカットについて
+      </button>
       
       {isVisible && (
         <div className="system-warning-container">
@@ -53,7 +40,7 @@ const SystemShortcutWarning = () => {
             <h3>macOSシステムショートカットについて</h3>
             <button 
               className="warning-close-btn"
-              onClick={handleDismiss}
+              onClick={handleClose}
               aria-label="閉じる"
             >
               ✕
