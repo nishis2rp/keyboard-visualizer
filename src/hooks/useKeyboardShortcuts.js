@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getKeyComboText, getShortcutDescription, getAvailableShortcuts } from '../utils'
 
 export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
@@ -6,6 +6,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
   const [history, setHistory] = useState([])
   const [currentDescription, setCurrentDescription] = useState(null)
   const [availableShortcuts, setAvailableShortcuts] = useState([])
+  const lastKeyPressTime = useRef(Date.now())
 
   const addToHistory = (keys) => {
     const comboText = getKeyComboText(keys, keyNameMap)
@@ -30,6 +31,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       const key = e.key
+      lastKeyPressTime.current = Date.now()
 
       // 重複キー押下を防ぐ
       if (pressedKeys.has(key)) {
@@ -128,86 +130,55 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       clearAllKeys()
     }
 
-    // ページが非表示になったときに全キーをクリア（macOSの不具合対策）
+    // ページが非表示になったときに全キーをクリア
     const handleVisibilityChange = () => {
       if (document.hidden) {
         clearAllKeys()
       }
     }
 
-    // 修飾キーの状態をチェックして、実際には押されていないのに残っているキーをクリア
-    const handleModifierCheck = (e) => {
-      setPressedKeys(prev => {
-        const newSet = new Set(prev)
-        let changed = false
-
-        // Meta/Command キーが押されていない場合、Meta キーを削除
-        if (!e.metaKey && (prev.has('Meta') || prev.has('OS'))) {
-          newSet.delete('Meta')
-          newSet.delete('OS')
-          changed = true
-        }
-
-        // Ctrl キーが押されていない場合、Control キーを削除
-        if (!e.ctrlKey && prev.has('Control')) {
-          newSet.delete('Control')
-          changed = true
-        }
-
-        // Alt キーが押されていない場合、Alt キーを削除
-        if (!e.altKey && prev.has('Alt')) {
-          newSet.delete('Alt')
-          changed = true
-        }
-
-        // Shift キーが押されていない場合、Shift キーを削除
-        if (!e.shiftKey && prev.has('Shift')) {
-          newSet.delete('Shift')
-          changed = true
-        }
-
-        // 修飾キーが全て解放されたら、すべてのキーをクリア
-        if (changed && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
-          clearAllKeys()
-          return new Set()
-        }
-
-        if (changed) {
-          // 状態を更新
-          if (newSet.size === 0) {
-            setCurrentDescription(null)
-            setAvailableShortcuts([])
-          } else {
-            const comboText = getKeyComboText(Array.from(newSet), keyNameMap)
-            const description = getShortcutDescription(comboText, shortcutDescriptions)
-            setCurrentDescription(description)
-            const shortcuts = getAvailableShortcuts(Array.from(newSet), keyNameMap, shortcutDescriptions)
-            setAvailableShortcuts(shortcuts)
+    // フォーカスが戻ったときにもクリア（念のため）
+    const handleFocus = () => {
+      // フォーカスが戻った時点で何かキーが残っていたらクリア
+      setTimeout(() => {
+        setPressedKeys(prev => {
+          if (prev.size > 0) {
+            clearAllKeys()
+            return new Set()
           }
-        }
-
-        return changed ? newSet : prev
-      })
+          return prev
+        })
+      }, 100)
     }
 
-    document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('keyup', handleKeyUp)
+    // 定期的にキー状態をチェックして、長時間押されているキーをクリア
+    const intervalId = setInterval(() => {
+      const now = Date.now()
+      // 3秒以上キーイベントがない場合、全てクリア
+      if (now - lastKeyPressTime.current > 3000) {
+        setPressedKeys(prev => {
+          if (prev.size > 0) {
+            clearAllKeys()
+            return new Set()
+          }
+          return prev
+        })
+      }
+    }, 1000)
+
+    document.addEventListener('keydown', handleKeyDown, true)
+    document.addEventListener('keyup', handleKeyUp, true)
     window.addEventListener('blur', handleBlur)
+    window.addEventListener('focus', handleFocus)
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    
-    // マウス操作時に修飾キーの状態をチェック（macOS対策）
-    document.addEventListener('mousedown', handleModifierCheck)
-    document.addEventListener('mousemove', handleModifierCheck)
-    document.addEventListener('click', handleModifierCheck)
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('keyup', handleKeyUp)
+      document.removeEventListener('keydown', handleKeyDown, true)
+      document.removeEventListener('keyup', handleKeyUp, true)
       window.removeEventListener('blur', handleBlur)
+      window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
-      document.removeEventListener('mousedown', handleModifierCheck)
-      document.removeEventListener('mousemove', handleModifierCheck)
-      document.removeEventListener('click', handleModifierCheck)
+      clearInterval(intervalId)
     }
   }, [pressedKeys, shortcutDescriptions, keyNameMap])
 
