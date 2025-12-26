@@ -32,6 +32,11 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       const shiftPressed = pressedKeys.has('Shift')
       const key = normalizeKey(e.key, shiftPressed)
 
+      // デバッグログ
+      if (import.meta.env.DEV) {
+        console.log(`[keydown] original: "${e.key}", normalized: "${key}", metaKey: ${e.metaKey}, ctrlKey: ${e.ctrlKey}`)
+      }
+
       if (pressedKeys.has(key)) {
         return
       }
@@ -83,9 +88,14 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     }
 
     const handleKeyUp = (e) => {
-      // Shiftキーが押されている場合、記号を元のキーに正規化
-      const shiftPressed = pressedKeys.has('Shift')
+      // keyupでもShiftの状態を確認（ただしShift自体が離された場合は除く）
+      const shiftPressed = e.key !== 'Shift' && pressedKeys.has('Shift')
       const key = normalizeKey(e.key, shiftPressed)
+
+      // デバッグログ
+      if (import.meta.env.DEV) {
+        console.log(`[keyup] original: "${e.key}", normalized: "${key}", metaKey: ${e.metaKey}, ctrlKey: ${e.ctrlKey}, pressedKeys:`, Array.from(pressedKeys))
+      }
 
       setPressedKeys(prev => {
         if (prev.has(key)) {
@@ -129,11 +139,59 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       }, 50)
     }
 
+    // マウス操作時に修飾キーの状態をチェック
+    const handleMouseEvent = (e) => {
+      // 実際の修飾キーの状態を確認
+      const actualModifiers = new Set()
+      if (e.ctrlKey) actualModifiers.add('Control')
+      if (e.shiftKey) actualModifiers.add('Shift')
+      if (e.altKey) actualModifiers.add('Alt')
+      if (e.metaKey) actualModifiers.add('Meta')
+
+      // 記録されている修飾キーと実際の状態が異なる場合はクリア
+      const recordedModifiers = new Set(
+        Array.from(pressedKeys).filter(key =>
+          ['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(key)
+        )
+      )
+
+      let needsClear = false
+      for (const mod of recordedModifiers) {
+        if (!actualModifiers.has(mod)) {
+          needsClear = true
+          break
+        }
+      }
+
+      // 修飾キーのみが押されている状態で文字キーが記録されている場合もクリア
+      if (!needsClear && pressedKeys.size > actualModifiers.size) {
+        const hasNonModifierKeys = Array.from(pressedKeys).some(key =>
+          !['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(key)
+        )
+        if (hasNonModifierKeys && actualModifiers.size === 0) {
+          needsClear = true
+        }
+      }
+
+      if (needsClear) {
+        if (import.meta.env.DEV) {
+          console.log('[Mouse Event] キー状態の不一致を検出、クリアします', {
+            recorded: Array.from(pressedKeys),
+            actual: Array.from(actualModifiers)
+          })
+        }
+        clearAllKeys()
+      }
+    }
+
     document.addEventListener('keydown', handleKeyDown, true)
     document.addEventListener('keyup', handleKeyUp, true)
     window.addEventListener('blur', handleBlur)
     window.addEventListener('focus', handleFocus)
     document.addEventListener('visibilitychange', handleVisibilityChange)
+    document.addEventListener('mousemove', handleMouseEvent)
+    document.addEventListener('mousedown', handleMouseEvent)
+    document.addEventListener('click', handleMouseEvent)
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown, true)
@@ -141,6 +199,9 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       window.removeEventListener('blur', handleBlur)
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      document.removeEventListener('mousemove', handleMouseEvent)
+      document.removeEventListener('mousedown', handleMouseEvent)
+      document.removeEventListener('click', handleMouseEvent)
     }
   }, [pressedKeys, shortcutDescriptions, keyNameMap])
 
