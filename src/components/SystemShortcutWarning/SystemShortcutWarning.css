@@ -1,25 +1,29 @@
 .warning-text-link {
   position: absolute;
-  top: 70px;
+  top: 90px;
   right: 20px;
   background: none;
   border: none;
   color: #007AFF;
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   text-decoration: underline;
-  padding: 0;
+  padding: 4px 8px;
   transition: color 0.2s ease;
+  white-space: nowrap;
+  z-index: 100;
 }
 
 .warning-text-link:hover {
   color: #0051D5;
   text-decoration: none;
+  background-color: rgba(0, 122, 255, 0.05);
+  border-radius: 4px;
 }
 
 .system-warning-container {
   position: fixed;
-  top: 100px;
+  top: 130px;
   right: 20px;
   max-width: 500px;
   width: 90%;
@@ -200,13 +204,13 @@
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
   .warning-text-link {
-    top: 60px;
+    top: 75px;
     right: 10px;
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .system-warning-container {
-    top: 90px;
+    top: 110px;
     right: 10px;
     left: 10px;
     max-width: none;
@@ -222,6 +226,7 @@
 
   .warning-text-link:hover {
     color: #409CFF;
+    background-color: rgba(10, 132, 255, 0.1);
   }
 
   .system-warning-container {
