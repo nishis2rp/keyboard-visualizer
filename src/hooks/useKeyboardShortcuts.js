@@ -139,7 +139,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
 
     // フォーカスが戻ったときにもクリア（念のため）
     const handleFocus = () => {
-      // フォーカスが戻った時点で何かキーが残っていたらクリア
       setTimeout(() => {
         setPressedKeys(prev => {
           if (prev.size > 0) {
@@ -148,14 +147,44 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
           }
           return prev
         })
-      }, 100)
+      }, 50)
     }
 
-    // 定期的にキー状態をチェックして、長時間押されているキーをクリア
+    // マウス操作時に修飾キーの状態をチェック（高速レスポンス）
+    const handleMouseEvent = (e) => {
+      setPressedKeys(prev => {
+        if (prev.size === 0) return prev
+
+        const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
+        const hasModifiers = Array.from(prev).some(key => modifierKeys.includes(key))
+
+        // 修飾キーが押されていないのに、キーが残っている場合は即座にクリア
+        if (!e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey && hasModifiers) {
+          clearAllKeys()
+          return new Set()
+        }
+
+        // 実際の修飾キー状態とpressedKeysの不一致をチェック
+        let needsClear = false
+        if (!e.metaKey && (prev.has('Meta') || prev.has('OS'))) needsClear = true
+        if (!e.ctrlKey && prev.has('Control')) needsClear = true
+        if (!e.altKey && prev.has('Alt')) needsClear = true
+        if (!e.shiftKey && prev.has('Shift')) needsClear = true
+
+        if (needsClear) {
+          clearAllKeys()
+          return new Set()
+        }
+
+        return prev
+      })
+    }
+
+    // 定期的にキー状態をチェック（高速化: 200msごと、タイムアウト500ms）
     const intervalId = setInterval(() => {
       const now = Date.now()
-      // 3秒以上キーイベントがない場合、全てクリア
-      if (now - lastKeyPressTime.current > 3000) {
+      // 500ms以上キーイベントがない場合、全てクリア
+      if (now - lastKeyPressTime.current > 500) {
         setPressedKeys(prev => {
           if (prev.size > 0) {
             clearAllKeys()
@@ -164,13 +193,18 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
           return prev
         })
       }
-    }, 1000)
+    }, 200)
 
     document.addEventListener('keydown', handleKeyDown, true)
     document.addEventListener('keyup', handleKeyUp, true)
     window.addEventListener('blur', handleBlur)
     window.addEventListener('focus', handleFocus)
     document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    // マウスイベントで即座にチェック（高速レスポンス）
+    document.addEventListener('mousemove', handleMouseEvent)
+    document.addEventListener('mousedown', handleMouseEvent)
+    document.addEventListener('click', handleMouseEvent)
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown, true)
@@ -178,6 +212,9 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
       window.removeEventListener('blur', handleBlur)
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      document.removeEventListener('mousemove', handleMouseEvent)
+      document.removeEventListener('mousedown', handleMouseEvent)
+      document.removeEventListener('click', handleMouseEvent)
       clearInterval(intervalId)
     }
   }, [pressedKeys, shortcutDescriptions, keyNameMap])
