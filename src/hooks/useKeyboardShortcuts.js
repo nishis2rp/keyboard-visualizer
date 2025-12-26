@@ -6,7 +6,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
   const [history, setHistory] = useState([])
   const [currentDescription, setCurrentDescription] = useState(null)
   const [availableShortcuts, setAvailableShortcuts] = useState([])
-  const [lastKeyPressTime, setLastKeyPressTime] = useState(0)
 
   const addToHistory = (keys) => {
     const comboText = getKeyComboText(keys, keyNameMap)
@@ -27,29 +26,11 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     setAvailableShortcuts([])
   }
 
-  // 定期的にキー状態をチェック（高速化：100ms間隔、200msでクリア）
-  useEffect(() => {
-    const checkInterval = setInterval(() => {
-      const now = Date.now()
-      const timeSinceLastKeyPress = now - lastKeyPressTime
-
-      // 何かキーが押されている状態で、かつ最後のキー操作から200ms以上経過している場合
-      if (pressedKeys.size > 0 && timeSinceLastKeyPress > 200) {
-        if (import.meta.env.DEV) {
-          console.log('[定期チェック] キーが200ms以上押されたまま、クリアします:', Array.from(pressedKeys), `経過時間: ${timeSinceLastKeyPress}ms`)
-        }
-        clearAllKeys()
-      }
-    }, 100) // 100msごとにチェック（高速化）
-
-    return () => clearInterval(checkInterval)
-  }, [pressedKeys, lastKeyPressTime])
+  // 定期チェックは削除（誤動作の原因となるため）
+  // マウスイベントとkeyupイベントでの検出のみに頼る
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // キーイベントのタイムスタンプを更新
-      setLastKeyPressTime(Date.now())
-
       // Shiftキーが押されている場合、記号を元のキーに正規化
       const shiftPressed = pressedKeys.has('Shift')
       const key = normalizeKey(e.key, shiftPressed)
@@ -108,9 +89,6 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyNameMap) => {
     }
 
     const handleKeyUp = (e) => {
-      // キーイベントのタイムスタンプを更新
-      setLastKeyPressTime(Date.now())
-
       // keyupでもShiftの状態を確認（ただしShift自体が離された場合は除く）
       const shiftPressed = e.key !== 'Shift' && pressedKeys.has('Shift')
       const key = normalizeKey(e.key, shiftPressed)
