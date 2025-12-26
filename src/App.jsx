@@ -5,6 +5,7 @@ import KeyboardLayoutSelector from './components/KeyboardLayoutSelector'
 import KeyDisplay from './components/KeyDisplay'
 import KeyboardLayout from './components/KeyboardLayout'
 import SystemShortcutWarning from './components/SystemShortcutWarning'
+import SetupScreen from './components/SetupScreen'
 import { allShortcuts } from './data/shortcuts'
 import { apps, keyboardLayouts, getKeyNameMap } from './config'
 import { specialKeys } from './constants'
@@ -13,17 +14,37 @@ import { useKeyboardShortcuts } from './hooks'
 import './styles/global.css'
 
 function App() {
+  const [showSetup, setShowSetup] = useState(true)
   const [selectedApp, setSelectedApp] = useState('windows11')
   const [keyboardLayout, setKeyboardLayout] = useState('windows-jis')
   const [fullscreenMode, setFullscreenMode] = useState(false)
 
-  // 現在選択されているアプリのショートカットを取得
+  useEffect(() => {
+    const savedSetup = localStorage.getItem('keyboard-visualizer-setup')
+    if (savedSetup) {
+      try {
+        const setup = JSON.parse(savedSetup)
+        if (setup.setupCompleted) {
+          setSelectedApp(setup.app)
+          setKeyboardLayout(setup.layout)
+          setShowSetup(false)
+        }
+      } catch (e) {
+        console.error('Failed to parse saved setup:', e)
+      }
+    }
+  }, [])
+
+  const handleSetupComplete = (app, layout) => {
+    setSelectedApp(app)
+    setKeyboardLayout(layout)
+    setShowSetup(false)
+  }
+
   const shortcutDescriptions = useMemo(() => allShortcuts[selectedApp], [selectedApp])
 
-  // キーボードレイアウトに応じたキー名マップを取得
   const keyNameMap = useMemo(() => getKeyNameMap(keyboardLayout), [keyboardLayout])
 
-  // カスタムフックを使用してキーボードショートカットの状態を管理
   const {
     pressedKeys,
     history,
@@ -32,13 +53,11 @@ function App() {
     handleClear
   } = useKeyboardShortcuts(shortcutDescriptions, keyNameMap)
 
-  // getKeyDisplayNameをラップして、keyNameMapを自動的に渡す（メモ化）
   const getKeyDisplayNameWithMap = useCallback(
     (key) => getKeyDisplayName(key, keyNameMap),
     [keyNameMap]
   )
 
-  // フルスクリーン状態の監視
   useEffect(() => {
     setFullscreenMode(isFullscreen())
     const cleanup = onFullscreenChange((isFs) => {
@@ -47,14 +66,16 @@ function App() {
     return cleanup
   }, [])
 
-  // フルスクリーントグルハンドラ
   const handleToggleFullscreen = useCallback(() => {
     toggleFullscreen()
   }, [])
 
+  if (showSetup) {
+    return <SetupScreen onSetupComplete={handleSetupComplete} />
+  }
+
   return (
     <div className="container">
-      {/* macOSシステムショートカット警告 */}
       <SystemShortcutWarning />
 
       <AppHeader
