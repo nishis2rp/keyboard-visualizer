@@ -1,23 +1,46 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import PropTypes from 'prop-types'; // PropTypesをインポート
 import { detectOS } from '../../constants'
 import './SystemShortcutWarning.css'
 
-const SystemShortcutWarning = () => {
+const LOCAL_STORAGE_KEY_WARNING_SHOWN = 'macOsSystemShortcutWarningShown';
+
+const SystemShortcutWarning = ({ onOpenRequest }) => { // onOpenRequestをプロップとして受け取る
   const [os, setOs] = useState('unknown')
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false) // モーダルの表示状態
+  const [hasShownWarning, setHasShownWarning] = useState(() => {
+    // ローカルストレージから初回表示フラグを読み込む
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(LOCAL_STORAGE_KEY_WARNING_SHOWN) === 'true';
+    }
+    return false;
+  });
+
+  const handleOpen = useCallback(() => {
+    setIsVisible(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+  }, []);
 
   useEffect(() => {
     const detectedOS = detectOS()
     setOs(detectedOS)
-  }, [])
 
-  const handleToggle = () => {
-    setIsVisible(!isVisible)
-  }
+    // macOSで、かつまだ警告を表示していない場合、モーダルを自動で表示
+    if (detectedOS === 'macos' && !hasShownWarning) {
+      handleOpen(); // handleOpenを呼び出す
+      // 一度表示したらフラグを立てる
+      localStorage.setItem(LOCAL_STORAGE_KEY_WARNING_SHOWN, 'true');
+      setHasShownWarning(true);
+    }
 
-  const handleClose = () => {
-    setIsVisible(false)
-  }
+    // onOpenRequestが提供された場合、handleOpenを渡す
+    if (onOpenRequest) {
+      onOpenRequest(handleOpen);
+    }
+  }, [hasShownWarning, onOpenRequest, handleOpen]); // onOpenRequestとhandleOpenを依存配列に追加
 
   if (os !== 'macos') {
     return null
@@ -25,13 +48,16 @@ const SystemShortcutWarning = () => {
 
   return (
     <>
-      <button 
+      {/* 警告モーダルを開くボタン。常に表示され、設定画面の一部として機能する */}
+      {/* AppHeaderに統合する予定なので、ここでは一時的に表示 */}
+      {/* <button 
         className="warning-text-link"
-        onClick={handleToggle}
+        onClick={handleOpen}
         title="macOSシステムショートカットの設定について"
+        style={{ position: 'absolute', top: '10px', right: '10px' }} // 一時的に右上に配置
       >
         macOSシステムショートカットについて
-      </button>
+      </button> */}
       
       {isVisible && (
         <div className="system-warning-container">
@@ -103,5 +129,9 @@ const SystemShortcutWarning = () => {
     </>
   )
 }
+
+SystemShortcutWarning.propTypes = {
+  onOpenRequest: PropTypes.func, // 新しく追加
+};
 
 export default SystemShortcutWarning

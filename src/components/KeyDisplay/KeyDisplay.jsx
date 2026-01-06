@@ -2,17 +2,25 @@ import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getSingleKeyShortcuts } from '../../utils'
 import ShortcutCard from '../ShortcutCard'
+import { getCodeDisplayName } from '../../utils/keyMapping' // getCodeDisplayNameをインポート
 
-// 修飾キーの表示順序
-const MODIFIER_DISPLAY_ORDER = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
+// 修飾キーのコードベースの表示順序
+const MODIFIER_CODE_DISPLAY_ORDER = [
+  'ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight',
+  'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'
+]
 
-// 修飾キーのリスト
-const MODIFIER_KEYS = ['Control', 'Shift', 'Alt', 'Meta', 'OS']
+// 修飾キーのコードリスト
+const MODIFIER_CODES = new Set(MODIFIER_CODE_DISPLAY_ORDER)
 
-const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, description, availableShortcuts, selectedApp, shortcutDescriptions }) => {
+const KeyDisplay = memo(({ pressedKeys, specialKeys, getDisplayKeyByCode, description, availableShortcuts, selectedApp, shortcutDescriptions, keyboardLayout }) => {
+  // Shiftキーが押されているか判定（getDisplayKeyByCodeに渡すため）
+  const shiftPressed = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight');
+
   if (pressedKeys.size === 0) {
     // すべてのアプリケーションで単独キーショートカットを表示
-    const singleKeyShortcuts = getSingleKeyShortcuts(shortcutDescriptions)
+    // getSingleKeyShortcutsもlayoutを考慮するように修正が必要かもしれない
+    const singleKeyShortcuts = getSingleKeyShortcuts(shortcutDescriptions, keyboardLayout) // keyboardLayoutを渡す
 
     if (singleKeyShortcuts.length > 0) {
       return (
@@ -34,7 +42,7 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
                   key={index}
                   shortcut={item.shortcut}
                   description={item.description}
-                  showDebugLog={true}
+                  // showDebugLog={true} // デバッグ用
                 />
               ))}
             </div>
@@ -50,9 +58,10 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
     )
   }
 
-  const sortedKeys = Array.from(pressedKeys).sort((a, b) => {
-    const aIndex = MODIFIER_DISPLAY_ORDER.indexOf(a)
-    const bIndex = MODIFIER_DISPLAY_ORDER.indexOf(b)
+  // pressedKeysはcodeのSetなので、表示用に変換し、ソートする
+  const sortedCodes = Array.from(pressedKeys).sort((a, b) => {
+    const aIndex = MODIFIER_CODE_DISPLAY_ORDER.indexOf(a)
+    const bIndex = MODIFIER_CODE_DISPLAY_ORDER.indexOf(b)
 
     if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
     if (aIndex !== -1) return -1
@@ -60,8 +69,8 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
     return 0
   })
 
-  // 修飾キーのみが押されているかチェック
-  const isOnlyModifierKeys = sortedKeys.every(key => MODIFIER_KEYS.includes(key))
+  // 修飾キーのみが押されているかチェック (codeベースで)
+  const isOnlyModifierKeys = sortedCodes.every(code => MODIFIER_CODES.has(code))
 
   // 完全なショートカットが押されている場合（説明がある）
   // ただし、修飾キーのみの場合は、利用可能なショートカット一覧も表示
@@ -70,11 +79,11 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
       <div className="display-area active">
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', alignItems: 'center' }}>
-            {sortedKeys.map((key, index) => (
-              <div key={`${key}-${index}`} style={{ display: 'contents' }}>
+            {sortedCodes.map((code, index) => (
+              <div key={`${code}-${index}`} style={{ display: 'contents' }}>
                 {index > 0 && <span className="plus">+</span>}
-                <div className={`key ${specialKeys.has(key) ? 'special-key' : ''}`}>
-                  {getKeyDisplayName(key)}
+                <div className={`key ${specialKeys.has(code) ? 'special-key' : ''}`}>
+                  {getDisplayKeyByCode(code, null, shiftPressed)} {/* keyは不明なのでnull */}
                 </div>
               </div>
             ))}
@@ -92,11 +101,11 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
     <div className="display-area active" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'center', marginBottom: availableShortcuts.length > 0 ? '4px' : '0' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
-          {sortedKeys.map((key, index) => (
-            <div key={`${key}-${index}`} style={{ display: 'contents' }}>
+          {sortedCodes.map((code, index) => (
+            <div key={`${code}-${index}`} style={{ display: 'contents' }}>
               {index > 0 && <span className="plus">+</span>}
-              <div className={`key ${specialKeys.has(key) ? 'special-key' : ''}`}>
-                {getKeyDisplayName(key)}
+              <div className={`key ${specialKeys.has(code) ? 'special-key' : ''}`}>
+                {getDisplayKeyByCode(code, null, shiftPressed)} {/* keyは不明なのでnull */}
               </div>
             </div>
           ))}
@@ -116,7 +125,7 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getKeyDisplayName, descript
                 key={index}
                 shortcut={item.shortcut}
                 description={item.description}
-                showDebugLog={true}
+                // showDebugLog={true} // デバッグ用
               />
             ))}
           </div>
@@ -131,7 +140,7 @@ KeyDisplay.displayName = 'KeyDisplay'
 KeyDisplay.propTypes = {
   pressedKeys: PropTypes.instanceOf(Set).isRequired,
   specialKeys: PropTypes.instanceOf(Set).isRequired,
-  getKeyDisplayName: PropTypes.func.isRequired,
+  getDisplayKeyByCode: PropTypes.func.isRequired, // プロップ名を変更
   description: PropTypes.string,
   availableShortcuts: PropTypes.arrayOf(
     PropTypes.shape({
@@ -140,7 +149,8 @@ KeyDisplay.propTypes = {
     })
   ).isRequired,
   selectedApp: PropTypes.string.isRequired,
-  shortcutDescriptions: PropTypes.objectOf(PropTypes.string).isRequired
+  shortcutDescriptions: PropTypes.objectOf(PropTypes.string).isRequired,
+  keyboardLayout: PropTypes.string.isRequired, // keyboardLayoutを追加
 }
 
 export default KeyDisplay

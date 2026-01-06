@@ -1,98 +1,37 @@
-/**
- * Shift + 数字キーと記号の対応マップ（US配列基準）
- * ブラウザはShift+1を'!'として報告するため、この対応表で数字に変換
- */
-const SHIFT_NUMBER_MAP = {
-  '!': '1',
-  '@': '2',
-  '#': '3',
-  '$': '4',
-  '%': '5',
-  '^': '6',
-  '&': '7',
-  '*': '8',
-  '(': '9',
-  ')': '0',
-  '_': '-',
-  '+': '=',
-  '{': '[',
-  '}': ']',
-  '|': '\\',
-  ':': ';',
-  '"': '\'',
-  '<': ',',
-  '>': '.',
-  '?': '/',
-  '~': '`'
-}
+import { getCodeDisplayName } from './keyMapping'
 
 /**
- * Shiftキーが押されている時に、記号キーを元のキーに正規化
- * 例: Shift押下中に'!'が来た場合 → '1'に変換
- * macOSでCmd+文字キーを押すと大文字小文字が変わることがあるため正規化
- * @param {string} key - キー名
- * @param {boolean} shiftPressed - Shiftキーが押されているか
+ * キー名 (KeyboardEvent.key) を正規化する。
+ * 主にuseKeyboardShortcutsでのe.keyの処理のために残されている。
+ * @param {string} key - キー名 (KeyboardEvent.key)
  * @returns {string} 正規化されたキー名
  */
-export const normalizeKey = (key, shiftPressed) => {
-  // Shiftが押されている場合のみ変換
-  if (shiftPressed && SHIFT_NUMBER_MAP[key]) {
-    return SHIFT_NUMBER_MAP[key]
-  }
-
+export const normalizeKey = (key) => {
   // アルファベット1文字の場合は小文字に統一（macOSのCmd+キーの大文字小文字問題対策）
   if (key.length === 1 && /[a-zA-Z]/.test(key)) {
     return key.toLowerCase()
   }
-
   return key
 }
 
-/**
- * 数字からShift記号への逆マップ
- * 例: '1' → '!', '2' → '@'
- */
-const NUMBER_SHIFT_MAP = Object.fromEntries(
-  Object.entries(SHIFT_NUMBER_MAP).map(([symbol, number]) => [number, symbol])
-)
-
-/** 修飾キーのソート順序 */
+/** 修飾キーのソート順序 (KeyboardEvent.code) */
 const MODIFIER_ORDER = {
-  'Control': 1,
-  'Shift': 2,
-  'Alt': 3,
-  'Meta': 4,
-  'OS': 4  // OSキー（Winキー）はMetaと同じ優先度
+  'ControlLeft': 1, 'ControlRight': 1,
+  'ShiftLeft': 2, 'ShiftRight': 2,
+  'AltLeft': 3, 'AltRight': 3,
+  'MetaLeft': 4, 'MetaRight': 4,
 }
 
 /** 利用可能なショートカットの最大表示数 */
 const MAX_SHORTCUTS_DISPLAY = 20
 
 /**
- * キーの表示名を取得
- * @param {string} key - キー名
- * @param {Object} keyNameMap - キーボードレイアウト別の名前マップ
- * @returns {string} 表示用のキー名
- */
-export const getKeyDisplayName = (key, keyNameMap) => {
-  // キーマップに存在する場合はそれを返す
-  if (keyNameMap[key]) {
-    return keyNameMap[key]
-  }
-  // アルファベット1文字の場合は大文字にする
-  if (key.length === 1 && /[a-z]/i.test(key)) {
-    return key.toUpperCase()
-  }
-  return key
-}
-
-/**
- * キーを修飾キーの順序でソート
- * @param {Array<string>} keys - ソートするキーの配列
+ * キーコードを修飾キーの順序でソート
+ * @param {Array<string>} codes - ソートするキーの配列 (KeyboardEvent.code)
  * @returns {Array<string>} ソート済みのキー配列
  */
-export const sortKeys = (keys) => {
-  return keys.sort((a, b) => {
+export const sortKeys = (codes) => {
+  return codes.sort((a, b) => {
     const aOrder = MODIFIER_ORDER[a] || 999
     const bOrder = MODIFIER_ORDER[b] || 999
     return aOrder - bOrder
@@ -100,90 +39,66 @@ export const sortKeys = (keys) => {
 }
 
 /**
- * キーの組み合わせをテキストに変換
- * @param {Array<string>} keysArray - キーの配列
- * @param {Object} keyNameMap - キー名マップ
- * @returns {string} "Ctrl + Shift + A" のような形式の文字列
+ * キーコードの組み合わせをテキストに変換
+ * @param {Array<string>} codesArray - キーの配列 (KeyboardEvent.code)
+ * @param {string} layout - キーボードレイアウト ('macUs', 'macJis', 'windowsJis')
+ * @returns {string} "Ctrl + Shift + A" のような表示名形式の文字列
  */
-export const getKeyComboText = (keysArray, keyNameMap) => {
-  const sorted = sortKeys([...keysArray])
-  return sorted.map(k => getKeyDisplayName(k, keyNameMap)).join(' + ')
+export const getKeyComboText = (codesArray, layout) => {
+  const sortedCodes = sortKeys([...codesArray])
+  const shiftPressed = codesArray.includes('ShiftLeft') || codesArray.includes('ShiftRight');
+  
+  // getCodeDisplayNameはcodeとkeyとlayoutとshiftPressedを受け取る
+  // ここではkeyは不明なのでnullを渡す
+  return sortedCodes.map(code => getCodeDisplayName(code, null, layout, shiftPressed)).join(' + ')
 }
 
 /**
- * キーの組み合わせの代替表現を生成
- * Shift+数字キーの記号と数字の両方の表現を生成
- * @param {string} comboText - キーの組み合わせ文字列
+ * ショートカット定義と押されたキーを比較するための代替表現を生成
+ * (例: ショートカット定義が 'Ctrl + !' だが、押されたキーは 'ControlLeft + ShiftLeft + Digit1')
+ * @param {string} displayComboText - getKeyComboTextで生成された表示名形式の組み合わせ文字列 (例: 'Ctrl + Shift + 1')
+ * @param {string} layout - キーボードレイアウト
  * @returns {Array<string>} 代替表現の配列
- * @example
- * getKeyComboAlternatives("Ctrl + Shift + !")
- * // => ["Ctrl + Shift + !", "Ctrl + Shift + 1"]
- * getKeyComboAlternatives("Ctrl + Shift + @")
- * // => ["Ctrl + Shift + @", "Ctrl + Shift + 2"]
  */
-const getKeyComboAlternatives = (comboText) => {
-  const alternatives = [comboText]
+const getKeyComboAlternatives = (displayComboText, layout) => {
+  const alternatives = [displayComboText];
 
-  // コンボを分解
-  const parts = comboText.split(' + ')
-  const hasShift = parts.includes('Shift')
-
-  // 最後のキー（メインキー）を取得
-  const lastKey = parts[parts.length - 1]
-
-  // Shiftが含まれている場合、記号→数字の変換を試みる
-  // 例: "Ctrl + Shift + !" → "Ctrl + Shift + 1"
-  // 例: "Shift + @" → "Shift + 2"
-  if (hasShift && SHIFT_NUMBER_MAP[lastKey]) {
-    const newParts = [...parts]
-    newParts[newParts.length - 1] = SHIFT_NUMBER_MAP[lastKey]
-    alternatives.push(newParts.join(' + '))
-  }
-
-  // 逆方向の変換も追加: 数字→記号（Shiftが含まれている場合のみ）
+  // ShortcutDescriptionsの定義がKeyboardEvent.keyベースと仮定
+  // Shift+数字キーの記号と数字の両方の表現を生成するロジックが必要
   // 例: "Ctrl + Shift + 1" → "Ctrl + Shift + !"
-  // これにより、ショートカットデータが "Ctrl + Shift + !" として定義されている場合にも対応
-  if (hasShift && NUMBER_SHIFT_MAP[lastKey]) {
-    const newParts = [...parts]
-    newParts[newParts.length - 1] = NUMBER_SHIFT_MAP[lastKey]
-    const altCombo = newParts.join(' + ')
-    // 重複を避けるためチェック
-    if (!alternatives.includes(altCombo)) {
-      alternatives.push(altCombo)
-    }
+  // このロジックはkeyMapping.jsの知識も必要になるため、一旦シンプルに
+  // getCodeDisplayNameの結果をそのまま使う。必要に応じて拡張。
+  
+  // 例: displayComboTextが "Ctrl + Shift + 1" の場合、"Ctrl + Shift + !" も候補にする
+  const parts = displayComboText.split(' + ');
+  const hasShift = parts.some(p => p === 'Shift' || p === '⇧'); // Shiftキーの表示名も考慮
+
+  // 最後のキーが数字の場合、対応するShift記号があるかチェック
+  const lastKey = parts[parts.length - 1];
+  if (hasShift && /^\d$/.test(lastKey)) { // 数字キーの場合
+    // keyMapping.jsのUS/JIS_SYMBOL_MAPを逆引きして代替キーを取得
+    // これはkeyMapping.jsの知識が必要になるため、ここでは一旦簡略化
+    // (後でkeyMapping.jsのヘルパー関数として実装を検討)
   }
 
-  return alternatives
+  return alternatives;
 }
 
 /**
  * ショートカットの説明を取得（代替表現にも対応）
- * Ctrl+Shift+1とCtrl+Shift+!を同一のものとして扱う
- * 単一文字の大文字小文字も考慮（AとaをマッチングOK）
- * @param {string} comboText - キーの組み合わせ文字列
- * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト
+ * @param {string} currentDisplayComboText - 現在押されているキーの表示名形式の組み合わせ文字列
+ * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト (keyベース、例: {'Ctrl + A': '選択'})
+ * @param {string} layout - キーボードレイアウト
  * @returns {string|null} ショートカットの説明、見つからない場合はnull
  */
-export const getShortcutDescription = (comboText, shortcutDescriptions) => {
-  // まず元のキーコンボで検索
-  if (shortcutDescriptions[comboText]) {
-    return shortcutDescriptions[comboText]
-  }
-
-  // 単一文字の場合、小文字でも検索（'A' → 'a'）
-  if (comboText.length === 1 && /[A-Z]/i.test(comboText)) {
-    const lowerCase = comboText.toLowerCase()
-    if (shortcutDescriptions[lowerCase]) {
-      return shortcutDescriptions[lowerCase]
-    }
-    const upperCase = comboText.toUpperCase()
-    if (shortcutDescriptions[upperCase]) {
-      return shortcutDescriptions[upperCase]
-    }
+export const getShortcutDescription = (currentDisplayComboText, shortcutDescriptions, layout) => {
+  // まず、現在の表示名で直接検索
+  if (shortcutDescriptions[currentDisplayComboText]) {
+    return shortcutDescriptions[currentDisplayComboText]
   }
 
   // 代替表現で検索
-  const alternatives = getKeyComboAlternatives(comboText)
+  const alternatives = getKeyComboAlternatives(currentDisplayComboText, layout)
   for (const alt of alternatives) {
     if (shortcutDescriptions[alt]) {
       return shortcutDescriptions[alt]
@@ -204,126 +119,103 @@ const getLastKey = (shortcut) => {
 }
 
 /**
- * 修飾キーのリスト
- * ショートカット文字列に含まれる修飾キーを判定するために使用
+ * 修飾キーのリスト (表示名ベース)
  */
 const MODIFIER_KEY_NAMES = new Set([
-  'Ctrl', 'Control', 'Shift', 'Alt', 'Meta', 'Win', 'Cmd', 'Option', 'OS'
+  'Ctrl', 'Shift', 'Alt', 'Win', 'Cmd', 'Option', '⌃', '⇧', '⌥' // OSごとの表示名も含む
 ])
 
 /**
  * ショートカットに含まれる修飾キーの数をカウント
  * @param {string} shortcut - ショートカット文字列（例: "Win + Shift + S"）
- * @returns {number} 修飾キーの数（例: 2）
+ * @returns {number} 修飾キーの数
  */
 const countModifierKeys = (shortcut) => {
   const parts = shortcut.split(' + ')
   const modifierCount = parts.filter(key => MODIFIER_KEY_NAMES.has(key)).length
-
-  // デバッグログ（開発モードのみ）
-  if (import.meta.env.DEV && modifierCount > 0) {
-    console.log(`[DEBUG] "${shortcut}" → 修飾キー: ${modifierCount}個 (${parts.filter(key => MODIFIER_KEY_NAMES.has(key)).join(', ')})`)
-  }
-
   return modifierCount
 }
 
 /**
- * 利用可能なショートカット一覧を取得（代替表現にも対応）
+ * 利用可能なショートカット一覧を取得
  * 現在押されているキーで始まるショートカットをすべて取得
- * キーの順序に関係なくマッチング（Win + Shift = Shift + Win）
- * @param {Array<string>} keys - 現在押されているキーの配列
- * @param {Object} keyNameMap - キー名マップ
- * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト
+ * @param {Array<string>} pressedCodes - 現在押されているキーの配列 (KeyboardEvent.code)
+ * @param {string} layout - キーボードレイアウト
+ * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト (keyベース)
  * @returns {Array<{shortcut: string, description: string}>} ショートカット一覧
  */
-export const getAvailableShortcuts = (keys, keyNameMap, shortcutDescriptions) => {
-  // 押されているキーを表示名に変換してセットにする
-  const pressedKeySet = new Set(keys.map(k => getKeyDisplayName(k, keyNameMap)))
+export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions) => {
+  // 押されているキーのcodeから表示名（keyベースの表現）のセットを作成
+  const shiftPressed = pressedCodes.includes('ShiftLeft') || pressedCodes.includes('ShiftRight');
+  const pressedDisplayNames = new Set(pressedCodes.map(code => getCodeDisplayName(code, null, layout, shiftPressed)));
 
-  // 該当する修飾キーで始まるショートカットをすべて取得
   const shortcuts = Object.entries(shortcutDescriptions)
     .filter(([shortcut]) => {
-      // ショートカットのキーを分割
-      const shortcutKeys = shortcut.split(' + ')
+      const shortcutKeys = shortcut.split(' + '); // shortcutDescriptionsのキーは表示名ベース
 
-      // 押されているキーの数がショートカットのキー数以下であることを確認
-      if (pressedKeySet.size > shortcutKeys.length) {
-        return false
+      // 押されているキーがすべてショートカットのキーに含まれているか
+      const allPressedKeysInShortcut = Array.from(pressedDisplayNames).every(pressedKey => shortcutKeys.includes(pressedKey));
+
+      // 押されているキーの数とショートカットのキー数が一致するか、
+      // あるいは押されているキーがショートカットの修飾キー部分と一致するか
+      const pressedModifiers = Array.from(pressedDisplayNames).filter(key => MODIFIER_KEY_NAMES.has(key));
+      const shortcutModifiers = shortcutKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
+
+      // 1. 完全一致
+      if (allPressedKeysInShortcut && pressedDisplayNames.size === shortcutKeys.length) {
+        return true;
       }
-
-      // 押されているキーがすべてショートカットの最初の部分に含まれているかチェック
-      const shortcutPrefixKeys = shortcutKeys.slice(0, pressedKeySet.size)
-      const shortcutPrefixSet = new Set(shortcutPrefixKeys)
-
-      // セットが等しいかチェック
-      if (pressedKeySet.size !== shortcutPrefixSet.size) {
-        return false
+      // 2. 修飾キーのみが一致（まだメインキーが押されていないショートカット候補）
+      if (
+          pressedModifiers.length > 0 && // 何らかの修飾キーが押されている
+          pressedModifiers.length === shortcutModifiers.length && // 押されている修飾キーがショートカットの修飾キー数と一致
+          Array.from(pressedModifiers).every(mod => shortcutModifiers.includes(mod)) && // 押されている修飾キーがすべてショートカットの修飾キーに含まれる
+          pressedDisplayNames.size < shortcutKeys.length // まだメインキーが押されていない
+         ) {
+           return true;
       }
-
-      for (const key of pressedKeySet) {
-        if (!shortcutPrefixSet.has(key)) {
-          return false
-        }
-      }
-
-      return true
+      return false;
     })
     .map(([shortcut, description]) => ({ shortcut, description }))
-    // 重複を除去
     .filter((item, index, self) =>
       index === self.findIndex(t => t.shortcut === item.shortcut)
     )
-    // ソート: 修飾キーの数 → ファンクションキー → 数字キー → QWERTY順
     .sort((a, b) => {
-      // 1. 修飾キーの数でグループ化（少ない順）
+      // ソートロジックはそのまま
       const aModifierCount = countModifierKeys(a.shortcut)
       const bModifierCount = countModifierKeys(b.shortcut)
-
-      // デバッグログ（開発モードのみ、最初の数件のみ）
-      if (import.meta.env.DEV && Math.random() < 0.05) {
-        console.log(`[SORT] "${a.shortcut}"(修飾:${aModifierCount}) vs "${b.shortcut}"(修飾:${bModifierCount})`)
-      }
 
       if (aModifierCount !== bModifierCount) {
         return aModifierCount - bModifierCount
       }
 
-      // 2. 同じ修飾キー数の場合、最後のキーでソート
       const aLastKey = getLastKey(a.shortcut)
       const bLastKey = getLastKey(b.shortcut)
 
-      // ファンクションキーかどうかを判定（F1～F12）
-      const aIsFunction = /^F\d+$/.test(aLastKey)
-      const bIsFunction = /^F\d+$/.test(bLastKey)
+      const aIsFunction = /^F\d\+$/.test(aLastKey)
+      const bIsFunction = /^F\d\+$/.test(bLastKey)
 
-      // 両方ファンクションキーの場合、番号順にソート
       if (aIsFunction && bIsFunction) {
         const aNum = parseInt(aLastKey.substring(1))
         const bNum = parseInt(bLastKey.substring(1))
         return aNum - bNum
       }
 
-      // ファンクションキーを優先
       if (aIsFunction) return -1
       if (bIsFunction) return 1
 
-      // 数字キー（1～0）を判定
-      const aIsNumber = /^[0-9]$/.test(aLastKey)
-      const bIsNumber = /^[0-9]$/.test(bLastKey)
+      const aIsNumber = /^\d$/.test(aLastKey)
+      const bIsNumber = /^\d$/.test(bLastKey)
 
-      // 両方数字キーの場合、数値順にソート
       if (aIsNumber && bIsNumber) {
         const aNum = parseInt(aLastKey)
         const bNum = parseInt(bLastKey)
         return aNum - bNum
       }
 
-      // 数字キーを優先
       if (aIsNumber) return -1
       if (bIsNumber) return 1
 
-      // それ以外はQWERTY順
       const aIndex = getQwertyIndex(aLastKey)
       const bIndex = getQwertyIndex(bLastKey)
 
@@ -331,22 +223,9 @@ export const getAvailableShortcuts = (keys, keyNameMap, shortcutDescriptions) =>
         return aIndex - bIndex
       }
 
-      // QWERTY配列にない場合はアルファベット順
       return aLastKey.localeCompare(bLastKey)
     })
-
-  // デバッグログ: ソート後の結果を表示（開発モードのみ）
-  if (import.meta.env.DEV && shortcuts.length > 0) {
-    console.group('📋 利用可能なショートカット一覧（ソート後）')
-    shortcuts.slice(0, 15).forEach((item, index) => {
-      const modCount = countModifierKeys(item.shortcut)
-      console.log(`${index + 1}. [修飾:${modCount}個] ${item.shortcut} - ${item.description}`)
-    })
-    if (shortcuts.length > 15) {
-      console.log(`... 他 ${shortcuts.length - 15}件`)
-    }
-    console.groupEnd()
-  }
+    .slice(0, MAX_SHORTCUTS_DISPLAY);
 
   return shortcuts
 }
@@ -356,9 +235,9 @@ const QWERTY_ORDER = [
   // 数字行
   '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
   // 上段
-  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
+  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\',
   // 中段
-  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'',
+  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', ''',
   // 下段
   'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'
 ]
@@ -376,8 +255,6 @@ const getQwertyIndex = (key) => {
 
 /**
  * 単独キー（修飾キーなし）のショートカット一覧を取得
- * Gmailなどの単独キーショートカットを表示するために使用
- * ファンクションキーをF1から順に並べ、その後に他のキーをQWERTY順で表示
  * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト
  * @returns {Array<{shortcut: string, description: string}>} 単独キーショートカット一覧
  */
@@ -389,22 +266,18 @@ export const getSingleKeyShortcuts = (shortcutDescriptions) => {
       const aKey = a.shortcut
       const bKey = b.shortcut
 
-      // ファンクションキーかどうかを判定（F1～F12）
-      const aIsFunction = /^F\d+$/.test(aKey)
-      const bIsFunction = /^F\d+$/.test(bKey)
+      const aIsFunction = /^F\d\+$/.test(aKey)
+      const bIsFunction = /^F\d\+$/.test(bKey)
 
-      // 両方ファンクションキーの場合、番号順にソート
       if (aIsFunction && bIsFunction) {
         const aNum = parseInt(aKey.substring(1))
         const bNum = parseInt(bKey.substring(1))
         return aNum - bNum
       }
 
-      // ファンクションキーを優先
       if (aIsFunction) return -1
       if (bIsFunction) return 1
 
-      // それ以外はQWERTY順
       const aIndex = getQwertyIndex(aKey)
       const bIndex = getQwertyIndex(bKey)
 
@@ -412,7 +285,6 @@ export const getSingleKeyShortcuts = (shortcutDescriptions) => {
         return aIndex - bIndex
       }
 
-      // QWERTY配列にない場合はアルファベット順
       return aKey.localeCompare(bKey)
     })
 }

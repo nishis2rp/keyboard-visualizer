@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import AppHeader from './components/AppHeader'
 import AppSelector from './components/AppSelector'
 import KeyboardLayoutSelector from './components/KeyboardLayoutSelector'
@@ -6,19 +6,21 @@ import KeyDisplay from './components/KeyDisplay'
 import KeyboardLayout from './components/KeyboardLayout'
 import SystemShortcutWarning from './components/SystemShortcutWarning'
 import SetupScreen from './components/SetupScreen'
+import QuestionCard from './components/Quiz/QuestionCard'
+import ScoreBoard from './components/Quiz/ScoreBoard'
+import ResultModal from './components/Quiz/ResultModal'
 import { allShortcuts } from './data/shortcuts'
-import { apps, keyboardLayouts, getKeyNameMap } from './config'
-import { specialKeys, SETUP_VERSION, STORAGE_KEYS, DEFAULTS } from './constants'
-import { getKeyDisplayName } from './utils'
+import { apps } from './config'
+import { specialKeys, SETUP_VERSION, STORAGE_KEYS, DEFAULTS, detectOS } from './constants'
+import { getCodeDisplayName } from './utils/keyMapping'
 import { useKeyboardShortcuts, useLocalStorage, useFullscreen } from './hooks'
+import { QuizProvider, useQuiz } from './context/QuizContext'
+import { windowsJisLayout, macJisLayout, macUsLayout, getLayoutDisplayName } from './data/layouts';
 import './styles/global.css'
 
-/**
- * メインアプリケーションコンポーネント
- * キーボードビジュアライザーのルートコンポーネント
- */
-function App() {
-  // セットアップ情報をLocalStorageから読み込み
+function AppContent({ isQuizMode, setIsQuizMode }) {
+  const { quizState, startQuiz, handleAnswer, dispatch } = useQuiz();
+  const { isFullscreenMode, toggleFullscreenMode } = useFullscreen()
   const [setup, setSetup] = useLocalStorage(
     STORAGE_KEYS.SETUP,
     { setupCompleted: false, app: DEFAULTS.APP, layout: DEFAULTS.LAYOUT },
@@ -28,21 +30,18 @@ function App() {
     }
   )
 
-  // セットアップ完了状態
   const [showSetup, setShowSetup] = useState(!setup.setupCompleted)
-
-  // 選択されているアプリとキーボードレイアウト
   const [selectedApp, setSelectedApp] = useState(setup.app || DEFAULTS.APP)
   const [keyboardLayout, setKeyboardLayout] = useState(setup.layout || DEFAULTS.LAYOUT)
 
-  // フルスクリーン管理
-  const { isFullscreenMode, toggleFullscreenMode } = useFullscreen()
+  // SystemShortcutWarningのモーダルを開く関数を保持するref
+  const openMacWarningModalRef = useRef(null);
 
-  /**
-   * セットアップ完了時のハンドラー
-   * @param {string} app - 選択されたアプリ
-   * @param {string} layout - 選択されたキーボードレイアウト
-   */
+  // SystemShortcutWarningからの関数を受け取るコールバック
+  const onMacWarningModalRequest = useCallback((openModalFunc) => {
+    openMacWarningModalRef.current = openModalFunc;
+  }, []);
+  
   const handleSetupComplete = useCallback((app, layout) => {
     setSelectedApp(app)
     setKeyboardLayout(layout)
@@ -54,90 +53,125 @@ function App() {
     setShowSetup(false)
   }, [setSetup])
 
-  // 現在選択されているアプリのショートカット定義
   const shortcutDescriptions = useMemo(
     () => allShortcuts[selectedApp],
     [selectedApp]
   )
 
-  // 現在選択されているキーボードレイアウトのキー名マップ
-  const keyNameMap = useMemo(
-    () => getKeyNameMap(keyboardLayout),
-    [keyboardLayout]
-  )
+  const keyboardLayouts = useMemo(() => {
+    return [
+      { name: 'windows-jis', displayName: getLayoutDisplayName('windows-jis') },
+      { name: 'mac-jis', displayName: getLayoutDisplayName('mac-jis') },
+      { name: 'mac-us', displayName: getLayoutDisplayName('mac-us') },
+    ];
+  }, []);
 
-  // キーボードショートカットフック
   const {
-    pressedKeys,
+    pressedKeys, // pressedKeysはKeyboardEvent.codeのSet
     history,
     currentDescription,
     availableShortcuts,
     handleClear
-  } = useKeyboardShortcuts(shortcutDescriptions, keyNameMap)
+  } = useKeyboardShortcuts(shortcutDescriptions, keyboardLayout, isQuizMode);
 
-  /**
-   * キー表示名を取得する関数（メモ化済み）
-   * @param {string} key - キー名
-   * @returns {string} 表示用のキー名
-   */
-  const getKeyDisplayNameWithMap = useCallback(
-    (key) => getKeyDisplayName(key, keyNameMap),
-    [keyNameMap]
-  )
+  // getCodeDisplayNameをラップする関数
+  const getDisplayKeyByCode = useCallback(
+    (code, key, shiftPressed) => getCodeDisplayName(code, key, keyboardLayout, shiftPressed),
+    [keyboardLayout]
+  );
 
-  // セットアップ画面を表示
+  // クイズモード切り替え時の処理
+  useEffect(() => {
+    if (isQuizMode) {
+      const os = detectOS();
+      // macOSで、かつクイズモード開始時に特定の警告が必要な場合
+      if (os === 'macos' && openMacWarningModalRef.current) {
+        // 例: Mission Controlのショートカットが有効になっているかチェックするロジックがあればここで
+        // 現状は常に警告を出す形で実装
+        openMacWarningModalRef.current();
+      }
+      // クイズ開始
+      startQuiz(selectedApp, isFullscreenMode);
+    } else {
+      // クイズ終了またはリセット
+      dispatch({ type: 'RESET_QUIZ' });
+    }
+  }, [isQuizMode, selectedApp, isFullscreenMode, startQuiz, dispatch]);
+
+  // クイズモード中にキーが押されたら回答をチェック
+  useEffect(() => {
+    if (isQuizMode && pressedKeys.size > 0 && quizState.status === 'playing') {
+      // handleAnswerに渡すのはpressedKeys(codes)と現在のlayout
+      handleAnswer(pressedKeys, keyboardLayout);
+    }
+  }, [isQuizMode, pressedKeys, keyboardLayout, quizState.status, handleAnswer]);
+
+
   if (showSetup) {
     return <SetupScreen onSetupComplete={handleSetupComplete} />
   }
 
-  // メインアプリケーション画面
   return (
     <div className="container">
-      {/* macOSシステムショートカット警告 */}
-      <SystemShortcutWarning />
-
-      {/* ヘッダー（タイトルとフルスクリーン切り替え） */}
+      {/* onOpenRequestを渡す */}
+      <SystemShortcutWarning onOpenRequest={onMacWarningModalRequest} />
       <AppHeader
         fullscreenMode={isFullscreenMode}
         onToggleFullscreen={toggleFullscreenMode}
+        isQuizMode={isQuizMode}
+        setIsQuizMode={setIsQuizMode}
       />
-
-      {/* アプリ選択とキーボードレイアウト選択 */}
-      <div className="selectors-container">
-        <AppSelector
-          apps={apps}
-          selectedApp={selectedApp}
-          onSelectApp={setSelectedApp}
-        />
-
-        <KeyboardLayoutSelector
-          layouts={keyboardLayouts}
-          selectedLayout={keyboardLayout}
-          onSelectLayout={setKeyboardLayout}
-        />
-      </div>
-
-      {/* キーボードレイアウト表示 */}
-      <KeyboardLayout
-        pressedKeys={pressedKeys}
-        specialKeys={specialKeys}
-        getKeyDisplayName={getKeyDisplayNameWithMap}
-        shortcutDescriptions={shortcutDescriptions}
-        keyboardLayout={keyboardLayout}
-      />
-
-      {/* キー表示エリア（押下中のキー、説明、利用可能なショートカット） */}
-      <KeyDisplay
-        pressedKeys={pressedKeys}
-        specialKeys={specialKeys}
-        getKeyDisplayName={getKeyDisplayNameWithMap}
-        description={currentDescription}
-        availableShortcuts={availableShortcuts}
-        selectedApp={selectedApp}
-        shortcutDescriptions={shortcutDescriptions}
-      />
+      {isQuizMode ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 60px)' }}>
+          <ScoreBoard />
+          <QuestionCard />
+          {quizState.status === 'finished' && <ResultModal />}
+        </div>
+      ) : (
+        <>
+          <div className="selectors-container">
+            <AppSelector
+              apps={apps}
+              selectedApp={selectedApp}
+              onSelectApp={setSelectedApp}
+            />
+            <KeyboardLayoutSelector
+              layouts={keyboardLayouts}
+              selectedLayout={keyboardLayout}
+              onSelectLayout={setKeyboardLayout}
+            />
+          </div>
+          <KeyboardLayout
+            pressedKeys={pressedKeys} // codesのSet
+            specialKeys={specialKeys}
+            getKeyDisplayName={getDisplayKeyByCode} // getCodeDisplayNameを渡す
+            shortcutDescriptions={shortcutDescriptions}
+            keyboardLayout={keyboardLayout}
+          />
+          <KeyDisplay
+            pressedKeys={pressedKeys} // codesのSet
+            specialKeys={specialKeys}
+            getKeyDisplayName={getDisplayKeyByCode} // getCodeDisplayNameを渡す
+            description={currentDescription}
+            availableShortcuts={availableShortcuts}
+            selectedApp={selectedApp}
+            shortcutDescriptions={shortcutDescriptions}
+            keyboardLayout={keyboardLayout} // KeyDisplayにもkeyboardLayoutを渡す
+          />
+        </>
+      )}
     </div>
   )
+}
+
+function App() {
+  const [isQuizMode, setIsQuizMode] = useState(false); // App内で状態を管理し、PropsとしてAppContentに渡す
+
+  return (
+    <QuizProvider>
+      <AppContent isQuizMode={isQuizMode} setIsQuizMode={setIsQuizMode} />
+    </QuizProvider>
+  );
 }
 
 export default App

@@ -9,8 +9,10 @@ import { memo } from 'react'
  *
  * @param {boolean} fullscreenMode - 全画面モード状態
  * @param {function} onToggleFullscreen - 全画面モード切り替えハンドラ
+ * @param {boolean} isQuizMode - クイズモード状態
+ * @param {function} setIsQuizMode - クイズモード切り替えハンドラ
  */
-const AppHeader = memo(({ fullscreenMode, onToggleFullscreen }) => {
+const AppHeader = memo(({ fullscreenMode, onToggleFullscreen, isQuizMode, setIsQuizMode }) => {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
@@ -98,32 +100,60 @@ const AppHeader = memo(({ fullscreenMode, onToggleFullscreen }) => {
             }}>Visualizer</span>
           </div>
         </h1>
-        <button
-          onClick={onToggleFullscreen}
-          style={{
-            padding: '12px 24px',
-            fontSize: '15px',
-            fontWeight: '600',
-            borderRadius: '12px',
-            border: '1px solid ' + (fullscreenMode ? '#FF3B30' : '#007AFF'),
-            background: fullscreenMode ? '#FF3B30' : '#007AFF',
-            color: '#FFFFFF',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
-            transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-1px)'
-            e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.16)'
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(0)'
-            e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.12)'
-          }}
-          title="フルスクリーンモードでショートカット競合を軽減。Keyboard Lock APIによりほとんどのWinキーショートカットをキャプチャできますが、Win+L（ロック）などのセキュリティ関連はOSレベルで保護されています"
-        >
-          {fullscreenMode ? '全画面を終了' : '全画面モード'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}> {/* フルスクリーンボタンとモード切り替えボタンを囲むdiv */}
+          <button
+            onClick={() => setIsQuizMode(!isQuizMode)}
+            style={{
+              padding: '12px 24px',
+              fontSize: '15px',
+              fontWeight: '600',
+              borderRadius: '12px',
+              border: '1px solid ' + (isQuizMode ? '#6C757D' : '#007AFF'), // クイズモード時は色を変える
+              background: isQuizMode ? '#6C757D' : '#007AFF', // クイズモード時は色を変える
+              color: '#FFFFFF',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-1px)'
+              e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.16)'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)'
+              e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.12)'
+            }}
+            title={isQuizMode ? 'クイズモードを終了してビジュアライザーに戻ります' : 'ショートカットを学習するクイズモードを開始します'}
+          >
+            {isQuizMode ? 'Visualizer Mode' : 'Quiz Mode'}
+          </button>
+          <button
+            onClick={onToggleFullscreen}
+            style={{
+              padding: '12px 24px',
+              fontSize: '15px',
+              fontWeight: '600',
+              borderRadius: '12px',
+              border: '1px solid ' + (fullscreenMode ? '#FF3B30' : '#007AFF'),
+              background: fullscreenMode ? '#FF3B30' : '#007AFF',
+              color: '#FFFFFF',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-1px)'
+              e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.16)'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)'
+              e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.12)'
+            }}
+            title="フルスクリーンモードでショートカット競合を軽減。Keyboard Lock APIによりほとんどのWinキーショートカットをキャプチャできますが、Win+L（ロック）などのセキュリティ関連はOSレベルで保護されています"
+          >
+            {fullscreenMode ? '全画面を終了' : '全画面モード'}
+          </button>
+        </div>
       </div>
       <p className="subtitle">
         アプリケーション別のショートカットを視覚的に表示します
@@ -139,7 +169,9 @@ AppHeader.displayName = 'AppHeader'
 
 AppHeader.propTypes = {
   fullscreenMode: PropTypes.bool.isRequired,
-  onToggleFullscreen: PropTypes.func.isRequired
+  onToggleFullscreen: PropTypes.func.isRequired,
+  isQuizMode: PropTypes.bool.isRequired, // 新しく追加
+  setIsQuizMode: PropTypes.func.isRequired // 新しく追加
 }
 
 export default AppHeader

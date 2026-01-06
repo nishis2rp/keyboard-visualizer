@@ -1,40 +1,67 @@
 import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getKeyboardLayoutByName, getLayoutDisplayName } from '../../data/layouts'
+import { getCodeDisplayName } from '../../utils/keyMapping' // getCodeDisplayNameをインポート
 
-const KeyboardLayout = memo(({ pressedKeys, specialKeys, getKeyDisplayName, shortcutDescriptions, keyboardLayout = 'windows-jis' }) => {
+const KeyboardLayout = memo(({ pressedKeys, specialKeys, shortcutDescriptions, keyboardLayout = 'windows-jis' }) => { // getKeyDisplayNameを削除
   // 現在のレイアウトを取得
   const keyboardRows = getKeyboardLayoutByName(keyboardLayout)
   const layoutName = getLayoutDisplayName(keyboardLayout)
 
   // キーが押されているかチェック
-  const isKeyPressed = (key) => {
-    if (key === ' ') return pressedKeys.has(' ')
-    return pressedKeys.has(key) || pressedKeys.has(key.toUpperCase()) || pressedKeys.has(key.toLowerCase())
+  const isKeyPressed = (keyObj) => { // keyObjを引数に
+    if (!keyObj.code) return false; // codeがない場合は判定しない
+
+    // pressedKeysにはcodeが格納されている
+    const isCodePressed = pressedKeys.has(keyObj.code);
+
+    // Shiftキーが押されているか確認
+    const shiftPressed = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight');
+
+    // getCodeDisplayNameで表示名を取得し、そのキーもpressedKeysに含まれるか確認
+    // これは主に修飾キーの表示名をチェックする際に有効だが、今回はcodeベースで統一
+    // const displayKey = getCodeDisplayName(keyObj.code, keyObj.key, keyboardLayout, shiftPressed);
+    // const isDisplayKeyPressed = pressedKeys.has(displayKey); // これは不要、pressedKeysはcode
+
+    return isCodePressed; // codeがpressedKeysにあるかで判定
   }
 
   // キーに関連するショートカットを取得
-  const getKeyShortcuts = (key) => {
-    const displayName = getKeyDisplayName(key)
+  const getKeyShortcuts = (keyObj) => { // keyObjを引数に
+    if (!keyObj.code) return [];
+
+    const shiftPressed = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight');
+    const keyDisplayName = getCodeDisplayName(keyObj.code, keyObj.key, keyboardLayout, shiftPressed); // codeから表示名を取得
     const shortcuts = []
 
     // 単一キーのショートカット
-    if (shortcutDescriptions[displayName]) {
-      shortcuts.push({ combo: displayName, desc: shortcutDescriptions[displayName] })
+    // shortcutDescriptionsは表示名（keyベース）で定義されていると仮定
+    if (shortcutDescriptions[keyDisplayName]) {
+      shortcuts.push({ combo: keyDisplayName, desc: shortcutDescriptions[keyDisplayName] })
     }
 
     // 修飾キーとの組み合わせ
     Object.entries(shortcutDescriptions).forEach(([combo, desc]) => {
-      const comboKeys = combo.split(' + ')
+      const comboKeys = combo.split(' + ') // shortcutDescriptionsのキーは表示名ベース
       const lastKey = comboKeys[comboKeys.length - 1]
 
-      if (lastKey.toUpperCase() === displayName.toUpperCase() ||
-          lastKey.toUpperCase() === key.toUpperCase()) {
+      // キーの表示名がショートカットの最後のキーと一致するか
+      if (lastKey.toUpperCase() === keyDisplayName.toUpperCase()) {
         shortcuts.push({ combo, desc })
       }
     })
 
-    return shortcuts // すべてのショートカットを表示
+    // 重複を排除
+    const uniqueShortcuts = [];
+    const seenCombos = new Set();
+    shortcuts.forEach(s => {
+      if (!seenCombos.has(s.combo)) {
+        uniqueShortcuts.push(s);
+        seenCombos.add(s.combo);
+      }
+    });
+
+    return uniqueShortcuts // すべてのショートカットを表示
   }
 
   return (
@@ -44,9 +71,9 @@ const KeyboardLayout = memo(({ pressedKeys, specialKeys, getKeyDisplayName, shor
         {keyboardRows.map((row, rowIndex) => (
           <div key={rowIndex} className="keyboard-row">
             {row.map((keyObj, keyIndex) => {
-              const isPressed = isKeyPressed(keyObj.key)
-              const isSpecial = specialKeys.has(keyObj.key)
-              const shortcuts = getKeyShortcuts(keyObj.key)
+              const isPressed = isKeyPressed(keyObj) // keyObjを渡す
+              const isSpecial = specialKeys.has(keyObj.key) // keyObj.keyは残す（特殊キーの定義はkeyベースかもしれないため）
+              const shortcuts = getKeyShortcuts(keyObj) // keyObjを渡す
 
               return (
                 <div
@@ -94,7 +121,7 @@ KeyboardLayout.displayName = 'KeyboardLayout'
 KeyboardLayout.propTypes = {
   pressedKeys: PropTypes.instanceOf(Set).isRequired,
   specialKeys: PropTypes.instanceOf(Set).isRequired,
-  getKeyDisplayName: PropTypes.func.isRequired,
+  // getKeyDisplayName: PropTypes.func.isRequired, // 削除
   shortcutDescriptions: PropTypes.objectOf(PropTypes.string).isRequired,
   keyboardLayout: PropTypes.string
 }
