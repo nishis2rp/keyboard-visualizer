@@ -83,7 +83,7 @@ export const windowsJisLayout = [
     { key: 'Comma', code: 'Comma', display: ',', width: 1 },
     { key: 'Period', code: 'Period', display: '.', width: 1 },
     { key: 'Slash', code: 'Slash', display: '/', width: 1 },
-    { key: 'IntlBackslash', code: 'IntlBackslash', display: '\', width: 1 }, // JISでは \
+    { key: 'IntlBackslash', code: 'IntlBackslash', display: '\\\\', width: 1 }, // JISでは \
     { key: 'ShiftRight', code: 'ShiftRight', display: 'Shift', width: 1.5 }, // JISでは右Shiftが短い
   ],
   // 6行目
