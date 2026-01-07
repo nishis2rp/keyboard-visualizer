@@ -50,11 +50,11 @@ const BASE_KEY_MAP = {
 const US_SYMBOL_MAP = {
   // Shiftなし
   'Backquote': '`', 'Minus': '-', 'Equal': '=', 'BracketLeft': '[', 'BracketRight': ']',
-  'Backslash': '\\', 'Semicolon': ';', 'Quote': "'", 'Comma': ',', 'Period': '.', 'Slash': '/',
+  'Backslash': '\', 'Semicolon': ';', 'Quote': "'", 'Comma': ',', 'Period': '.', 'Slash': '/',
 
   // Shiftあり (KeyboardEvent.key で検出される値)
   'ShiftLeft+Backquote': '~', 'ShiftLeft+Minus': '_', 'ShiftLeft+Equal': '+',
-  'ShiftLeft+BracketLeft': '{', 'ShiftLeft+BracketRight': '}', 'ShiftLeft+Backslash': '\\\\',
+  'ShiftLeft+BracketLeft': '{', 'ShiftLeft+BracketRight': '}', 'ShiftLeft+Backslash': '|',
   'ShiftLeft+Semicolon': ':', 'ShiftLeft+Quote': '"', 'ShiftLeft+Comma': '<',
   'ShiftLeft+Period': '>', 'ShiftLeft+Slash': '?',
 
@@ -72,14 +72,14 @@ const US_SYMBOL_MAP = {
 const JIS_SYMBOL_MAP = {
   // Shiftなし (KeyboardEvent.code)
   'Backquote': '`', 'Minus': '-', 'Equal': '^', 'BracketLeft': '[', 'BracketRight': ']',
-  'Backslash': '\\\\', 'Semicolon': ';', 'Quote': ':', 'Comma': ',', 'Period': '.', 'Slash': '/',
+  'Backslash': '\', 'Semicolon': ';', 'Quote': ':', 'Comma': ',', 'Period': '.', 'Slash': '/',
   'IntlYen': '¥', // JIS固有
   'IntlRo': '_',  // JIS固有（アンダーバー）
   'IntlHash': '@', // JIS固有
 
   // Shiftあり (KeyboardEvent.key で検出される値)
   'ShiftLeft+Backquote': '~', 'ShiftLeft+Minus': '=', 'ShiftLeft+Equal': '~',
-  'ShiftLeft+BracketLeft': '{', 'ShiftLeft+BracketRight': '}', 'ShiftLeft+Backslash': '\\\\', // エスケープ
+  'ShiftLeft+BracketLeft': '{', 'ShiftLeft+BracketRight': '}', 'ShiftLeft+Backslash': '|',
   'ShiftLeft+Semicolon': '+', 'ShiftLeft+Quote': '*', 'ShiftLeft+Comma': '<',
   'ShiftLeft+Period': '>', 'ShiftLeft+Slash': '?',
   'ShiftLeft+IntlYen': '|',
@@ -106,12 +106,12 @@ const OS_MODIFIER_MAP = {
   },
   'macos': {
     'MetaLeft': 'Cmd', 'MetaRight': 'Cmd',
-    'ControlLeft': 'Ctrl', // Control Symbol -> Ctrl
-    'ControlRight': 'Ctrl',
-    'ShiftLeft': 'Shift', // Shift Symbol -> Shift
-    'ShiftRight': 'Shift',
-    'AltLeft': 'Alt', // Option Symbol -> Alt
-    'AltRight': 'Alt',
+    'ControlLeft': '⌃', // Control Symbol
+    'ControlRight': '⌃',
+    'ShiftLeft': '⇧', // Shift Symbol
+    'ShiftRight': '⇧',
+    'AltLeft': '⌥', // Option Symbol
+    'AltRight': '⌥',
   },
 };
 

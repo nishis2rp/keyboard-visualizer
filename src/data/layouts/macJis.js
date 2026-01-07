@@ -80,7 +80,7 @@ export const macJisLayout = [
     { key: 'Comma', code: 'Comma', display: ',', width: 1 },
     { key: 'Period', code: 'Period', display: '.', width: 1 },
     { key: 'Slash', code: 'Slash', display: '/', width: 1 },
-    { key: 'Backslash', code: 'Backslash', display: '\\\\', width: 1 }, // JISの「ろ」
+    { key: 'Backslash', code: 'Backslash', display: 'ろ', width: 1 }, // JISの「ろ」
     { key: 'ShiftRight', code: 'ShiftRight', display: 'shift', width: 1.5 },
   ],
   // 6行目

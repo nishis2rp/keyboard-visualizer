@@ -48,7 +48,7 @@ export const macUsLayout = [
     { key: 'KeyP', code: 'KeyP', display: 'P', width: 1 },
     { key: 'BracketLeft', code: 'BracketLeft', display: '[', width: 1 },
     { key: 'BracketRight', code: 'BracketRight', display: ']', width: 1 },
-    { key: 'Backslash', code: 'Backslash', display: '\\\\', width: 1.5 },
+    { key: 'Backslash', code: 'Backslash', display: '\', width: 1.5 },
   ],
   // 4行目
   [

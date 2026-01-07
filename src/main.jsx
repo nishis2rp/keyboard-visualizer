@@ -4,18 +4,17 @@ import App from './App.jsx'
 import './styles'
 
 // Service Workerの登録
-// Service Workerの登録
-// if ('serviceWorker' in navigator && import.meta.env.PROD) { // 開発環境では登録しない
-//   window.addEventListener('load', () => {
-//     navigator.serviceWorker.register('/service-worker.js')
-//       .then(registration => {
-//         console.log('Service Worker registered with scope:', registration.scope);
-//       })
-//       .catch(error => {
-//         console.error('Service Worker registration failed:', error);
-//       });
-//   });
-// }
+if ('serviceWorker' in navigator && import.meta.env.PROD) { // 開発環境では登録しない
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('Service Worker registered with scope:', registration.scope);
+      })
+      .catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+  });
+}
 
 
 createRoot(document.getElementById('root')).render(
