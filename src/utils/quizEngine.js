@@ -9,13 +9,13 @@ import { allShortcuts } from '../data/shortcuts';
 const currentOS = detectOS();
 
 /**
- * ショートカットキー文字列を正規化する
- * - キーをソートすることで、修飾キーの順序に依存しない比較を可能にする
- * - 'Win' キーは 'Meta' キーとして扱う (macOSのCmdキーとの統一)
- * - 修飾キーは大文字で統一
- * - メインキーのアルファベットは小文字で統一（テストケースに合わせる）
- * @param {string} shortcutString - 'Ctrl + Shift + A' のようなショートカット文字列
- * @returns {string} 正規化されたショートカット文字列
+ * Normalizes the shortcut key string.
+ * - Allows for comparison independent of modifier key order by sorting the keys.
+ * - Treats the 'Win' key as the 'Meta' key (for consistency with macOS's Cmd key).
+ * - Standardizes modifier keys to uppercase.
+ * - Standardizes main alphabet keys to uppercase to match test cases.
+ * @param {string} shortcutString - A shortcut string like 'Ctrl + Shift + A'.
+ * @returns {string} The normalized shortcut string.
  */
 export const normalizeShortcut = (shortcutString) => {
   if (!shortcutString) return '';
@@ -59,10 +59,10 @@ export const normalizeShortcut = (shortcutString) => {
 };
 
 /**
- * ユーザーが押したキーの配列をショートカット文字列に変換し、正規化する
- * @param {Set<string>} pressedCodes - 現在押されているキーのコードのセット (例: new Set(['ControlLeft', 'KeyA']))
- * @param {string} layout - キーボードレイアウト
- * @returns {string} 正規化されたショートカット文字列
+ * Converts and normalizes an array of user-pressed keys into a shortcut string.
+ * @param {Set<string>} pressedCodes - A set of codes for currently pressed keys (e.g., new Set(['ControlLeft', 'KeyA'])).
+ * @param {string} layout - The keyboard layout.
+ * @returns {string} The normalized shortcut string.
  */
 export const normalizePressedKeys = (pressedCodes, layout) => {
   const keys = Array.from(pressedCodes)
@@ -98,11 +98,11 @@ export const normalizePressedKeys = (pressedCodes, layout) => {
 
 
 /**
- * ショートカットが安全に出題可能かチェックする
- * @param {string} shortcut - ショートカット文字列 (例: 'Ctrl + W')
- * @param {string} quizMode - クイズモード ('default' or 'hardcore')
- * @param {boolean} isFullscreen - フルスクリーンモードかどうか
- * @returns {boolean} 安全に出題可能であれば true
+ * Checks if a shortcut can be safely presented as a question.
+ * @param {string} shortcut - The shortcut string (e.g., 'Ctrl + W').
+ * @param {string} quizMode - The quiz mode ('default' or 'hardcore').
+ * @param {boolean} isFullscreen - Whether fullscreen mode is active.
+ * @returns {boolean} True if it can be safely presented.
  */
 const isShortcutSafe = (shortcut, quizMode, isFullscreen) => {
   const normalizedShortcut = normalizeShortcut(shortcut);
@@ -126,11 +126,11 @@ const isShortcutSafe = (shortcut, quizMode, isFullscreen) => {
 };
 
 /**
- * ショートカットから問題を作成する
- * @param {Object} shortcuts - アプリケーションのショートカット定義 (例: {'Ctrl+S': '保存'})
- * @param {string} quizMode - クイズモード ('default' or 'hardcore')
- * @param {boolean} isFullscreen - フルスクリーンモードかどうか
- * @returns {{question: string, correctShortcut: string} | null} 問題オブジェクト、またはショートカットがなければnull
+ * Creates a question from a shortcut.
+ * @param {Object} shortcuts - The application's shortcut definitions (e.g., {'Ctrl+S': 'Save'}).
+ * @param {string} quizMode - The quiz mode ('default' or 'hardcore').
+ * @param {boolean} isFullscreen - Whether fullscreen mode is active.
+ * @returns {{question: string, correctShortcut: string, normalizedCorrectShortcut: string} | null} A question object, or null if no shortcuts are available.
  */
 export const generateQuestion = (shortcuts, quizMode = 'default', isFullscreen = false) => {
   const shortcutEntries = Object.entries(shortcuts);
@@ -139,13 +139,13 @@ export const generateQuestion = (shortcuts, quizMode = 'default', isFullscreen =
     return null;
   }
 
-  // 安全なショートカットのみをフィルタリング
+  // Filter for safe shortcuts only
   const safeShortcuts = shortcutEntries.filter(([shortcut, _]) =>
     isShortcutSafe(shortcut, quizMode, isFullscreen)
   );
 
   if (safeShortcuts.length === 0) {
-    console.warn('利用可能な安全なショートカットがありません。フィルタリング設定を確認してください。');
+    console.warn('No safe shortcuts available. Check filter settings.');
     return null;
   }
 
@@ -153,21 +153,21 @@ export const generateQuestion = (shortcuts, quizMode = 'default', isFullscreen =
   const [correctShortcut, description] = safeShortcuts[randomIndex];
 
   return {
-    question: `${description} のショートカットは？`,
+    question: `What is the shortcut for ${description}?`,
     correctShortcut: correctShortcut,
     normalizedCorrectShortcut: normalizeShortcut(correctShortcut),
   };
 };
 
 /**
- * ユーザーの回答が正しいかチェックする
- * @param {string} userAnswer - ユーザーが入力した正規化済みショートカット
- * @param {string} normalizedCorrectAnswer - 正解の正規化済みショートカット
- * @returns {boolean} 正しい場合は true
+ * Checks if the user's answer is correct.
+ * @param {string} userAnswer - The normalized shortcut entered by the user.
+ * @param {string} normalizedCorrectAnswer - The normalized correct shortcut.
+ * @returns {boolean} True if correct.
  */
 export const checkAnswer = (userAnswer, normalizedCorrectAnswer) => {
   return userAnswer === normalizedCorrectAnswer;
 };
 
-// --- テスト用のエクスポート (開発時にのみ使用) ---
+// --- Test exports (only used during development) ---
 export const _testExports = process.env.NODE_ENV === 'test' ? { isShortcutSafe } : {};

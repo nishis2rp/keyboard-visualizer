@@ -1,6 +1,6 @@
 /**
- * サポートされているアプリケーションの一覧
- * 各アプリケーションには専用のショートカット定義がある
+ * List of supported applications.
+ * Each application has its own shortcut definition.
  * @type {Array<{id: string, name: string, icon: string}>}
  */
 export const apps = [
@@ -13,8 +13,8 @@ export const apps = [
 ]
 
 /**
- * サポートされているキーボードレイアウトの一覧
- * レイアウトによってキー配置と表示名が異なる
+ * List of supported keyboard layouts.
+ * Key arrangements and display names differ by layout.
  * @type {Array<{id: string, name: string, icon: string}>}
  */
 export const keyboardLayouts = [

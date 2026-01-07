@@ -232,13 +232,13 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
 
 /** QWERTY配列の順序定義 */
 const QWERTY_ORDER = [
-  // 数字行
+  // Number row
   '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
-  // 上段
-  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\',
-  // 中段
-  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', ''',
-  // 下段
+  // Top row
+  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
+  // Middle row
+  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
+  // Bottom row
   'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'
 ]
 

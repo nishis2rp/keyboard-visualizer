@@ -1,27 +1,27 @@
 /**
- * アプリケーション全体で使用される定数
+ * Constants used throughout the application.
  */
 
 /**
- * セットアップ画面のバージョン
- * バージョンが変わると、既存のセットアップをリセットして再度セットアップを求める
+ * Setup screen version.
+ * If the version changes, the existing setup will be reset and setup will be prompted again.
  */
 export const SETUP_VERSION = 'v2'
 
 /**
- * LocalStorageのキー
+ * LocalStorage keys.
  */
 export const STORAGE_KEYS = {
-  /** セットアップ情報を保存するキー */
+  /** Key for saving setup information. */
   SETUP: 'keyboard-visualizer-setup'
 }
 
 /**
- * デフォルト値
+ * Default values.
  */
 export const DEFAULTS = {
-  /** デフォルトアプリ */
+  /** Default app. */
   APP: 'windows11',
-  /** デフォルトキーボードレイアウト */
+  /** Default keyboard layout. */
   LAYOUT: 'windows-jis'
 }

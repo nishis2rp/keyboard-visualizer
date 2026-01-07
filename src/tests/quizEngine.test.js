@@ -14,18 +14,18 @@ import {
 
 const { isShortcutSafe } = _testExports;
 
-// detectOSをモック化
+// Mock detectOS
 vi.mock('../constants/systemProtectedShortcuts', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
-    detectOS: vi.fn(() => 'windows'), // デフォルトはWindows
+    detectOS: vi.fn(() => 'windows'), // Default to Windows
   };
 });
 
 describe('quizEngine', () => {
   beforeEach(() => {
-    // 各テスト前にモックをリセット
+    // Reset mocks before each test
     detectOS.mockReturnValue('windows');
   });
 
@@ -42,16 +42,16 @@ describe('quizEngine', () => {
     it('should handle "Win" and "Cmd" keys by converting to "Meta"', () => {
       expect(normalizeShortcut('Win + A')).toBe('Meta+A');
       expect(normalizeShortcut('Cmd + S')).toBe('Meta+S');
-      expect(normalizeShortcut('Shift + Win + C')).toBe('Meta+Shift+C'); // 期待値を修正
+      expect(normalizeShortcut('Shift + Win + C')).toBe('Meta+Shift+C'); // Corrected expectation
     });
 
     it('should handle different modifier casing', () => {
-      expect(normalizeShortcut('ctrl + a')).toBe('Ctrl+A'); // 期待値を修正
-      expect(normalizeShortcut('ALT + B')).toBe('Alt+B'); // 期待値を修正
+      expect(normalizeShortcut('ctrl + a')).toBe('Ctrl+A'); // Corrected expectation
+      expect(normalizeShortcut('ALT + B')).toBe('Alt+B'); // Corrected expectation
     });
 
     it('should remove spaces', () => {
-      expect(normalizeShortcut(' Ctrl + A ')).toBe('Ctrl+A'); // 期待値を修正
+      expect(normalizeShortcut(' Ctrl + A ')).toBe('Ctrl+A'); // Corrected expectation
     });
 
     it('should return empty string for null or empty input', () => {
@@ -65,7 +65,7 @@ describe('quizEngine', () => {
     const keyNameMap = {
       'KeyA': 'A', 'KeyB': 'B',
       'ControlLeft': 'Ctrl', 'ShiftLeft': 'Shift', 'AltLeft': 'Alt',
-      'MetaLeft': 'Win', // Windows環境のMetaLeft
+      'MetaLeft': 'Win', // MetaLeft in Windows environment
       'ArrowUp': '↑',
     };
 
@@ -91,13 +91,13 @@ describe('quizEngine', () => {
 
     it('should handle Windows Meta key', () => {
       const pressed = new Set(['MetaLeft', 'KeyD']);
-      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('Meta+D'); // normalizeShortcutでMetaに変換される
+      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('Meta+D'); // Converted to Meta by normalizeShortcut
     });
 
     it('should handle macOS Cmd key', () => {
-      detectOS.mockReturnValue('macos'); // macOSに設定
+      detectOS.mockReturnValue('macos'); // Set to macOS
       const pressed = new Set(['MetaLeft', 'KeyS']);
-      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('Meta+S'); // normalizeShortcutでMetaに変換される
+      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('Meta+S'); // Converted to Meta by normalizeShortcut
     });
   });
 
@@ -115,7 +115,7 @@ describe('quizEngine', () => {
     it('should be unsafe if in ALWAYS_PROTECTED_SHORTCUTS', () => {
       ALWAYS_PROTECTED_SHORTCUTS.add('Ctrl+L');
       expect(isShortcutSafe('Ctrl+L', 'default', false)).toBe(false);
-      expect(isShortcutSafe('Ctrl+L', 'hardcore', true)).toBe(false); // ハードコアでも常に保護
+      expect(isShortcutSafe('Ctrl+L', 'hardcore', true)).toBe(false); // Always protected, even in hardcore mode
     });
 
     it('should be unsafe if in FULLSCREEN_PREVENTABLE_SHORTCUTS and not fullscreen in default mode', () => {
@@ -150,12 +150,12 @@ describe('quizEngine', () => {
     });
 
     it('should generate a question from safe shortcuts in default mode', () => {
-      ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L'); // Win+LはMeta+Lとして正規化される
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W'); // Ctrl+Wはデフォルトで危険
+      ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L'); // Win+L is normalized to Meta+L
+      FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W'); // Ctrl+W is unsafe by default
 
       const question = generateQuestion(mockShortcuts, 'default', false);
       expect(question).not.toBeNull();
-      // Win+L と Ctrl+W が除外されるので、Ctrl+A, Ctrl+S, Alt+F4のいずれか
+      // Win+L and Ctrl+W are excluded, so one of Ctrl+A, Ctrl+S, Alt+F4
       const possibleShortcuts = ['Ctrl+A', 'Ctrl+S', 'Alt+F4'];
       expect(possibleShortcuts).toContain(question.correctShortcut);
       expect(question.question).toMatch(/のショートカットは？$/);
@@ -166,9 +166,9 @@ describe('quizEngine', () => {
       ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L');
       FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
 
-      const question = generateQuestion(mockShortcuts, 'default', true); // フルスクリーン
+      const question = generateQuestion(mockShortcuts, 'default', true); // Fullscreen
       expect(question).not.toBeNull();
-      // Win+L は常に保護なので除外。Ctrl+W はフルスクリーンなので安全になる。
+      // Win+L is always protected and excluded. Ctrl+W becomes safe in fullscreen.
       const possibleShortcuts = ['Ctrl+A', 'Ctrl+S', 'Alt+F4', 'Ctrl+W'];
       expect(possibleShortcuts).toContain(question.correctShortcut);
     });
@@ -177,9 +177,9 @@ describe('quizEngine', () => {
       ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L');
       FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
 
-      const question = generateQuestion(mockShortcuts, 'hardcore', false); // ハードコアモード
+      const question = generateQuestion(mockShortcuts, 'hardcore', false); // Hardcore mode
       expect(question).not.toBeNull();
-      // Win+Lは常に保護なので除外。Ctrl+Wはハードコアモードなので安全になる。
+      // Win+L is always protected and excluded. Ctrl+W becomes safe in hardcore mode.
       const possibleShortcuts = ['Ctrl+A', 'Ctrl+S', 'Alt+F4', 'Ctrl+W'];
       expect(possibleShortcuts).toContain(question.correctShortcut);
     });
@@ -207,7 +207,7 @@ describe('quizEngine', () => {
     });
 
     it('should handle different casing in userAnswer if normalized correctly', () => {
-      // normalizeShortcutによって大文字小文字が正規化される前提
+      // Assumes that casing is normalized by normalizeShortcut
       expect(checkAnswer(normalizeShortcut('ctrl+a'), normalizeShortcut('Ctrl+A'))).toBe(true);
     });
   });

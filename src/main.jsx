@@ -1,7 +1,9 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
-import './styles'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.jsx';
+import { AppProvider } from './context/AppContext.jsx';
+import { QuizProvider } from './context/QuizContext.jsx';
+import './styles';
 
 // Service Workerの登録
 if ('serviceWorker' in navigator && import.meta.env.PROD) { // 開発環境では登録しない
@@ -16,9 +18,12 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) { // 開発環境で�
   });
 }
 
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <AppProvider>
+      <QuizProvider>
+        <App />
+      </QuizProvider>
+    </AppProvider>
   </StrictMode>,
-)
+);

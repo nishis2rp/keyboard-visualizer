@@ -1,6 +1,6 @@
-// Mac JISキーボードレイアウト
+// Mac JIS keyboard layout
 export const macJisLayout = [
-  // 1行目
+  // Row 1
   [
     { key: 'Escape', code: 'Escape', display: 'esc', width: 1 },
     { key: 'F1', code: 'F1', display: 'F1', width: 1 },
@@ -16,9 +16,9 @@ export const macJisLayout = [
     { key: 'F11', code: 'F11', display: 'F11', width: 1 },
     { key: 'F12', code: 'F12', display: 'F12', width: 1 },
   ],
-  // 2行目
+  // Row 2
   [
-    { key: 'IntlRo', code: 'IntlRo', display: '半角/全角', width: 1 }, // JIS固有
+    { key: 'IntlRo', code: 'IntlRo', display: '半/全', width: 1 }, // Zenkaku/Hankaku
     { key: 'Digit1', code: 'Digit1', display: '1', width: 1 },
     { key: 'Digit2', code: 'Digit2', display: '2', width: 1 },
     { key: 'Digit3', code: 'Digit3', display: '3', width: 1 },
@@ -34,7 +34,7 @@ export const macJisLayout = [
     { key: 'IntlYen', code: 'IntlYen', display: '¥', width: 1 },
     { key: 'Backspace', code: 'Backspace', display: 'delete', width: 1.5 },
   ],
-  // 3行目
+  // Row 3
   [
     { key: 'Tab', code: 'Tab', display: 'tab', width: 1.5 },
     { key: 'KeyQ', code: 'KeyQ', display: 'Q', width: 1 },
@@ -51,7 +51,7 @@ export const macJisLayout = [
     { key: 'BracketRight', code: 'BracketRight', display: '[', width: 1 },
     { key: 'Enter', code: 'Enter', display: 'return', width: 1.5 },
   ],
-  // 4行目
+  // Row 4
   [
     { key: 'CapsLock', code: 'CapsLock', display: 'caps', width: 1.75 },
     { key: 'KeyA', code: 'KeyA', display: 'A', width: 1 },
@@ -65,9 +65,9 @@ export const macJisLayout = [
     { key: 'KeyL', code: 'KeyL', display: 'L', width: 1 },
     { key: 'Semicolon', code: 'Semicolon', display: ';', width: 1 },
     { key: 'Quote', code: 'Quote', display: ':', width: 1 },
-    { key: 'IntlBackslash', code: 'IntlBackslash', display: ']', width: 1 }, // JISでは ]
+    { key: 'IntlBackslash', code: 'IntlBackslash', display: ']', width: 1 }, // JIS layout: ]
   ],
-  // 5行目
+  // Row 5
   [
     { key: 'ShiftLeft', code: 'ShiftLeft', display: 'shift', width: 2.25 },
     { key: 'KeyZ', code: 'KeyZ', display: 'Z', width: 1 },
@@ -80,10 +80,10 @@ export const macJisLayout = [
     { key: 'Comma', code: 'Comma', display: ',', width: 1 },
     { key: 'Period', code: 'Period', display: '.', width: 1 },
     { key: 'Slash', code: 'Slash', display: '/', width: 1 },
-    { key: 'Backslash', code: 'Backslash', display: 'ろ', width: 1 }, // JISの「ろ」
+    { key: 'Backslash', code: 'Backslash', display: 'ろ', width: 1 }, // JIS layout: "ro"
     { key: 'ShiftRight', code: 'ShiftRight', display: 'shift', width: 1.5 },
   ],
-  // 6行目
+  // Row 6
   [
     { key: 'ControlLeft', code: 'ControlLeft', display: 'control', width: 1.25 },
     { key: 'AltLeft', code: 'AltLeft', display: 'option', width: 1.25 },

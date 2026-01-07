@@ -3,62 +3,62 @@ import { detectOS } from '../constants/systemProtectedShortcuts';
 const currentOS = detectOS();
 
 // =============================================================================
-// キーボードコードと表示名のマッピング定義
+// Key code and display name mapping definitions
 // ============================================================================
 
-// 一般的なキーコードと表示名のマッピング
-// これらはOSやレイアウトに依存しないことが多いが、一部上書きされる
+// General key code to display name mapping
+// These are often independent of OS or layout, but some are overridden
 const BASE_KEY_MAP = {
-  // 文字キー
+  // Letter keys
   'KeyA': 'A', 'KeyB': 'B', 'KeyC': 'C', 'KeyD': 'D', 'KeyE': 'E', 'KeyF': 'F', 'KeyG': 'G',
   'KeyH': 'H', 'KeyI': 'I', 'KeyJ': 'J', 'KeyK': 'K', 'KeyL': 'L', 'KeyM': 'M', 'KeyN': 'N',
   'KeyO': 'O', 'KeyP': 'P', 'KeyQ': 'Q', 'KeyR': 'R', 'KeyS': 'S', 'KeyT': 'T', 'KeyU': 'U',
   'KeyV': 'V', 'KeyW': 'W', 'KeyX': 'X', 'KeyY': 'Y', 'KeyZ': 'Z',
 
-  // 数字キー
+  // Number keys
   'Digit0': '0', 'Digit1': '1', 'Digit2': '2', 'Digit3': '3', 'Digit4': '4',
   'Digit5': '5', 'Digit6': '6', 'Digit7': '7', 'Digit8': '8', 'Digit9': '9',
 
-  // ファンクションキー
+  // Function keys
   'F1': 'F1', 'F2': 'F2', 'F3': 'F3', 'F4': 'F4', 'F5': 'F5', 'F6': 'F6',
   'F7': 'F7', 'F8': 'F8', 'F9': 'F9', 'F10': 'F10', 'F11': 'F11', 'F12': 'F12',
 
-  // テンキー
+  // Numpad keys
   'Numpad0': 'Num 0', 'Numpad1': 'Num 1', 'Numpad2': 'Num 2', 'Numpad3': 'Num 3',
   'Numpad4': 'Num 4', 'Numpad5': 'Num 5', 'Numpad6': 'Num 6', 'Numpad7': 'Num 7',
   'Numpad8': 'Num 8', 'Numpad9': 'Num 9',
   'NumpadAdd': 'Num +', 'NumpadSubtract': 'Num -', 'NumpadMultiply': 'Num *', 'NumpadDivide': 'Num /',
   'NumpadDecimal': 'Num .', 'NumpadEnter': 'Num Enter', 'NumpadComma': 'Num ,',
 
-  // その他
+  // Others
   'Escape': 'Esc', 'Tab': 'Tab', 'Backspace': 'Bksp', 'Enter': 'Enter', 'Space': 'Space',
   'CapsLock': 'Caps Lock', 'PrintScreen': 'PrtSc', 'ScrollLock': 'Scroll Lock', 'Pause': 'Pause',
   'Insert': 'Ins', 'Home': 'Home', 'PageUp': 'PgUp', 'Delete': 'Del', 'End': 'End', 'PageDown': 'PgDn',
   'ArrowUp': '↑', 'ArrowDown': '↓', 'ArrowLeft': '←', 'ArrowRight': '→',
   'NumLock': 'Num Lock', 'ContextMenu': 'Menu', 'Power': 'Power',
-  'KanaMode': 'Kana', 'IntlRo': 'Ro', 'Convert': '変換', 'NonConvert': '無変換',
+  'KanaMode': 'Kana', 'IntlRo': 'Ro', 'Convert': 'Convert', 'NonConvert': 'NonConvert',
 
-  // 修飾キー (OSによって表示名が変わる可能性があるため注意)
+  // Modifier keys (display names may change by OS, so be careful)
   'ControlLeft': 'Ctrl', 'ControlRight': 'Ctrl',
   'ShiftLeft': 'Shift', 'ShiftRight': 'Shift',
   'AltLeft': 'Alt', 'AltRight': 'Alt',
 };
 
 // =============================================================================
-// US配列の記号キーマッピング (Shiftなし/あり)
+// US layout symbol key mapping (no Shift / with Shift)
 // ============================================================================
 const US_SYMBOL_MAP = {
-  // Shiftなし
+  // No Shift
   'Backquote': '`', 'Minus': '-', 'Equal': '=', 'BracketLeft': '[', 'BracketRight': ']',
-  'Backslash': '\', 'Semicolon': ';', 'Quote': "'", 'Comma': ',', 'Period': '.', 'Slash': '/',
+  'Backslash': '\\', 'Semicolon': ';', 'Quote': "'", 'Comma': ',', 'Period': '.', 'Slash': '/',
 
-  // Shiftあり (KeyboardEvent.key で検出される値)
+  // With Shift (values detected by KeyboardEvent.key)
   'ShiftLeft+Backquote': '~', 'ShiftLeft+Minus': '_', 'ShiftLeft+Equal': '+',
   'ShiftLeft+BracketLeft': '{', 'ShiftLeft+BracketRight': '}', 'ShiftLeft+Backslash': '|',
   'ShiftLeft+Semicolon': ':', 'ShiftLeft+Quote': '"', 'ShiftLeft+Comma': '<',
   'ShiftLeft+Period': '>', 'ShiftLeft+Slash': '?',
 
-  // 数字キーのShift記号 (KeyboardEvent.key で検出される値)
+  // Shift symbols for number keys (values detected by KeyboardEvent.key)
   'ShiftLeft+Digit1': '!', 'ShiftLeft+Digit2': '@', 'ShiftLeft+Digit3': '#',
   'ShiftLeft+Digit4': '$', 'ShiftLeft+Digit5': '%', 'ShiftLeft+Digit6': '^',
   'ShiftLeft+Digit7': '&', 'ShiftLeft+Digit8': '*', 'ShiftLeft+Digit9': '(',
@@ -67,35 +67,35 @@ const US_SYMBOL_MAP = {
 
 
 // =============================================================================
-// JIS配列の記号キーマッピング (Shiftなし/あり)
+// JIS layout symbol key mapping (no Shift / with Shift)
 // ============================================================================
 const JIS_SYMBOL_MAP = {
-  // Shiftなし (KeyboardEvent.code)
+  // No Shift (KeyboardEvent.code)
   'Backquote': '`', 'Minus': '-', 'Equal': '^', 'BracketLeft': '[', 'BracketRight': ']',
-  'Backslash': '\', 'Semicolon': ';', 'Quote': ':', 'Comma': ',', 'Period': '.', 'Slash': '/',
-  'IntlYen': '¥', // JIS固有
-  'IntlRo': '_',  // JIS固有（アンダーバー）
-  'IntlHash': '@', // JIS固有
+  'Backslash': '\\', 'Semicolon': ';', 'Quote': ':', 'Comma': ',', 'Period': '.', 'Slash': '/',
+  'IntlYen': '¥', // JIS specific
+  'IntlRo': '_',  // JIS specific (underscore)
+  'IntlHash': '@', // JIS specific
 
-  // Shiftあり (KeyboardEvent.key で検出される値)
+  // With Shift (values detected by KeyboardEvent.key)
   'ShiftLeft+Backquote': '~', 'ShiftLeft+Minus': '=', 'ShiftLeft+Equal': '~',
   'ShiftLeft+BracketLeft': '{', 'ShiftLeft+BracketRight': '}', 'ShiftLeft+Backslash': '|',
   'ShiftLeft+Semicolon': '+', 'ShiftLeft+Quote': '*', 'ShiftLeft+Comma': '<',
   'ShiftLeft+Period': '>', 'ShiftLeft+Slash': '?',
   'ShiftLeft+IntlYen': '|',
-  'ShiftLeft+IntlRo': 'ローマ字', // ローマ字切り替え (仮)
+  'ShiftLeft+IntlRo': 'Romaji', // Romaji toggle (tentative)
   'ShiftLeft+IntlHash': '`',
 
-  // 数字キーのShift記号 (KeyboardEvent.key で検出される値)
+  // Shift symbols for number keys (values detected by KeyboardEvent.key)
   'ShiftLeft+Digit1': '!', 'ShiftLeft+Digit2': '"', 'ShiftLeft+Digit3': '#',
   'ShiftLeft+Digit4': '$', 'ShiftLeft+Digit5': '%', 'ShiftLeft+Digit6': '&',
   'ShiftLeft+Digit7': "'", 'ShiftLeft+Digit8': '(', 'ShiftLeft+Digit9': ')',
-  'ShiftLeft+Digit0': '0', // JISのShift+0は0
+  'ShiftLeft+Digit0': '0', // JIS Shift+0 is 0
 };
 
 
 // =============================================================================
-// OSごとの修飾キー表示名
+// Modifier key display names per OS
 // ============================================================================
 const OS_MODIFIER_MAP = {
   'windows': {
@@ -117,22 +117,22 @@ const OS_MODIFIER_MAP = {
 
 
 /**
- * キーコードから表示名を取得する
- * @param {string} code - KeyboardEvent.code (例: 'KeyA', 'BracketLeft')
- * @param {string} key - KeyboardEvent.key (例: 'a', '[', '{')
- * @param {string} layout - 選択されているキーボードレイアウト ('macUs', 'macJis', 'windowsJis')
- * @param {boolean} shiftPressed - Shiftキーが押されているか
- * @returns {string} 表示用のキー名
+ * Gets the display name from a key code.
+ * @param {string} code - KeyboardEvent.code (e.g., 'KeyA', 'BracketLeft')
+ * @param {string} key - KeyboardEvent.key (e.g., 'a', '[', '{')
+ * @param {string} layout - The selected keyboard layout ('macUs', 'macJis', 'windowsJis')
+ * @param {boolean} shiftPressed - Whether the Shift key is pressed
+ * @returns {string} The display name for the key
  */
 export const getCodeDisplayName = (code, key, layout, shiftPressed) => {
   let displayKey = '';
 
-  // 1. OS固有の修飾キーマッピング
+  // 1. OS-specific modifier key mapping
   if (OS_MODIFIER_MAP[currentOS] && OS_MODIFIER_MAP[currentOS][code]) {
     return OS_MODIFIER_MAP[currentOS][code];
   }
 
-  // 2. レイアウト固有の記号マッピング
+  // 2. Layout-specific symbol mapping
   if (layout.includes('us')) {
     displayKey = US_SYMBOL_MAP[code];
     if (shiftPressed && US_SYMBOL_MAP[`ShiftLeft+${code}`]) {
@@ -145,37 +145,37 @@ export const getCodeDisplayName = (code, key, layout, shiftPressed) => {
     }
   }
 
-  // 3. 基本マッピング (レイアウト固有で上書きされなかった場合)
+  // 3. Base mapping (if not overridden by layout-specific)
   if (!displayKey && BASE_KEY_MAP[code]) {
     displayKey = BASE_KEY_MAP[code];
   }
 
-  // 4. マッピングにない場合、KeyboardEvent.keyを使用
+  // 4. Use KeyboardEvent.key if no mapping found
   if (!displayKey && key) {
     if (key.length === 1 && /[a-z]/i.test(key)) {
-      return key.toUpperCase(); // アルファベットは常に大文字に
+      return key.toUpperCase(); // Always uppercase for letters
     }
     return key;
   }
 
-  // 5. 最終フォールバック
+  // 5. Final fallback
   return displayKey || code;
 };
 
 
 /**
- * pressedKeys (codeのSet) から表示名の配列を生成
- * @param {Set<string>} pressedCodes - 現在押されているキーの KeyboardEvent.code のセット
- * @param {string} layout - 選択されているキーボードレイアウト ('macUs', 'macJis', 'windowsJis')
- * @returns {string[]} 表示名の配列
+ * Generates an array of display names from a Set of pressed codes.
+ * @param {Set<string>} pressedCodes - Set of KeyboardEvent.code for currently pressed keys
+ * @param {string} layout - The selected keyboard layout ('macUs', 'macJis', 'windowsJis')
+ * @returns {string[]} Array of display names
  */
 export const getDisplayNamesFromCodes = (pressedCodes, layout) => {
   const shiftPressed = pressedCodes.has('ShiftLeft') || pressedCodes.has('ShiftRight');
   
   const displayNames = Array.from(pressedCodes).map(code => {
-    // pressedCodesにはcodeしか含まれていないため、keyは不明。
-    // そのため、getCodeDisplayNameのkey引数にはnullを渡すか、
-    // ここでkeyを推測するロジックが必要だが、複雑になるためまずはcodeベースで。
+    // Since pressedCodes only contains 'code', 'key' is unknown.
+    // We could pass null for the key argument to getCodeDisplayName,
+    // or implement logic to infer the key here, but for now we'll proceed based on code.
     return getCodeDisplayName(code, null, layout, shiftPressed);
   });
 
