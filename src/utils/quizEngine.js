@@ -153,7 +153,7 @@ export const generateQuestion = (shortcuts, quizMode = 'default', isFullscreen =
   const [correctShortcut, description] = safeShortcuts[randomIndex];
 
   return {
-    question: `What is the shortcut for ${description}?`,
+    question: `${description}のショートカットは？`,
     correctShortcut: correctShortcut,
     normalizedCorrectShortcut: normalizeShortcut(correctShortcut),
   };

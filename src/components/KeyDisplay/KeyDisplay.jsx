@@ -19,8 +19,7 @@ const KeyDisplay = memo(({ pressedKeys, specialKeys, getDisplayKeyByCode, descri
 
   if (pressedKeys.size === 0) {
     // すべてのアプリケーションで単独キーショートカットを表示
-    // getSingleKeyShortcutsもlayoutを考慮するように修正が必要かもしれない
-    const singleKeyShortcuts = getSingleKeyShortcuts(shortcutDescriptions, keyboardLayout) // keyboardLayoutを渡す
+    const singleKeyShortcuts = getSingleKeyShortcuts(shortcutDescriptions)
 
     if (singleKeyShortcuts.length > 0) {
       return (

@@ -1,6 +1,6 @@
 import { useState } from 'react'
+import { SETUP_VERSION } from '../../constants/app'
 import './SetupScreen.css'
-const SETUP_VERSION = 'v2'
 
 const SetupScreen = ({ onSetupComplete }) => {
   const [selectedOption, setSelectedOption] = useState(null)

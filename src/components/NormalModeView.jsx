@@ -6,6 +6,7 @@ import KeyDisplay from './KeyDisplay';
 import { useKeyboardShortcuts } from '../hooks';
 import { useAppContext } from '../context/AppContext';
 import { getCodeDisplayName } from '../utils/keyMapping';
+import { specialKeys } from '../constants/keys';
 
 const NormalModeView = () => {
   const {
@@ -15,15 +16,13 @@ const NormalModeView = () => {
     setKeyboardLayout,
     shortcutDescriptions,
     keyboardLayouts,
-    apps, // useAppContextからappsを取得
+    apps,
   } = useAppContext();
 
   const {
     pressedKeys,
-    history, // これはまだ使われていないが、将来のために残す
     currentDescription,
     availableShortcuts,
-    handleClear, // これも同様
   } = useKeyboardShortcuts(shortcutDescriptions, keyboardLayout, false);
 
   const getDisplayKeyByCode = (code, key, shiftPressed) => {
@@ -34,7 +33,7 @@ const NormalModeView = () => {
     <>
       <div className="selectors-container">
         <AppSelector
-          apps={apps} // Contextから取得したappsを使用
+          apps={apps}
           selectedApp={selectedApp}
           onSelectApp={setSelectedApp}
         />
@@ -46,7 +45,7 @@ const NormalModeView = () => {
       </div>
       <KeyboardLayout
         pressedKeys={pressedKeys}
-        getKeyDisplayName={getDisplayKeyByCode}
+        specialKeys={specialKeys}
         shortcutDescriptions={shortcutDescriptions}
         keyboardLayout={keyboardLayout}
       />

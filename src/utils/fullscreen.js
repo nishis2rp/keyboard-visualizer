@@ -17,8 +17,6 @@ const lockKeyboard = async () => {
       // 引数なしで呼び出すことで、できるだけ多くのキーをロック
       // （Escキーを除く。Escキーは全画面モードを終了するために常に利用可能）
       await navigator.keyboard.lock()
-      console.log('キーボードロックが有効化されました（可能な限りすべてのキーをキャプチャします）')
-      console.log('⚠️ 注意: Win+L（ロック）などのセキュリティ関連ショートカットはOSレベルで保護されており、キャプチャできません')
     }
   } catch (error) {
     console.warn('キーボードロックに失敗:', error)
@@ -33,7 +31,6 @@ const unlockKeyboard = () => {
   try {
     if (navigator.keyboard && navigator.keyboard.unlock) {
       navigator.keyboard.unlock()
-      console.log('キーボードロックが解除されました')
     }
   } catch (error) {
     console.warn('キーボードロック解除に失敗:', error)
