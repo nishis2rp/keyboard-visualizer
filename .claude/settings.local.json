@@ -14,7 +14,10 @@
       "Bash(done)",
       "Bash(grep:*)",
       "Bash(echo:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx vite build)"
     ],
     "deny": [],
     "ask": []

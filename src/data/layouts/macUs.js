@@ -1,6 +1,22 @@
 // Mac US keyboard layout
 export const macUsLayout = [
-  // Row 1 (Number row)
+  // Row 1 (Function keys)
+  [
+    { key: 'Escape', code: 'Escape', display: 'esc', width: 1 },
+    { key: 'F1', code: 'F1', display: 'F1', width: 1 },
+    { key: 'F2', code: 'F2', display: 'F2', width: 1 },
+    { key: 'F3', code: 'F3', display: 'F3', width: 1 },
+    { key: 'F4', code: 'F4', display: 'F4', width: 1 },
+    { key: 'F5', code: 'F5', display: 'F5', width: 1 },
+    { key: 'F6', code: 'F6', display: 'F6', width: 1 },
+    { key: 'F7', code: 'F7', display: 'F7', width: 1 },
+    { key: 'F8', code: 'F8', display: 'F8', width: 1 },
+    { key: 'F9', code: 'F9', display: 'F9', width: 1 },
+    { key: 'F10', code: 'F10', display: 'F10', width: 1 },
+    { key: 'F11', code: 'F11', display: 'F11', width: 1 },
+    { key: 'F12', code: 'F12', display: 'F12', width: 1 },
+  ],
+  // Row 2 (Number row)
   [
     { key: 'Backquote', code: 'Backquote', display: '`', width: 1 },
     { key: 'Digit1', code: 'Digit1', display: '1', width: 1 },

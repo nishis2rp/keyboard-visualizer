@@ -1,6 +1,22 @@
 // Windows JIS keyboard layout
 export const windowsJisLayout = [
-  // Row 1 (Number row)
+  // Row 1 (Function keys)
+  [
+    { key: 'Escape', code: 'Escape', display: 'Esc', width: 1 },
+    { key: 'F1', code: 'F1', display: 'F1', width: 1 },
+    { key: 'F2', code: 'F2', display: 'F2', width: 1 },
+    { key: 'F3', code: 'F3', display: 'F3', width: 1 },
+    { key: 'F4', code: 'F4', display: 'F4', width: 1 },
+    { key: 'F5', code: 'F5', display: 'F5', width: 1 },
+    { key: 'F6', code: 'F6', display: 'F6', width: 1 },
+    { key: 'F7', code: 'F7', display: 'F7', width: 1 },
+    { key: 'F8', code: 'F8', display: 'F8', width: 1 },
+    { key: 'F9', code: 'F9', display: 'F9', width: 1 },
+    { key: 'F10', code: 'F10', display: 'F10', width: 1 },
+    { key: 'F11', code: 'F11', display: 'F11', width: 1 },
+    { key: 'F12', code: 'F12', display: 'F12', width: 1 },
+  ],
+  // Row 2 (Number row)
   [
     { key: 'Backquote', code: 'Backquote', display: '`', width: 1 }, // Zenkaku/Hankaku
     { key: 'Digit1', code: 'Digit1', display: '1', width: 1 },
@@ -79,25 +95,5 @@ export const windowsJisLayout = [
     { key: 'ArrowLeft', code: 'ArrowLeft', display: '←', width: 1 },
     { key: 'ArrowDown', code: 'ArrowDown', display: '↓', width: 1 },
     { key: 'ArrowRight', code: 'ArrowRight', display: '→', width: 1 },
-  ],
-  // Numpad and others (layout is temporary)
-  [
-    { key: 'NumLock', code: 'NumLock', display: 'NumLk', width: 1 },
-    { key: 'NumpadDivide', code: 'NumpadDivide', display: 'Num /', width: 1 },
-    { key: 'NumpadMultiply', code: 'NumpadMultiply', display: 'Num *', width: 1 },
-    { key: 'NumpadSubtract', code: 'NumpadSubtract', display: 'Num -', width: 1 },
-    { key: 'Numpad7', code: 'Numpad7', display: 'Num 7', width: 1 },
-    { key: 'Numpad8', code: 'Numpad8', display: 'Num 8', width: 1 },
-    { key: 'Numpad9', code: 'Numpad9', display: 'Num 9', width: 1 },
-    { key: 'NumpadAdd', code: 'NumpadAdd', display: 'Num +', width: 1 },
-    { key: 'Numpad4', code: 'Numpad4', display: 'Num 4', width: 1 },
-    { key: 'Numpad5', code: 'Numpad5', display: 'Num 5', width: 1 },
-    { key: 'Numpad6', code: 'Numpad6', display: 'Num 6', width: 1 },
-    { key: 'Numpad1', code: 'Numpad1', display: 'Num 1', width: 1 },
-    { key: 'Numpad2', code: 'Numpad2', display: 'Num 2', width: 1 },
-    { key: 'Numpad3', code: 'Numpad3', display: 'Num 3', width: 1 },
-    { key: 'NumpadEnter', code: 'NumpadEnter', display: 'Num Ent', width: 1 },
-    { key: 'Numpad0', code: 'Numpad0', display: 'Num 0', width: 2 },
-    { key: 'NumpadDecimal', code: 'NumpadDecimal', display: 'Num .', width: 1 },
   ],
 ]
