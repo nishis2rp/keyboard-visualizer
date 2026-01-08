@@ -88,11 +88,12 @@ export const windowsJisLayout = [
     { key: 'ControlLeft', code: 'ControlLeft', display: 'Ctrl', width: 1.5 },
     { key: 'MetaLeft', code: 'MetaLeft', display: 'Win', width: 1.25 },
     { key: 'AltLeft', code: 'AltLeft', display: 'Alt', width: 1.25 },
-    { key: 'Space', code: 'Space', display: 'Space', width: 5 },
+    { key: 'Space', code: 'Space', display: 'Space', width: 4.5 },
     { key: 'AltRight', code: 'AltRight', display: 'Alt', width: 1.25 },
     { key: 'KanaMode', code: 'KanaMode', display: 'かな', width: 1 }, // JIS specific
     { key: 'ControlRight', code: 'ControlRight', display: 'Ctrl', width: 1.25 },
     { key: 'ArrowLeft', code: 'ArrowLeft', display: '←', width: 1 },
+    { key: 'ArrowUp', code: 'ArrowUp', display: '↑', width: 1 },
     { key: 'ArrowDown', code: 'ArrowDown', display: '↓', width: 1 },
     { key: 'ArrowRight', code: 'ArrowRight', display: '→', width: 1 },
   ],

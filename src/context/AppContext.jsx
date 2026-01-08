@@ -41,9 +41,9 @@ export const AppProvider = ({ children }) => {
 
   const keyboardLayouts = useMemo(() => {
     return [
-      { name: 'windows-jis', displayName: getLayoutDisplayName('windows-jis') },
-      { name: 'mac-jis', displayName: getLayoutDisplayName('mac-jis') },
-      { name: 'mac-us', displayName: getLayoutDisplayName('mac-us') },
+      { id: 'windows-jis', icon: '⊞', name: 'Windows JIS' },
+      { id: 'mac-jis', icon: '', name: 'Mac JIS' },
+      { id: 'mac-us', icon: '', name: 'Mac US' },
     ];
   }, []);
 
