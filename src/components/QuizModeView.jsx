@@ -33,6 +33,18 @@ const QuizModeView = () => {
     };
   }, [selectedApp, isFullscreenMode, startQuiz, dispatch]);
 
+  // Auto-pause on window blur (focus loss)
+  useEffect(() => {
+    const handleWindowBlur = () => {
+      if (quizState.status === 'playing') {
+        dispatch({ type: 'PAUSE_QUIZ' });
+      }
+    };
+
+    window.addEventListener('blur', handleWindowBlur);
+    return () => window.removeEventListener('blur', handleWindowBlur);
+  }, [quizState.status, dispatch]);
+
   useEffect(() => {
     if (pressedKeys.size > 0 && quizState.status === 'playing') {
       handleAnswer(pressedKeys, keyboardLayout);
@@ -46,7 +58,7 @@ const QuizModeView = () => {
     }
 
     const timer = setInterval(() => {
-      const newTime = quizState.timeRemaining - 0.1;
+      const newTime = Math.max(0, quizState.timeRemaining - 0.1);
 
       if (newTime <= 0) {
         dispatch({ type: 'TIMEOUT' });

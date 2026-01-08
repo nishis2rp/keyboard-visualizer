@@ -51,17 +51,35 @@ function quizReducer(state, action) {
         lastAnswerResult: null,
       };
     case 'ANSWER_QUESTION': {
-      const { userAnswer, isCorrect } = action.payload;
-      const newScore = state.score + (isCorrect ? 1 : 0);
+      const { userAnswer, isCorrect, answerTimeMs } = action.payload;
+
+      // Speed bonus calculation
+      const calculateSpeedBonus = (timeMs) => {
+        if (timeMs < 1000) return 2; // Fast: 2 points bonus
+        if (timeMs < 3000) return 1; // Normal: 1 point bonus
+        return 0; // Slow: no bonus
+      };
+
+      const speedBonus = isCorrect ? calculateSpeedBonus(answerTimeMs) : 0;
+      const newScore = state.score + (isCorrect ? 1 : 0) + speedBonus;
       const newMistakes = state.mistakes + (isCorrect ? 0 : 1);
       const newCombo = isCorrect ? state.combo + 1 : 0;
       const newMaxCombo = Math.max(state.maxCombo, newCombo);
+
+      // Categorize answer speed
+      const getSpeedCategory = (timeMs) => {
+        if (timeMs < 1000) return 'fast';
+        if (timeMs < 3000) return 'normal';
+        return 'slow';
+      };
 
       const historyEntry = {
         question: state.currentQuestion.question,
         correctShortcut: state.currentQuestion.correctShortcut,
         userAnswer: userAnswer,
         isCorrect: isCorrect,
+        answerTimeMs: answerTimeMs,
+        speedCategory: getSpeedCategory(answerTimeMs),
       };
 
       return {
@@ -189,12 +207,15 @@ export function QuizProvider({ children }) {
       return;
     }
 
+    // Calculate answer time
+    const answerTimeMs = Date.now() - quizState.questionStartTime;
+
     const userAnswer = normalizePressedKeys(pressedKeys, keyNameMap);
     const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
 
-    dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect } });
+    dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
     getNextQuestion(); // 次の問題へ
-  }, [quizState.status, quizState.currentQuestion, getNextQuestion]);
+  }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, getNextQuestion]);
 
   // コンテキストに渡す値
   const value = {

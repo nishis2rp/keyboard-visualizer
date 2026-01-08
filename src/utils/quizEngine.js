@@ -160,12 +160,34 @@ export const generateQuestion = (shortcuts, quizMode = 'default', isFullscreen =
 };
 
 /**
+ * Grace Period for key combination judgment (in milliseconds)
+ * Allows user to complete key combination within this time window
+ */
+export const GRACE_PERIOD_MS = 300;
+
+/**
  * Checks if the user's answer is correct.
  * @param {string} userAnswer - The normalized shortcut entered by the user.
  * @param {string} normalizedCorrectAnswer - The normalized correct shortcut.
  * @returns {boolean} True if correct.
  */
 export const checkAnswer = (userAnswer, normalizedCorrectAnswer) => {
+  return userAnswer === normalizedCorrectAnswer;
+};
+
+/**
+ * Checks if the user's answer is correct with grace period consideration.
+ * @param {string} userAnswer - The normalized shortcut entered by the user.
+ * @param {string} normalizedCorrectAnswer - The normalized correct shortcut.
+ * @param {number} answerTimeMs - Time taken to answer (in milliseconds).
+ * @returns {boolean} True if correct.
+ */
+export const checkAnswerWithGracePeriod = (userAnswer, normalizedCorrectAnswer, answerTimeMs) => {
+  // Within grace period, allow answer
+  if (answerTimeMs <= GRACE_PERIOD_MS) {
+    return userAnswer === normalizedCorrectAnswer;
+  }
+  // After grace period, still check for correctness
   return userAnswer === normalizedCorrectAnswer;
 };
 

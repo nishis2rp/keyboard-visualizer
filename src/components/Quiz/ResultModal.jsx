@@ -29,6 +29,24 @@ function ResultModal() {
       .map(([shortcut, count]) => ({ shortcut, count }));
   }, [quizHistory]);
 
+  // 回答速度の統計
+  const speedStats = useMemo(() => {
+    const correctAnswers = quizHistory.filter(entry => entry.isCorrect && entry.answerTimeMs);
+    if (correctAnswers.length === 0) return null;
+
+    const avgTime = correctAnswers.reduce((sum, entry) => sum + entry.answerTimeMs, 0) / correctAnswers.length;
+    const fastCount = correctAnswers.filter(entry => entry.speedCategory === 'fast').length;
+    const normalCount = correctAnswers.filter(entry => entry.speedCategory === 'normal').length;
+    const slowCount = correctAnswers.filter(entry => entry.speedCategory === 'slow').length;
+
+    return {
+      avgTime: (avgTime / 1000).toFixed(2),
+      fastCount,
+      normalCount,
+      slowCount,
+    };
+  }, [quizHistory]);
+
   // ランク付け
   const getRank = (accuracy) => {
     if (accuracy >= 95) return { rank: 'S', color: '#ffd700', emoji: '🏆' };
@@ -138,6 +156,37 @@ function ResultModal() {
             <div style={{ color: '#a855f7', fontWeight: 'bold', fontSize: '1.5rem' }}>⏱️ {timeTaken}秒</div>
           </div>
         </div>
+
+        {/* 回答速度統計 */}
+        {speedStats && (
+          <div style={{
+            marginTop: '20px',
+            padding: '15px',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            borderRadius: '8px',
+            border: '1px solid #8b5cf6',
+          }}>
+            <h3 style={{ fontSize: '1.3rem', color: '#a78bfa', marginBottom: '10px' }}>⚡ 回答速度</h3>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'space-around', fontSize: '0.95rem' }}>
+              <div>
+                <div style={{ color: '#9ca3af' }}>平均</div>
+                <div style={{ color: '#a78bfa', fontWeight: 'bold' }}>{speedStats.avgTime}秒</div>
+              </div>
+              <div>
+                <div style={{ color: '#9ca3af' }}>高速 🚀</div>
+                <div style={{ color: '#4ade80', fontWeight: 'bold' }}>{speedStats.fastCount}問</div>
+              </div>
+              <div>
+                <div style={{ color: '#9ca3af' }}>普通 ⏱️</div>
+                <div style={{ color: '#fbbf24', fontWeight: 'bold' }}>{speedStats.normalCount}問</div>
+              </div>
+              <div>
+                <div style={{ color: '#9ca3af' }}>遅い 🐢</div>
+                <div style={{ color: '#fb923c', fontWeight: 'bold' }}>{speedStats.slowCount}問</div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {difficultShortcuts.length > 0 && (
           <div style={{ marginTop: '20px', textAlign: 'left' }}>
