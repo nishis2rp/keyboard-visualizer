@@ -2,7 +2,6 @@
  * ユーティリティ関数のエントリーポイント
  */
 export {
-  getKeyDisplayName,
   sortKeys,
   getKeyComboText,
   getShortcutDescription,
