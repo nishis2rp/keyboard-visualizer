@@ -18,7 +18,7 @@ export const macJisLayout = [
   ],
   // Row 2 (Number row)
   [
-    { key: 'IntlRo', code: 'IntlRo', display: '半/全', width: 1 }, // Zenkaku/Hankaku
+    { key: 'Backquote', code: 'Backquote', display: '半/全', width: 1 }, // Zenkaku/Hankaku
     { key: 'Digit1', code: 'Digit1', display: '1', width: 1 },
     { key: 'Digit2', code: 'Digit2', display: '2', width: 1 },
     { key: 'Digit3', code: 'Digit3', display: '3', width: 1 },
@@ -80,7 +80,7 @@ export const macJisLayout = [
     { key: 'Comma', code: 'Comma', display: ',', width: 1 },
     { key: 'Period', code: 'Period', display: '.', width: 1 },
     { key: 'Slash', code: 'Slash', display: '/', width: 1 },
-    { key: 'Backslash', code: 'Backslash', display: 'ろ', width: 1 }, // JIS layout: "ro"
+    { key: 'IntlRo', code: 'IntlRo', display: 'ろ', width: 1 }, // JIS layout: "ro"
     { key: 'ShiftRight', code: 'ShiftRight', display: 'shift', width: 1.5 },
   ],
   // Row 6
