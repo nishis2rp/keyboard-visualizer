@@ -10,6 +10,9 @@ const initialQuizState = {
   status: 'idle', // 'idle', 'playing', 'paused', 'finished'
   selectedApp: null,
   currentQuestion: null,
+  questionStartTime: null, // 現在の問題の開始時刻
+  timeRemaining: 10, // 残り時間（秒）
+  lastAnswerResult: null, // 'correct' | 'incorrect' | null
   score: 0,
   combo: 0,
   maxCombo: 0,
@@ -19,11 +22,10 @@ const initialQuizState = {
   endTime: null,
   settings: {
     quizMode: 'default', // 'default' or 'hardcore'
-    timeLimit: 10000, // 10秒
+    timeLimit: 10, // 10秒
+    totalQuestions: 10, // 総問題数
     isFullscreen: false, // フルスクリーンモードかどうか
   },
-  // useKeyboardShortcuts からの pressedKeys と keyNameMap をここで管理しない
-  // これらは QuizProvider の外部から渡されるか、useKeyboardShortcutsフック自体が提供する
 };
 
 // --- 3. Reducer関数の定義 ---
@@ -44,6 +46,9 @@ function quizReducer(state, action) {
       return {
         ...state,
         currentQuestion: action.payload.question,
+        questionStartTime: Date.now(),
+        timeRemaining: state.settings.timeLimit,
+        lastAnswerResult: null,
       };
     case 'ANSWER_QUESTION': {
       const { userAnswer, isCorrect } = action.payload;
@@ -65,6 +70,7 @@ function quizReducer(state, action) {
         mistakes: newMistakes,
         combo: newCombo,
         maxCombo: newMaxCombo,
+        lastAnswerResult: isCorrect ? 'correct' : 'incorrect',
         quizHistory: [...state.quizHistory, historyEntry],
       };
     }
@@ -101,6 +107,27 @@ function quizReducer(state, action) {
           ...state.settings,
           isFullscreen: action.payload,
         },
+      };
+    case 'UPDATE_TIMER':
+      return {
+        ...state,
+        timeRemaining: action.payload,
+      };
+    case 'TIMEOUT':
+      // 時間切れで不正解扱い
+      return {
+        ...state,
+        mistakes: state.mistakes + 1,
+        combo: 0,
+        quizHistory: [
+          ...state.quizHistory,
+          {
+            question: state.currentQuestion?.question || '',
+            userAnswer: '（時間切れ）',
+            correctAnswer: state.currentQuestion?.correctShortcut || '',
+            isCorrect: false,
+          },
+        ],
       };
     default:
       return state;

@@ -29,23 +29,20 @@ function ResultModal() {
       .map(([shortcut, count]) => ({ shortcut, count }));
   }, [quizHistory]);
 
-  // ランク付け (仮実装)
+  // ランク付け
   const getRank = (accuracy) => {
-    if (accuracy >= 95) return 'S';
-    if (accuracy >= 80) return 'A';
-    if (accuracy >= 60) return 'B';
-    if (accuracy >= 40) return 'C';
-    if (accuracy >= 20) return 'D';
-    return 'F';
+    if (accuracy >= 95) return { rank: 'S', color: '#ffd700', emoji: '🏆' };
+    if (accuracy >= 80) return { rank: 'A', color: '#4ade80', emoji: '🌟' };
+    if (accuracy >= 60) return { rank: 'B', color: '#3b82f6', emoji: '👍' };
+    if (accuracy >= 40) return { rank: 'C', color: '#fbbf24', emoji: '💪' };
+    if (accuracy >= 20) return { rank: 'D', color: '#fb923c', emoji: '📚' };
+    return { rank: 'F', color: '#ef4444', emoji: '😢' };
   };
-  const rank = getRank(accuracy);
+  const rankData = getRank(accuracy);
 
   const handleRetry = () => {
     dispatch({ type: 'RESET_QUIZ' });
-    // クイズ開始時のisFullscreen状態はApp.jsxから渡されるので、ここではデフォルトでfalseを渡すか、
-    // useQuiz() にisFullscreen状態を渡すメカニズムが必要。
-    // 仮にcurrentFullscreenModeを渡す (要修正)
-    startQuiz(selectedApp, quizState.settings.isFullscreen); // isFullscreenを渡すように修正
+    startQuiz(selectedApp, quizState.settings.isFullscreen);
   };
 
   return (
@@ -75,13 +72,71 @@ function ResultModal() {
           boxShadow: '0 5px 15px rgba(0,0,0,0.5)',
         }}
       >
-        <h2 style={{ fontSize: '2.5rem', marginBottom: '20px', color: '#0f0' }}>クイズ終了！</h2>
-        <div style={{ fontSize: '1.2rem', marginBottom: '10px' }}>
-          <p>正解数: <span style={{ color: '#0f0', fontWeight: 'bold' }}>{correctAnswers}</span> / {totalQuestions}</p>
-          <p>正答率: <span style={{ color: '#0f0', fontWeight: 'bold' }}>{accuracy}%</span></p>
-          <p>ランク: <span style={{ color: '#ff0', fontWeight: 'bold', fontSize: '1.5rem' }}>{rank}</span></p>
-          <p>最大コンボ: <span style={{ color: '#0ff', fontWeight: 'bold' }}>{maxCombo}</span></p>
-          <p>経過時間: <span style={{ color: '#fff', fontWeight: 'bold' }}>{timeTaken}秒</span></p>
+        <h2 style={{ fontSize: '2.5rem', marginBottom: '20px', color: '#4ade80' }}>🎉 クイズ終了！</h2>
+
+        {/* ランク表示 */}
+        <div style={{
+          marginBottom: '30px',
+          padding: '20px',
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          borderRadius: '10px',
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: '10px' }}>
+            {rankData.emoji}
+          </div>
+          <div style={{ fontSize: '3rem', fontWeight: 'bold', color: rankData.color, marginBottom: '10px' }}>
+            ランク: {rankData.rank}
+          </div>
+          <div style={{ fontSize: '2rem', color: '#4ade80', fontWeight: 'bold' }}>
+            {accuracy}%
+          </div>
+        </div>
+
+        {/* スコア詳細 */}
+        <div style={{
+          fontSize: '1.1rem',
+          marginBottom: '20px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '15px',
+          textAlign: 'left',
+        }}>
+          <div style={{
+            padding: '15px',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            borderRadius: '8px',
+            border: '1px solid #4ade80',
+          }}>
+            <div style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '5px' }}>正解数</div>
+            <div style={{ color: '#4ade80', fontWeight: 'bold', fontSize: '1.5rem' }}>{correctAnswers} / {totalQuestions}</div>
+          </div>
+          <div style={{
+            padding: '15px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderRadius: '8px',
+            border: '1px solid #ef4444',
+          }}>
+            <div style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '5px' }}>ミス</div>
+            <div style={{ color: '#ef4444', fontWeight: 'bold', fontSize: '1.5rem' }}>{mistakes}</div>
+          </div>
+          <div style={{
+            padding: '15px',
+            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+            borderRadius: '8px',
+            border: '1px solid #06b6d4',
+          }}>
+            <div style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '5px' }}>最大コンボ</div>
+            <div style={{ color: '#06b6d4', fontWeight: 'bold', fontSize: '1.5rem' }}>🔥 {maxCombo}</div>
+          </div>
+          <div style={{
+            padding: '15px',
+            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+            borderRadius: '8px',
+            border: '1px solid #a855f7',
+          }}>
+            <div style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '5px' }}>経過時間</div>
+            <div style={{ color: '#a855f7', fontWeight: 'bold', fontSize: '1.5rem' }}>⏱️ {timeTaken}秒</div>
+          </div>
         </div>
 
         {difficultShortcuts.length > 0 && (
