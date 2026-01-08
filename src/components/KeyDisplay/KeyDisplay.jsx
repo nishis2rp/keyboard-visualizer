@@ -13,7 +13,7 @@ const MODIFIER_CODE_DISPLAY_ORDER = [
 // 修飾キーのコードリスト
 const MODIFIER_CODES = new Set(MODIFIER_CODE_DISPLAY_ORDER)
 
-const KeyDisplay = memo(({ pressedKeys, specialKeys, getDisplayKeyByCode, description, availableShortcuts, selectedApp, shortcutDescriptions, keyboardLayout }) => {
+const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), getDisplayKeyByCode, description, availableShortcuts = [], selectedApp, shortcutDescriptions = {}, keyboardLayout }) => {
   // Shiftキーが押されているか判定（getDisplayKeyByCodeに渡すため）
   const shiftPressed = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight');
 

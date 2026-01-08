@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { getKeyboardLayoutByName, getLayoutDisplayName } from '../../data/layouts'
 import { getCodeDisplayName } from '../../utils/keyMapping' // getCodeDisplayNameをインポート
 
-const KeyboardLayout = memo(({ pressedKeys, specialKeys, shortcutDescriptions, keyboardLayout = 'windows-jis' }) => { // getKeyDisplayNameを削除
+const KeyboardLayout = memo(({ pressedKeys = new Set(), specialKeys = new Set(), shortcutDescriptions = {}, keyboardLayout = 'windows-jis' }) => { // デフォルト値を追加
   // 現在のレイアウトを取得
   const keyboardRows = getKeyboardLayoutByName(keyboardLayout)
   const layoutName = getLayoutDisplayName(keyboardLayout)
