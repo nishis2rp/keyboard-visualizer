@@ -1,9 +1,18 @@
 import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getKeyboardLayoutByName, getLayoutDisplayName } from '../../data/layouts'
-import { getCodeDisplayName } from '../../utils/keyMapping' // getCodeDisplayNameをインポート
+import { getCodeDisplayName } from '../../utils/keyMapping'
 
-const KeyboardLayout = memo(({ pressedKeys = new Set(), specialKeys = new Set(), shortcutDescriptions = {}, keyboardLayout = 'windows-jis' }) => { // デフォルト値を追加
+// 修飾キーのコードリスト
+const MODIFIER_CODES = new Set([
+  'ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight',
+  'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'
+])
+
+// 修飾キーかどうかを判定する関数
+const isModifierKey = (code) => MODIFIER_CODES.has(code)
+
+const KeyboardLayout = memo(({ pressedKeys = new Set(), specialKeys = new Set(), shortcutDescriptions = {}, keyboardLayout = 'windows-jis' }) => {
   // 現在のレイアウトを取得
   const keyboardRows = getKeyboardLayoutByName(keyboardLayout)
   const layoutName = getLayoutDisplayName(keyboardLayout)
@@ -71,14 +80,15 @@ const KeyboardLayout = memo(({ pressedKeys = new Set(), specialKeys = new Set(),
         {keyboardRows.map((row, rowIndex) => (
           <div key={rowIndex} className="keyboard-row">
             {row.map((keyObj, keyIndex) => {
-              const isPressed = isKeyPressed(keyObj) // keyObjを渡す
-              const isSpecial = specialKeys.has(keyObj.key) // keyObj.keyは残す（特殊キーの定義はkeyベースかもしれないため）
-              const shortcuts = getKeyShortcuts(keyObj) // keyObjを渡す
+              const isPressed = isKeyPressed(keyObj)
+              const isModifier = isModifierKey(keyObj.code)
+              const isSpecial = !isModifier && specialKeys.has(keyObj.key)
+              const shortcuts = getKeyShortcuts(keyObj)
 
               return (
                 <div
                   key={`${rowIndex}-${keyIndex}`}
-                  className={`keyboard-key ${isPressed ? 'pressed' : ''} ${isSpecial ? 'special' : ''}`}
+                  className={`keyboard-key ${isPressed ? 'pressed' : ''} ${isModifier ? 'modifier' : (isSpecial ? 'special' : '')}`}
                   style={{ flex: `${keyObj.width} 1 0%` }}
                   title={shortcuts.length > 0 ? shortcuts.map(s => `${s.combo}: ${s.desc}`).join('\n') : ''}
                 >

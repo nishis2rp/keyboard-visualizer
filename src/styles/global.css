@@ -483,6 +483,20 @@ h1 {
     inset 0 -1px 3px rgba(0, 0, 0, 0.2);
 }
 
+.keyboard-key.modifier {
+  background: linear-gradient(180deg, #4A9FFF 0%, var(--sf-blue) 50%, var(--sf-blue-dark) 100%);
+  border: 1px solid rgba(0, 122, 255, 0.4);
+  border-bottom: 3px solid rgba(0, 70, 180, 0.6);
+  color: var(--white);
+  font-weight: 600;
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.15),
+    0 4px 8px rgba(0, 122, 255, 0.4),
+    0 6px 20px rgba(0, 122, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.2);
+}
+
 .keyboard-key.special:hover {
   background: linear-gradient(180deg, #0084FF 0%, #0066E0 100%);
   box-shadow:
