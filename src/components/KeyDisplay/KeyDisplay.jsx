@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getSingleKeyShortcuts } from '../../utils'
 import ShortcutCard from '../ShortcutCard'
-import { getCodeDisplayName } from '../../utils/keyMapping' // getCodeDisplayNameをインポート
+import { getCodeDisplayName } from '../../utils/keyMapping'
 
 // 修飾キーのコードベースの表示順序
 const MODIFIER_CODE_DISPLAY_ORDER = [
@@ -13,8 +13,11 @@ const MODIFIER_CODE_DISPLAY_ORDER = [
 // 修飾キーのコードリスト
 const MODIFIER_CODES = new Set(MODIFIER_CODE_DISPLAY_ORDER)
 
-const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), getDisplayKeyByCode, description, availableShortcuts = [], selectedApp, shortcutDescriptions = {}, keyboardLayout }) => {
-  // Shiftキーが押されているか判定（getDisplayKeyByCodeに渡すため）
+// 修飾キーかどうかを判定する関数
+const isModifierKey = (code) => MODIFIER_CODES.has(code)
+
+const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), description, availableShortcuts = [], selectedApp, shortcutDescriptions = {}, keyboardLayout }) => {
+  // Shiftキーが押されているか判定（getCodeDisplayNameに渡すため）
   const shiftPressed = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight');
 
   if (pressedKeys.size === 0) {
@@ -81,8 +84,8 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), get
             {sortedCodes.map((code, index) => (
               <div key={`${code}-${index}`} style={{ display: 'contents' }}>
                 {index > 0 && <span className="plus">+</span>}
-                <div className={`key ${specialKeys.has(code) ? 'special-key' : ''}`}>
-                  {getDisplayKeyByCode(code, null, shiftPressed)} {/* keyは不明なのでnull */}
+                <div className={`key ${isModifierKey(code) ? 'modifier-key' : (specialKeys.has(code) ? 'special-key' : '')}`}>
+                  {getCodeDisplayName(code, null, keyboardLayout, shiftPressed)} {/* keyは不明なのでnull */}
                 </div>
               </div>
             ))}
@@ -103,8 +106,8 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), get
           {sortedCodes.map((code, index) => (
             <div key={`${code}-${index}`} style={{ display: 'contents' }}>
               {index > 0 && <span className="plus">+</span>}
-              <div className={`key ${specialKeys.has(code) ? 'special-key' : ''}`}>
-                {getDisplayKeyByCode(code, null, shiftPressed)} {/* keyは不明なのでnull */}
+              <div className={`key ${isModifierKey(code) ? 'modifier-key' : (specialKeys.has(code) ? 'special-key' : '')}`}>
+                {getCodeDisplayName(code, null, keyboardLayout, shiftPressed)} {/* keyは不明なのでnull */}
               </div>
             </div>
           ))}
@@ -139,7 +142,6 @@ KeyDisplay.displayName = 'KeyDisplay'
 KeyDisplay.propTypes = {
   pressedKeys: PropTypes.instanceOf(Set).isRequired,
   specialKeys: PropTypes.instanceOf(Set).isRequired,
-  getDisplayKeyByCode: PropTypes.func.isRequired, // プロップ名を変更
   description: PropTypes.string,
   availableShortcuts: PropTypes.arrayOf(
     PropTypes.shape({
@@ -152,4 +154,4 @@ KeyDisplay.propTypes = {
   keyboardLayout: PropTypes.string.isRequired, // keyboardLayoutを追加
 }
 
-export default KeyDisplay
+export default KeyDisplay;

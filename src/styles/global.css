@@ -299,6 +299,16 @@ h1 {
     0 4px 16px rgba(0, 122, 255, 0.25);
 }
 
+/* Modifier keys - must come after .special-key for proper specificity */
+.key.modifier-key {
+  background: linear-gradient(180deg, #4A9FFF 0%, var(--sf-blue) 100%) !important;
+  color: var(--white) !important;
+  border-color: var(--sf-blue) !important;
+  box-shadow:
+    0 2px 0 rgba(0, 122, 255, 0.3),
+    0 4px 12px rgba(0, 122, 255, 0.2) !important;
+}
+
 /* Shortcut Description - Card Style */
 .shortcut-description-inline {
   flex: 1;

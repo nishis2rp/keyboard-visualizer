@@ -1,4 +1,4 @@
-import { getCodeDisplayName } from './keyMapping'
+import { getCodeDisplayName, getShiftedSymbolForKey } from './keyMapping'
 
 /**
  * キー名 (KeyboardEvent.key) を正規化する。
@@ -63,22 +63,21 @@ export const getKeyComboText = (codesArray, layout) => {
 const getKeyComboAlternatives = (displayComboText, layout) => {
   const alternatives = [displayComboText];
 
-  // ShortcutDescriptionsの定義がKeyboardEvent.keyベースと仮定
-  // Shift+数字キーの記号と数字の両方の表現を生成するロジックが必要
-  // 例: "Ctrl + Shift + 1" → "Ctrl + Shift + !"
-  // このロジックはkeyMapping.jsの知識も必要になるため、一旦シンプルに
-  // getCodeDisplayNameの結果をそのまま使う。必要に応じて拡張。
-  
-  // 例: displayComboTextが "Ctrl + Shift + 1" の場合、"Ctrl + Shift + !" も候補にする
   const parts = displayComboText.split(' + ');
-  const hasShift = parts.some(p => p === 'Shift' || p === '⇧'); // Shiftキーの表示名も考慮
+  const hasShift = parts.some(p => p === 'Shift' || p === '⇧'); 
 
   // 最後のキーが数字の場合、対応するShift記号があるかチェック
   const lastKey = parts[parts.length - 1];
   if (hasShift && /^\d$/.test(lastKey)) { // 数字キーの場合
     // keyMapping.jsのUS/JIS_SYMBOL_MAPを逆引きして代替キーを取得
-    // これはkeyMapping.jsの知識が必要になるため、ここでは一旦簡略化
-    // (後でkeyMapping.jsのヘルパー関数として実装を検討)
+    // getShiftedSymbolForKey は code (e.g., 'Digit1') を期待するので、lastKey (e.g., '1') を 'DigitX' 形式に変換する必要がある
+    const digitCode = `Digit${lastKey}`;
+    const shiftedSymbol = getShiftedSymbolForKey(digitCode, layout);
+
+    if (shiftedSymbol) {
+      const altParts = [...parts.slice(0, -1), shiftedSymbol];
+      alternatives.push(altParts.join(' + '));
+    }
   }
 
   return alternatives;
@@ -107,6 +106,7 @@ export const getShortcutDescription = (currentDisplayComboText, shortcutDescript
 
   return null
 }
+
 
 /**
  * ショートカットの最後のキーを取得
@@ -192,8 +192,8 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
       const aLastKey = getLastKey(a.shortcut)
       const bLastKey = getLastKey(b.shortcut)
 
-      const aIsFunction = /^F\d\+$/.test(aLastKey)
-      const bIsFunction = /^F\d\+$/.test(bLastKey)
+      const aIsFunction = /^F\d+$/.test(aLastKey)
+      const bIsFunction = /^F\d+$/.test(bLastKey)
 
       if (aIsFunction && bIsFunction) {
         const aNum = parseInt(aLastKey.substring(1))
@@ -266,8 +266,8 @@ export const getSingleKeyShortcuts = (shortcutDescriptions) => {
       const aKey = a.shortcut
       const bKey = b.shortcut
 
-      const aIsFunction = /^F\d\+$/.test(aKey)
-      const bIsFunction = /^F\d\+$/.test(bKey)
+      const aIsFunction = /^F\d+$/.test(aKey)
+      const bIsFunction = /^F\d+$/.test(bKey)
 
       if (aIsFunction && bIsFunction) {
         const aNum = parseInt(aKey.substring(1))

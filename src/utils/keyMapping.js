@@ -116,6 +116,23 @@ const OS_MODIFIER_MAP = {
 };
 
 
+
+
+/**
+ * Get shifted symbol for a given key code, layout, and shift state.
+ * @param {string} code - KeyboardEvent.code (e.g., 'Digit1')
+ * @param {string} layout - The selected keyboard layout ('macUs', 'macJis', 'windowsJis')
+ * @returns {string|null} The shifted symbol, or null if not applicable
+ */
+export const getShiftedSymbolForKey = (code, layout) => {
+  if (layout.includes('us')) {
+    return US_SYMBOL_MAP[`ShiftLeft+${code}`] || null;
+  } else if (layout.includes('jis')) {
+    return JIS_SYMBOL_MAP[`ShiftLeft+${code}`] || null;
+  }
+  return null;
+};
+
 /**
  * Gets the display name from a key code.
  * @param {string} code - KeyboardEvent.code (e.g., 'KeyA', 'BracketLeft')
@@ -161,6 +178,7 @@ export const getCodeDisplayName = (code, key, layout, shiftPressed) => {
   // 5. Final fallback
   return displayKey || code;
 };
+
 
 
 /**

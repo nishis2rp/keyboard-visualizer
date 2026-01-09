@@ -5,7 +5,6 @@ import KeyboardLayout from './KeyboardLayout';
 import KeyDisplay from './KeyDisplay';
 import { useKeyboardShortcuts } from '../hooks';
 import { useAppContext } from '../context/AppContext';
-import { getCodeDisplayName } from '../utils/keyMapping';
 import { specialKeys } from '../constants/keys';
 
 const NormalModeView = () => {
@@ -24,10 +23,6 @@ const NormalModeView = () => {
     currentDescription,
     availableShortcuts,
   } = useKeyboardShortcuts(shortcutDescriptions, keyboardLayout, false);
-
-  const getDisplayKeyByCode = (code, key, shiftPressed) => {
-    return getCodeDisplayName(code, key, keyboardLayout, shiftPressed);
-  };
 
   return (
     <>
@@ -51,7 +46,7 @@ const NormalModeView = () => {
       />
       <KeyDisplay
         pressedKeys={pressedKeys}
-        getKeyDisplayName={getDisplayKeyByCode}
+        specialKeys={specialKeys}
         description={currentDescription}
         availableShortcuts={availableShortcuts}
         selectedApp={selectedApp}
