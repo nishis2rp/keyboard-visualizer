@@ -78,10 +78,21 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyboardLayout, isQui
       const description = getShortcutDescription(comboText, shortcutDescriptionsRef.current);
       const isShortcut = !!description;
 
-      // ショートカットが成立した場合、またはOSのショートカットと競合する可能性のある特定の組み合わせの場合にpreventDefaultを実行
-      const isSystemShortcut = (metaKey && ['s', 'p', 'r', 'w', 'q'].includes(key.toLowerCase())) || (ctrlKey && ['s', 'p', 'r', 'w', 'q'].includes(key.toLowerCase()));
-      if (isShortcut || isSystemShortcut) {
-        e.preventDefault();
+      // クイズモード中は、開発用キー（F5, F12）を除き、全ての修飾キー付き入力をブロック
+      const isDevelopmentKey = ['F5', 'F12'].includes(code);
+      const hasModifier = metaKey || ctrlKey || altKey || (shiftKey && (metaKey || ctrlKey || altKey));
+
+      if (isQuizModeRef.current) {
+        // クイズモード: 開発用キー以外の修飾キー付き入力をすべてブロック
+        if (hasModifier && !isDevelopmentKey) {
+          e.preventDefault();
+        }
+      } else {
+        // 通常モード: ショートカットが成立した場合、またはOSのショートカットと競合する可能性のある特定の組み合わせの場合にpreventDefaultを実行
+        const isSystemShortcut = (metaKey && ['s', 'p', 'r', 'w', 'q'].includes(key.toLowerCase())) || (ctrlKey && ['s', 'p', 'r', 'w', 'q'].includes(key.toLowerCase()));
+        if (isShortcut || isSystemShortcut) {
+          e.preventDefault();
+        }
       }
 
       setPressedKeys(newPressedKeys);

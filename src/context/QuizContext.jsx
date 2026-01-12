@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext, useCallback } from 'react';
-import { generateQuestion, checkAnswer, normalizePressedKeys } from '../utils/quizEngine';
+import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps } from '../utils/quizEngine';
 import { allShortcuts } from '../data/shortcuts'; // 全ショートカットデータ
 
 // --- 1. Contextの作成 ---
@@ -9,6 +9,7 @@ const QuizContext = createContext();
 const initialQuizState = {
   status: 'idle', // 'idle', 'playing', 'paused', 'finished'
   selectedApp: null,
+  keyboardLayout: null, // キーボードレイアウト (e.g., 'windows-jis', 'mac-jis')
   currentQuestion: null,
   questionStartTime: null, // 現在の問題の開始時刻
   timeRemaining: 10, // 残り時間（秒）
@@ -36,6 +37,7 @@ function quizReducer(state, action) {
         ...initialQuizState, // 初期状態に戻す
         status: 'playing',
         selectedApp: action.payload.app,
+        keyboardLayout: action.payload.keyboardLayout,
         settings: {
           ...state.settings,
           isFullscreen: action.payload.isFullscreen, // 現在のフルスクリーン状態を反映
@@ -158,63 +160,96 @@ export function QuizProvider({ children }) {
 
   // 次の問題を生成してセットする関数
   const getNextQuestion = useCallback(() => {
-    if (!quizState.selectedApp) {
-      console.warn("アプリが選択されていません。");
+    if (!quizState.keyboardLayout) {
+      console.warn("[QuizContext] キーボードレイアウトが選択されていません。");
       dispatch({ type: 'FINISH_QUIZ' });
       return;
     }
-    
-    const appShortcuts = allShortcuts[quizState.selectedApp];
+
+    // キーボードレイアウトに基づいて互換性のあるアプリを取得
+    const compatibleApps = getCompatibleApps(quizState.keyboardLayout);
+    console.log('[QuizContext] Getting next question for compatible apps:', compatibleApps);
+
     const newQuestion = generateQuestion(
-      appShortcuts,
-      quizState.settings.quizMode,
+      allShortcuts,
+      compatibleApps,
+      'default', // デフォルトモードを使用
       quizState.settings.isFullscreen
     );
+    console.log('[QuizContext] Next question:', newQuestion);
 
     if (newQuestion) {
       dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
     } else {
       // 問題が生成できない場合、クイズを終了
+      console.warn('[QuizContext] No more questions available, finishing quiz');
       dispatch({ type: 'FINISH_QUIZ' });
     }
-  }, [quizState.selectedApp, quizState.settings.quizMode, quizState.settings.isFullscreen]);
+  }, [quizState.keyboardLayout, quizState.settings.isFullscreen]);
 
 
   // クイズを開始する
-  const startQuiz = useCallback((app, isFullscreen) => {
-    dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen } });
-    // 最初の一問を生成
-    // startQuiz後にselectedAppが設定されるため、getNextQuestion内でallShortcuts[app]が正しく参照される
-    setTimeout(() => { // state更新が反映されるのを待つ
-      const appShortcuts = allShortcuts[app];
+  const startQuiz = useCallback((app, isFullscreen, keyboardLayout) => {
+    console.log('[QuizContext] Starting quiz:', { app, isFullscreen, keyboardLayout });
+
+    dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout } });
+
+    // キーボードレイアウトに基づいて互換性のあるアプリを取得
+    const compatibleApps = getCompatibleApps(keyboardLayout);
+    console.log('[QuizContext] Compatible apps for layout:', compatibleApps);
+
+    // state更新が反映されるのを待つ
+    setTimeout(() => {
       const newQuestion = generateQuestion(
-        appShortcuts,
-        quizState.settings.quizMode,
+        allShortcuts,
+        compatibleApps,
+        'default', // デフォルトモードを使用
         isFullscreen
       );
+      console.log('[QuizContext] Generated question:', newQuestion);
+
       if (newQuestion) {
         dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
       } else {
+        console.warn('[QuizContext] Failed to generate question');
         dispatch({ type: 'FINISH_QUIZ' });
       }
     }, 0);
-  }, [quizState.settings.quizMode]); // isFullscreenはstartQuizの引数で渡される
+  }, []); // 依存配列を空にして常に最新の値を使用
 
 
   // 回答を処理する
-  const handleAnswer = useCallback((pressedKeys, keyNameMap) => {
+  const handleAnswer = useCallback((pressedKeys) => {
+    console.log('[QuizContext] handleAnswer called:', {
+      status: quizState.status,
+      hasQuestion: !!quizState.currentQuestion,
+      pressedKeys: Array.from(pressedKeys)
+    });
+
     if (quizState.status !== 'playing' || !quizState.currentQuestion) {
+      console.warn('[QuizContext] Cannot answer - quiz not playing or no question');
       return;
     }
 
     // Calculate answer time
     const answerTimeMs = Date.now() - quizState.questionStartTime;
 
-    const userAnswer = normalizePressedKeys(pressedKeys, keyNameMap);
+    const userAnswer = normalizePressedKeys(pressedKeys);
     const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
 
+    console.log('[QuizContext] Answer result:', {
+      userAnswer,
+      correctAnswer: quizState.currentQuestion.normalizedCorrectShortcut,
+      isCorrect,
+      answerTimeMs
+    });
+
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
-    getNextQuestion(); // 次の問題へ
+
+    // 次の問題へ（少し遅延を入れてフィードバックを表示）
+    setTimeout(() => {
+      getNextQuestion();
+    }, 500);
   }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, getNextQuestion]);
 
   // コンテキストに渡す値

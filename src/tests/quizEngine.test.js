@@ -62,42 +62,35 @@ describe('quizEngine', () => {
 
   // --- normalizePressedKeys ---
   describe('normalizePressedKeys', () => {
-    const keyNameMap = {
-      'KeyA': 'A', 'KeyB': 'B',
-      'ControlLeft': 'Ctrl', 'ShiftLeft': 'Shift', 'AltLeft': 'Alt',
-      'MetaLeft': 'Win', // MetaLeft in Windows environment
-      'ArrowUp': '↑',
-    };
-
     it('should normalize basic key presses', () => {
       const pressed = new Set(['KeyA']);
-      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('A');
+      expect(normalizePressedKeys(pressed)).toBe('A');
     });
 
     it('should normalize modifier key presses', () => {
       const pressed = new Set(['ControlLeft']);
-      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('Ctrl');
+      expect(normalizePressedKeys(pressed)).toBe('Ctrl');
     });
 
     it('should combine and sort modifiers with main keys (Windows)', () => {
       const pressed = new Set(['ControlLeft', 'ShiftLeft', 'KeyA']);
-      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('Ctrl+Shift+A');
+      expect(normalizePressedKeys(pressed)).toBe('Ctrl+Shift+A');
     });
 
     it('should map arrow keys correctly', () => {
       const pressed = new Set(['ArrowUp']);
-      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('↑');
+      expect(normalizePressedKeys(pressed)).toBe('↑');
     });
 
     it('should handle Windows Meta key', () => {
       const pressed = new Set(['MetaLeft', 'KeyD']);
-      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('Meta+D'); // Converted to Meta by normalizeShortcut
+      expect(normalizePressedKeys(pressed)).toBe('Meta+D'); // Converted to Meta by normalizeShortcut
     });
 
     it('should handle macOS Cmd key', () => {
       detectOS.mockReturnValue('macos'); // Set to macOS
       const pressed = new Set(['MetaLeft', 'KeyS']);
-      expect(normalizePressedKeys(pressed, keyNameMap)).toBe('Meta+S'); // Converted to Meta by normalizeShortcut
+      expect(normalizePressedKeys(pressed)).toBe('Meta+S'); // Converted to Meta by normalizeShortcut
     });
   });
 

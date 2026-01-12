@@ -12,55 +12,170 @@ function QuestionCard() {
   // タイマーの色を時間に応じて変更
   const getTimerColor = () => {
     const percentage = timeRemaining / settings.timeLimit;
-    if (percentage > 0.5) return '#4ade80'; // 緑
-    if (percentage > 0.25) return '#fbbf24'; // 黄色
+    if (percentage > 0.5) return '#10b981'; // 緑
+    if (percentage > 0.25) return '#f59e0b'; // オレンジ
     return '#ef4444'; // 赤
   };
 
-  // 背景色を回答結果に応じて変更
-  const getBackgroundColor = () => {
+  // プログレスバーの幅
+  const getProgressWidth = () => {
+    return (timeRemaining / settings.timeLimit) * 100;
+  };
+
+  // 背景グラデーションを回答結果に応じて変更
+  const getBackgroundGradient = () => {
     if (lastAnswerResult === 'correct') {
-      return 'rgba(34, 197, 94, 0.3)'; // 緑
+      return 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
     }
     if (lastAnswerResult === 'incorrect') {
-      return 'rgba(239, 68, 68, 0.3)'; // 赤
+      return 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
     }
-    return 'rgba(255, 255, 255, 0.1)'; // デフォルト
+    return 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
   };
 
   return (
     <div
       style={{
-        fontSize: '2rem',
-        fontWeight: 'bold',
-        textAlign: 'center',
-        padding: '20px',
-        backgroundColor: getBackgroundColor(),
-        borderRadius: '10px',
-        margin: '20px auto',
-        maxWidth: '600px',
-        color: 'white',
-        position: 'relative',
-        transition: 'background-color 0.3s ease',
+        width: '100%',
+        maxWidth: '800px',
+        margin: '0 auto',
       }}
     >
+      {/* メインカード */}
       <div
         style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          fontSize: '1.5rem',
-          fontWeight: 'bold',
-          color: getTimerColor(),
-          display: 'flex',
-          alignItems: 'center',
-          gap: '5px',
+          background: getBackgroundGradient(),
+          borderRadius: '24px',
+          padding: '48px',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+          position: 'relative',
+          transition: 'all 0.3s ease',
+          transform: lastAnswerResult ? 'scale(1.02)' : 'scale(1)',
         }}
       >
-        <span>⏱️</span>
-        <span>{Math.ceil(timeRemaining)}</span>
+        {/* タイマー表示 */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '24px',
+            right: '24px',
+            background: 'rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '16px',
+            padding: '12px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            border: '2px solid rgba(255, 255, 255, 0.3)',
+          }}
+        >
+          <span style={{ fontSize: '24px' }}>⏱️</span>
+          <span
+            style={{
+              fontSize: '28px',
+              fontWeight: 'bold',
+              color: getTimerColor(),
+              fontFamily: 'monospace',
+              textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            }}
+          >
+            {Math.ceil(timeRemaining)}s
+          </span>
+        </div>
+
+        {/* プログレスバー */}
+        <div
+          style={{
+            width: '100%',
+            height: '8px',
+            background: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: '4px',
+            marginBottom: '32px',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              width: `${getProgressWidth()}%`,
+              height: '100%',
+              background: getTimerColor(),
+              borderRadius: '4px',
+              transition: 'width 0.1s linear, background-color 0.3s ease',
+              boxShadow: `0 0 10px ${getTimerColor()}`,
+            }}
+          />
+        </div>
+
+        {/* 問題ヘッダー */}
+        <div
+          style={{
+            fontSize: '18px',
+            fontWeight: '600',
+            color: 'rgba(255, 255, 255, 0.9)',
+            marginBottom: '16px',
+            textTransform: 'uppercase',
+            letterSpacing: '2px',
+          }}
+        >
+          📝 Question
+        </div>
+
+        {/* 問題文 */}
+        <div
+          style={{
+            fontSize: '36px',
+            fontWeight: 'bold',
+            color: 'white',
+            lineHeight: '1.4',
+            marginBottom: '32px',
+            textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+          }}
+        >
+          {currentQuestion.question}
+        </div>
+
+        {/* 指示テキスト */}
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '12px',
+            padding: '16px 24px',
+            border: '2px solid rgba(255, 255, 255, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <span style={{ fontSize: '28px' }}>⌨️</span>
+          <span
+            style={{
+              fontSize: '18px',
+              color: 'white',
+              fontWeight: '500',
+            }}
+          >
+            正しいショートカットキーを押してください
+          </span>
+        </div>
+
+        {/* フィードバック表示 */}
+        {lastAnswerResult && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: '120px',
+              animation: 'bounce 0.5s ease',
+              pointerEvents: 'none',
+            }}
+          >
+            {lastAnswerResult === 'correct' ? '✅' : '❌'}
+          </div>
+        )}
       </div>
-      <p style={{ marginTop: '10px' }}>{currentQuestion.question}</p>
     </div>
   );
 }

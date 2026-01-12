@@ -17,15 +17,17 @@ export const AppProvider = ({ children }) => {
     }
   );
 
-  const [showSetup, setShowSetup] = useState(!setup.setupCompleted);
+  // セットアップ画面を毎回表示（セッションベース）
+  const [showSetup, setShowSetup] = useState(true);
   const [selectedApp, setSelectedApp] = useState(setup.app || DEFAULTS.APP);
   const [keyboardLayout, setKeyboardLayout] = useState(setup.layout || DEFAULTS.LAYOUT);
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [apps] = useState(appConfig); // stateとして保持
 
-  const handleSetupComplete = useCallback((app, layout) => {
+  const handleSetupComplete = useCallback((app, layout, mode = 'visualizer') => {
     setSelectedApp(app);
     setKeyboardLayout(layout);
+    setIsQuizMode(mode === 'quiz');
     setSetup({
       setupCompleted: true,
       app,
