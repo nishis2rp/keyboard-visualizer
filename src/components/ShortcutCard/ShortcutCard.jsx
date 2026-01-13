@@ -18,10 +18,10 @@ import { getProtectionLevel } from '../../constants'
 const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
   const protectionLevel = getProtectionLevel(shortcut)
 
-  // デバッグログ（開発時のみ）
-  if (protectionLevel !== 'none' && showDebugLog && import.meta.env.DEV) {
-    const emoji = protectionLevel === 'always-protected' ? '🔒' : '🔵'
-    console.log(`${emoji} 保護ショートカット検出: ${shortcut} (${protectionLevel})`)
+  // デバッグログ（開発時のみ） - 全てのショートカットでログ出力
+  if (showDebugLog && import.meta.env.DEV) {
+    const emoji = protectionLevel === 'always-protected' ? '🔒' : protectionLevel === 'fullscreen-preventable' ? '🔵' : '⚪'
+    console.log(`${emoji} ${shortcut} -> ${protectionLevel}`)
   }
 
   // 保護レベルに応じたスタイル

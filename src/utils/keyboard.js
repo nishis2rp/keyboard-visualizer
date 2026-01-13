@@ -23,7 +23,7 @@ const MODIFIER_ORDER = {
 }
 
 /** 利用可能なショートカットの最大表示数 */
-const MAX_SHORTCUTS_DISPLAY = 20
+const MAX_SHORTCUTS_DISPLAY = 60
 
 /**
  * キーコードを修飾キーの順序でソート
