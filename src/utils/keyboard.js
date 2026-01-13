@@ -149,6 +149,11 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
   const shiftPressed = pressedCodes.includes('ShiftLeft') || pressedCodes.includes('ShiftRight');
   const pressedDisplayNames = new Set(pressedCodes.map(code => getCodeDisplayName(code, null, layout, shiftPressed)));
 
+  // デバッグログ
+  console.log('[getAvailableShortcuts] pressedCodes:', pressedCodes);
+  console.log('[getAvailableShortcuts] pressedDisplayNames:', Array.from(pressedDisplayNames));
+  console.log('[getAvailableShortcuts] layout:', layout);
+
   const shortcuts = Object.entries(shortcutDescriptions)
     .filter(([shortcut]) => {
       const shortcutKeys = shortcut.split(' + '); // shortcutDescriptionsのキーは表示名ベース
@@ -160,6 +165,21 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
       // あるいは押されているキーがショートカットの修飾キー部分と一致するか
       const pressedModifiers = Array.from(pressedDisplayNames).filter(key => MODIFIER_KEY_NAMES.has(key));
       const shortcutModifiers = shortcutKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
+
+      // Ctrl + Tab専用デバッグログ
+      if (shortcut === 'Ctrl + Tab') {
+        console.log('[DEBUG Ctrl+Tab] shortcutKeys:', shortcutKeys);
+        console.log('[DEBUG Ctrl+Tab] pressedModifiers:', pressedModifiers);
+        console.log('[DEBUG Ctrl+Tab] shortcutModifiers:', shortcutModifiers);
+        console.log('[DEBUG Ctrl+Tab] allPressedKeysInShortcut:', allPressedKeysInShortcut);
+        console.log('[DEBUG Ctrl+Tab] Check 1 (complete match):', allPressedKeysInShortcut && pressedDisplayNames.size === shortcutKeys.length);
+        console.log('[DEBUG Ctrl+Tab] Check 2 conditions:', {
+          'pressedModifiers.length > 0': pressedModifiers.length > 0,
+          'pressedModifiers.length === shortcutModifiers.length': pressedModifiers.length === shortcutModifiers.length,
+          'every mod in shortcut': Array.from(pressedModifiers).every(mod => shortcutModifiers.includes(mod)),
+          'pressedDisplayNames.size < shortcutKeys.length': pressedDisplayNames.size < shortcutKeys.length
+        });
+      }
 
       // 1. 完全一致
       if (allPressedKeysInShortcut && pressedDisplayNames.size === shortcutKeys.length) {

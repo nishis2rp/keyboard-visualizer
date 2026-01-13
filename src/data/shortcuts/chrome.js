@@ -3,9 +3,14 @@ export const chromeShortcuts = {
   // タブ操作
   'Ctrl + T': '新しいタブを開く',
   'Ctrl + W': 'タブを閉じる',
+  'Ctrl + F4': 'タブを閉じる',
   'Ctrl + Shift + T': '閉じたタブを再度開く',
   'Ctrl + Tab': '次のタブに移動',
   'Ctrl + Shift + Tab': '前のタブに移動',
+  'Ctrl + Page Down': '次のタブに移動',
+  'Ctrl + Page Up': '前のタブに移動',
+  'Ctrl + Shift + Page Down': 'タブを右に移動',
+  'Ctrl + Shift + Page Up': 'タブを左に移動',
   'Ctrl + 1': '1番目のタブに移動',
   'Ctrl + 2': '2番目のタブに移動',
   'Ctrl + 3': '3番目のタブに移動',
@@ -25,18 +30,28 @@ export const chromeShortcuts = {
   // ナビゲーション
   'Alt + ←': '前のページに戻る',
   'Alt + →': '次のページに進む',
+  'Backspace': '前のページに戻る',
+  'Shift + Backspace': '次のページに進む',
   'F5': 'ページを更新',
   'Ctrl + F5': 'キャッシュをクリアして更新',
+  'Ctrl + R': 'ページを更新',
+  'Ctrl + Shift + R': 'キャッシュをクリアして強制再読み込み',
   'Escape': '読み込みを停止',
   'Ctrl + L': 'アドレスバーにフォーカス',
+  'Alt + D': 'アドレスバーにフォーカス',
   'Ctrl + K': '検索バーにフォーカス',
+  'Ctrl + E': '検索バーにフォーカス',
+  'F7': 'カーソルブラウジングの切り替え',
 
   // ページ操作
   'Ctrl + F': 'ページ内検索',
+  'F3': 'ページ内検索を開く',
   'Ctrl + G': '次を検索',
+  'Shift + F3': '前の検索結果に移動',
   'Ctrl + Shift + G': '前を検索',
   'Ctrl + P': '印刷',
   'Ctrl + S': 'ページを保存',
+  'Ctrl + Shift + S': '名前を付けて保存',
   'Ctrl + O': 'ファイルを開く',
   'Ctrl + U': 'ソースを表示',
   'Ctrl + H': '履歴を開く',
@@ -72,8 +87,6 @@ export const chromeShortcuts = {
 
   // タブグループ
   'Ctrl + Shift + A': 'タブを検索',
-  'Shift + Enter (アドレスバー)': '新しいウィンドウでURLを開く',
-  'Ctrl + Shift + Enter (アドレスバー)': '新しいタブでURLを開く',
 
   // ページ内移動
   'Space': '1ページ下にスクロール',
@@ -83,22 +96,14 @@ export const chromeShortcuts = {
   'Page Down': '1画面下にスクロール',
   'Page Up': '1画面上にスクロール',
 
-  // マウス操作の代替
+  // その他
   'Alt + Home': 'ホームページを開く',
   'Ctrl + Shift + O': 'ブックマークマネージャーを開く',
   'Shift + Escape': 'Chromeタスクマネージャーを開く',
-  'Ctrl + Shift + M': 'ユーザーを切り替え',
   'Alt + Shift + I': 'フィードバックを送信',
 
-  // マウスジェスチャーキーボード版
-  'Ctrl + Enter (アドレスバー)': '.comを追加して移動',
-  'Ctrl + Shift + Enter (アドレスバー)': '.comを追加して新しいタブで開く',
-
-  // リンク操作
-  'Ctrl + クリック': '新しいタブでリンクを開く',
-  'Ctrl + Shift + クリック': '新しいタブでリンクを開いて切り替える',
-  'Shift + クリック': '新しいウィンドウでリンクを開く',
-  'Alt + クリック': 'リンクをダウンロード',
+  // アドレスバー機能
+  'Ctrl + Enter': '.comを追加して移動',
 
   // 特殊機能
   'Ctrl + Shift + Q': 'Chromeからログアウト',
@@ -114,8 +119,5 @@ export const chromeShortcuts = {
 
   // その他の便利なショートカット
   'Ctrl + Shift + V': '書式なしで貼り付け',
-  'Ctrl + Shift + R': 'キャッシュをクリアして強制再読み込み',
   'Ctrl + M': '現在のユーザーをミュート',
-  'F3': 'ページ内検索を開く',
-  'Shift + F3': '前の検索結果に移動',
 }

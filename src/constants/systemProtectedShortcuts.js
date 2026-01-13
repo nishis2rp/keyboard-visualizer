@@ -19,11 +19,16 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
 
   // ブラウザタブ操作（フルスクリーンで防げる）
   'Ctrl + W',                   // タブを閉じる
+  'Ctrl + F4',                  // タブを閉じる
   'Ctrl + T',                   // 新しいタブ
   'Ctrl + N',                   // 新しいウィンドウ
   'Ctrl + Shift + N',           // シークレットウィンドウ
   'Ctrl + Tab',                 // 次のタブ
   'Ctrl + Shift + Tab',         // 前のタブ
+  'Ctrl + Page Down',           // 次のタブ
+  'Ctrl + Page Up',             // 前のタブ
+  'Ctrl + Shift + Page Down',   // タブを右に移動
+  'Ctrl + Shift + Page Up',     // タブを左に移動
   'Ctrl + 1',                   // 1番目のタブ
   'Ctrl + 2',                   // 2番目のタブ
   'Ctrl + 3',                   // 3番目のタブ
@@ -33,17 +38,21 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Ctrl + 7',                   // 7番目のタブ
   'Ctrl + 8',                   // 8番目のタブ
   'Ctrl + 9',                   // 最後のタブ
-  'Ctrl + F4',                  // タブを閉じる
   'Ctrl + Shift + T',           // 閉じたタブを再度開く
 
   // ブラウザナビゲーション（フルスクリーンで防げる）
   'Alt + ←',                    // 戻る
   'Alt + →',                    // 進む
+  'Backspace',                  // 前のページに戻る
+  'Shift + Backspace',          // 次のページに進む
+  'Ctrl + R',                   // ページを更新
   'Ctrl + +',                   // ズームイン
   'Ctrl + -',                   // ズームアウト
   'Ctrl + 0',                   // ズームリセット
   'Ctrl + L',                   // アドレスバーにフォーカス
+  'Alt + D',                    // アドレスバーにフォーカス
   'Ctrl + K',                   // 検索バーにフォーカス
+  'Ctrl + E',                   // 検索バーにフォーカス
 
   // ブラウザ機能（フルスクリーンで防げる）
   'Ctrl + H',                   // 履歴
@@ -53,11 +62,26 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Ctrl + Shift + B',           // ブックマークバー
   'Ctrl + Shift + O',           // ブックマークマネージャ
   'Ctrl + U',                   // ソース表示
+  'Ctrl + O',                   // ファイルを開く
+  'Ctrl + Shift + S',           // 名前を付けて保存
+  'Ctrl + F',                   // ページ内検索
+  'F3',                         // ページ内検索
+  'Shift + F3',                 // 前の検索結果
+  'Ctrl + G',                   // 次を検索
+  'Ctrl + Shift + G',           // 前を検索
+  'F7',                         // カーソルブラウジング
   'Ctrl + Shift + Delete',      // 閲覧データを削除
   'F12',                        // デベロッパーツール
   'Ctrl + Shift + I',           // デベロッパーツール
   'Ctrl + Shift + J',           // コンソールを開く
   'Ctrl + Shift + C',           // 要素を検証
+  'Ctrl + Shift + M',           // デバイスツールバー
+  'Ctrl + [',                   // DevTools前のパネル
+  'Ctrl + ]',                   // DevTools次のパネル
+  'Ctrl + Enter',               // .comを追加
+  'Ctrl + Shift + A',           // タブを検索
+  'Ctrl + Shift + E',           // 拡張機能ページ
+  'Shift + Escape',             // タスクマネージャー
 
   // ===== macOS =====
 
@@ -68,6 +92,8 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Cmd + Shift + N',            // シークレットウィンドウ
   'Cmd + Option + ←',           // 前のタブ
   'Cmd + Option + →',           // 次のタブ
+  'Cmd + Shift + [',            // 前のタブ
+  'Cmd + Shift + ]',            // 次のタブ
   'Cmd + 1',                    // 1番目のタブ
   'Cmd + 2',                    // 2番目のタブ
   'Cmd + 3',                    // 3番目のタブ
@@ -82,6 +108,8 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   // ブラウザナビゲーション（フルスクリーンで防げる）
   'Cmd + [',                    // 戻る
   'Cmd + ]',                    // 進む
+  'Cmd + R',                    // ページを更新
+  'Cmd + Shift + R',            // キャッシュをクリアして強制再読み込み
   'Cmd + +',                    // ズームイン
   'Cmd + -',                    // ズームアウト
   'Cmd + 0',                    // ズームリセット
@@ -95,10 +123,14 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Cmd + Shift + D',            // 全てブックマーク
   'Cmd + Option + B',           // ブックマークバー
   'Cmd + Option + U',           // ソース表示
+  'Cmd + Shift + S',            // 名前を付けて保存
+  'Cmd + O',                    // ファイルを開く
   'Cmd + Shift + Delete',       // 閲覧データを削除
   'Cmd + Option + I',           // デベロッパーツール
   'Cmd + Option + J',           // コンソールを開く
   'Cmd + Option + C',           // 要素を検証
+  'Cmd + Shift + A',            // タブを検索
+  'Cmd + Shift + E',            // 拡張機能ページ
 ])
 
 /**
