@@ -28,9 +28,9 @@ export const normalizeShortcut = (shortcutString) => {
       // 'Win'キーは'Meta'に変換し、'Cmd'も'Meta'に変換
       if (lowerKey === 'win' || lowerKey === 'cmd') return 'Meta';
       // 修飾キーは最初が大文字で統一
-      if (lowerKey === 'ctrl' || lowerKey === 'control') return 'Ctrl';
-      if (lowerKey === 'alt') return 'Alt';
-      if (lowerKey === 'shift') return 'Shift';
+      if (lowerKey === 'ctrl' || lowerKey === 'control' || lowerKey === '⌃') return 'Ctrl';
+      if (lowerKey === 'alt' || lowerKey === 'option' || lowerKey === '⌥') return 'Alt';
+      if (lowerKey === 'shift' || lowerKey === '⇧') return 'Shift';
       if (lowerKey === 'meta') return 'Meta';
       // その他のアルファベットキーは大文字に統一（テストケースに合わせる）
       return key.length === 1 && /[a-zA-Z]/.test(key) ? key.toUpperCase() : key;
@@ -40,8 +40,8 @@ export const normalizeShortcut = (shortcutString) => {
   const mainKeys = [];
 
   keys.forEach(key => {
-    const lowerKey = key.toLowerCase();
-    if (lowerKey === 'ctrl' || lowerKey === 'alt' || lowerKey === 'shift' || lowerKey === 'meta') {
+    // 既に正規化された後なので、'Ctrl', 'Alt', 'Shift', 'Meta' のいずれかかをチェック
+    if (key === 'Ctrl' || key === 'Alt' || key === 'Shift' || key === 'Meta') {
       modifiers.push(key);
     } else {
       mainKeys.push(key);

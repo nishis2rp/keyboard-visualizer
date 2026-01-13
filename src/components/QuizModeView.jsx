@@ -50,17 +50,18 @@ const QuizModeView = () => {
     };
   }, [selectedApp, keyboardLayout, isFullscreenMode, startQuiz, dispatch]);
 
-  // Auto-pause on window blur (focus loss)
-  useEffect(() => {
-    const handleWindowBlur = () => {
-      if (quizState.status === 'playing') {
-        dispatch({ type: 'PAUSE_QUIZ' });
-      }
-    };
+  // Auto-pause on window blur (focus loss) - クイズモードでは無効化
+  // クイズモードではキー入力がpreventDefaultされるため、意図しないblurが発生する
+  // useEffect(() => {
+  //   const handleWindowBlur = () => {
+  //     if (quizState.status === 'playing') {
+  //       dispatch({ type: 'PAUSE_QUIZ' });
+  //     }
+  //   };
 
-    window.addEventListener('blur', handleWindowBlur);
-    return () => window.removeEventListener('blur', handleWindowBlur);
-  }, [quizState.status, dispatch]);
+  //   window.addEventListener('blur', handleWindowBlur);
+  //   return () => window.removeEventListener('blur', handleWindowBlur);
+  // }, [quizState.status, dispatch]);
 
   // 回答判定ロジック: キーが離されたときのみ判定
   useEffect(() => {
@@ -106,19 +107,6 @@ const QuizModeView = () => {
 
   const pauseQuiz = () => dispatch({ type: 'PAUSE_QUIZ' });
   const resumeQuiz = () => dispatch({ type: 'RESUME_QUIZ' });
-
-  // キー表示用のヘルパー関数
-  const getKeyComboText = () => {
-    if (pressedKeys.size === 0) return '';
-    const keys = Array.from(pressedKeys);
-    return keys.map(code => {
-      if (code.startsWith('Control')) return 'Ctrl';
-      if (code.startsWith('Shift')) return 'Shift';
-      if (code.startsWith('Alt')) return 'Alt';
-      if (code.startsWith('Meta')) return 'Cmd';
-      return code.replace(/^(Key|Digit)/, '');
-    }).join(' + ');
-  };
 
   return (
     <>
@@ -205,16 +193,18 @@ const QuizModeView = () => {
         )}
 
         <ScoreBoard />
-        <QuestionCard />
+        <QuestionCard pressedKeys={pressedKeys} keyboardLayout={keyboardLayout} />
 
         {/* キーボードビジュアライザー */}
         {(quizState.status === 'playing' || quizState.status === 'paused') && (
           <div style={{
-            marginTop: '24px',
+            marginTop: '32px',
             width: '100%',
-            maxWidth: '1200px',
+            maxWidth: '1000px',
             display: 'flex',
             justifyContent: 'center',
+            transform: 'scale(0.85)',
+            transformOrigin: 'top center',
           }}>
             <KeyboardLayout
               pressedKeys={pressedKeys}
@@ -223,33 +213,6 @@ const QuizModeView = () => {
           </div>
         )}
 
-        {/* キー入力表示 */}
-        {pressedKeys.size > 0 && quizState.status === 'playing' && (
-          <div
-            style={{
-              marginTop: '24px',
-              padding: '24px 48px',
-              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)',
-              backdropFilter: 'blur(10px)',
-              border: '3px solid rgba(59, 130, 246, 0.5)',
-              borderRadius: '20px',
-              fontSize: '32px',
-              fontWeight: 'bold',
-              color: '#60a5fa',
-              minWidth: '300px',
-              textAlign: 'center',
-              boxShadow: '0 0 30px rgba(59, 130, 246, 0.3)',
-              animation: 'pulse 0.5s ease-in-out',
-              textShadow: '0 0 10px rgba(59, 130, 246, 0.5)',
-              fontFamily: 'monospace',
-            }}
-          >
-            <div style={{ fontSize: '16px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '8px' }}>
-              入力中...
-            </div>
-            {getKeyComboText()}
-          </div>
-        )}
 
         {quizState.status === 'paused' && (
           <div

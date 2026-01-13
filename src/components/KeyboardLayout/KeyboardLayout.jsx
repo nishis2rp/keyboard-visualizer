@@ -89,7 +89,11 @@ const KeyboardLayout = memo(({ pressedKeys = new Set(), specialKeys = new Set(),
                 <div
                   key={`${rowIndex}-${keyIndex}`}
                   className={`keyboard-key ${isPressed ? 'pressed' : ''} ${isModifier ? 'modifier' : (isSpecial ? 'special' : '')}`}
-                  style={{ flex: `${keyObj.width} 1 0%` }}
+                  style={{
+                    flexGrow: keyObj.width || 1,
+                    flexShrink: 0,
+                    flexBasis: `${(keyObj.width || 1) * 50}px`
+                  }}
                   title={shortcuts.length > 0 ? shortcuts.map(s => `${s.combo}: ${s.desc}`).join('\n') : ''}
                 >
                   <div className="key-display">{keyObj.display}</div>
