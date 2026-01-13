@@ -39,14 +39,11 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   // ブラウザナビゲーション（フルスクリーンで防げる）
   'Alt + ←',                    // 戻る
   'Alt + →',                    // 進む
-  'F5',                         // 更新
-  'Ctrl + R',                   // 更新
-  'Ctrl + F5',                  // 強制更新
-  'Ctrl + Shift + R',           // 強制更新
-  'F11',                        // 全画面表示
   'Ctrl + +',                   // ズームイン
   'Ctrl + -',                   // ズームアウト
   'Ctrl + 0',                   // ズームリセット
+  'Ctrl + L',                   // アドレスバーにフォーカス
+  'Ctrl + K',                   // 検索バーにフォーカス
 
   // ブラウザ機能（フルスクリーンで防げる）
   'Ctrl + H',                   // 履歴
@@ -56,18 +53,11 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Ctrl + Shift + B',           // ブックマークバー
   'Ctrl + Shift + O',           // ブックマークマネージャ
   'Ctrl + U',                   // ソース表示
-
-  // Windows ウィンドウ管理（フルスクリーンで防げる）
-  'Win + D',                    // デスクトップ表示
-  'Win + M',                    // 全ウィンドウ最小化
-  'Win + ↑',                    // ウィンドウ最大化
-  'Win + ↓',                    // ウィンドウ最小化/復元
-  'Win + ←',                    // 左半分にスナップ
-  'Win + →',                    // 右半分にスナップ
-  'Win + Home',                 // アクティブウィンドウ以外を最小化
-  'Alt + Tab',                  // ウィンドウ切り替え
-  'Alt + Escape',               // ウィンドウ順次切り替え
-  'Alt + F4',                   // ウィンドウを閉じる
+  'Ctrl + Shift + Delete',      // 閲覧データを削除
+  'F12',                        // デベロッパーツール
+  'Ctrl + Shift + I',           // デベロッパーツール
+  'Ctrl + Shift + J',           // コンソールを開く
+  'Ctrl + Shift + C',           // 要素を検証
 
   // ===== macOS =====
 
@@ -92,12 +82,10 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   // ブラウザナビゲーション（フルスクリーンで防げる）
   'Cmd + [',                    // 戻る
   'Cmd + ]',                    // 進む
-  'Cmd + R',                    // 更新
-  'Cmd + Shift + R',            // 強制更新
-  'Cmd + Ctrl + F',             // 全画面表示
   'Cmd + +',                    // ズームイン
   'Cmd + -',                    // ズームアウト
   'Cmd + 0',                    // ズームリセット
+  'Cmd + L',                    // アドレスバーにフォーカス
 
   // ブラウザ機能（フルスクリーンで防げる）
   'Cmd + F',                    // 検索
@@ -107,14 +95,10 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Cmd + Shift + D',            // 全てブックマーク
   'Cmd + Option + B',           // ブックマークバー
   'Cmd + Option + U',           // ソース表示
-
-  // macOSウィンドウ管理（フルスクリーンで防げる）
-  'Cmd + H',                    // ウィンドウを隠す
-  'Cmd + Option + H',           // 他を隠す
-  'Cmd + M',                    // ウィンドウを最小化
-  'Cmd + Q',                    // アプリを終了
-  'Cmd + Tab',                  // アプリケーションの切り替え
-  'Cmd + `',                    // 同じアプリのウィンドウ切り替え
+  'Cmd + Shift + Delete',       // 閲覧データを削除
+  'Cmd + Option + I',           // デベロッパーツール
+  'Cmd + Option + J',           // コンソールを開く
+  'Cmd + Option + C',           // 要素を検証
 ])
 
 /**
@@ -142,6 +126,18 @@ export const ALWAYS_PROTECTED_SHORTCUTS = new Set([
   'Win + Shift + S',            // スクリーンショット（Snipping Tool）
   'Print Screen',               // スクリーンショット
 
+  // Windows ウィンドウ管理（システムレベル）
+  'Win + D',                    // デスクトップ表示
+  'Win + M',                    // 全ウィンドウ最小化
+  'Win + ↑',                    // ウィンドウ最大化
+  'Win + ↓',                    // ウィンドウ最小化/復元
+  'Win + ←',                    // 左半分にスナップ
+  'Win + →',                    // 右半分にスナップ
+  'Win + Home',                 // アクティブウィンドウ以外を最小化
+  'Alt + Tab',                  // ウィンドウ切り替え
+  'Alt + Escape',               // ウィンドウ順次切り替え
+  'Alt + F4',                   // ウィンドウを閉じる
+
   // ===== macOS =====
 
   // セキュリティ・システム関連（最高優先度）
@@ -160,8 +156,6 @@ export const ALWAYS_PROTECTED_SHORTCUTS = new Set([
   'Ctrl + ↓',                   // アプリケーションWindowsを表示
   'Ctrl + ←',                   // Mission Control左へ
   'Ctrl + →',                   // Mission Control右へ
-  'F3',                         // Mission Control
-  'F4',                         // Launchpadを表示
 
   // スクリーンショット（システムレベル）
   'Cmd + Shift + 3',            // スクリーン全体をキャプチャ
@@ -181,6 +175,14 @@ export const ALWAYS_PROTECTED_SHORTCUTS = new Set([
   'Ctrl + F3',                  // Dockにフォーカス
   'Cmd + Option + D',           // Dockの表示/非表示
   'Ctrl + Cmd + N',             // 通知センターを表示
+
+  // macOS ウィンドウ管理（システムレベル）
+  'Cmd + H',                    // ウィンドウを隠す
+  'Cmd + Option + H',           // 他を隠す
+  'Cmd + M',                    // ウィンドウを最小化
+  'Cmd + Q',                    // アプリを終了
+  'Cmd + Tab',                  // アプリケーションの切り替え
+  'Cmd + `',                    // 同じアプリのウィンドウ切り替え
 ])
 
 // 後方互換性のため、全ての保護ショートカットを統合

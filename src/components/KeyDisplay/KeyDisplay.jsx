@@ -56,7 +56,7 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
                   key={index}
                   shortcut={item.shortcut}
                   description={item.description}
-                  // showDebugLog={true} // デバッグ用
+                  showDebugLog={true} // デバッグ用
                 />
               ))}
             </div>
@@ -151,7 +151,7 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
                 key={index}
                 shortcut={item.shortcut}
                 description={item.description}
-                // showDebugLog={true} // デバッグ用
+                showDebugLog={true} // デバッグ用
               />
             ))}
           </div>

@@ -89,7 +89,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyboardLayout, isQui
         }
       } else {
         // 通常モード: ショートカットが成立した場合、またはOSのショートカットと競合する可能性のある特定の組み合わせの場合にpreventDefaultを実行
-        const isSystemShortcut = (metaKey && ['s', 'p', 'r', 'w', 'q'].includes(key.toLowerCase())) || (ctrlKey && ['s', 'p', 'r', 'w', 'q'].includes(key.toLowerCase()));
+        const isSystemShortcut = (metaKey && ['s', 'p', 'r', 'w', 'q'].includes(key.toLowerCase())) || (ctrlKey && ['s', 'p', 'r', 'w', 'q', 'tab'].includes(key.toLowerCase()));
         if (isShortcut || isSystemShortcut) {
           e.preventDefault();
         }
