@@ -199,9 +199,14 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
     .map(([shortcut, description]) => ({ shortcut, description }))
     .filter((item, index, self) =>
       index === self.findIndex(t => t.shortcut === item.shortcut)
-    )
-    .sort((a, b) => {
-      // ソートロジックはそのまま
+    );
+
+  // フィルタ後の結果をログ出力
+  console.log('[getAvailableShortcuts] After filter, before sort:', shortcuts.length, 'shortcuts');
+  console.log('[getAvailableShortcuts] Contains Ctrl+Tab?', shortcuts.some(s => s.shortcut === 'Ctrl + Tab'));
+
+  const sortedShortcuts = shortcuts.sort((a, b) => {
+      // ソートロジック：修飾キーの数 → キーボード配列順
       const aModifierCount = countModifierKeys(a.shortcut)
       const bModifierCount = countModifierKeys(b.shortcut)
 
@@ -212,64 +217,71 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
       const aLastKey = getLastKey(a.shortcut)
       const bLastKey = getLastKey(b.shortcut)
 
-      const aIsFunction = /^F\d+$/.test(aLastKey)
-      const bIsFunction = /^F\d+$/.test(bLastKey)
-
-      if (aIsFunction && bIsFunction) {
-        const aNum = parseInt(aLastKey.substring(1))
-        const bNum = parseInt(bLastKey.substring(1))
-        return aNum - bNum
-      }
-
-      if (aIsFunction) return -1
-      if (bIsFunction) return 1
-
-      const aIsNumber = /^\d$/.test(aLastKey)
-      const bIsNumber = /^\d$/.test(bLastKey)
-
-      if (aIsNumber && bIsNumber) {
-        const aNum = parseInt(aLastKey)
-        const bNum = parseInt(bLastKey)
-        return aNum - bNum
-      }
-
-      if (aIsNumber) return -1
-      if (bIsNumber) return 1
-
-      const aIndex = getQwertyIndex(aLastKey)
-      const bIndex = getQwertyIndex(bLastKey)
+      // キーボード配列順でソート
+      const aIndex = getKeyboardLayoutIndex(aLastKey)
+      const bIndex = getKeyboardLayoutIndex(bLastKey)
 
       if (aIndex !== bIndex) {
         return aIndex - bIndex
       }
 
+      // インデックスが同じ場合は文字列比較
       return aLastKey.localeCompare(bLastKey)
     })
     .slice(0, MAX_SHORTCUTS_DISPLAY);
 
-  return shortcuts
+  console.log('[getAvailableShortcuts] After sort and slice:', sortedShortcuts.length, 'shortcuts');
+  console.log('[getAvailableShortcuts] Final result contains Ctrl+Tab?', sortedShortcuts.some(s => s.shortcut === 'Ctrl + Tab'));
+  if (sortedShortcuts.length > 0) {
+    console.log('[getAvailableShortcuts] First 5 shortcuts:', sortedShortcuts.slice(0, 5).map(s => s.shortcut));
+  }
+
+  return sortedShortcuts
 }
 
-/** QWERTY配列の順序定義 */
-const QWERTY_ORDER = [
+/** キーボード配列順の定義（物理的な配置順） */
+const KEYBOARD_LAYOUT_ORDER = [
+  // Function row
+  'esc', 'escape',
+  'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12',
+
   // Number row
-  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
-  // Top row
-  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
-  // Middle row
-  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
-  // Bottom row
-  'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'
+  '`', '~',
+  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+  '-', '_', '=', '+',
+  'backspace', 'bksp',
+
+  // Top row (QWERTY)
+  'tab',
+  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+  '[', '{', ']', '}', '\\', '|',
+
+  // Middle row (ASDF)
+  'caps lock',
+  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+  ';', ':', "'", '"',
+  'enter', 'return',
+
+  // Bottom row (ZXCV)
+  'z', 'x', 'c', 'v', 'b', 'n', 'm',
+  ',', '<', '.', '>', '/', '?',
+
+  // Special keys
+  'space',
+  'page up', 'pgup', 'page down', 'pgdn',
+  'home', 'end',
+  'insert', 'ins', 'delete', 'del',
+  '↑', '↓', '←', '→',
 ]
 
 /**
- * QWERTY配列での位置を取得
+ * キーボード配列での位置を取得
  * @param {string} key - キー名
- * @returns {number} QWERTY配列でのインデックス（見つからない場合は999）
+ * @returns {number} キーボード配列でのインデックス（見つからない場合は999）
  */
-const getQwertyIndex = (key) => {
+const getKeyboardLayoutIndex = (key) => {
   const lowerKey = key.toLowerCase()
-  const index = QWERTY_ORDER.indexOf(lowerKey)
+  const index = KEYBOARD_LAYOUT_ORDER.indexOf(lowerKey)
   return index === -1 ? 999 : index
 }
 
@@ -286,20 +298,9 @@ export const getSingleKeyShortcuts = (shortcutDescriptions) => {
       const aKey = a.shortcut
       const bKey = b.shortcut
 
-      const aIsFunction = /^F\d+$/.test(aKey)
-      const bIsFunction = /^F\d+$/.test(bKey)
-
-      if (aIsFunction && bIsFunction) {
-        const aNum = parseInt(aKey.substring(1))
-        const bNum = parseInt(bKey.substring(1))
-        return aNum - bNum
-      }
-
-      if (aIsFunction) return -1
-      if (bIsFunction) return 1
-
-      const aIndex = getQwertyIndex(aKey)
-      const bIndex = getQwertyIndex(bKey)
+      // キーボード配列順でソート
+      const aIndex = getKeyboardLayoutIndex(aKey)
+      const bIndex = getKeyboardLayoutIndex(bKey)
 
       if (aIndex !== bIndex) {
         return aIndex - bIndex
