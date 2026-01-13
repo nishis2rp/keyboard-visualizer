@@ -44,8 +44,8 @@ export const AppProvider = ({ children }) => {
   const keyboardLayouts = useMemo(() => {
     return [
       { id: 'windows-jis', icon: '⊞', name: 'Windows JIS' },
-      { id: 'mac-jis', icon: '', name: 'Mac JIS' },
-      { id: 'mac-us', icon: '', name: 'Mac US' },
+      { id: 'mac-jis', icon: '⌘', name: 'Mac JIS' },
+      { id: 'mac-us', icon: '⌘', name: 'Mac US' },
     ];
   }, []);
 

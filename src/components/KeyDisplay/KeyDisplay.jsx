@@ -37,7 +37,19 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
             </div>
           </div>
           <div style={{ width: '100%' }}>
-            <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '6px' }}>利用可能な単独キーショートカット</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '0' }}>利用可能な単独キーショートカット</h3>
+              <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ color: '#007AFF', fontSize: '14px' }}>🔵</span>
+                  <span>全画面表示で防げる</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ color: '#FF3B30', fontSize: '14px' }}>🔒</span>
+                  <span>システム保護</span>
+                </div>
+              </div>
+            </div>
             <div className="shortcuts-grid">
               {singleKeyShortcuts.map((item, index) => (
                 <ShortcutCard
@@ -120,7 +132,19 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
       </div>
       {availableShortcuts.length > 0 && (
         <div style={{ width: '100%' }}>
-          <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '6px' }}>利用可能なショートカット</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '0' }}>利用可能なショートカット</h3>
+            <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ color: '#007AFF', fontSize: '14px' }}>🔵</span>
+                <span>全画面表示で防げる</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ color: '#FF3B30', fontSize: '14px' }}>🔒</span>
+                <span>システム保護</span>
+              </div>
+            </div>
+          </div>
           <div className="shortcuts-grid">
             {availableShortcuts.map((item, index) => (
               <ShortcutCard

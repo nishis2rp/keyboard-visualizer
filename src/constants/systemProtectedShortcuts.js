@@ -10,11 +10,14 @@
 /**
  * 全画面表示（Keyboard Lock API）で防げるショートカット
  * これらは通常はブラウザやOSに取られるが、フルスクリーン+Keyboard Lock APIで防げる
+ *
+ * 注意: 一般的な編集ショートカット（Ctrl+S, Ctrl+Pなど）はここに含めない
+ * それらはアプリケーション内で正常に動作するため、全画面表示の必要はない
  */
 export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   // ===== Windows =====
 
-  // ブラウザショートカット（フルスクリーンで防げる）
+  // ブラウザタブ操作（フルスクリーンで防げる）
   'Ctrl + W',                   // タブを閉じる
   'Ctrl + T',                   // 新しいタブ
   'Ctrl + N',                   // 新しいウィンドウ
@@ -31,6 +34,9 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Ctrl + 8',                   // 8番目のタブ
   'Ctrl + 9',                   // 最後のタブ
   'Ctrl + F4',                  // タブを閉じる
+  'Ctrl + Shift + T',           // 閉じたタブを再度開く
+
+  // ブラウザナビゲーション（フルスクリーンで防げる）
   'Alt + ←',                    // 戻る
   'Alt + →',                    // 進む
   'F5',                         // 更新
@@ -41,15 +47,14 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Ctrl + +',                   // ズームイン
   'Ctrl + -',                   // ズームアウト
   'Ctrl + 0',                   // ズームリセット
-  'Ctrl + F',                   // 検索
+
+  // ブラウザ機能（フルスクリーンで防げる）
   'Ctrl + H',                   // 履歴
   'Ctrl + J',                   // ダウンロード
   'Ctrl + D',                   // ブックマーク
   'Ctrl + Shift + D',           // 全てブックマーク
   'Ctrl + Shift + B',           // ブックマークバー
   'Ctrl + Shift + O',           // ブックマークマネージャ
-  'Ctrl + P',                   // 印刷
-  'Ctrl + S',                   // 保存
   'Ctrl + U',                   // ソース表示
 
   // Windows ウィンドウ管理（フルスクリーンで防げる）
@@ -62,10 +67,11 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Win + Home',                 // アクティブウィンドウ以外を最小化
   'Alt + Tab',                  // ウィンドウ切り替え
   'Alt + Escape',               // ウィンドウ順次切り替え
+  'Alt + F4',                   // ウィンドウを閉じる
 
   // ===== macOS =====
 
-  // ブラウザショートカット（フルスクリーンで防げる）
+  // ブラウザタブ操作（フルスクリーンで防げる）
   'Cmd + W',                    // タブを閉じる
   'Cmd + T',                    // 新しいタブ
   'Cmd + N',                    // 新しいウィンドウ
@@ -81,6 +87,9 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Cmd + 7',                    // 7番目のタブ
   'Cmd + 8',                    // 8番目のタブ
   'Cmd + 9',                    // 最後のタブ
+  'Cmd + Shift + T',            // 閉じたタブを再度開く
+
+  // ブラウザナビゲーション（フルスクリーンで防げる）
   'Cmd + [',                    // 戻る
   'Cmd + ]',                    // 進む
   'Cmd + R',                    // 更新
@@ -89,26 +98,30 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Cmd + +',                    // ズームイン
   'Cmd + -',                    // ズームアウト
   'Cmd + 0',                    // ズームリセット
+
+  // ブラウザ機能（フルスクリーンで防げる）
   'Cmd + F',                    // 検索
   'Cmd + G',                    // 次を検索
   'Cmd + Shift + G',            // 前を検索
+  'Cmd + D',                    // ブックマーク
+  'Cmd + Shift + D',            // 全てブックマーク
+  'Cmd + Option + B',           // ブックマークバー
+  'Cmd + Option + U',           // ソース表示
+
+  // macOSウィンドウ管理（フルスクリーンで防げる）
   'Cmd + H',                    // ウィンドウを隠す
   'Cmd + Option + H',           // 他を隠す
   'Cmd + M',                    // ウィンドウを最小化
   'Cmd + Q',                    // アプリを終了
-  'Cmd + W',                    // ウィンドウを閉じる
-  'Cmd + D',                    // ブックマーク
-  'Cmd + Shift + D',            // 全てブックマーク
-  'Cmd + Option + B',           // ブックマークバー
-  'Cmd + P',                    // 印刷
-  'Cmd + S',                    // 保存
-  'Cmd + Option + U',           // ソース表示
-  'Cmd + ,',                    // 設定
+  'Cmd + Tab',                  // アプリケーションの切り替え
+  'Cmd + `',                    // 同じアプリのウィンドウ切り替え
 ])
 
 /**
  * 常にシステムレベルで保護されているショートカット
  * フルスクリーン+Keyboard Lock APIでも防げない（OSレベルで優先）
+ *
+ * 注意: 実際にOSレベルで保護されているショートカットのみを含める
  */
 export const ALWAYS_PROTECTED_SHORTCUTS = new Set([
   // ===== Windows =====
@@ -168,22 +181,6 @@ export const ALWAYS_PROTECTED_SHORTCUTS = new Set([
   'Ctrl + F3',                  // Dockにフォーカス
   'Cmd + Option + D',           // Dockの表示/非表示
   'Ctrl + Cmd + N',             // 通知センターを表示
-
-  // ファンクションキー（ハードウェア制御）
-  'F1',                         // ディスプレイの輝度を下げる
-  'F2',                         // ディスプレイの輝度を上げる
-  'F5',                         // キーボードのバックライトを暗くする
-  'F6',                         // キーボードのバックライトを明るくする
-  'F7',                         // 前のトラック
-  'F8',                         // 再生/一時停止
-  'F9',                         // 次のトラック
-  'F10',                        // ミュート
-  'F11',                        // 音量を下げる
-  'F12',                        // 音量を上げる
-
-  // アプリケーション切り替え（システムレベル）
-  'Cmd + Tab',                  // アプリケーションの切り替え
-  'Cmd + `',                    // 同じアプリのウィンドウ切り替え
 ])
 
 // 後方互換性のため、全ての保護ショートカットを統合
