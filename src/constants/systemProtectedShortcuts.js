@@ -83,6 +83,23 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Ctrl + Shift + E',           // 拡張機能ページ
   'Shift + Escape',             // タスクマネージャー
 
+  // Windows UI操作（フルスクリーンで防げる）
+  'Win + D',                    // デスクトップ表示
+  'Win + M',                    // 全ウィンドウ最小化
+  'Win + ↑',                    // ウィンドウ最大化
+  'Win + ↓',                    // ウィンドウ最小化/復元
+  'Win + ←',                    // 左半分にスナップ
+  'Win + →',                    // 右半分にスナップ
+  'Win + Home',                 // アクティブウィンドウ以外を最小化
+
+  // Windows 機能（フルスクリーンで防げる）
+  'Win + G',                    // Xbox Game Barを開く
+  'Win + Alt + R',              // ゲームバーで録画開始/停止
+  'Win + Alt + Print Screen',   // ゲームウィンドウのスクリーンショット
+  'Win + Alt + G',              // 最後の30秒を録画
+  'Win + Print Screen',         // スクリーンショットを保存
+  'Win + Shift + S',            // スクリーンショット（Snipping Tool）
+
   // ===== macOS =====
 
   // ブラウザタブ操作（フルスクリーンで防げる）
@@ -147,25 +164,8 @@ export const ALWAYS_PROTECTED_SHORTCUTS = new Set([
   'Ctrl + Alt + Delete',        // セキュリティオプション
   'Ctrl + Shift + Escape',      // タスクマネージャー（システム保護）
 
-  // Xbox Game Bar関連（システムレベルフック）
-  'Win + G',                    // Xbox Game Barを開く
-  'Win + Alt + R',              // ゲームバーで録画開始/停止
-  'Win + Alt + Print Screen',   // ゲームウィンドウのスクリーンショット
-  'Win + Alt + G',              // 最後の30秒を録画
-
-  // スクリーンショット関連
-  'Win + Print Screen',         // スクリーンショットを保存
-  'Win + Shift + S',            // スクリーンショット（Snipping Tool）
+  // Windows システムショートカット（OSレベルで保護）
   'Print Screen',               // スクリーンショット
-
-  // Windows ウィンドウ管理（システムレベル）
-  'Win + D',                    // デスクトップ表示
-  'Win + M',                    // 全ウィンドウ最小化
-  'Win + ↑',                    // ウィンドウ最大化
-  'Win + ↓',                    // ウィンドウ最小化/復元
-  'Win + ←',                    // 左半分にスナップ
-  'Win + →',                    // 右半分にスナップ
-  'Win + Home',                 // アクティブウィンドウ以外を最小化
   'Alt + Tab',                  // ウィンドウ切り替え
   'Alt + Escape',               // ウィンドウ順次切り替え
   'Alt + F4',                   // ウィンドウを閉じる
