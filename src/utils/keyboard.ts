@@ -1,41 +1,28 @@
-import { getCodeDisplayName, getShiftedSymbolForKey } from './keyMapping'
+import { getCodeDisplayName, getShiftedSymbolForKey } from './keyMapping';
+import { getModifierPriority } from '../constants/modifierKeys';
+import { UI_SETTINGS } from '../config/settings';
 
 /**
  * キー名 (KeyboardEvent.key) を正規化する。
  * 主にuseKeyboardShortcutsでのe.keyの処理のために残されている。
- * @param {string} key - キー名 (KeyboardEvent.key)
- * @returns {string} 正規化されたキー名
  */
-export const normalizeKey = (key) => {
+export const normalizeKey = (key: string): string => {
   // アルファベット1文字の場合は小文字に統一（macOSのCmd+キーの大文字小文字問題対策）
   if (key.length === 1 && /[a-zA-Z]/.test(key)) {
-    return key.toLowerCase()
+    return key.toLowerCase();
   }
-  return key
+  return key;
 }
-
-/** 修飾キーのソート順序 (KeyboardEvent.code) */
-const MODIFIER_ORDER = {
-  'ControlLeft': 1, 'ControlRight': 1,
-  'ShiftLeft': 2, 'ShiftRight': 2,
-  'AltLeft': 3, 'AltRight': 3,
-  'MetaLeft': 4, 'MetaRight': 4,
-}
-
-/** 利用可能なショートカットの最大表示数 */
-const MAX_SHORTCUTS_DISPLAY = 60
 
 /**
  * キーコードを修飾キーの順序でソート
- * @param {Array<string>} codes - ソートするキーの配列 (KeyboardEvent.code)
- * @returns {Array<string>} ソート済みのキー配列
  */
-export const sortKeys = (codes) => {
+export const sortKeys = (codes: string[]): string[] => {
   return codes.sort((a, b) => {
-    const aOrder = MODIFIER_ORDER[a] || 999
-    const bOrder = MODIFIER_ORDER[b] || 999
-    return aOrder - bOrder
-  })
+    const aOrder = getModifierPriority(a);
+    const bOrder = getModifierPriority(b);
+    return aOrder - bOrder;
+  });
 }
 
 /**
@@ -228,7 +215,7 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
       // インデックスが同じ場合は文字列比較
       return aLastKey.localeCompare(bLastKey)
     })
-    .slice(0, MAX_SHORTCUTS_DISPLAY);
+    .slice(0, UI_SETTINGS.MAX_SHORTCUTS_DISPLAY);
 
   console.log('[getAvailableShortcuts] After sort and slice:', sortedShortcuts.length, 'shortcuts');
   console.log('[getAvailableShortcuts] Final result contains Ctrl+Tab?', sortedShortcuts.some(s => s.shortcut === 'Ctrl + Tab'));

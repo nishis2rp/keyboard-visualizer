@@ -4,6 +4,7 @@ import { SETUP_VERSION, STORAGE_KEYS, DEFAULTS } from '../constants';
 import { allShortcuts } from '../data/shortcuts';
 import { getLayoutDisplayName } from '../data/layouts';
 import { apps as appConfig } from '../config/apps'; // appsをインポート
+import { KEYBOARD_LAYOUTS } from '../config/keyboardLayouts';
 
 export const AppContext = createContext();
 
@@ -41,14 +42,6 @@ export const AppProvider = ({ children }) => {
     [selectedApp]
   );
 
-  const keyboardLayouts = useMemo(() => {
-    return [
-      { id: 'windows-jis', icon: '⊞', name: 'Windows JIS' },
-      { id: 'mac-jis', icon: '⌘', name: 'Mac JIS' },
-      { id: 'mac-us', icon: '⌘', name: 'Mac US' },
-    ];
-  }, []);
-
   const value = {
     // State
     setup,
@@ -57,7 +50,7 @@ export const AppProvider = ({ children }) => {
     keyboardLayout,
     isQuizMode,
     shortcutDescriptions,
-    keyboardLayouts,
+    keyboardLayouts: KEYBOARD_LAYOUTS,
     apps, // appsを提供
 
     // Actions
