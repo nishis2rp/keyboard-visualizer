@@ -1,7 +1,6 @@
 import React, { createContext, useReducer, useContext, useCallback } from 'react';
 import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps } from '../utils/quizEngine';
 import { allShortcuts } from '../data/shortcuts'; // 全ショートカットデータ
-import { QUIZ_SETTINGS } from '../config/settings';
 
 // --- 1. Contextの作成 ---
 const QuizContext = createContext();
@@ -13,7 +12,7 @@ const initialQuizState = {
   keyboardLayout: null, // キーボードレイアウト (e.g., 'windows-jis', 'mac-jis')
   currentQuestion: null,
   questionStartTime: null, // 現在の問題の開始時刻
-  timeRemaining: QUIZ_SETTINGS.DEFAULT_TIME_LIMIT, // 残り時間（秒）
+  timeRemaining: 10, // 残り時間（秒）
   lastAnswerResult: null, // 'correct' | 'incorrect' | null
   score: 0,
   combo: 0,

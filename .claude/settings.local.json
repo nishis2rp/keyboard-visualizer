@@ -19,20 +19,7 @@
       "Bash(npm run build:*)",
       "Bash(npx vite build)",
       "Bash(tee:*)",
-      "Bash(node:*)",
-      "Bash(taskkill:*)",
-      "Bash(npm run deploy:*)",
-      "Bash(timeout 5 bash:*)",
-      "Bash(timeout 3 bash:*)",
-      "Bash(cat:*)",
-      "Bash(git remote:*)",
-      "Bash(timeout 10 bash:*)",
-      "Bash(npm run:*)",
-      "Bash(tree:*)",
-      "Bash(dir /s /b \"C:\\Users\\shing\\OneDrive\\ドキュメント\\keyboard-visualizer\\src\")",
-      "Bash(npm install:*)",
-      "Bash(move:*)",
-      "Bash(npx tsc:*)"
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

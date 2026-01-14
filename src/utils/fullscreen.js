@@ -3,26 +3,6 @@
  * フルスクリーンモードでブラウザのショートカット競合を軽減
  */
 
-// Type declarations for vendor-prefixed fullscreen APIs
-declare global {
-  interface Document {
-    webkitExitFullscreen?: () => Promise<void>;
-    msExitFullscreen?: () => Promise<void>;
-    webkitFullscreenElement?: Element;
-    msFullscreenElement?: Element;
-  }
-  interface HTMLElement {
-    webkitRequestFullscreen?: () => Promise<void>;
-    msRequestFullscreen?: () => Promise<void>;
-  }
-  interface Navigator {
-    keyboard?: {
-      lock?: (keyCodes?: string[]) => Promise<void>;
-      unlock?: () => void;
-    };
-  }
-}
-
 /**
  * キーボードロックを有効化（全画面モード時のみ）
  * Winキーなどのシステムキーをブラウザがキャプチャできるようにする

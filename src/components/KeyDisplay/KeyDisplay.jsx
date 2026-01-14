@@ -3,10 +3,18 @@ import { memo } from 'react'
 import { getSingleKeyShortcuts } from '../../utils'
 import ShortcutCard from '../ShortcutCard'
 import { getCodeDisplayName } from '../../utils/keyMapping'
-import { MODIFIER_CODES, MODIFIER_CODES_SET, isModifierKey } from '../../constants/modifierKeys'
 
-// 修飾キーのコードベースの表示順序（新しい定数モジュールから取得）
-const MODIFIER_CODE_DISPLAY_ORDER = MODIFIER_CODES
+// 修飾キーのコードベースの表示順序
+const MODIFIER_CODE_DISPLAY_ORDER = [
+  'ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight',
+  'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'
+]
+
+// 修飾キーのコードリスト
+const MODIFIER_CODES = new Set(MODIFIER_CODE_DISPLAY_ORDER)
+
+// 修飾キーかどうかを判定する関数
+const isModifierKey = (code) => MODIFIER_CODES.has(code)
 
 const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), description, availableShortcuts = [], selectedApp, shortcutDescriptions = {}, keyboardLayout }) => {
   // Shiftキーが押されているか判定（getCodeDisplayNameに渡すため）

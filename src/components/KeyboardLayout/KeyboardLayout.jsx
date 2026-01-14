@@ -2,7 +2,15 @@ import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getKeyboardLayoutByName, getLayoutDisplayName } from '../../data/layouts'
 import { getCodeDisplayName } from '../../utils/keyMapping'
-import { isModifierKey } from '../../constants/modifierKeys'
+
+// 修飾キーのコードリスト
+const MODIFIER_CODES = new Set([
+  'ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight',
+  'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'
+])
+
+// 修飾キーかどうかを判定する関数
+const isModifierKey = (code) => MODIFIER_CODES.has(code)
 
 const KeyboardLayout = memo(({ pressedKeys = new Set(), specialKeys = new Set(), shortcutDescriptions = {}, keyboardLayout = 'windows-jis' }) => {
   // 現在のレイアウトを取得
