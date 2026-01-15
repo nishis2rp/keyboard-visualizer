@@ -111,17 +111,33 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyboardLayout, isQui
       if (pressedKeysRef.current.has(code)) {
         // 履歴に追加
         addToHistory(Array.from(pressedKeysRef.current));
-        
-        // 修飾キーではないキーが離されたら、押されているキーをすべてクリアする
-        // これにより、「Cmd+C」の後、Cを離したらCmdもクリアされ、次の入力を待つ状態になる
+
+        // 離されたキーをセットから削除
+        const newPressedKeys = new Set(pressedKeysRef.current);
+        newPressedKeys.delete(code);
+        setPressedKeys(newPressedKeys);
+
+        // 修飾キーのみが残っている場合は、説明とショートカット候補をクリア
         const isModifier = code.startsWith('Control') || code.startsWith('Shift') || code.startsWith('Alt') || code.startsWith('Meta');
-        if (!isModifier) {
-          clearAllKeys();
-        } else {
-          // 修飾キーが離された場合は、そのキーだけをセットから削除
-          const newPressedKeys = new Set(pressedKeysRef.current);
-          newPressedKeys.delete(code);
-          setPressedKeys(newPressedKeys);
+        if (!isModifier && !isQuizModeRef.current) {
+          // 残っているキーがすべて修飾キーかチェック
+          const remainingKeys = Array.from(newPressedKeys);
+          const allModifiers = remainingKeys.every(k =>
+            k.startsWith('Control') || k.startsWith('Shift') || k.startsWith('Alt') || k.startsWith('Meta')
+          );
+
+          if (allModifiers) {
+            // 修飾キーのみが残っている場合は説明とショートカット候補をクリア
+            setCurrentDescription(null);
+            setAvailableShortcuts([]);
+          } else {
+            // 非修飾キーが残っている場合は、新しい組み合わせの説明を更新
+            const comboText = getKeyComboText(remainingKeys, keyboardLayoutRef.current);
+            const description = getShortcutDescription(comboText, shortcutDescriptionsRef.current);
+            setCurrentDescription(description);
+            const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayoutRef.current, shortcutDescriptionsRef.current);
+            setAvailableShortcuts(shortcuts);
+          }
         }
       }
     };
