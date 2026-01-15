@@ -1,36 +1,86 @@
-import React, { createContext, useReducer, useContext, useCallback } from 'react';
+import React, { createContext, useReducer, useContext, useCallback, ReactNode, Dispatch } from 'react';
 import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps } from '../utils/quizEngine';
-import { allShortcuts } from '../data/shortcuts'; // 全ショートカットデータ
+import { allShortcuts } from '../data/shortcuts';
+import { QuizQuestion, QuizStats, QuizResult } from '../types';
 
-// --- 1. Contextの作成 ---
-const QuizContext = createContext();
+interface QuizSettings {
+  quizMode: 'default' | 'hardcore';
+  timeLimit: number;
+  totalQuestions: number;
+  isFullscreen: boolean;
+}
+
+interface QuizState {
+  status: 'idle' | 'playing' | 'paused' | 'finished';
+  selectedApp: string | null;
+  keyboardLayout: string | null;
+  currentQuestion: QuizQuestion | null;
+  questionStartTime: number | null;
+  timeRemaining: number;
+  lastAnswerResult: 'correct' | 'incorrect' | null;
+  score: number;
+  combo: number;
+  maxCombo: number;
+  mistakes: number;
+  quizHistory: any[];
+  startTime: number | null;
+  endTime: number | null;
+  settings: QuizSettings;
+}
+
+type QuizAction =
+  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean } }
+  | { type: 'SET_QUESTION'; payload: { question: QuizQuestion } }
+  | { type: 'ANSWER_QUESTION'; payload: { userAnswer: string; isCorrect: boolean; answerTimeMs: number } }
+  | { type: 'SKIP_QUESTION' }
+  | { type: 'TICK_TIMER' }
+  | { type: 'PAUSE_QUIZ' }
+  | { type: 'RESUME_QUIZ' }
+  | { type: 'END_QUIZ' }
+  | { type: 'RESET_QUIZ' }
+  | { type: 'UPDATE_FULLSCREEN'; payload: { isFullscreen: boolean } };
+
+interface QuizContextType {
+  state: QuizState;
+  dispatch: Dispatch<QuizAction>;
+  startQuiz: (app: string, keyboardLayout: string, isFullscreen: boolean) => void;
+  answerQuestion: (pressedCodes: Set<string>) => void;
+  skipQuestion: () => void;
+  pauseQuiz: () => void;
+  resumeQuiz: () => void;
+  endQuiz: () => void;
+  resetQuiz: () => void;
+  updateFullscreen: (isFullscreen: boolean) => void;
+}
+
+const QuizContext = createContext<QuizContextType | undefined>(undefined);
 
 // --- 2. 初期状態の定義 ---
-const initialQuizState = {
-  status: 'idle', // 'idle', 'playing', 'paused', 'finished'
+const initialQuizState: QuizState = {
+  status: 'idle',
   selectedApp: null,
-  keyboardLayout: null, // キーボードレイアウト (e.g., 'windows-jis', 'mac-jis')
+  keyboardLayout: null,
   currentQuestion: null,
-  questionStartTime: null, // 現在の問題の開始時刻
-  timeRemaining: 10, // 残り時間（秒）
-  lastAnswerResult: null, // 'correct' | 'incorrect' | null
+  questionStartTime: null,
+  timeRemaining: 10,
+  lastAnswerResult: null,
   score: 0,
   combo: 0,
   maxCombo: 0,
   mistakes: 0,
-  quizHistory: [], // { question: string, userAnswer: string, correctAnswer: string, isCorrect: boolean }
+  quizHistory: [],
   startTime: null,
   endTime: null,
   settings: {
-    quizMode: 'default', // 'default' or 'hardcore'
-    timeLimit: 10, // 10秒
-    totalQuestions: 10, // 総問題数
-    isFullscreen: false, // フルスクリーンモードかどうか
+    quizMode: 'default',
+    timeLimit: 10,
+    totalQuestions: 10,
+    isFullscreen: false,
   },
 };
 
 // --- 3. Reducer関数の定義 ---
-function quizReducer(state, action) {
+function quizReducer(state: QuizState, action: QuizAction): QuizState {
   switch (action.type) {
     case 'START_QUIZ':
       return {
@@ -155,7 +205,11 @@ function quizReducer(state, action) {
 }
 
 // --- 4. Providerコンポーネント ---
-export function QuizProvider({ children }) {
+interface QuizProviderProps {
+  children: ReactNode;
+}
+
+export function QuizProvider({ children }: QuizProviderProps) {
   const [quizState, dispatch] = useReducer(quizReducer, initialQuizState);
 
   // 次の問題を生成してセットする関数

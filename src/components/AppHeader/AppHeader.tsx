@@ -1,18 +1,19 @@
-import PropTypes from 'prop-types'
 import { memo } from 'react'
+
+interface AppHeaderProps {
+  fullscreenMode: boolean;
+  onToggleFullscreen: () => void;
+  isQuizMode: boolean;
+  setIsQuizMode: (mode: boolean) => void;
+}
 
 /**
  * アプリケーションヘッダーコンポーネント
  *
  * タイトルと全画面モード切り替えボタンを表示
  * 全画面モードでない場合は、ショートカット競合に関する警告を表示
- *
- * @param {boolean} fullscreenMode - 全画面モード状態
- * @param {function} onToggleFullscreen - 全画面モード切り替えハンドラ
- * @param {boolean} isQuizMode - クイズモード状態
- * @param {function} setIsQuizMode - クイズモード切り替えハンドラ
  */
-const AppHeader = memo(({ fullscreenMode, onToggleFullscreen, isQuizMode, setIsQuizMode }) => {
+const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, isQuizMode, setIsQuizMode }) => {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
@@ -166,12 +167,5 @@ const AppHeader = memo(({ fullscreenMode, onToggleFullscreen, isQuizMode, setIsQ
 })
 
 AppHeader.displayName = 'AppHeader'
-
-AppHeader.propTypes = {
-  fullscreenMode: PropTypes.bool.isRequired,
-  onToggleFullscreen: PropTypes.func.isRequired,
-  isQuizMode: PropTypes.bool.isRequired, // 新しく追加
-  setIsQuizMode: PropTypes.func.isRequired // 新しく追加
-}
 
 export default AppHeader

@@ -1,13 +1,47 @@
-import React, { createContext, useState, useMemo, useCallback, useContext } from 'react';
+import React, { createContext, useState, useMemo, useCallback, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '../hooks';
 import { SETUP_VERSION, STORAGE_KEYS, DEFAULTS } from '../constants';
 import { allShortcuts } from '../data/shortcuts';
 import { getLayoutDisplayName } from '../data/layouts';
-import { apps as appConfig } from '../config/apps'; // appsをインポート
+import { apps as appConfig } from '../config/apps';
+import { App, ShortcutData } from '../types';
 
-export const AppContext = createContext();
+interface SetupData {
+  setupCompleted: boolean;
+  app: string;
+  layout: string;
+}
 
-export const AppProvider = ({ children }) => {
+interface KeyboardLayoutOption {
+  id: string;
+  icon: string;
+  name: string;
+}
+
+interface AppContextType {
+  setup: SetupData;
+  showSetup: boolean;
+  selectedApp: string;
+  keyboardLayout: string;
+  isQuizMode: boolean;
+  shortcutDescriptions: ShortcutData;
+  keyboardLayouts: KeyboardLayoutOption[];
+  apps: App[];
+  setSetup: (setup: SetupData) => void;
+  setShowSetup: (show: boolean) => void;
+  setSelectedApp: (app: string) => void;
+  setKeyboardLayout: (layout: string) => void;
+  setIsQuizMode: (mode: boolean) => void;
+  handleSetupComplete: (app: string, layout: string, mode?: string) => void;
+}
+
+export const AppContext = createContext<AppContextType | undefined>(undefined);
+
+interface AppProviderProps {
+  children: ReactNode;
+}
+
+export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [setup, setSetup] = useLocalStorage(
     STORAGE_KEYS.SETUP,
     { setupCompleted: false, app: DEFAULTS.APP, layout: DEFAULTS.LAYOUT },

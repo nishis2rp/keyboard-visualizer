@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getSingleKeyShortcuts } from '../../utils'
 import ShortcutCard from '../ShortcutCard'
@@ -163,19 +162,5 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
 
 KeyDisplay.displayName = 'KeyDisplay'
 
-KeyDisplay.propTypes = {
-  pressedKeys: PropTypes.instanceOf(Set).isRequired,
-  specialKeys: PropTypes.instanceOf(Set).isRequired,
-  description: PropTypes.string,
-  availableShortcuts: PropTypes.arrayOf(
-    PropTypes.shape({
-      shortcut: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  selectedApp: PropTypes.string.isRequired,
-  shortcutDescriptions: PropTypes.objectOf(PropTypes.string).isRequired,
-  keyboardLayout: PropTypes.string.isRequired, // keyboardLayoutを追加
-}
 
 export default KeyDisplay;

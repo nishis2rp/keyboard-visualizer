@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuiz } from '../../context/QuizContext';
 import { getCodeDisplayName } from '../../utils/keyMapping';
 
@@ -254,9 +253,5 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
   );
 }
 
-QuestionCard.propTypes = {
-  pressedKeys: PropTypes.instanceOf(Set),
-  keyboardLayout: PropTypes.string,
-};
 
 export default QuestionCard;

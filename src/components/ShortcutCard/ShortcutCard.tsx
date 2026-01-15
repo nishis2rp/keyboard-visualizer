@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getProtectionLevel } from '../../constants'
 
@@ -94,10 +93,5 @@ const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
 
 ShortcutCard.displayName = 'ShortcutCard'
 
-ShortcutCard.propTypes = {
-  shortcut: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  showDebugLog: PropTypes.bool
-}
 
 export default ShortcutCard

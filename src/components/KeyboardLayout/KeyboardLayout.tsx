@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types'
 import { memo } from 'react'
 import { getKeyboardLayoutByName, getLayoutDisplayName } from '../../data/layouts'
 import { getCodeDisplayName } from '../../utils/keyMapping'
+import { PressedKeys, ShortcutData } from '../../types'
 
 // 修飾キーのコードリスト
 const MODIFIER_CODES = new Set([
@@ -10,9 +10,16 @@ const MODIFIER_CODES = new Set([
 ])
 
 // 修飾キーかどうかを判定する関数
-const isModifierKey = (code) => MODIFIER_CODES.has(code)
+const isModifierKey = (code: string): boolean => MODIFIER_CODES.has(code)
 
-const KeyboardLayout = memo(({ pressedKeys = new Set(), specialKeys = new Set(), shortcutDescriptions = {}, keyboardLayout = 'windows-jis' }) => {
+interface KeyboardLayoutProps {
+  pressedKeys?: Set<string>;
+  specialKeys?: Set<string>;
+  shortcutDescriptions?: ShortcutData;
+  keyboardLayout?: string;
+}
+
+const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), specialKeys = new Set(), shortcutDescriptions = {}, keyboardLayout = 'windows-jis' }) => {
   // 現在のレイアウトを取得
   const keyboardRows = getKeyboardLayoutByName(keyboardLayout)
   const layoutName = getLayoutDisplayName(keyboardLayout)
@@ -131,13 +138,5 @@ const KeyboardLayout = memo(({ pressedKeys = new Set(), specialKeys = new Set(),
 })
 
 KeyboardLayout.displayName = 'KeyboardLayout'
-
-KeyboardLayout.propTypes = {
-  pressedKeys: PropTypes.instanceOf(Set).isRequired,
-  specialKeys: PropTypes.instanceOf(Set).isRequired,
-  // getKeyDisplayName: PropTypes.func.isRequired, // 削除
-  shortcutDescriptions: PropTypes.objectOf(PropTypes.string).isRequired,
-  keyboardLayout: PropTypes.string
-}
 
 export default KeyboardLayout

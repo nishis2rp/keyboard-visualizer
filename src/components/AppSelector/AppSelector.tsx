@@ -1,16 +1,18 @@
-import PropTypes from 'prop-types'
 import { memo } from 'react'
+import { App } from '../../types'
+
+interface AppSelectorProps {
+  apps: App[];
+  selectedApp: string;
+  onSelectApp: (appId: string) => void;
+}
 
 /**
  * アプリケーション選択コンポーネント
  *
  * 利用可能なアプリケーションの一覧を表示し、選択できるようにする
- *
- * @param {Array} apps - アプリケーションの配列 [{id, icon, name}, ...]
- * @param {string} selectedApp - 現在選択されているアプリのID
- * @param {function} onSelectApp - アプリ選択時のハンドラ
  */
-const AppSelector = memo(({ apps, selectedApp, onSelectApp }) => {
+const AppSelector = memo<AppSelectorProps>(({ apps, selectedApp, onSelectApp }) => {
   return (
     <div className="selector-section">
       <h3 className="selector-title">アプリケーション</h3>
@@ -31,17 +33,5 @@ const AppSelector = memo(({ apps, selectedApp, onSelectApp }) => {
 })
 
 AppSelector.displayName = 'AppSelector'
-
-AppSelector.propTypes = {
-  apps: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      icon: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  selectedApp: PropTypes.string.isRequired,
-  onSelectApp: PropTypes.func.isRequired
-}
 
 export default AppSelector

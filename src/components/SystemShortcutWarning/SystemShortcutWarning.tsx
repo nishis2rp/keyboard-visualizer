@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import PropTypes from 'prop-types'; // PropTypesをインポート
 import { detectOS } from '../../constants'
 import './SystemShortcutWarning.css'
 
@@ -130,8 +129,5 @@ const SystemShortcutWarning = ({ onOpenRequest }) => { // onOpenRequestをプロ
   )
 }
 
-SystemShortcutWarning.propTypes = {
-  onOpenRequest: PropTypes.func, // 新しく追加
-};
 
 export default SystemShortcutWarning

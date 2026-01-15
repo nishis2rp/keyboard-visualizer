@@ -4,7 +4,15 @@
       "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
       "Bash(cat:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Migrate project to TypeScript\n\n- Convert all .js files to .ts and .jsx files to .tsx\n- Add tsconfig.json and tsconfig.node.json configurations\n- Install TypeScript as dev dependency\n- Fix duplicate key errors in shortcut definitions:\n  - windows11.ts: 7 duplicates removed\n  - gmail.ts: 4 duplicates removed\n  - excel.ts: 8 duplicates removed\n  - slack.ts: 6 duplicates removed\n  - macos.ts: 1 duplicate removed\n- Update index.html to reference main.tsx\n- Successfully build with TypeScript\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(gh run list:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(for:*)",
+      "Bash(do sed -i \"/^import.*''prop-types''/d\" \"$file\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
