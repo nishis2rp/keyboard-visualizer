@@ -272,7 +272,6 @@ export const macosShortcuts = {
   'Cmd + T (Pages)': 'フォントパネル (Pages)',
   'Cmd + Shift + C (Pages)': 'カラーパネル (Pages)',
   'Cmd + Option + I (Pages)': 'インスペクタを表示 (Pages)',
-  'Cmd + Option + M': 'メディアブラウザ (Pages)',
   'Cmd + {': '左揃え (Pages)',
   'Cmd + }': '右揃え (Pages)',
   'Cmd + |': '中央揃え (Pages)',

@@ -1,25 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx gh-pages:*)",
-      "Bash(gh api:*)",
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:nishis2rp.github.io)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(curl:*)",
-      "Bash(npm run dev:*)",
-      "Bash(gh run:*)",
-      "Bash(done)",
-      "Bash(grep:*)",
-      "Bash(echo:*)",
-      "Bash(git restore:*)",
-      "Bash(npm test:*)",
+      "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
-      "Bash(npx vite build)",
-      "Bash(tee:*)",
-      "Bash(node:*)"
+      "Bash(cat:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

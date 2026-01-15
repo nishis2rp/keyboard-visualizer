@@ -5,7 +5,6 @@ export const windows11Shortcuts = {
 
   // Windowsキー + 文字
   'Win + A': 'クイック設定を開く',
-  'Win + B': '通知領域にフォーカス',
   'Win + C': 'Microsoft Teams チャットを開く',
   'Win + D': 'デスクトップを表示/非表示',
   'Win + E': 'エクスプローラーを開く',
@@ -90,7 +89,6 @@ export const windows11Shortcuts = {
   // Altキーの組み合わせ
   'Alt + Tab': 'アプリの切り替え',
   'Alt + F4': 'アプリを閉じる',
-  'Alt + Enter': 'プロパティを表示',
   'Alt + ←': '前に戻る',
   'Alt + →': '次に進む',
   'Alt + Space': 'ウィンドウメニューを開く',
@@ -119,7 +117,6 @@ export const windows11Shortcuts = {
   'Ctrl + L': 'アドレスバーにフォーカス',
 
   // スクリーンショット・録画
-  'Win + Shift + S': 'スクリーンショット（切り取り&スケッチ）',
   'Win + Print Screen': 'スクリーンショットを保存',
   'Win + Alt + R': 'ゲームバーで録画開始/停止',
   'Win + Alt + Print Screen': 'ゲームウィンドウのスクリーンショット',
@@ -145,16 +142,9 @@ export const windows11Shortcuts = {
   'Win + Shift + M': '最小化したウィンドウを復元',
   'Alt + Escape': 'ウィンドウを開いた順番で切り替え',
 
-  // 仮想デスクトップの追加
-  'Win + Ctrl + F4': '現在の仮想デスクトップを閉じる',
-  'Win + Ctrl + Left': '左の仮想デスクトップに切り替え',
-  'Win + Ctrl + Right': '右の仮想デスクトップに切り替え',
-
   // ダイアログボックス
   'Tab': '次のオプションに移動',
   'Shift + Tab': '前のオプションに移動',
-  'Ctrl + Tab': '次のタブに移動',
-  'Ctrl + Shift + Tab': '前のタブに移動',
   'Space': 'チェックボックスのオン/オフ',
   'Enter': 'ボタンを実行',
 
@@ -182,5 +172,4 @@ export const windows11Shortcuts = {
   'Shift + F10': '右クリックメニューを表示',
   'Ctrl + Shift + V': 'クリップボード履歴から貼り付け',
   'Win + Pause': 'システムのプロパティを表示',
-  'Win + Print Screen': 'スクリーンショットを撮影して保存',
 }
