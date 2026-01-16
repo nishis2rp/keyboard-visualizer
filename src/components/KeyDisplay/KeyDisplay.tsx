@@ -12,8 +12,14 @@ const MODIFIER_CODE_DISPLAY_ORDER = [
 // 修飾キーのコードリスト
 const MODIFIER_CODES = new Set(MODIFIER_CODE_DISPLAY_ORDER)
 
+// Windowsキーのコードリスト
+const WINDOWS_KEY_CODES = new Set(['MetaLeft', 'MetaRight'])
+
 // 修飾キーかどうかを判定する関数
 const isModifierKey = (code) => MODIFIER_CODES.has(code)
+
+// Windowsキーかどうかを判定する関数
+const isWindowsKey = (code) => WINDOWS_KEY_CODES.has(code)
 
 const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), description, availableShortcuts = [], selectedApp, shortcutDescriptions = {}, keyboardLayout }) => {
   // Shiftキーが押されているか判定（getCodeDisplayNameに渡すため）
@@ -95,7 +101,7 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
             {sortedCodes.map((code, index) => (
               <div key={`${code}-${index}`} style={{ display: 'contents' }}>
                 {index > 0 && <span className="plus">+</span>}
-                <div className={`key ${isModifierKey(code) ? 'modifier-key' : (specialKeys.has(code) ? 'special-key' : '')}`}>
+                <div className={`key ${isWindowsKey(code) ? 'windows-key' : (isModifierKey(code) ? 'modifier-key' : (specialKeys.has(code) ? 'special-key' : ''))}`}>
                   {getCodeDisplayName(code, null, keyboardLayout, shiftPressed)} {/* keyは不明なのでnull */}
                 </div>
               </div>
@@ -117,7 +123,7 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
           {sortedCodes.map((code, index) => (
             <div key={`${code}-${index}`} style={{ display: 'contents' }}>
               {index > 0 && <span className="plus">+</span>}
-              <div className={`key ${isModifierKey(code) ? 'modifier-key' : (specialKeys.has(code) ? 'special-key' : '')}`}>
+              <div className={`key ${isWindowsKey(code) ? 'windows-key' : (isModifierKey(code) ? 'modifier-key' : (specialKeys.has(code) ? 'special-key' : ''))}`}>
                 {getCodeDisplayName(code, null, keyboardLayout, shiftPressed)} {/* keyは不明なのでnull */}
               </div>
             </div>

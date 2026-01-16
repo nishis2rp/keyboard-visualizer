@@ -9,8 +9,14 @@ const MODIFIER_CODES = new Set([
   'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'
 ])
 
+// Windowsキーのコードリスト
+const WINDOWS_KEY_CODES = new Set(['MetaLeft', 'MetaRight'])
+
 // 修飾キーかどうかを判定する関数
 const isModifierKey = (code: string): boolean => MODIFIER_CODES.has(code)
+
+// Windowsキーかどうかを判定する関数
+const isWindowsKey = (code: string): boolean => WINDOWS_KEY_CODES.has(code)
 
 interface KeyboardLayoutProps {
   pressedKeys?: Set<string>;
@@ -89,13 +95,14 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
             {row.map((keyObj, keyIndex) => {
               const isPressed = isKeyPressed(keyObj)
               const isModifier = isModifierKey(keyObj.code)
+              const isWinKey = isWindowsKey(keyObj.code)
               const isSpecial = !isModifier && specialKeys.has(keyObj.key)
               const shortcuts = getKeyShortcuts(keyObj)
 
               return (
                 <div
                   key={`${rowIndex}-${keyIndex}`}
-                  className={`keyboard-key ${isPressed ? 'pressed' : ''} ${isModifier ? 'modifier' : (isSpecial ? 'special' : '')}`}
+                  className={`keyboard-key ${isPressed ? 'pressed' : ''} ${isWinKey ? 'windows-key' : (isModifier ? 'modifier' : (isSpecial ? 'special' : ''))}`}
                   style={{
                     flexGrow: keyObj.width || 1,
                     flexShrink: 0,
