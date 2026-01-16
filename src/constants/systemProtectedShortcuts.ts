@@ -92,14 +92,72 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Win + ←',                    // 左半分にスナップ
   'Win + →',                    // 右半分にスナップ
   'Win + Home',                 // アクティブウィンドウ以外を最小化
+  'Win + Shift + ↑',            // 垂直方向に最大化
+  'Win + Shift + ↓',            // 垂直方向サイズ戻す
+  'Win + Shift + ←',            // 左のモニターに移動
+  'Win + Shift + →',            // 右のモニターに移動
+  'Win + Shift + M',            // 最小化したウィンドウを復元
 
   // Windows 機能（フルスクリーンで防げる）
+  'Win',                        // スタートメニュー
+  'Win + A',                    // クイック設定
+  'Win + C',                    // Microsoft Teams チャット
+  'Win + E',                    // エクスプローラー
+  'Win + F',                    // フィードバックHub
   'Win + G',                    // Xbox Game Barを開く
+  'Win + H',                    // 音声入力
+  'Win + I',                    // 設定
+  'Win + K',                    // キャスト（ワイヤレスディスプレイ）
+  'Win + N',                    // 通知センター
+  'Win + O',                    // デバイスの向きをロック
+  'Win + P',                    // プレゼンテーション表示モード
+  'Win + Q',                    // 検索
+  'Win + R',                    // ファイル名を指定して実行
+  'Win + S',                    // 検索
+  'Win + T',                    // タスクバーのアプリを順番に選択
+  'Win + U',                    // 簡単操作センター
+  'Win + V',                    // クリップボード履歴
+  'Win + W',                    // ウィジェット
+  'Win + X',                    // クイックリンクメニュー
+  'Win + Y',                    // Windows Mixed Reality
+  'Win + Z',                    // スナップレイアウト
+  'Win + Tab',                  // タスクビュー
+  'Win + Space',                // 入力言語切り替え
+  'Win + Enter',                // ナレーター
+  'Win + .',                    // 絵文字パネル
+  'Win + ;',                    // 絵文字パネル
+  'Win + ,',                    // デスクトッププレビュー
+  'Win + +',                    // 拡大鏡で拡大
+  'Win + -',                    // 拡大鏡で縮小
+  'Win + Escape',               // 拡大鏡終了
+  'Win + /',                    // IME再変換
+  'Win + B',                    // 通知領域フォーカス
+  'Win + Pause',                // システムのプロパティ
+  'Win + 1',                    // タスクバー1番目
+  'Win + 2',                    // タスクバー2番目
+  'Win + 3',                    // タスクバー3番目
+  'Win + 4',                    // タスクバー4番目
+  'Win + 5',                    // タスクバー5番目
+  'Win + 6',                    // タスクバー6番目
+  'Win + 7',                    // タスクバー7番目
+  'Win + 8',                    // タスクバー8番目
+  'Win + 9',                    // タスクバー9番目
+  'Win + 0',                    // タスクバー10番目
   'Win + Alt + R',              // ゲームバーで録画開始/停止
   'Win + Alt + Print Screen',   // ゲームウィンドウのスクリーンショット
   'Win + Alt + G',              // 最後の30秒を録画
   'Win + Print Screen',         // スクリーンショットを保存
   'Win + Shift + S',            // スクリーンショット（Snipping Tool）
+  'Win + Shift + N',            // 通知センター・カレンダー
+  'Win + Ctrl + D',             // 新しい仮想デスクトップ
+  'Win + Ctrl + ←',             // 左の仮想デスクトップ
+  'Win + Ctrl + →',             // 右の仮想デスクトップ
+  'Win + Ctrl + F4',            // 仮想デスクトップを閉じる
+  'Win + Ctrl + Enter',         // ナレーター
+  'Win + Ctrl + N',             // ナレーター設定
+  'Win + Ctrl + M',             // 拡大鏡
+  'Win + Ctrl + C',             // カラーフィルター
+  'Win + Ctrl + Shift + B',     // グラフィックドライバー再起動
 
   // ===== macOS =====
 
