@@ -64,6 +64,7 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Ctrl + U',                   // ソース表示
   'Ctrl + O',                   // ファイルを開く
   'Ctrl + Shift + S',           // 名前を付けて保存
+  'Ctrl + A',                   // すべて選択
   'Ctrl + F',                   // ページ内検索
   'F3',                         // ページ内検索
   'Shift + F3',                 // 前の検索結果

@@ -127,9 +127,10 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyboardLayout, isQui
           );
 
           if (allModifiers) {
-            // 修飾キーのみが残っている場合は説明とショートカット候補をクリア
+            // 修飾キーのみが残っている場合は、その修飾キーで利用可能なショートカット候補を表示
             setCurrentDescription(null);
-            setAvailableShortcuts([]);
+            const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayoutRef.current, shortcutDescriptionsRef.current);
+            setAvailableShortcuts(shortcuts);
           } else {
             // 非修飾キーが残っている場合は、新しい組み合わせの説明を更新
             const comboText = getKeyComboText(remainingKeys, keyboardLayoutRef.current);

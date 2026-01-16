@@ -4,6 +4,5 @@
  */
 export const specialKeys = new Set([
   'Control', 'Shift', 'Alt', 'Meta', 'OS', 'Tab', 'Enter', 'Escape',
-  'CapsLock', 'Backspace', 'Delete', 'ArrowUp', 'ArrowDown',
-  'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'
+  'CapsLock', 'Backspace', 'Delete', 'Home', 'End', 'PageUp', 'PageDown'
 ])
