@@ -72,19 +72,43 @@ const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
     }
   }
 
-  // ショートカット文字列をパースしてWinキーを青色でスタイリング
+  // 修飾キーかどうかを判定
+  const isModifierKey = (keyName: string) => {
+    return ['Ctrl', 'Shift', 'Alt', 'Cmd', 'Option'].includes(keyName)
+  }
+
+  // Windowsキーかどうかを判定
+  const isWindowsKey = (keyName: string) => {
+    return keyName === 'Win'
+  }
+
+  // ショートカット文字列をパースしてキーをボタンとして表示
   const renderShortcut = () => {
     // ショートカットを " + " で分割
     const parts = shortcut.split(' + ')
 
-    return parts.map((part, index) => (
-      <span key={index}>
-        {index > 0 && <span> + </span>}
-        <span style={part === 'Win' ? { color: '#007AFF', fontWeight: '600' } : {}}>
-          {part}
-        </span>
-      </span>
-    ))
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+        {parts.map((part, index) => (
+          <span key={index} style={{ display: 'contents' }}>
+            {index > 0 && <span style={{ fontSize: '0.8em', color: '#86868B', margin: '0 2px' }}>+</span>}
+            <span
+              className={`key ${isWindowsKey(part) ? 'windows-key' : (isModifierKey(part) ? 'modifier-key' : '')}`}
+              style={{
+                padding: '2px 6px',
+                fontSize: '0.75em',
+                minWidth: 'auto',
+                display: 'inline-block',
+                borderRadius: '4px',
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              {part}
+            </span>
+          </span>
+        ))}
+      </div>
+    )
   }
 
   const style = getStyle()
@@ -95,9 +119,11 @@ const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
       style={style.card}
       title={style.tooltip}
     >
-      <div className="shortcut-combo" style={style.combo}>
-        {style.icon && `${style.icon} `}
-        {renderShortcut()}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+        {style.icon && <span style={{ fontSize: '0.9em' }}>{style.icon}</span>}
+        <div className="shortcut-combo" style={{ ...style.combo, marginBottom: 0 }}>
+          {renderShortcut()}
+        </div>
       </div>
       <div className="shortcut-desc" style={style.description}>
         {description}
