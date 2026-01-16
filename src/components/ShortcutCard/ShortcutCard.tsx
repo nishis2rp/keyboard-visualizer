@@ -72,6 +72,21 @@ const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
     }
   }
 
+  // ショートカット文字列をパースしてWinキーを青色でスタイリング
+  const renderShortcut = () => {
+    // ショートカットを " + " で分割
+    const parts = shortcut.split(' + ')
+
+    return parts.map((part, index) => (
+      <span key={index}>
+        {index > 0 && <span> + </span>}
+        <span style={part === 'Win' ? { color: '#007AFF', fontWeight: '600' } : {}}>
+          {part}
+        </span>
+      </span>
+    ))
+  }
+
   const style = getStyle()
 
   return (
@@ -82,7 +97,7 @@ const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
     >
       <div className="shortcut-combo" style={style.combo}>
         {style.icon && `${style.icon} `}
-        {shortcut}
+        {renderShortcut()}
       </div>
       <div className="shortcut-desc" style={style.description}>
         {description}
