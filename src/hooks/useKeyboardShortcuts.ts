@@ -117,27 +117,33 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyboardLayout, isQui
         newPressedKeys.delete(code);
         setPressedKeys(newPressedKeys);
 
-        // 修飾キーのみが残っている場合は、説明とショートカット候補をクリア
-        const isModifier = code.startsWith('Control') || code.startsWith('Shift') || code.startsWith('Alt') || code.startsWith('Meta');
-        if (!isModifier && !isQuizModeRef.current) {
-          // 残っているキーがすべて修飾キーかチェック
+        // クイズモードでない場合は、残っているキーに基づいて説明とショートカット候補を更新
+        if (!isQuizModeRef.current) {
           const remainingKeys = Array.from(newPressedKeys);
-          const allModifiers = remainingKeys.every(k =>
-            k.startsWith('Control') || k.startsWith('Shift') || k.startsWith('Alt') || k.startsWith('Meta')
-          );
 
-          if (allModifiers) {
-            // 修飾キーのみが残っている場合は、その修飾キーで利用可能なショートカット候補を表示
+          if (remainingKeys.length === 0) {
+            // すべてのキーが離された場合はクリア
             setCurrentDescription(null);
-            const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayoutRef.current, shortcutDescriptionsRef.current);
-            setAvailableShortcuts(shortcuts);
+            setAvailableShortcuts([]);
           } else {
-            // 非修飾キーが残っている場合は、新しい組み合わせの説明を更新
-            const comboText = getKeyComboText(remainingKeys, keyboardLayoutRef.current);
-            const description = getShortcutDescription(comboText, shortcutDescriptionsRef.current);
-            setCurrentDescription(description);
-            const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayoutRef.current, shortcutDescriptionsRef.current);
-            setAvailableShortcuts(shortcuts);
+            // 残っているキーがすべて修飾キーかチェック
+            const allModifiers = remainingKeys.every(k =>
+              k.startsWith('Control') || k.startsWith('Shift') || k.startsWith('Alt') || k.startsWith('Meta')
+            );
+
+            if (allModifiers) {
+              // 修飾キーのみが残っている場合は、その修飾キーで利用可能なショートカット候補を表示
+              setCurrentDescription(null);
+              const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayoutRef.current, shortcutDescriptionsRef.current);
+              setAvailableShortcuts(shortcuts);
+            } else {
+              // 非修飾キーが残っている場合は、新しい組み合わせの説明を更新
+              const comboText = getKeyComboText(remainingKeys, keyboardLayoutRef.current);
+              const description = getShortcutDescription(comboText, shortcutDescriptionsRef.current);
+              setCurrentDescription(description);
+              const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayoutRef.current, shortcutDescriptionsRef.current);
+              setAvailableShortcuts(shortcuts);
+            }
           }
         }
       }
