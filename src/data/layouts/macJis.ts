@@ -2,7 +2,7 @@
 export const macJisLayout = [
   // Row 1 (Function keys)
   [
-    { key: 'Escape', code: 'Escape', display: '⎋ esc', width: 1 },
+    { key: 'Escape', code: 'Escape', display: '⎋ esc', width: 2 },
     { key: 'F1', code: 'F1', display: 'F1 🔅', width: 1 },
     { key: 'F2', code: 'F2', display: 'F2 🔆', width: 1 },
     { key: 'F3', code: 'F3', display: 'F3 ⌃↑', width: 1 },
@@ -17,7 +17,7 @@ export const macJisLayout = [
     { key: 'F12', code: 'F12', display: 'F12 🔊', width: 1 },
     { key: 'F13', code: 'F13', display: 'F13', width: 1 },
     { key: 'F14', code: 'F14', display: 'F14', width: 1 },
-    { key: 'F15', code: 'F15', display: 'F15', width: 1 },
+    { key: 'F15', code: 'F15', display: 'F15', width: 1.5 },
   ],
   // Row 2 (Number row)
   [
@@ -54,8 +54,8 @@ export const macJisLayout = [
     { key: 'KeyO', code: 'KeyO', display: 'O', width: 1 },
     { key: 'KeyP', code: 'KeyP', display: 'P', width: 1 },
     { key: 'BracketLeft', code: 'BracketLeft', display: '@', width: 1 },
-    { key: 'BracketRight', code: 'BracketRight', display: '[', width: 1 },
-    { key: 'Enter', code: 'Enter', display: '⏎ return', width: 2 },
+    { key: 'BracketRight', code: 'BracketRight', display: '[', width: 1.5 },
+    { key: 'Enter', code: 'Enter', display: '⏎ return', width: 1.5, rowSpan: 2 },
     { key: 'Delete', code: 'Delete', display: '⌦ delete', width: 1 },
     { key: 'End', code: 'End', display: 'end', width: 1 },
     { key: 'PageDown', code: 'PageDown', display: 'page down', width: 1 },
@@ -74,11 +74,11 @@ export const macJisLayout = [
     { key: 'KeyL', code: 'KeyL', display: 'L', width: 1 },
     { key: 'Semicolon', code: 'Semicolon', display: ';', width: 1 },
     { key: 'Quote', code: 'Quote', display: ':', width: 1 },
-    { key: 'IntlBackslash', code: 'IntlBackslash', display: ']', width: 1 }, // JIS layout: ]
+    { key: 'IntlBackslash', code: 'IntlBackslash', display: ']', width: 1.25 }, // JIS layout: ]
   ],
   // Row 5
   [
-    { key: 'ShiftLeft', code: 'ShiftLeft', display: '⇧ shift', width: 2.25 },
+    { key: 'ShiftLeft', code: 'ShiftLeft', display: '⇧ shift', width: 2.5 },
     { key: 'KeyZ', code: 'KeyZ', display: 'Z', width: 1 },
     { key: 'KeyX', code: 'KeyX', display: 'X', width: 1 },
     { key: 'KeyC', code: 'KeyC', display: 'C', width: 1 },
@@ -90,18 +90,20 @@ export const macJisLayout = [
     { key: 'Period', code: 'Period', display: '.', width: 1 },
     { key: 'Slash', code: 'Slash', display: '/', width: 1 },
     { key: 'IntlRo', code: 'IntlRo', display: 'ろ', width: 1 }, // JIS layout: "ro"
-    { key: 'ShiftRight', code: 'ShiftRight', display: '⇧ shift', width: 3.25 },
+    { key: 'ShiftRight', code: 'ShiftRight', display: '⇧ shift', width: 2 },
     { key: 'ArrowUp', code: 'ArrowUp', display: '↑', width: 1 },
   ],
   // Row 6
   [
     { key: 'ControlLeft', code: 'ControlLeft', display: '⌃ control', width: 1.25 },
     { key: 'AltLeft', code: 'AltLeft', display: '⌥ option', width: 1.25 },
-    { key: 'MetaLeft', code: 'MetaLeft', display: '⌘ command', width: 1.5 },
-    { key: 'Space', code: 'Space', display: '', width: 4 },
-    { key: 'MetaRight', code: 'MetaRight', display: '⌘ command', width: 1.5 },
-    { key: 'AltRight', code: 'AltRight', display: '⌥ option', width: 1.25 },
-    { key: 'ControlRight', code: 'ControlRight', display: '⌃ control', width: 4.5 },
+    { key: 'MetaLeft', code: 'MetaLeft', display: '⌘ command', width: 1.25 },
+    { key: 'NonConvert', code: 'NonConvert', display: '英数', width: 1 },
+    { key: 'Space', code: 'Space', display: '', width: 6 },
+    { key: 'Convert', code: 'Convert', display: 'かな', width: 1 },
+    { key: 'MetaRight', code: 'MetaRight', display: '⌘ command', width: 1.25 },
+    { key: 'AltRight', code: 'AltRight', display: '⌥ option', width: 1 },
+    { key: 'ControlRight', code: 'ControlRight', display: '⌃ control', width: 2 },
     { key: 'ArrowLeft', code: 'ArrowLeft', display: '←', width: 1 },
     { key: 'ArrowDown', code: 'ArrowDown', display: '↓', width: 1 },
     { key: 'ArrowRight', code: 'ArrowRight', display: '→', width: 1 },

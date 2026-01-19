@@ -74,45 +74,88 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
     return uniqueShortcuts // すべてのショートカットを表示
   }
 
+  // Calculate grid positions for all keys
+  // Grid columns: 72 (allows 0.25 increments: 1.0 = 4 cols, 1.25 = 5 cols, etc.)
+  // Main keyboard: 62 cols (15.5 * 4), Gap: 2 cols, Navigation: 12 cols (3 * 4)
+  const GRID_MULTIPLIER = 4
+  const MAIN_KEYBOARD_END = 62
+  const NAV_BLOCK_START = 64
+
+  // Navigation keys that should be positioned on the right
+  const navKeys = new Set(['Fn', 'Home', 'PageUp', 'Delete', 'End', 'PageDown', 'Insert', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight', 'PrintScreen', 'ScrollLock', 'Pause', 'F13', 'F14', 'F15'])
+
+  const keysWithPositions = keyboardRows.flatMap((row, rowIndex) => {
+    let mainColStart = 1
+    let navColStart = NAV_BLOCK_START
+
+    return row.map((keyObj) => {
+      const widthInCols = Math.round((keyObj.width || 1) * GRID_MULTIPLIER)
+      const isNavKey = navKeys.has(keyObj.code)
+
+      let colStart, colEnd
+      if (isNavKey) {
+        // Special handling for ArrowUp - center it in the nav block
+        if (keyObj.code === 'ArrowUp') {
+          colStart = NAV_BLOCK_START + 4 // Center position (skip 1 column)
+          colEnd = colStart + widthInCols
+        } else {
+          colStart = navColStart
+          colEnd = navColStart + widthInCols
+          navColStart = colEnd
+        }
+      } else {
+        colStart = mainColStart
+        colEnd = mainColStart + widthInCols
+        mainColStart = colEnd
+      }
+
+      const rowStart = rowIndex + 1
+      const rowEnd = rowStart + (keyObj.rowSpan || 1)
+      const position = {
+        gridColumn: `${colStart} / ${colEnd}`,
+        gridRow: `${rowStart} / ${rowEnd}`,
+        width: keyObj.width || 1
+      }
+
+      return { ...keyObj, ...position }
+    })
+  })
+
   return (
     <div className="keyboard-layout">
       <h3 className="keyboard-title">{layoutName}</h3>
       <div className="keyboard">
-        {keyboardRows.map((row, rowIndex) => (
-          <div key={rowIndex} className="keyboard-row">
-            {row.map((keyObj, keyIndex) => {
-              const isPressed = isKeyPressed(keyObj)
-              const isModifier = isModifierKey(keyObj.code)
-              const isWinKey = isWindowsKey(keyObj.code)
-              const isSpecial = !isModifier && specialKeys.has(keyObj.key)
-              const shortcuts = getKeyShortcuts(keyObj)
+        {keysWithPositions.map((keyObj, index) => {
+          const isPressed = isKeyPressed(keyObj)
+          const isModifier = isModifierKey(keyObj.code)
+          const isWinKey = isWindowsKey(keyObj.code)
+          const isSpecial = !isModifier && specialKeys.has(keyObj.key)
+          const shortcuts = getKeyShortcuts(keyObj)
 
-              return (
-                <div
-                  key={`${rowIndex}-${keyIndex}`}
-                  className={`keyboard-key ${isPressed ? 'pressed' : ''} ${isWinKey ? 'windows-key' : (isModifier ? 'modifier' : (isSpecial ? 'special' : ''))}`}
-                  style={{
-                    flexGrow: keyObj.width || 1,
-                    flexShrink: 0,
-                    flexBasis: `${(keyObj.width || 1) * KEY_WIDTH_MULTIPLIER}px`
-                  }}
-                  title={shortcuts.length > 0 ? shortcuts.map(s => `${s.combo}: ${s.desc}`).join('\n') : ''}
-                >
-                  <div className="key-display">{keyObj.display}</div>
-                  {shortcuts.length > 0 && (
-                    <div className="key-shortcuts-popup">
-                      {shortcuts.map((shortcut, idx) => (
-                        <div key={idx} className="key-shortcut-item">
-                          <strong>{shortcut.combo}</strong>: {shortcut.desc}
-                        </div>
-                      ))}
+          return (
+            <div
+              key={`${index}-${keyObj.code}`}
+              className={`keyboard-key ${isPressed ? 'pressed' : ''} ${isWinKey ? 'windows-key' : (isModifier ? 'modifier' : (isSpecial ? 'special' : ''))}`}
+              style={{
+                gridColumn: keyObj.gridColumn,
+                gridRow: keyObj.gridRow,
+                minWidth: `${keyObj.width * KEY_WIDTH_MULTIPLIER}px`
+              }}
+              title={shortcuts.length > 0 ? shortcuts.map(s => `${s.combo}: ${s.desc}`).join('\n') : ''}
+            >
+              <div className="key-display">{keyObj.display}</div>
+              {shortcuts.length > 0 && (
+                <div className="key-shortcuts-popup">
+                  {shortcuts.map((shortcut, idx) => (
+                    <div key={idx} className="key-shortcut-item">
+                      <strong>{shortcut.combo}</strong>: {shortcut.desc}
                     </div>
-                  )}
+                  ))}
                 </div>
-              )
-            })}
-          </div>
-        ))}
+              )}
+            </div>
+          )
+        })}
       </div>
       <div className="keyboard-legend">
         <div className="legend-item">
