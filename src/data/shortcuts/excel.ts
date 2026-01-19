@@ -22,6 +22,9 @@ export const excelShortcuts = {
   'Ctrl + R': '[編集] 右方向にコピー',
   'Ctrl + -': '[編集] セル/行/列を削除',
   'Ctrl + Shift + +': '[編集] セル/行/列を挿入',
+  'Insert': '[編集] セルを挿入',
+  'Shift + Insert': '[編集] 貼り付け',
+  'Ctrl + Insert': '[編集] コピー',
 
   // セル操作
   'F2': '[セル] セルを編集',

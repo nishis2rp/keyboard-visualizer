@@ -15,6 +15,9 @@ export const macUsLayout = [
     { key: 'F10', code: 'F10', display: 'F10 🔇', width: 1 },
     { key: 'F11', code: 'F11', display: 'F11 🔉', width: 1 },
     { key: 'F12', code: 'F12', display: 'F12 🔊', width: 1 },
+    { key: 'F13', code: 'F13', display: 'F13', width: 1 },
+    { key: 'F14', code: 'F14', display: 'F14', width: 1 },
+    { key: 'F15', code: 'F15', display: 'F15', width: 1 },
   ],
   // Row 2 (Number row)
   [
@@ -32,6 +35,9 @@ export const macUsLayout = [
     { key: 'Minus', code: 'Minus', display: '-', width: 1 },
     { key: 'Equal', code: 'Equal', display: '=', width: 1 },
     { key: 'Backspace', code: 'Backspace', display: '⌫ delete', width: 2 },
+    { key: 'Fn', code: 'Fn', display: 'fn', width: 1 },
+    { key: 'Home', code: 'Home', display: 'home', width: 1 },
+    { key: 'PageUp', code: 'PageUp', display: 'page up', width: 1 },
   ],
   // Row 3
   [
@@ -49,6 +55,9 @@ export const macUsLayout = [
     { key: 'BracketLeft', code: 'BracketLeft', display: '[', width: 1 },
     { key: 'BracketRight', code: 'BracketRight', display: ']', width: 1 },
     { key: 'Backslash', code: 'Backslash', display: '\\', width: 1.5 },
+    { key: 'Delete', code: 'Delete', display: '⌦ delete', width: 1 },
+    { key: 'End', code: 'End', display: 'end', width: 1 },
+    { key: 'PageDown', code: 'PageDown', display: 'page down', width: 1 },
   ],
   // Row 4
   [

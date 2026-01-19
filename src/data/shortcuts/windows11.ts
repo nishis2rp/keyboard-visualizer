@@ -163,8 +163,17 @@ export const windows11Shortcuts = {
   'Ctrl + Delete': '次の単語を削除',
   'Home': '行の先頭に移動',
   'End': '行の末尾に移動',
+  'PageUp': '1画面分上にスクロール',
+  'PageDown': '1画面分下にスクロール',
   'Ctrl + Home': 'ドキュメントの先頭に移動',
   'Ctrl + End': 'ドキュメントの末尾に移動',
+  'Shift + Home': '行の先頭まで選択',
+  'Shift + End': '行の末尾まで選択',
+  'Shift + PageUp': '1画面分上まで選択',
+  'Shift + PageDown': '1画面分下まで選択',
+  'Insert': '挿入モード/上書きモードの切り替え',
+  'Shift + Insert': '貼り付け',
+  'Ctrl + Insert': 'コピー',
 
   // その他の便利なショートカット
   'F7': 'スペルチェック（一部アプリ）',

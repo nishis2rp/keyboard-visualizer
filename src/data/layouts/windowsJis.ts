@@ -15,6 +15,9 @@ export const windowsJisLayout = [
     { key: 'F10', code: 'F10', display: 'F10', width: 1 },
     { key: 'F11', code: 'F11', display: 'F11', width: 1 },
     { key: 'F12', code: 'F12', display: 'F12', width: 1 },
+    { key: 'PrintScreen', code: 'PrintScreen', display: 'PrtSc', width: 1 },
+    { key: 'ScrollLock', code: 'ScrollLock', display: 'ScrLk', width: 1 },
+    { key: 'Pause', code: 'Pause', display: 'Pause', width: 1 },
   ],
   // Row 2 (Number row)
   [
@@ -33,6 +36,9 @@ export const windowsJisLayout = [
     { key: 'Equal', code: 'Equal', display: '^', width: 1 }, // JIS layout: ^
     { key: 'IntlYen', code: 'IntlYen', display: '¥', width: 1 }, // JIS specific
     { key: 'Backspace', code: 'Backspace', display: 'Back', width: 2 },
+    { key: 'Insert', code: 'Insert', display: 'Ins', width: 1 },
+    { key: 'Home', code: 'Home', display: 'Home', width: 1 },
+    { key: 'PageUp', code: 'PageUp', display: 'PgUp', width: 1 },
   ],
   // Row 3
   [
@@ -50,6 +56,9 @@ export const windowsJisLayout = [
     { key: 'BracketLeft', code: 'BracketLeft', display: '@', width: 1 }, // JIS layout: @
     { key: 'BracketRight', code: 'BracketRight', display: '[', width: 1 }, // JIS layout: [
     { key: 'Enter', code: 'Enter', display: 'Enter', width: 1.5 },
+    { key: 'Delete', code: 'Delete', display: 'Del', width: 1 },
+    { key: 'End', code: 'End', display: 'End', width: 1 },
+    { key: 'PageDown', code: 'PageDown', display: 'PgDn', width: 1 },
   ],
   // Row 4
   [
