@@ -55,7 +55,7 @@ export const windowsJisLayout = [
     { key: 'KeyP', code: 'KeyP', display: 'P', width: 1 },
     { key: 'BracketLeft', code: 'BracketLeft', display: '@', width: 1 }, // JIS layout: @
     { key: 'BracketRight', code: 'BracketRight', display: '[', width: 1 }, // JIS layout: [
-    { key: 'Enter', code: 'Enter', display: 'Enter', width: 1.5 },
+    { key: 'Enter', code: 'Enter', display: 'Enter', width: 2.5 },
     { key: 'Delete', code: 'Delete', display: 'Del', width: 1 },
     { key: 'End', code: 'End', display: 'End', width: 1 },
     { key: 'PageDown', code: 'PageDown', display: 'PgDn', width: 1 },
@@ -90,7 +90,8 @@ export const windowsJisLayout = [
     { key: 'Period', code: 'Period', display: '.', width: 1 },
     { key: 'Slash', code: 'Slash', display: '/', width: 1 },
     { key: 'IntlBackslash', code: 'IntlBackslash', display: '\\', width: 1 }, // JIS layout: \\
-    { key: 'ShiftRight', code: 'ShiftRight', display: 'Shift', width: 1.5 }, // JIS: Right Shift is shorter
+    { key: 'ShiftRight', code: 'ShiftRight', display: 'Shift', width: 4.75 },
+    { key: 'ArrowUp', code: 'ArrowUp', display: '↑', width: 1 },
   ],
   // Row 6
   [
@@ -100,9 +101,8 @@ export const windowsJisLayout = [
     { key: 'Space', code: 'Space', display: 'Space', width: 4.5 },
     { key: 'AltRight', code: 'AltRight', display: 'Alt', width: 1.25 },
     { key: 'KanaMode', code: 'KanaMode', display: 'かな', width: 1 }, // JIS specific
-    { key: 'ControlRight', code: 'ControlRight', display: 'Ctrl', width: 1.25 },
+    { key: 'ControlRight', code: 'ControlRight', display: 'Ctrl', width: 4.25 },
     { key: 'ArrowLeft', code: 'ArrowLeft', display: '←', width: 1 },
-    { key: 'ArrowUp', code: 'ArrowUp', display: '↑', width: 1 },
     { key: 'ArrowDown', code: 'ArrowDown', display: '↓', width: 1 },
     { key: 'ArrowRight', code: 'ArrowRight', display: '→', width: 1 },
   ],

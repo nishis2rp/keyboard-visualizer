@@ -55,7 +55,7 @@ export const macJisLayout = [
     { key: 'KeyP', code: 'KeyP', display: 'P', width: 1 },
     { key: 'BracketLeft', code: 'BracketLeft', display: '@', width: 1 },
     { key: 'BracketRight', code: 'BracketRight', display: '[', width: 1 },
-    { key: 'Enter', code: 'Enter', display: '⏎ return', width: 1.5 },
+    { key: 'Enter', code: 'Enter', display: '⏎ return', width: 2 },
     { key: 'Delete', code: 'Delete', display: '⌦ delete', width: 1 },
     { key: 'End', code: 'End', display: 'end', width: 1 },
     { key: 'PageDown', code: 'PageDown', display: 'page down', width: 1 },
@@ -90,7 +90,8 @@ export const macJisLayout = [
     { key: 'Period', code: 'Period', display: '.', width: 1 },
     { key: 'Slash', code: 'Slash', display: '/', width: 1 },
     { key: 'IntlRo', code: 'IntlRo', display: 'ろ', width: 1 }, // JIS layout: "ro"
-    { key: 'ShiftRight', code: 'ShiftRight', display: '⇧ shift', width: 1.5 },
+    { key: 'ShiftRight', code: 'ShiftRight', display: '⇧ shift', width: 3.25 },
+    { key: 'ArrowUp', code: 'ArrowUp', display: '↑', width: 1 },
   ],
   // Row 6
   [
@@ -100,8 +101,8 @@ export const macJisLayout = [
     { key: 'Space', code: 'Space', display: '', width: 4 },
     { key: 'MetaRight', code: 'MetaRight', display: '⌘ command', width: 1.5 },
     { key: 'AltRight', code: 'AltRight', display: '⌥ option', width: 1.25 },
+    { key: 'ControlRight', code: 'ControlRight', display: '⌃ control', width: 4.5 },
     { key: 'ArrowLeft', code: 'ArrowLeft', display: '←', width: 1 },
-    { key: 'ArrowUp', code: 'ArrowUp', display: '↑', width: 1 },
     { key: 'ArrowDown', code: 'ArrowDown', display: '↓', width: 1 },
     { key: 'ArrowRight', code: 'ArrowRight', display: '→', width: 1 },
   ],

@@ -88,7 +88,7 @@ export const macUsLayout = [
     { key: 'Comma', code: 'Comma', display: ',', width: 1 },
     { key: 'Period', code: 'Period', display: '.', width: 1 },
     { key: 'Slash', code: 'Slash', display: '/', width: 1 },
-    { key: 'ShiftRight', code: 'ShiftRight', display: '⇧ shift', width: 2.75 }, // Mac US Right Shift
+    { key: 'ShiftRight', code: 'ShiftRight', display: '⇧ shift', width: 3.75 },
     { key: 'ArrowUp', code: 'ArrowUp', display: '↑', width: 1 },
   ],
   // Row 6
@@ -99,6 +99,7 @@ export const macUsLayout = [
     { key: 'Space', code: 'Space', display: '', width: 5 },
     { key: 'MetaRight', code: 'MetaRight', display: '⌘ command', width: 1.5 },
     { key: 'AltRight', code: 'AltRight', display: '⌥ option', width: 1.25 },
+    { key: 'ControlRight', code: 'ControlRight', display: '⌃ control', width: 3.25 },
     { key: 'ArrowLeft', code: 'ArrowLeft', display: '←', width: 1 },
     { key: 'ArrowDown', code: 'ArrowDown', display: '↓', width: 1 },
     { key: 'ArrowRight', code: 'ArrowRight', display: '→', width: 1 },
