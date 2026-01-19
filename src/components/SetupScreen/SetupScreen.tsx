@@ -1,10 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SETUP_VERSION } from '../../constants/app'
+import { apps as appConfig } from '../../config/apps'
+import { useAppContext } from '../../context/AppContext'
 import './SetupScreen.css'
 
-const SetupScreen = ({ onSetupComplete }) => {
+interface SetupScreenProps {
+  onSetupComplete: (app: string, layout: string, mode: string, quizApp: string | null) => void;
+}
+
+const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
+  const { isQuizMode } = useAppContext()
   const [selectedOption, setSelectedOption] = useState(null)
   const [selectedMode, setSelectedMode] = useState(null)
+  const [selectedQuizApp, setSelectedQuizApp] = useState(null)
+
+  // クイズモードが既に有効な場合、モード選択をスキップ
+  useEffect(() => {
+    if (isQuizMode) {
+      setSelectedMode({ id: 'quiz', title: 'クイズモード', icon: '🎯' })
+    }
+  }, [isQuizMode])
 
   const options = [
     {
@@ -26,7 +41,7 @@ const SetupScreen = ({ onSetupComplete }) => {
     {
       id: 'macos-us',
       title: 'macOS & US',
-      icon: '🍎',
+      icon: '🇺🇸',
       description: 'macOS + US（英語）キーボード',
       app: 'macos',
       layout: 'mac-us'
@@ -48,16 +63,42 @@ const SetupScreen = ({ onSetupComplete }) => {
     }
   ]
 
+  // クイズ用のアプリ選択肢（ランダムを含む）
+  const quizAppOptions = [
+    {
+      id: 'random',
+      name: 'ランダム',
+      icon: '🎲',
+      description: 'すべてのアプリからランダムに出題'
+    },
+    ...appConfig.map(app => ({
+      ...app,
+      description: `${app.name}のショートカットのみ出題`
+    }))
+  ]
+
   const handleSelect = (option) => {
     setSelectedOption(option)
   }
 
   const handleSelectMode = (mode) => {
     setSelectedMode(mode)
+    // クイズモード以外を選択した場合、アプリ選択をリセット
+    if (mode.id !== 'quiz') {
+      setSelectedQuizApp(null)
+    }
+  }
+
+  const handleSelectQuizApp = (app) => {
+    setSelectedQuizApp(app)
   }
 
   const handleConfirm = () => {
-    if (selectedOption && selectedMode) {
+    // ビジュアライザーモードの場合、またはクイズモードでアプリが選択されている場合
+    const canProceed = selectedOption && selectedMode &&
+      (selectedMode.id !== 'quiz' || selectedQuizApp)
+
+    if (canProceed) {
       localStorage.setItem('keyboard-visualizer-setup', JSON.stringify({
         app: selectedOption.app,
         layout: selectedOption.layout,
@@ -65,7 +106,13 @@ const SetupScreen = ({ onSetupComplete }) => {
         version: SETUP_VERSION
       }))
 
-      onSetupComplete(selectedOption.app, selectedOption.layout, selectedMode.id)
+      // クイズモードの場合は選択されたアプリも渡す
+      onSetupComplete(
+        selectedOption.app,
+        selectedOption.layout,
+        selectedMode.id,
+        selectedMode.id === 'quiz' ? selectedQuizApp.id : null
+      )
     }
   }
 
@@ -97,36 +144,75 @@ const SetupScreen = ({ onSetupComplete }) => {
           ))}
         </div>
 
-        <div className="setup-divider">
-          <h3>モードを選択してください</h3>
-        </div>
-
-        <div className="setup-options setup-modes">
-          {modes.map((mode) => (
-            <div
-              key={mode.id}
-              className={`setup-option ${selectedMode?.id === mode.id ? 'selected' : ''}`}
-              onClick={() => handleSelectMode(mode)}
-            >
-              <div className="option-icon">{mode.icon}</div>
-              <div className="option-content">
-                <h3>{mode.title}</h3>
-                <p>{mode.description}</p>
-              </div>
-              <div className="option-check">
-                {selectedMode?.id === mode.id && '✓'}
-              </div>
+        {/* クイズモードが既に有効でない場合のみ、モード選択を表示 */}
+        {!isQuizMode && (
+          <>
+            <div className="setup-divider">
+              <h3>モードを選択してください</h3>
             </div>
-          ))}
-        </div>
+
+            <div className="setup-options setup-modes">
+              {modes.map((mode) => (
+                <div
+                  key={mode.id}
+                  className={`setup-option ${selectedMode?.id === mode.id ? 'selected' : ''}`}
+                  onClick={() => handleSelectMode(mode)}
+                >
+                  <div className="option-icon">{mode.icon}</div>
+                  <div className="option-content">
+                    <h3>{mode.title}</h3>
+                    <p>{mode.description}</p>
+                  </div>
+                  <div className="option-check">
+                    {selectedMode?.id === mode.id && '✓'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* クイズモードが選択された場合、アプリケーション選択を表示 */}
+        {selectedMode?.id === 'quiz' && (
+          <>
+            <div className="setup-divider">
+              <h3>出題するアプリケーションを選択してください</h3>
+            </div>
+
+            <div className="setup-options setup-quiz-apps">
+              {quizAppOptions.map((app) => (
+                <div
+                  key={app.id}
+                  className={`setup-option ${selectedQuizApp?.id === app.id ? 'selected' : ''}`}
+                  onClick={() => handleSelectQuizApp(app)}
+                >
+                  <div className="option-icon">{app.icon}</div>
+                  <div className="option-content">
+                    <h3>{app.name}</h3>
+                    <p>{app.description}</p>
+                  </div>
+                  <div className="option-check">
+                    {selectedQuizApp?.id === app.id && '✓'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
         <div className="setup-footer">
           <button
             className="setup-confirm-btn"
             onClick={handleConfirm}
-            disabled={!selectedOption || !selectedMode}
+            disabled={!selectedOption || !selectedMode || (selectedMode?.id === 'quiz' && !selectedQuizApp)}
           >
-            {selectedOption && selectedMode ? '開始する' : !selectedOption ? '環境を選択してください' : 'モードを選択してください'}
+            {!selectedOption
+              ? '環境を選択してください'
+              : !selectedMode
+              ? 'モードを選択してください'
+              : selectedMode.id === 'quiz' && !selectedQuizApp
+              ? 'アプリケーションを選択してください'
+              : '開始する'}
           </button>
           <p className="setup-note">
             後で設定から変更できます

@@ -24,6 +24,7 @@ interface AppContextType {
   selectedApp: string;
   keyboardLayout: string;
   isQuizMode: boolean;
+  quizApp: string | null;
   shortcutDescriptions: ShortcutData;
   keyboardLayouts: KeyboardLayoutOption[];
   apps: App[];
@@ -32,7 +33,8 @@ interface AppContextType {
   setSelectedApp: (app: string) => void;
   setKeyboardLayout: (layout: string) => void;
   setIsQuizMode: (mode: boolean) => void;
-  handleSetupComplete: (app: string, layout: string, mode?: string) => void;
+  setQuizApp: (app: string | null) => void;
+  handleSetupComplete: (app: string, layout: string, mode?: string, quizApp?: string | null) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -56,12 +58,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [selectedApp, setSelectedApp] = useState(setup.app || DEFAULTS.APP);
   const [keyboardLayout, setKeyboardLayout] = useState(setup.layout || DEFAULTS.LAYOUT);
   const [isQuizMode, setIsQuizMode] = useState(false);
+  const [quizApp, setQuizApp] = useState<string | null>(null);
   const [apps] = useState(appConfig); // stateとして保持
 
-  const handleSetupComplete = useCallback((app, layout, mode = 'visualizer') => {
+  const handleSetupComplete = useCallback((app, layout, mode = 'visualizer', quizAppParam = null) => {
     setSelectedApp(app);
     setKeyboardLayout(layout);
     setIsQuizMode(mode === 'quiz');
+    setQuizApp(quizAppParam);
     setSetup({
       setupCompleted: true,
       app,
@@ -90,6 +94,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     selectedApp,
     keyboardLayout,
     isQuizMode,
+    quizApp,
     shortcutDescriptions,
     keyboardLayouts,
     apps, // appsを提供
@@ -100,6 +105,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setSelectedApp,
     setKeyboardLayout,
     setIsQuizMode,
+    setQuizApp,
     handleSetupComplete,
   };
 

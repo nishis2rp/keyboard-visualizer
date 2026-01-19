@@ -19,7 +19,7 @@ const lockKeyboard = async () => {
       await navigator.keyboard.lock()
     }
   } catch (error) {
-    console.warn('キーボードロックに失敗:', error)
+    // キーボードロックは一部のブラウザでサポートされていない
   }
 }
 
@@ -33,7 +33,7 @@ const unlockKeyboard = () => {
       navigator.keyboard.unlock()
     }
   } catch (error) {
-    console.warn('キーボードロック解除に失敗:', error)
+    // キーボードロックは一部のブラウザでサポートされていない
   }
 }
 

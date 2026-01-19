@@ -150,9 +150,6 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
   const pressedDisplayNames = new Set(pressedCodes.map(code => getCodeDisplayName(code, null, layout, shiftPressed)));
 
   // デバッグログ
-  console.log('[getAvailableShortcuts] pressedCodes:', pressedCodes);
-  console.log('[getAvailableShortcuts] pressedDisplayNames:', Array.from(pressedDisplayNames));
-  console.log('[getAvailableShortcuts] layout:', layout);
 
   const shortcuts = Object.entries(shortcutDescriptions)
     .filter(([shortcut]) => {
@@ -165,21 +162,6 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
       // あるいは押されているキーがショートカットの修飾キー部分と一致するか
       const pressedModifiers = Array.from(pressedDisplayNames).filter(key => MODIFIER_KEY_NAMES.has(key));
       const shortcutModifiers = shortcutKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
-
-      // Ctrl + Tab専用デバッグログ
-      if (shortcut === 'Ctrl + Tab') {
-        console.log('[DEBUG Ctrl+Tab] shortcutKeys:', shortcutKeys);
-        console.log('[DEBUG Ctrl+Tab] pressedModifiers:', pressedModifiers);
-        console.log('[DEBUG Ctrl+Tab] shortcutModifiers:', shortcutModifiers);
-        console.log('[DEBUG Ctrl+Tab] allPressedKeysInShortcut:', allPressedKeysInShortcut);
-        console.log('[DEBUG Ctrl+Tab] Check 1 (complete match):', allPressedKeysInShortcut && pressedDisplayNames.size === shortcutKeys.length);
-        console.log('[DEBUG Ctrl+Tab] Check 2 conditions:', {
-          'pressedModifiers.length > 0': pressedModifiers.length > 0,
-          'pressedModifiers.length === shortcutModifiers.length': pressedModifiers.length === shortcutModifiers.length,
-          'every mod in shortcut': Array.from(pressedModifiers).every(mod => shortcutModifiers.includes(mod)),
-          'pressedDisplayNames.size < shortcutKeys.length': pressedDisplayNames.size < shortcutKeys.length
-        });
-      }
 
       // 1. 完全一致
       if (allPressedKeysInShortcut && pressedDisplayNames.size === shortcutKeys.length) {
@@ -202,8 +184,6 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
     );
 
   // フィルタ後の結果をログ出力
-  console.log('[getAvailableShortcuts] After filter, before sort:', shortcuts.length, 'shortcuts');
-  console.log('[getAvailableShortcuts] Contains Ctrl+Tab?', shortcuts.some(s => s.shortcut === 'Ctrl + Tab'));
 
   const sortedShortcuts = shortcuts.sort((a, b) => {
       // ソートロジック：修飾キーの数 → キーボード配列順
@@ -230,10 +210,7 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
     })
     .slice(0, MAX_SHORTCUTS_DISPLAY);
 
-  console.log('[getAvailableShortcuts] After sort and slice:', sortedShortcuts.length, 'shortcuts');
-  console.log('[getAvailableShortcuts] Final result contains Ctrl+Tab?', sortedShortcuts.some(s => s.shortcut === 'Ctrl + Tab'));
   if (sortedShortcuts.length > 0) {
-    console.log('[getAvailableShortcuts] First 5 shortcuts:', sortedShortcuts.slice(0, 5).map(s => s.shortcut));
   }
 
   return sortedShortcuts

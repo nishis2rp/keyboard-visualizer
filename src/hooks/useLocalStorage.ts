@@ -24,14 +24,12 @@ export const useLocalStorage = (key, initialValue, options = {}) => {
 
       // バージョンチェック
       if (version && parsedItem.version !== version) {
-        console.log(`Version mismatch for ${key}. Clearing old data.`)
         window.localStorage.removeItem(key)
         return initialValue
       }
 
       // カスタム検証
       if (validator && !validator(parsedItem)) {
-        console.log(`Validation failed for ${key}. Clearing invalid data.`)
         window.localStorage.removeItem(key)
         return initialValue
       }

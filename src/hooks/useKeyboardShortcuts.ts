@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getKeyComboText, getShortcutDescription, getAvailableShortcuts } from '../utils';
+import { ShortcutData } from '../types';
+
+const MAX_HISTORY_SIZE = 10; // ショートカット履歴の最大保存件数
 
 // このフックはキーボードショートカットの検出と管理を担当します。
-export const useKeyboardShortcuts = (shortcutDescriptions, keyboardLayout, isQuizMode = false) => {
+export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboardLayout: string, isQuizMode = false) => {
   const [pressedKeys, setPressedKeys] = useState(new Set()); // 現在押されているキーの`code`を保持
   const [history, setHistory] = useState([]);
   const [currentDescription, setCurrentDescription] = useState(null);
@@ -49,7 +52,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyboardLayout, isQui
 
     setHistory(prev => {
       if (prev.length === 0 || prev[0].combo !== comboText) {
-        return [{ combo: comboText, description }, ...prev].slice(0, 10);
+        return [{ combo: comboText, description }, ...prev].slice(0, MAX_HISTORY_SIZE);
       }
       return prev;
     });
@@ -65,7 +68,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyboardLayout, isQui
         // ただし、修飾キーを伴うショートカットは許可
         if (!(metaKey || ctrlKey || altKey)) return;
       }
-      
+
       // すでにキーが押されている場合は何もしない
       if (repeat || pressedKeysRef.current.has(code)) {
         return;
@@ -163,7 +166,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions, keyboardLayout, isQui
       document.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('blur', handleBlur);
     };
-  }, [addToHistory, clearAllKeys]); // これらの関数はuseCallbackでメモ化されているため、初回レンダリング時のみ実行される
+  }, []); // マウント時のみイベントリスナーを登録
 
   const handleClearHistory = () => {
     setHistory([]);

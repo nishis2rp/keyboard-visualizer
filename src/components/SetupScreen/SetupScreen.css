@@ -25,7 +25,7 @@
   background: white;
   border-radius: 24px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 600px;
+  max-width: 800px;
   max-height: 90vh;
   width: 90%;
   padding: 40px;
@@ -114,6 +114,46 @@
 
 .setup-modes .setup-option {
   position: relative;
+}
+
+/* クイズアプリ選択のスタイル */
+.setup-quiz-apps {
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.setup-quiz-apps .setup-option {
+  flex-direction: column;
+  text-align: center;
+  padding: 12px 10px;
+  position: relative;
+}
+
+.setup-quiz-apps .option-icon {
+  margin-right: 0;
+  margin-bottom: 6px;
+  font-size: 28px;
+}
+
+.setup-quiz-apps .option-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+}
+
+.setup-quiz-apps .option-content h3 {
+  font-size: 16px;
+  margin: 0 0 2px 0;
+}
+
+.setup-quiz-apps .option-content p {
+  font-size: 12px;
+  margin: 0;
 }
 
 .setup-option {
@@ -254,5 +294,13 @@
 
   .setup-modes .option-icon {
     font-size: 48px;
+  }
+
+  .setup-quiz-apps {
+    grid-template-columns: 1fr;
+  }
+
+  .setup-quiz-apps .option-icon {
+    font-size: 36px;
   }
 }

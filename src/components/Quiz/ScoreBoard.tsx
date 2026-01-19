@@ -3,15 +3,15 @@ import { useQuiz } from '../../context/QuizContext';
 
 function ScoreBoard() {
   const { quizState } = useQuiz();
-  const { score, mistakes, combo, maxCombo, status, quizHistory, settings } = quizState;
+  const { status, quizHistory, settings } = quizState;
 
   if (status !== 'playing' && status !== 'paused') {
     return null;
   }
 
-  const totalQuestions = quizHistory.length;
+  const totalQuestions = settings.totalQuestions;
+  const currentQuestionNumber = quizHistory.length + 1;
   const correctAnswers = quizHistory.filter(h => h.isCorrect).length;
-  const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
 
   const StatCard = ({ icon, label, value, color, subtitle }) => (
     <div
@@ -100,31 +100,16 @@ function ScoreBoard() {
         }}
       >
         <StatCard
-          icon="⭐"
-          label="Score"
-          value={score}
-          color="#fbbf24"
-          subtitle={`${totalQuestions}問回答`}
+          icon="📝"
+          label="問題"
+          value={`${currentQuestionNumber}/${totalQuestions}`}
+          color="#60a5fa"
         />
         <StatCard
-          icon="🎯"
-          label="Accuracy"
-          value={`${accuracy}%`}
+          icon="✅"
+          label="正解数"
+          value={correctAnswers}
           color="#10b981"
-          subtitle={`${correctAnswers}/${totalQuestions} 正解`}
-        />
-        <StatCard
-          icon="🔥"
-          label="Combo"
-          value={combo}
-          color="#f97316"
-          subtitle={`最高 ${maxCombo}`}
-        />
-        <StatCard
-          icon="❌"
-          label="Misses"
-          value={mistakes}
-          color="#ef4444"
         />
       </div>
     </div>

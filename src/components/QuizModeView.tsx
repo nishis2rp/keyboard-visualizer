@@ -9,24 +9,15 @@ import { useAppContext } from '../context/AppContext';
 import { useKeyboardShortcuts } from '../hooks';
 import { useFullscreen } from '../hooks';
 import { detectOS } from '../constants';
+import { specialKeys } from '../constants/keys';
+import { isModifierKey } from '../utils/keyUtils';
 
 const QuizModeView = () => {
   const { isFullscreenMode } = useFullscreen();
-  const { selectedApp, keyboardLayout } = useAppContext();
-  const { quizState, startQuiz, handleAnswer, getNextQuestion, dispatch } = useQuiz();
+  const { selectedApp, keyboardLayout, shortcutDescriptions, quizApp } = useAppContext();
+  const { quizState, startQuiz, handleAnswer, getNextQuestion, dispatch, updateFullscreen } = useQuiz();
 
-  const { pressedKeys } = useKeyboardShortcuts(null, keyboardLayout, true);
-
-  // デバッグ: クイズ状態をログ出力
-  useEffect(() => {
-    console.log('[QuizModeView] Quiz state updated:', {
-      status: quizState.status,
-      hasQuestion: !!quizState.currentQuestion,
-      question: quizState.currentQuestion?.question,
-      score: quizState.score,
-      selectedApp: quizState.selectedApp
-    });
-  }, [quizState]);
+  const { pressedKeys } = useKeyboardShortcuts(shortcutDescriptions, keyboardLayout, true);
 
   // 回答判定用: キーが離されたときに判定するため、前回のpressedKeysをキャッシュ
   const previousPressedKeysRef = useRef(new Set());
@@ -36,51 +27,70 @@ const QuizModeView = () => {
     openMacWarningModalRef.current = openModalFunc;
   };
 
+  // 初回マウント時のみクイズを開始
   useEffect(() => {
-    console.log('[QuizModeView] Initializing quiz mode:', { selectedApp, keyboardLayout, isFullscreenMode });
     const os = detectOS();
     if (os === 'macos' && openMacWarningModalRef.current) {
       openMacWarningModalRef.current();
     }
-    startQuiz(selectedApp, isFullscreenMode, keyboardLayout);
+    // quizAppを渡す（nullの場合はselectedAppを使用）
+    startQuiz(quizApp || selectedApp, isFullscreenMode, keyboardLayout);
 
     return () => {
-      console.log('[QuizModeView] Cleanup - resetting quiz');
       dispatch({ type: 'RESET_QUIZ' });
     };
-  }, [selectedApp, keyboardLayout, isFullscreenMode, startQuiz, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // マウント時のみ実行
 
-  // Auto-pause on window blur (focus loss) - クイズモードでは無効化
-  // クイズモードではキー入力がpreventDefaultされるため、意図しないblurが発生する
-  // useEffect(() => {
-  //   const handleWindowBlur = () => {
-  //     if (quizState.status === 'playing') {
-  //       dispatch({ type: 'PAUSE_QUIZ' });
-  //     }
-  //   };
+  // フルスクリーン状態の変更を監視
+  useEffect(() => {
+    if (quizState.status === 'playing') {
+      updateFullscreen(isFullscreenMode);
+    }
+  }, [isFullscreenMode, quizState.status, updateFullscreen]);
 
-  //   window.addEventListener('blur', handleWindowBlur);
-  //   return () => window.removeEventListener('blur', handleWindowBlur);
-  // }, [quizState.status, dispatch]);
 
-  // 回答判定ロジック: キーが離されたときのみ判定
+  // handleAnswerとgetNextQuestionをRefに保存して無限ループを防ぐ
+  const handleAnswerRef = useRef(handleAnswer);
+  const getNextQuestionRef = useRef(getNextQuestion);
+  useEffect(() => {
+    handleAnswerRef.current = handleAnswer;
+    getNextQuestionRef.current = getNextQuestion;
+  }, [handleAnswer, getNextQuestion]);
+
+  // 回答判定ロジック: 非修飾キーが離されたときに判定
   useEffect(() => {
     if (quizState.status !== 'playing') {
       return;
     }
 
+    const previousKeys = previousPressedKeysRef.current;
+    const currentKeys = pressedKeys;
+
     // キーが押されている場合、キャッシュに保存
-    if (pressedKeys.size > 0) {
-      console.log('[QuizModeView] Keys pressed:', Array.from(pressedKeys));
-      previousPressedKeysRef.current = new Set(pressedKeys);
+    if (currentKeys.size > 0) {
+      previousPressedKeysRef.current = new Set(currentKeys);
     }
-    // 全てのキーが離された場合、キャッシュされたキーで判定
-    else if (pressedKeys.size === 0 && previousPressedKeysRef.current.size > 0) {
-      console.log('[QuizModeView] Keys released, judging:', Array.from(previousPressedKeysRef.current));
-      handleAnswer(previousPressedKeysRef.current);
-      previousPressedKeysRef.current = new Set(); // キャッシュをクリア
+
+    // キーが離されたかチェック
+    if (previousKeys.size > 0) {
+      // 前回押されていたキーの中で、今回押されていないキーを探す
+      const releasedKeys = Array.from(previousKeys).filter(key => !currentKeys.has(key));
+
+      if (releasedKeys.length > 0) {
+        // 離されたキーの中に非修飾キーがあれば判定
+        const hasNonModifierReleased = releasedKeys.some(key => !isModifierKey(key));
+
+        if (hasNonModifierReleased) {
+          handleAnswerRef.current(previousKeys);
+          previousPressedKeysRef.current = new Set(); // キャッシュをクリア
+        } else {
+          // 修飾キーのみが離された場合は、現在のキーでキャッシュを更新
+          previousPressedKeysRef.current = new Set(currentKeys);
+        }
+      }
     }
-  }, [pressedKeys, quizState.status, handleAnswer]);
+  }, [pressedKeys, quizState.status]);
 
   // タイマーロジック
   useEffect(() => {
@@ -95,7 +105,7 @@ const QuizModeView = () => {
         dispatch({ type: 'TIMEOUT' });
         // 次の問題へ
         setTimeout(() => {
-          getNextQuestion();
+          getNextQuestionRef.current();
         }, 500);
       } else {
         dispatch({ type: 'UPDATE_TIMER', payload: newTime });
@@ -103,7 +113,7 @@ const QuizModeView = () => {
     }, 100);
 
     return () => clearInterval(timer);
-  }, [quizState.status, quizState.currentQuestion, quizState.timeRemaining, dispatch, getNextQuestion]);
+  }, [quizState.status, quizState.currentQuestion, quizState.timeRemaining, dispatch]);
 
   const pauseQuiz = () => dispatch({ type: 'PAUSE_QUIZ' });
   const resumeQuiz = () => dispatch({ type: 'RESUME_QUIZ' });
@@ -111,6 +121,7 @@ const QuizModeView = () => {
   return (
     <>
       <SystemShortcutWarning onOpenRequest={onMacWarningModalRequest} />
+
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -118,39 +129,9 @@ const QuizModeView = () => {
         justifyContent: 'center',
         height: 'calc(100vh - 60px)',
         position: 'relative',
-        background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
         padding: '20px',
         overflow: 'auto',
       }}>
-
-        {/* デバッグ情報表示 */}
-        {quizState.currentQuestion && (
-          <div style={{
-            position: 'absolute',
-            top: '80px',
-            left: '10px',
-            background: 'rgba(0, 0, 0, 0.9)',
-            color: '#0f0',
-            padding: '12px',
-            borderRadius: '8px',
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            maxWidth: '350px',
-            border: '1px solid #0f0',
-            zIndex: 1000,
-          }}>
-            <div style={{ color: '#ff0', marginBottom: '8px', fontWeight: 'bold' }}>DEBUG INFO</div>
-            <div>正解: {quizState.currentQuestion.correctShortcut}</div>
-            <div>正規化済: {quizState.currentQuestion.normalizedCorrectShortcut}</div>
-            {quizState.quizHistory.length > 0 && (
-              <>
-                <div style={{ marginTop: '8px', color: '#ff0' }}>最後の回答:</div>
-                <div>入力: {quizState.quizHistory[quizState.quizHistory.length - 1].userAnswer}</div>
-                <div>結果: {quizState.quizHistory[quizState.quizHistory.length - 1].isCorrect ? '✅ 正解' : '❌ 不正解'}</div>
-              </>
-            )}
-          </div>
-        )}
 
         {/* コントロールパネル */}
         {quizState.status === 'playing' && (
@@ -208,6 +189,8 @@ const QuizModeView = () => {
           }}>
             <KeyboardLayout
               pressedKeys={pressedKeys}
+              specialKeys={specialKeys}
+              shortcutDescriptions={shortcutDescriptions}
               keyboardLayout={keyboardLayout}
             />
           </div>

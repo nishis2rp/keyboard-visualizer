@@ -2,21 +2,9 @@ import { memo } from 'react'
 import { getKeyboardLayoutByName, getLayoutDisplayName } from '../../data/layouts'
 import { getCodeDisplayName } from '../../utils/keyMapping'
 import { PressedKeys, ShortcutData } from '../../types'
+import { isModifierKey, isWindowsKey } from '../../utils/keyUtils'
 
-// 修飾キーのコードリスト
-const MODIFIER_CODES = new Set([
-  'ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight',
-  'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'
-])
-
-// Windowsキーのコードリスト
-const WINDOWS_KEY_CODES = new Set(['MetaLeft', 'MetaRight'])
-
-// 修飾キーかどうかを判定する関数
-const isModifierKey = (code: string): boolean => MODIFIER_CODES.has(code)
-
-// Windowsキーかどうかを判定する関数
-const isWindowsKey = (code: string): boolean => WINDOWS_KEY_CODES.has(code)
+const KEY_WIDTH_MULTIPLIER = 50; // キー幅の基準値（px）
 
 interface KeyboardLayoutProps {
   pressedKeys?: Set<string>;
@@ -106,7 +94,7 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
                   style={{
                     flexGrow: keyObj.width || 1,
                     flexShrink: 0,
-                    flexBasis: `${(keyObj.width || 1) * 50}px`
+                    flexBasis: `${(keyObj.width || 1) * KEY_WIDTH_MULTIPLIER}px`
                   }}
                   title={shortcuts.length > 0 ? shortcuts.map(s => `${s.combo}: ${s.desc}`).join('\n') : ''}
                 >
@@ -147,3 +135,4 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
 KeyboardLayout.displayName = 'KeyboardLayout'
 
 export default KeyboardLayout
+

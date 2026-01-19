@@ -64,8 +64,6 @@ export const normalizeShortcut = (shortcutString) => {
  * @returns {string} The normalized shortcut string.
  */
 export const normalizePressedKeys = (pressedCodes) => {
-  console.log('[normalizePressedKeys] Input codes:', Array.from(pressedCodes));
-
   const keys = Array.from(pressedCodes)
     .map(code => {
       // 修飾キーのコードを正規化された名前に変換
@@ -96,13 +94,9 @@ export const normalizePressedKeys = (pressedCodes) => {
     })
     .filter(Boolean); // 空のキーを除外
 
-  console.log('[normalizePressedKeys] Mapped keys:', keys);
-
   // 重複を除外し、normalizeShortcutで最終的な正規化を行う
   const uniqueKeys = Array.from(new Set(keys));
   const result = normalizeShortcut(uniqueKeys.join('+'));
-
-  console.log('[normalizePressedKeys] Final result:', result);
 
   return result;
 };
@@ -131,49 +125,12 @@ const isShortcutSafe = (shortcut, quizMode, isFullscreen) => {
     return false;
   }
 
-  // 全画面でない場合は、安全なショートカットのみを許可（ホワイトリスト方式）
-  if (!isFullscreen) {
-    // 安全なショートカットのリスト（ブラウザ・OS機能と競合しない）
-    const safeShortcuts = new Set([
-      // 基本的な編集ショートカット
-      normalizeShortcut('Ctrl + C'),    // コピー
-      normalizeShortcut('Ctrl + V'),    // 貼り付け
-      normalizeShortcut('Ctrl + X'),    // 切り取り
-      normalizeShortcut('Ctrl + Z'),    // 元に戻す
-      normalizeShortcut('Ctrl + Y'),    // やり直し
-      normalizeShortcut('Ctrl + A'),    // すべて選択
-      normalizeShortcut('Ctrl + F'),    // 検索（ページ内検索は問題ない）
-
-      // Shiftとの組み合わせ
-      normalizeShortcut('Ctrl + Shift + Z'),  // やり直し
-      normalizeShortcut('Shift + ↑'),   // 上方向に選択
-      normalizeShortcut('Shift + ↓'),   // 下方向に選択
-      normalizeShortcut('Shift + ←'),   // 左方向に選択
-      normalizeShortcut('Shift + →'),   // 右方向に選択
-
-      // 矢印キー単体
-      normalizeShortcut('↑'),
-      normalizeShortcut('↓'),
-      normalizeShortcut('←'),
-      normalizeShortcut('→'),
-
-      // Mac版
-      normalizeShortcut('Meta + C'),
-      normalizeShortcut('Meta + V'),
-      normalizeShortcut('Meta + X'),
-      normalizeShortcut('Meta + Z'),
-      normalizeShortcut('Meta + Y'),
-      normalizeShortcut('Meta + A'),
-      normalizeShortcut('Meta + F'),
-      normalizeShortcut('Meta + Shift + Z'),
-    ]);
-
-    const isSafe = safeShortcuts.has(normalizedShortcut);
-    console.log('[isShortcutSafe]', normalizedShortcut, '→', isSafe ? 'SAFE' : 'UNSAFE (not in whitelist)');
-    return isSafe;
+  // 全画面モードでない場合、フルスクリーンで防止可能なショートカットも除外
+  if (!isFullscreen && normalizedFullscreenPreventable.has(normalizedShortcut)) {
+    return false;
   }
 
-  // 全画面の場合は、ALWAYS_PROTECTED以外は全て許可
+  // システム保護されたショートカット以外はすべて許可
   return true;
 };
 
@@ -216,22 +173,16 @@ export const getCompatibleApps = (keyboardLayout) => {
  * @param {string[]} allowedApps - Array of app IDs to include in questions
  * @param {string} quizMode - The quiz mode ('default' or 'hardcore').
  * @param {boolean} isFullscreen - Whether fullscreen mode is active.
+ * @param {Set<string>} usedShortcuts - Set of already used normalized shortcuts to avoid duplicates.
  * @returns {{question: string, correctShortcut: string, normalizedCorrectShortcut: string, appName: string} | null} A question object, or null if no shortcuts are available.
  */
-export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false) => {
-  console.log('[generateQuestion] Input:', {
-    allowedApps,
-    quizMode,
-    isFullscreen
-  });
-
+export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false, usedShortcuts = new Set()) => {
   // 全ての許可されたアプリのショートカットを収集
   const allSafeShortcuts = [];
 
   allowedApps.forEach(appId => {
     const appShortcuts = allShortcuts[appId];
     if (!appShortcuts) {
-      console.warn(`[generateQuestion] No shortcuts found for app: ${appId}`);
       return;
     }
 
@@ -242,27 +193,22 @@ export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default'
       return isShortcutSafe(shortcut, quizMode, isFullscreen);
     });
 
-    // 各ショートカットにアプリ情報を追加
+    // 各ショートカットにアプリ情報を追加（未使用のもののみ）
     safeShortcuts.forEach(([shortcut, description]) => {
-      allSafeShortcuts.push({
-        appId,
-        appName: APP_DISPLAY_NAMES[appId] || appId,
-        shortcut,
-        description
-      });
+      const normalized = normalizeShortcut(shortcut);
+      // 既に出題済みのショートカットは除外
+      if (!usedShortcuts.has(normalized)) {
+        allSafeShortcuts.push({
+          appId,
+          appName: APP_DISPLAY_NAMES[appId] || appId,
+          shortcut,
+          description
+        });
+      }
     });
   });
 
-  console.log('[generateQuestion] Total safe shortcuts:', {
-    count: allSafeShortcuts.length,
-    byApp: allowedApps.reduce((acc, appId) => {
-      acc[appId] = allSafeShortcuts.filter(s => s.appId === appId).length;
-      return acc;
-    }, {})
-  });
-
   if (allSafeShortcuts.length === 0) {
-    console.warn('[generateQuestion] No safe shortcuts available from any app');
     return null;
   }
 
@@ -277,8 +223,6 @@ export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default'
     appName: selected.appName,
     appId: selected.appId,
   };
-
-  console.log('[generateQuestion] Generated question:', question);
 
   return question;
 };

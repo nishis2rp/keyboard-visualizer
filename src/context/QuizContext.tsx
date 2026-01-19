@@ -1,13 +1,23 @@
 import React, { createContext, useReducer, useContext, useCallback, ReactNode, Dispatch } from 'react';
-import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps } from '../utils/quizEngine';
+import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps, normalizeShortcut } from '../utils/quizEngine';
 import { allShortcuts } from '../data/shortcuts';
 import { QuizQuestion, QuizStats, QuizResult } from '../types';
+import { ALWAYS_PROTECTED_SHORTCUTS, FULLSCREEN_PREVENTABLE_SHORTCUTS } from '../constants/systemProtectedShortcuts';
 
 interface QuizSettings {
   quizMode: 'default' | 'hardcore';
   timeLimit: number;
   totalQuestions: number;
   isFullscreen: boolean;
+}
+
+interface QuizHistoryEntry {
+  question: string;
+  correctShortcut: string;
+  userAnswer: string;
+  isCorrect: boolean;
+  answerTimeMs?: number;
+  speedCategory?: 'fast' | 'normal' | 'slow';
 }
 
 interface QuizState {
@@ -19,10 +29,8 @@ interface QuizState {
   timeRemaining: number;
   lastAnswerResult: 'correct' | 'incorrect' | null;
   score: number;
-  combo: number;
-  maxCombo: number;
-  mistakes: number;
-  quizHistory: any[];
+  quizHistory: QuizHistoryEntry[];
+  usedShortcuts: Set<string>; // 出題済みショートカットを記録
   startTime: number | null;
   endTime: number | null;
   settings: QuizSettings;
@@ -38,7 +46,10 @@ type QuizAction =
   | { type: 'RESUME_QUIZ' }
   | { type: 'END_QUIZ' }
   | { type: 'RESET_QUIZ' }
-  | { type: 'UPDATE_FULLSCREEN'; payload: { isFullscreen: boolean } };
+  | { type: 'UPDATE_FULLSCREEN'; payload: { isFullscreen: boolean } }
+  | { type: 'UPDATE_TIMER'; payload: number }
+  | { type: 'TIMEOUT' }
+  | { type: 'FINISH_QUIZ' };
 
 interface QuizContextType {
   state: QuizState;
@@ -65,10 +76,8 @@ const initialQuizState: QuizState = {
   timeRemaining: 10,
   lastAnswerResult: null,
   score: 0,
-  combo: 0,
-  maxCombo: 0,
-  mistakes: 0,
   quizHistory: [],
+  usedShortcuts: new Set(),
   startTime: null,
   endTime: null,
   settings: {
@@ -94,29 +103,24 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         },
         startTime: Date.now(),
       };
-    case 'SET_QUESTION':
+    case 'SET_QUESTION': {
+      const newUsedShortcuts = new Set(state.usedShortcuts);
+      if (action.payload.question) {
+        newUsedShortcuts.add(action.payload.question.normalizedCorrectShortcut);
+      }
       return {
         ...state,
         currentQuestion: action.payload.question,
         questionStartTime: Date.now(),
         timeRemaining: state.settings.timeLimit,
         lastAnswerResult: null,
+        usedShortcuts: newUsedShortcuts,
       };
+    }
     case 'ANSWER_QUESTION': {
       const { userAnswer, isCorrect, answerTimeMs } = action.payload;
 
-      // Speed bonus calculation
-      const calculateSpeedBonus = (timeMs) => {
-        if (timeMs < 1000) return 2; // Fast: 2 points bonus
-        if (timeMs < 3000) return 1; // Normal: 1 point bonus
-        return 0; // Slow: no bonus
-      };
-
-      const speedBonus = isCorrect ? calculateSpeedBonus(answerTimeMs) : 0;
-      const newScore = state.score + (isCorrect ? 1 : 0) + speedBonus;
-      const newMistakes = state.mistakes + (isCorrect ? 0 : 1);
-      const newCombo = isCorrect ? state.combo + 1 : 0;
-      const newMaxCombo = Math.max(state.maxCombo, newCombo);
+      const newScore = state.score + (isCorrect ? 1 : 0);
 
       // Categorize answer speed
       const getSpeedCategory = (timeMs) => {
@@ -137,9 +141,6 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
       return {
         ...state,
         score: newScore,
-        mistakes: newMistakes,
-        combo: newCombo,
-        maxCombo: newMaxCombo,
         lastAnswerResult: isCorrect ? 'correct' : 'incorrect',
         quizHistory: [...state.quizHistory, historyEntry],
       };
@@ -171,11 +172,12 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         },
       };
     case 'SET_FULLSCREEN_MODE':
+    case 'UPDATE_FULLSCREEN':
       return {
         ...state,
         settings: {
           ...state.settings,
-          isFullscreen: action.payload,
+          isFullscreen: action.payload.isFullscreen || action.payload,
         },
       };
     case 'UPDATE_TIMER':
@@ -187,14 +189,12 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
       // 時間切れで不正解扱い
       return {
         ...state,
-        mistakes: state.mistakes + 1,
-        combo: 0,
         quizHistory: [
           ...state.quizHistory,
           {
             question: state.currentQuestion?.question || '',
+            correctShortcut: state.currentQuestion?.correctShortcut || '',
             userAnswer: '（時間切れ）',
-            correctAnswer: state.currentQuestion?.correctShortcut || '',
             isCorrect: false,
           },
         ],
@@ -215,42 +215,55 @@ export function QuizProvider({ children }: QuizProviderProps) {
   // 次の問題を生成してセットする関数
   const getNextQuestion = useCallback(() => {
     if (!quizState.keyboardLayout) {
-      console.warn("[QuizContext] キーボードレイアウトが選択されていません。");
+      dispatch({ type: 'FINISH_QUIZ' });
+      return;
+    }
+
+    // 10問に達したかチェック
+    if (quizState.quizHistory.length >= quizState.settings.totalQuestions) {
       dispatch({ type: 'FINISH_QUIZ' });
       return;
     }
 
     // キーボードレイアウトに基づいて互換性のあるアプリを取得
-    const compatibleApps = getCompatibleApps(quizState.keyboardLayout);
-    console.log('[QuizContext] Getting next question for compatible apps:', compatibleApps);
+    let compatibleApps = getCompatibleApps(quizState.keyboardLayout);
+
+    // selectedAppが'random'でない場合、指定されたアプリのみに絞る
+    if (quizState.selectedApp && quizState.selectedApp !== 'random' && compatibleApps.includes(quizState.selectedApp)) {
+      compatibleApps = [quizState.selectedApp];
+    }
+
 
     const newQuestion = generateQuestion(
       allShortcuts,
       compatibleApps,
       'default', // デフォルトモードを使用
-      quizState.settings.isFullscreen
+      quizState.settings.isFullscreen,
+      quizState.usedShortcuts
     );
-    console.log('[QuizContext] Next question:', newQuestion);
 
     if (newQuestion) {
       dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
     } else {
       // 問題が生成できない場合、クイズを終了
-      console.warn('[QuizContext] No more questions available, finishing quiz');
       dispatch({ type: 'FINISH_QUIZ' });
     }
-  }, [quizState.keyboardLayout, quizState.settings.isFullscreen]);
+  }, [quizState.keyboardLayout, quizState.settings.isFullscreen, quizState.selectedApp, quizState.quizHistory.length, quizState.settings.totalQuestions]);
 
 
   // クイズを開始する
   const startQuiz = useCallback((app, isFullscreen, keyboardLayout) => {
-    console.log('[QuizContext] Starting quiz:', { app, isFullscreen, keyboardLayout });
 
     dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout } });
 
     // キーボードレイアウトに基づいて互換性のあるアプリを取得
-    const compatibleApps = getCompatibleApps(keyboardLayout);
-    console.log('[QuizContext] Compatible apps for layout:', compatibleApps);
+    let compatibleApps = getCompatibleApps(keyboardLayout);
+
+    // appが'random'でない場合、指定されたアプリのみに絞る
+    if (app !== 'random' && compatibleApps.includes(app)) {
+      compatibleApps = [app];
+    }
+
 
     // state更新が反映されるのを待つ
     setTimeout(() => {
@@ -258,14 +271,13 @@ export function QuizProvider({ children }: QuizProviderProps) {
         allShortcuts,
         compatibleApps,
         'default', // デフォルトモードを使用
-        isFullscreen
+        isFullscreen,
+        new Set() // 最初の問題なので空のSet
       );
-      console.log('[QuizContext] Generated question:', newQuestion);
 
       if (newQuestion) {
         dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
       } else {
-        console.warn('[QuizContext] Failed to generate question');
         dispatch({ type: 'FINISH_QUIZ' });
       }
     }, 0);
@@ -274,14 +286,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
 
   // 回答を処理する
   const handleAnswer = useCallback((pressedKeys) => {
-    console.log('[QuizContext] handleAnswer called:', {
-      status: quizState.status,
-      hasQuestion: !!quizState.currentQuestion,
-      pressedKeys: Array.from(pressedKeys)
-    });
-
     if (quizState.status !== 'playing' || !quizState.currentQuestion) {
-      console.warn('[QuizContext] Cannot answer - quiz not playing or no question');
       return;
     }
 
@@ -291,13 +296,6 @@ export function QuizProvider({ children }: QuizProviderProps) {
     const userAnswer = normalizePressedKeys(pressedKeys);
     const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
 
-    console.log('[QuizContext] Answer result:', {
-      userAnswer,
-      correctAnswer: quizState.currentQuestion.normalizedCorrectShortcut,
-      isCorrect,
-      answerTimeMs
-    });
-
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
 
     // 次の問題へ（少し遅延を入れてフィードバックを表示）
@@ -306,6 +304,37 @@ export function QuizProvider({ children }: QuizProviderProps) {
     }, 500);
   }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, getNextQuestion]);
 
+  // フルスクリーン状態を更新し、現在の問題が安全かチェック
+  const updateFullscreen = useCallback((isFullscreen: boolean) => {
+
+    // フルスクリーン状態を更新
+    dispatch({ type: 'UPDATE_FULLSCREEN', payload: { isFullscreen } });
+
+    // 現在プレイ中で問題がある場合、その問題が新しいフルスクリーン状態で安全かチェック
+    if (quizState.status === 'playing' && quizState.currentQuestion) {
+      const normalizedShortcut = quizState.currentQuestion.normalizedCorrectShortcut;
+
+      // 正規化されたショートカットのセットを作成
+      const normalizedAlwaysProtected = new Set(
+        Array.from(ALWAYS_PROTECTED_SHORTCUTS).map(s => normalizeShortcut(s))
+      );
+      const normalizedFullscreenPreventable = new Set(
+        Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map(s => normalizeShortcut(s))
+      );
+
+      // 常に保護されているショートカットは問題外（これは出題されないはず）
+      if (normalizedAlwaysProtected.has(normalizedShortcut)) {
+        getNextQuestion();
+        return;
+      }
+
+      // 全画面でない場合、フルスクリーンで防止可能なショートカットは安全でない
+      if (!isFullscreen && normalizedFullscreenPreventable.has(normalizedShortcut)) {
+        getNextQuestion();
+      }
+    }
+  }, [quizState.status, quizState.currentQuestion, getNextQuestion]);
+
   // コンテキストに渡す値
   const value = {
     quizState,
@@ -313,6 +342,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
     startQuiz,
     handleAnswer,
     getNextQuestion, // 外部からも次問取得できるようにエクスポート
+    updateFullscreen,
   };
 
   return (
