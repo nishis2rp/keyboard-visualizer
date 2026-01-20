@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { getProtectionLevel } from '../../constants'
+import { isSequentialShortcut } from '../../utils/shortcutUtils'
 
 /**
  * ショートカットカードコンポーネント
@@ -12,10 +13,11 @@ import { getProtectionLevel } from '../../constants'
  *
  * @param {string} shortcut - ショートカットのキー組み合わせ（例: "Win + L"）
  * @param {string} description - ショートカットの説明
+ * @param {string} appContext - アプリケーションコンテキスト（例: "excel", "chrome"など）
  * @param {boolean} showDebugLog - デバッグログを表示するか（開発モードのみ）
  */
-const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
-  const protectionLevel = getProtectionLevel(shortcut)
+const ShortcutCard = memo(({ shortcut, description, appContext = null, showDebugLog = false }) => {
+  const protectionLevel = getProtectionLevel(shortcut, appContext)
 
   // デバッグログ（開発時のみ） - 全てのショートカットでログ出力
   if (showDebugLog && import.meta.env.DEV) {
@@ -85,12 +87,23 @@ const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
   const renderShortcut = () => {
     // ショートカットを " + " で分割
     const parts = shortcut.split(' + ')
+    const isSequential = isSequentialShortcut(shortcut)
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+        {/* 順押しの場合はアイコン表示 */}
+        {isSequential && (
+          <span style={{ fontSize: '0.85em', color: '#FF9500', marginRight: '2px' }} title="順押し: キーを順番に押します">
+            ▶
+          </span>
+        )}
         {parts.map((part, index) => (
           <span key={index} style={{ display: 'contents' }}>
-            {index > 0 && <span style={{ fontSize: '0.8em', color: '#86868B', margin: '0 2px' }}>+</span>}
+            {index > 0 && (
+              <span style={{ fontSize: '0.8em', color: '#86868B', margin: '0 2px' }}>
+                {isSequential ? '→' : '+'}
+              </span>
+            )}
             <span
               className={`key ${isWindowsKey(part) ? 'windows-key' : (isModifierKey(part) ? 'modifier-key' : '')}`}
               style={{
@@ -99,7 +112,13 @@ const ShortcutCard = memo(({ shortcut, description, showDebugLog = false }) => {
                 minWidth: 'auto',
                 display: 'inline-block',
                 borderRadius: '4px',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                // 順押しの場合は左から右へのグラデーション効果
+                ...(isSequential && {
+                  background: `linear-gradient(to right, rgba(255, 149, 0, 0.1) ${index * (100 / parts.length)}%, transparent ${(index + 1) * (100 / parts.length)}%)`,
+                  backgroundSize: '200% 100%',
+                  backgroundPosition: 'left center'
+                })
               }}
             >
               {part}

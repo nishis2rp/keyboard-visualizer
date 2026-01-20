@@ -69,8 +69,33 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
         if (!(metaKey || ctrlKey || altKey)) return;
       }
 
-      // すでにキーが押されている場合は何もしない
+      // 修飾キー（Alt、Win/Cmd）単体でブラウザのデフォルト動作を防ぐ
+      // Alt: ブラウザのメニューバーにフォーカスが移るのを防ぐ
+      // Meta (Win/Cmd): WindowsスタートメニューやmacOS Spotlightを防ぐ
+      const isModifierKeyAlone =
+        code === 'AltLeft' ||
+        code === 'AltRight' ||
+        code === 'MetaLeft' ||
+        code === 'MetaRight';
+
+      if (isModifierKeyAlone) {
+        e.preventDefault();
+      }
+
+      // キーリピート時の処理：現在のキー組み合わせがショートカットの場合はpreventDefaultする
       if (repeat || pressedKeysRef.current.has(code)) {
+        // 現在押されているキーの組み合わせがショートカットかチェック
+        const currentComboText = getKeyComboText(Array.from(pressedKeysRef.current), keyboardLayoutRef.current);
+        const currentDescription = getShortcutDescription(currentComboText, shortcutDescriptionsRef.current);
+        const isCurrentShortcut = !!currentDescription;
+
+        // ショートカットの場合、またはシステムショートカットの場合はpreventDefault
+        const isSystemShortcut = (metaKey && ['s', 'p', 'r', 'w', 'q', 'a'].includes(key.toLowerCase())) ||
+                                 (ctrlKey && ['s', 'p', 'r', 'w', 'q', 'a', 'tab'].includes(key.toLowerCase()));
+
+        if (isCurrentShortcut || isSystemShortcut) {
+          e.preventDefault();
+        }
         return;
       }
 

@@ -46,6 +46,10 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
               <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '0' }}>利用可能な単独キーショートカット</h3>
               <div style={{ display: 'flex', gap: '12px', fontSize: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ fontSize: '14px' }}>▶</span>
+                  <span style={{ color: '#FF9500' }}>順押し</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '14px' }}>🔵</span>
                   <span style={{ color: '#007AFF' }}>全画面表示で防げる</span>
                 </div>
@@ -61,6 +65,7 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
                   key={index}
                   shortcut={item.shortcut}
                   description={item.description}
+                  appContext={selectedApp}
                   showDebugLog={true} // デバッグ用
                 />
               ))}
@@ -141,6 +146,10 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
             <h3 className="shortcuts-list-title" style={{ marginTop: '0', marginBottom: '0' }}>利用可能なショートカット</h3>
             <div style={{ display: 'flex', gap: '12px', fontSize: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ fontSize: '14px' }}>▶</span>
+                <span style={{ color: '#FF9500' }}>順押し</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span style={{ fontSize: '14px' }}>🔵</span>
                 <span style={{ color: '#007AFF' }}>全画面表示で防げる</span>
               </div>
@@ -156,6 +165,7 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
                 key={index}
                 shortcut={item.shortcut}
                 description={item.description}
+                appContext={selectedApp}
                 showDebugLog={true} // デバッグ用
               />
             ))}

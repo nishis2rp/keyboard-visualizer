@@ -17,3 +17,9 @@ export {
   isFullscreen,
   onFullscreenChange
 } from './fullscreen'
+
+export {
+  isSequentialShortcut,
+  getShortcutType,
+  parseShortcutKeys
+} from './shortcutUtils'
