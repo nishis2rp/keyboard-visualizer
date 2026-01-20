@@ -126,6 +126,7 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
       <h3 className="keyboard-title">{layoutName}</h3>
       <div className="keyboard">
         {keysWithPositions.map((keyObj, index) => {
+          const isSpacer = !keyObj.code || keyObj.code === ''
           const isPressed = isKeyPressed(keyObj)
           const isModifier = isModifierKey(keyObj.code)
           const isWinKey = isWindowsKey(keyObj.code)
@@ -135,7 +136,7 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
           return (
             <div
               key={`${index}-${keyObj.code}`}
-              className={`keyboard-key ${isPressed ? 'pressed' : ''} ${isWinKey ? 'windows-key' : (isModifier ? 'modifier' : (isSpecial ? 'special' : ''))}`}
+              className={`keyboard-key ${isSpacer ? 'spacer' : ''} ${isPressed ? 'pressed' : ''} ${isWinKey ? 'windows-key' : (isModifier ? 'modifier' : (isSpecial ? 'special' : ''))}`}
               style={{
                 gridColumn: keyObj.gridColumn,
                 gridRow: keyObj.gridRow,

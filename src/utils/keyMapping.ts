@@ -71,20 +71,18 @@ const US_SYMBOL_MAP = {
 // ============================================================================
 const JIS_SYMBOL_MAP = {
   // No Shift (KeyboardEvent.code)
-  'Backquote': '`', 'Minus': '-', 'Equal': '^', 'BracketLeft': '[', 'BracketRight': ']',
-  'Backslash': '\\', 'Semicolon': ';', 'Quote': ':', 'Comma': ',', 'Period': '.', 'Slash': '/',
+  'Backquote': '`', 'Minus': '-', 'Equal': '^', 'BracketLeft': '@', 'BracketRight': '[',
+  'Backslash': ']', 'Semicolon': ';', 'Quote': ':', 'Comma': ',', 'Period': '.', 'Slash': '/',
   'IntlYen': '¥', // JIS specific
-  'IntlRo': '_',  // JIS specific (underscore)
-  'IntlHash': '@', // JIS specific
+  'IntlRo': '\\',  // JIS specific (backslash on JIS keyboard)
 
   // With Shift (values detected by KeyboardEvent.key)
   'ShiftLeft+Backquote': '~', 'ShiftLeft+Minus': '=', 'ShiftLeft+Equal': '~',
-  'ShiftLeft+BracketLeft': '{', 'ShiftLeft+BracketRight': '}', 'ShiftLeft+Backslash': '|',
+  'ShiftLeft+BracketLeft': '`', 'ShiftLeft+BracketRight': '{', 'ShiftLeft+Backslash': '}',
   'ShiftLeft+Semicolon': '+', 'ShiftLeft+Quote': '*', 'ShiftLeft+Comma': '<',
   'ShiftLeft+Period': '>', 'ShiftLeft+Slash': '?',
   'ShiftLeft+IntlYen': '|',
-  'ShiftLeft+IntlRo': 'Romaji', // Romaji toggle (tentative)
-  'ShiftLeft+IntlHash': '`',
+  'ShiftLeft+IntlRo': '_', // Underscore on JIS keyboard
 
   // Shift symbols for number keys (values detected by KeyboardEvent.key)
   'ShiftLeft+Digit1': '!', 'ShiftLeft+Digit2': '"', 'ShiftLeft+Digit3': '#',

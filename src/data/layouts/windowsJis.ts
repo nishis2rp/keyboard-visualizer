@@ -2,19 +2,22 @@
 export const windowsJisLayout = [
   // Row 1 (Function keys)
   [
-    { key: 'Escape', code: 'Escape', display: 'Esc', width: 2 },
-    { key: 'F1', code: 'F1', display: 'F1', width: 1 },
-    { key: 'F2', code: 'F2', display: 'F2', width: 1 },
-    { key: 'F3', code: 'F3', display: 'F3', width: 1 },
-    { key: 'F4', code: 'F4', display: 'F4', width: 1 },
-    { key: 'F5', code: 'F5', display: 'F5', width: 1 },
-    { key: 'F6', code: 'F6', display: 'F6', width: 1 },
-    { key: 'F7', code: 'F7', display: 'F7', width: 1 },
-    { key: 'F8', code: 'F8', display: 'F8', width: 1 },
-    { key: 'F9', code: 'F9', display: 'F9', width: 1 },
-    { key: 'F10', code: 'F10', display: 'F10', width: 1 },
-    { key: 'F11', code: 'F11', display: 'F11', width: 1 },
-    { key: 'F12', code: 'F12', display: 'F12', width: 1 },
+    { key: 'Escape', code: 'Escape', display: 'Esc', width: 1 },
+    { key: '', code: '', display: '', width: 0.5 },
+    { key: 'F1', code: 'F1', display: 'F1', width: 1.1 },
+    { key: 'F2', code: 'F2', display: 'F2', width: 1.1 },
+    { key: 'F3', code: 'F3', display: 'F3', width: 1.1 },
+    { key: 'F4', code: 'F4', display: 'F4', width: 1.1 },
+    { key: '', code: '', display: '', width: 0.5 },
+    { key: 'F5', code: 'F5', display: 'F5', width: 1.1 },
+    { key: 'F6', code: 'F6', display: 'F6', width: 1.1 },
+    { key: 'F7', code: 'F7', display: 'F7', width: 1.1 },
+    { key: 'F8', code: 'F8', display: 'F8', width: 1.1 },
+    { key: '', code: '', display: '', width: 0.5 },
+    { key: 'F9', code: 'F9', display: 'F9', width: 1.1 },
+    { key: 'F10', code: 'F10', display: 'F10', width: 1.1 },
+    { key: 'F11', code: 'F11', display: 'F11', width: 1.1 },
+    { key: 'F12', code: 'F12', display: 'F12', width: 1.1 },
     { key: 'PrintScreen', code: 'PrintScreen', display: 'PrtSc', width: 1 },
     { key: 'ScrollLock', code: 'ScrollLock', display: 'ScrLk', width: 1 },
     { key: 'Pause', code: 'Pause', display: 'Pause', width: 1 },
@@ -74,7 +77,7 @@ export const windowsJisLayout = [
     { key: 'KeyL', code: 'KeyL', display: 'L', width: 1 },
     { key: 'Semicolon', code: 'Semicolon', display: ';', width: 1 },
     { key: 'Quote', code: 'Quote', display: ':', width: 1 }, // JIS layout: :
-    { key: 'IntlBackslash', code: 'IntlBackslash', display: ']', width: 1 }, // JIS layout: ]
+    { key: 'Backslash', code: 'Backslash', display: ']', width: 1 }, // JIS layout: ]
   ],
   // Row 5
   [
@@ -98,9 +101,9 @@ export const windowsJisLayout = [
     { key: 'ControlLeft', code: 'ControlLeft', display: 'Ctrl', width: 1.25 },
     { key: 'MetaLeft', code: 'MetaLeft', display: 'Win', width: 1 },
     { key: 'AltLeft', code: 'AltLeft', display: 'Alt', width: 1.25 },
-    { key: 'NonConvert', code: 'NonConvert', display: '無変換', width: 1 }, // JIS specific
-    { key: 'Space', code: 'Space', display: 'Space', width: 6 },
-    { key: 'Convert', code: 'Convert', display: '変換', width: 1 }, // JIS specific
+    { key: 'NonConvert', code: 'NonConvert', display: '無変換', width: 1.25 }, // JIS specific
+    { key: 'Space', code: 'Space', display: 'Space', width: 5.5 },
+    { key: 'Convert', code: 'Convert', display: '変換', width: 1.25 }, // JIS specific
     { key: 'KanaMode', code: 'KanaMode', display: 'かな', width: 1 }, // JIS specific
     { key: 'AltRight', code: 'AltRight', display: 'Alt', width: 1 },
     { key: 'ControlRight', code: 'ControlRight', display: 'Ctrl', width: 1.5 },

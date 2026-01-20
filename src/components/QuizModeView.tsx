@@ -95,7 +95,7 @@ const QuizModeView = () => {
 
   // タイマーロジック
   useEffect(() => {
-    if (quizState.status !== 'playing' || !quizState.currentQuestion) {
+    if (quizState.status !== 'playing' || !quizState.currentQuestion || quizState.showAnswer) {
       return;
     }
 
@@ -104,17 +104,13 @@ const QuizModeView = () => {
 
       if (newTime <= 0) {
         dispatch({ type: 'TIMEOUT' });
-        // 次の問題へ
-        setTimeout(() => {
-          getNextQuestionRef.current();
-        }, 500);
       } else {
         dispatch({ type: 'UPDATE_TIMER', payload: newTime });
       }
     }, 100);
 
     return () => clearInterval(timer);
-  }, [quizState.status, quizState.currentQuestion, quizState.timeRemaining, dispatch]);
+  }, [quizState.status, quizState.currentQuestion, quizState.timeRemaining, quizState.showAnswer, dispatch]);
 
   const pauseQuiz = () => dispatch({ type: 'PAUSE_QUIZ' });
   const resumeQuiz = () => dispatch({ type: 'RESUME_QUIZ' });

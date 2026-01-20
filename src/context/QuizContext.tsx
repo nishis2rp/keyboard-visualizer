@@ -28,6 +28,7 @@ interface QuizState {
   questionStartTime: number | null;
   timeRemaining: number;
   lastAnswerResult: 'correct' | 'incorrect' | null;
+  showAnswer: boolean; // 正解を表示するかどうか
   score: number;
   quizHistory: QuizHistoryEntry[];
   usedShortcuts: Set<string>; // 出題済みショートカットを記録
@@ -49,18 +50,15 @@ type QuizAction =
   | { type: 'UPDATE_FULLSCREEN'; payload: { isFullscreen: boolean } }
   | { type: 'UPDATE_TIMER'; payload: number }
   | { type: 'TIMEOUT' }
-  | { type: 'FINISH_QUIZ' };
+  | { type: 'FINISH_QUIZ' }
+  | { type: 'NEXT_QUESTION' };
 
 interface QuizContextType {
-  state: QuizState;
+  quizState: QuizState;
   dispatch: Dispatch<QuizAction>;
-  startQuiz: (app: string, keyboardLayout: string, isFullscreen: boolean) => void;
-  answerQuestion: (pressedCodes: Set<string>) => void;
-  skipQuestion: () => void;
-  pauseQuiz: () => void;
-  resumeQuiz: () => void;
-  endQuiz: () => void;
-  resetQuiz: () => void;
+  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string) => void;
+  handleAnswer: (pressedCodes: Set<string>) => void;
+  getNextQuestion: () => void;
   updateFullscreen: (isFullscreen: boolean) => void;
 }
 
@@ -75,6 +73,7 @@ const initialQuizState: QuizState = {
   questionStartTime: null,
   timeRemaining: 10,
   lastAnswerResult: null,
+  showAnswer: false,
   score: 0,
   quizHistory: [],
   usedShortcuts: new Set(),
@@ -114,6 +113,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         questionStartTime: Date.now(),
         timeRemaining: state.settings.timeLimit,
         lastAnswerResult: null,
+        showAnswer: false,
         usedShortcuts: newUsedShortcuts,
       };
     }
@@ -142,6 +142,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         ...state,
         score: newScore,
         lastAnswerResult: isCorrect ? 'correct' : 'incorrect',
+        showAnswer: true,
         quizHistory: [...state.quizHistory, historyEntry],
       };
     }
@@ -189,6 +190,8 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
       // 時間切れで不正解扱い
       return {
         ...state,
+        showAnswer: true,
+        lastAnswerResult: 'incorrect',
         quizHistory: [
           ...state.quizHistory,
           {
@@ -198,6 +201,13 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
             isCorrect: false,
           },
         ],
+      };
+    case 'NEXT_QUESTION':
+      // 次の問題へ進む準備（showAnswerをリセット）
+      return {
+        ...state,
+        showAnswer: false,
+        lastAnswerResult: null,
       };
     default:
       return state;
@@ -225,6 +235,9 @@ export function QuizProvider({ children }: QuizProviderProps) {
       return;
     }
 
+    // 次の問題へ進む準備
+    dispatch({ type: 'NEXT_QUESTION' });
+
     // キーボードレイアウトに基づいて互換性のあるアプリを取得
     let compatibleApps = getCompatibleApps(quizState.keyboardLayout);
 
@@ -248,7 +261,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
       // 問題が生成できない場合、クイズを終了
       dispatch({ type: 'FINISH_QUIZ' });
     }
-  }, [quizState.keyboardLayout, quizState.settings.isFullscreen, quizState.selectedApp, quizState.quizHistory.length, quizState.settings.totalQuestions]);
+  }, [quizState.keyboardLayout, quizState.settings.isFullscreen, quizState.selectedApp, quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts]);
 
 
   // クイズを開始する
@@ -286,7 +299,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
 
   // 回答を処理する
   const handleAnswer = useCallback((pressedKeys) => {
-    if (quizState.status !== 'playing' || !quizState.currentQuestion) {
+    if (quizState.status !== 'playing' || !quizState.currentQuestion || quizState.showAnswer) {
       return;
     }
 
@@ -297,12 +310,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
     const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
 
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
-
-    // 次の問題へ（少し遅延を入れてフィードバックを表示）
-    setTimeout(() => {
-      getNextQuestion();
-    }, 500);
-  }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, getNextQuestion]);
+  }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, quizState.showAnswer]);
 
   // フルスクリーン状態を更新し、現在の問題が安全かチェック
   const updateFullscreen = useCallback((isFullscreen: boolean) => {

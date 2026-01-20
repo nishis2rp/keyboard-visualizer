@@ -4,8 +4,8 @@ import { getCodeDisplayName } from '../../utils/keyMapping';
 import styles from './QuestionCard.module.css';
 
 function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' }) {
-  const { quizState } = useQuiz();
-  const { currentQuestion, status, timeRemaining, settings, lastAnswerResult } = quizState;
+  const { quizState, getNextQuestion } = useQuiz();
+  const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer } = quizState;
 
   if (status !== 'playing' || !currentQuestion) {
     return null;
@@ -96,6 +96,26 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
         {lastAnswerResult && (
           <div className={styles.feedbackIcon}>
             {lastAnswerResult === 'correct' ? '✅' : '❌'}
+          </div>
+        )}
+
+        {/* 正解表示と次の問題ボタン */}
+        {showAnswer && (
+          <div className={styles.answerSection}>
+            <div className={styles.correctAnswer}>
+              <div className={styles.correctAnswerLabel}>
+                {lastAnswerResult === 'correct' ? '正解！' : '正解は：'}
+              </div>
+              <div className={styles.correctAnswerValue}>
+                {currentQuestion.correctShortcut}
+              </div>
+            </div>
+            <button
+              className={styles.nextButton}
+              onClick={getNextQuestion}
+            >
+              次の問題へ →
+            </button>
           </div>
         )}
       </div>
