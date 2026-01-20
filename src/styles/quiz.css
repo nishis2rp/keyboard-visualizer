@@ -1,0 +1,116 @@
+/* ===================================
+   Quiz Mode Styles
+   ================================== */
+
+/* Quiz Mode Animations */
+@keyframes bounce {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Quiz Container */
+.quiz-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 60px);
+  position: relative;
+  padding: 20px;
+  overflow: auto;
+}
+
+/* Quiz Controls */
+.quiz-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.quiz-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: var(--transition-base);
+}
+
+.quiz-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.quiz-button-pause {
+  background-color: var(--sf-yellow);
+  color: #000;
+}
+
+.quiz-button-resume {
+  background-color: var(--sf-green);
+  color: #000;
+}
+
+/* Pause Overlay */
+.quiz-pause-overlay {
+  background: rgba(251, 191, 36, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 48px 64px;
+  border: 3px solid rgba(251, 191, 36, 0.5);
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
+}
+
+.quiz-pause-icon {
+  font-size: 72px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.quiz-pause-text {
+  font-size: 32px;
+  color: var(--sf-yellow);
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+/* Quiz Keyboard Wrapper */
+.quiz-keyboard-wrapper {
+  margin-top: 32px;
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  justify-content: center;
+  transform: scale(0.85);
+  transform-origin: top center;
+}

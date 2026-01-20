@@ -1,0 +1,94 @@
+/* AppHeader Component Styles */
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.titleContainer {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 2em;
+  position: relative;
+}
+
+.logoGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logoBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  font-size: 1.2em;
+  font-weight: 700;
+  color: #FFFFFF;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.logoBoxK {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.logoBoxS {
+  background: linear-gradient(135deg, #50C9C9 0%, #38A3A5 100%);
+  box-shadow: 0 2px 8px rgba(80, 201, 201, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.logoBoxV {
+  background: linear-gradient(135deg, #5FD9C2 0%, #4ABFA8 100%);
+  box-shadow: 0 2px 8px rgba(95, 217, 194, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.titleTextContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 1.1;
+}
+
+.titleLine1 {
+  background: linear-gradient(135deg, #4A90E2 0%, #50C9C9 50%, #5FD9C2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  font-size: 0.85em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.titleLine2 {
+  background: linear-gradient(135deg, #4A90E2 0%, #50C9C9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+  font-size: 0.9em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+}
+
+.warningText {
+  color: var(--sf-red);
+  font-weight: 600;
+  margin-left: 10px;
+}

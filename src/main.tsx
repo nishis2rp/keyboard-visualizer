@@ -1,9 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
-import { AppProvider } from './context/AppContext.jsx';
-import { QuizProvider } from './context/QuizContext.jsx';
-import ErrorBoundary from './components/ErrorBoundary.jsx';
+import App from './App';
+import { AppProvider } from './context/AppContext';
+import { QuizProvider } from './context/QuizContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import './styles';
 
 // Service Workerの登録

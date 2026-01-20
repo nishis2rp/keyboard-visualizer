@@ -1,0 +1,129 @@
+/* ===================================
+   CSS Variables - Design System
+   ================================== */
+
+:root {
+  /* Enhanced Apple Color System */
+  --sf-blue: #007AFF;
+  --sf-blue-hover: #0051D5;
+  --sf-blue-dark: #005FCC;
+  --sf-blue-light: #5AC8FA;
+  --sf-blue-ultralight: #E5F3FF;
+
+  --sf-gray: #86868B;
+  --sf-gray-light: #F5F5F7;
+  --sf-gray-ultralight: #FAFAFA;
+  --sf-gray-dark: #48484A;
+
+  --sf-red: #FF3B30;
+  --sf-red-dark: #E62E24;
+  --sf-red-light: #FF6B6B;
+
+  --sf-green: #10b981;
+  --sf-green-dark: #059669;
+  --sf-green-light: #34D399;
+
+  --sf-orange: #f59e0b;
+  --sf-yellow: #fbbf24;
+  --sf-purple: #AF52DE;
+  --sf-purple-light: #BF5AF2;
+
+  --text-primary: #1D1D1F;
+  --text-secondary: #6E6E73;
+  --text-tertiary: #86868B;
+  --border-color: #D2D2D7;
+  --border-color-light: #E5E5EA;
+  --white: #FFFFFF;
+  --black: #000000;
+
+  /* Enhanced Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.16), 0 12px 32px rgba(0, 0, 0, 0.12);
+  --shadow-2xl: 0 32px 80px rgba(0, 0, 0, 0.2), 0 16px 40px rgba(0, 0, 0, 0.16);
+
+  /* Colored Shadows */
+  --shadow-blue: 0 8px 24px rgba(0, 122, 255, 0.2), 0 4px 12px rgba(0, 122, 255, 0.1);
+  --shadow-green: 0 8px 24px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.1);
+  --shadow-red: 0 8px 24px rgba(255, 59, 48, 0.2), 0 4px 12px rgba(255, 59, 48, 0.1);
+
+  /* 3D Key Shadows */
+  --key-shadow-3d:
+    0 2px 0 rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 6px 20px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.1);
+
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Enhanced Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-cubic: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --transition-smooth: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Typography Scale */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  --font-size-5xl: 3rem;      /* 48px */
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* Gradients */
+  --gradient-blue: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+  --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-red: linear-gradient(135deg, #FF3B30 0%, #E62E24 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+
+  /* Backdrop Blur */
+  --blur-sm: blur(8px);
+  --blur-md: blur(12px);
+  --blur-lg: blur(16px);
+  --blur-xl: blur(24px);
+  --blur-2xl: blur(40px);
+
+  /* Quiz Colors */
+  --quiz-purple-start: #667eea;
+  --quiz-purple-end: #764ba2;
+  --quiz-correct: #10b981;
+  --quiz-correct-dark: #059669;
+  --quiz-incorrect: #ef4444;
+  --quiz-incorrect-dark: #dc2626;
+}

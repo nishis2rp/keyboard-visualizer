@@ -1,0 +1,54 @@
+/* ===================================
+   Responsive Design - Apple Breakpoints
+   ================================== */
+
+@media (max-width: 1280px) {
+  .keyboard {
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 32px;
+  }
+
+  .keyboard {
+    transform: scale(0.75);
+    transform-origin: top center;
+  }
+
+  h1 {
+    font-size: 2.5em;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 24px;
+  }
+
+  .selectors-container {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .keyboard {
+    transform: scale(0.7);
+    transform-origin: top center;
+  }
+
+  .shortcuts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 2em;
+  }
+
+  .key-shortcuts-popup {
+    min-width: 200px;
+    font-size: 0.9em;
+  }
+}

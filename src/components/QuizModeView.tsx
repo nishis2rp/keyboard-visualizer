@@ -11,6 +11,7 @@ import { useFullscreen } from '../hooks';
 import { detectOS } from '../constants';
 import { specialKeys } from '../constants/keys';
 import { isModifierKey } from '../utils/keyUtils';
+import '../styles/quiz.css';
 
 const QuizModeView = () => {
   const { isFullscreenMode } = useFullscreen();
@@ -122,52 +123,18 @@ const QuizModeView = () => {
     <>
       <SystemShortcutWarning onOpenRequest={onMacWarningModalRequest} />
 
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 'calc(100vh - 60px)',
-        position: 'relative',
-        padding: '20px',
-        overflow: 'auto',
-      }}>
-
+      <div className="quiz-container">
         {/* コントロールパネル */}
         {quizState.status === 'playing' && (
-          <div style={{ position: 'absolute', top: '20px', right: '20px', display: 'flex', gap: '10px' }}>
-            <button
-              onClick={pauseQuiz}
-              style={{
-                padding: '10px 20px',
-                fontSize: '1rem',
-                backgroundColor: '#fbbf24',
-                color: '#000',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-              }}
-            >
+          <div className="quiz-controls">
+            <button onClick={pauseQuiz} className="quiz-button quiz-button-pause">
               ⏸️ 一時停止
             </button>
           </div>
         )}
         {quizState.status === 'paused' && (
-          <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
-            <button
-              onClick={resumeQuiz}
-              style={{
-                padding: '10px 20px',
-                fontSize: '1rem',
-                backgroundColor: '#4ade80',
-                color: '#000',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-              }}
-            >
+          <div className="quiz-controls">
+            <button onClick={resumeQuiz} className="quiz-button quiz-button-resume">
               ▶️ 再開
             </button>
           </div>
@@ -178,15 +145,7 @@ const QuizModeView = () => {
 
         {/* キーボードビジュアライザー */}
         {(quizState.status === 'playing' || quizState.status === 'paused') && (
-          <div style={{
-            marginTop: '32px',
-            width: '100%',
-            maxWidth: '1000px',
-            display: 'flex',
-            justifyContent: 'center',
-            transform: 'scale(0.85)',
-            transformOrigin: 'top center',
-          }}>
+          <div className="quiz-keyboard-wrapper">
             <KeyboardLayout
               pressedKeys={pressedKeys}
               specialKeys={specialKeys}
@@ -196,34 +155,10 @@ const QuizModeView = () => {
           </div>
         )}
 
-
         {quizState.status === 'paused' && (
-          <div
-            style={{
-              background: 'rgba(251, 191, 36, 0.2)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '24px',
-              padding: '48px 64px',
-              border: '3px solid rgba(251, 191, 36, 0.5)',
-              boxShadow: '0 0 40px rgba(251, 191, 36, 0.3)',
-            }}
-          >
-            <div style={{
-              fontSize: '72px',
-              textAlign: 'center',
-              marginBottom: '16px',
-            }}>
-              ⏸️
-            </div>
-            <div style={{
-              fontSize: '32px',
-              color: '#fbbf24',
-              fontWeight: 'bold',
-              textAlign: 'center',
-              textShadow: '0 0 10px rgba(251, 191, 36, 0.5)',
-            }}>
-              一時停止中
-            </div>
+          <div className="quiz-pause-overlay">
+            <div className="quiz-pause-icon">⏸️</div>
+            <div className="quiz-pause-text">一時停止中</div>
           </div>
         )}
 

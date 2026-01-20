@@ -1,0 +1,75 @@
+/* ScoreBoard Component Styles */
+
+.scoreBoardWrapper {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 24px auto;
+}
+
+.statsContainer {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  flex: 1;
+  min-width: 140px;
+  transition: var(--transition-slow);
+  cursor: default;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.statIcon {
+  font-size: 32px;
+  margin-right: 8px;
+}
+
+.statLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.statValue {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  font-family: monospace;
+}
+
+.statValue.blue {
+  color: #60a5fa;
+  text-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+}
+
+.statValue.green {
+  color: var(--sf-green);
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.statSubtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  margin-top: 8px;
+}
