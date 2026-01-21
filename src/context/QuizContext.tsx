@@ -6,7 +6,7 @@ import { ALWAYS_PROTECTED_SHORTCUTS, FULLSCREEN_PREVENTABLE_SHORTCUTS } from '..
 
 interface QuizSettings {
   quizMode: 'default' | 'hardcore';
-  difficulty: 'basic' | 'standard' | 'madmax';
+  difficulty: 'basic' | 'standard' | 'madmax' | 'allrange';
   timeLimit: number;
   totalQuestions: number;
   isFullscreen: boolean;
@@ -57,7 +57,7 @@ type QuizAction =
 interface QuizContextType {
   quizState: QuizState;
   dispatch: Dispatch<QuizAction>;
-  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: 'basic' | 'standard' | 'madmax') => void;
+  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: 'basic' | 'standard' | 'madmax' | 'allrange') => void;
   handleAnswer: (pressedCodes: Set<string>) => void;
   getNextQuestion: () => void;
   updateFullscreen: (isFullscreen: boolean) => void;
@@ -101,7 +101,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         settings: {
           ...state.settings,
           isFullscreen: action.payload.isFullscreen, // 現在のフルスクリーン状態を反映
-          difficulty: action.payload.difficulty as 'basic' | 'standard' | 'madmax', // 難易度を設定
+          difficulty: action.payload.difficulty as 'basic' | 'standard' | 'madmax' | 'allrange', // 難易度を設定
         },
         startTime: Date.now(),
       };
@@ -269,7 +269,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
 
 
   // クイズを開始する
-  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'madmax' = 'standard') => {
+  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'madmax' | 'allrange' = 'standard') => {
 
     dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
 

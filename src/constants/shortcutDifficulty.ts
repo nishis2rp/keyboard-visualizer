@@ -1,9 +1,10 @@
 /**
  * ショートカットの難易度分類
  *
- * Basic: よく使われる基本的なショートカット
- * Standard: 全てのショートカット（basic + madmax含む）
- * MadMax: あまり使わないショートカット
+ * Basic: よく使われる基本的なショートカット（初心者向け）
+ * Standard: 中級レベルのショートカット（Basic、MadMax以外）
+ * MadMax: 上級者向けの高度なショートカット
+ * AllRange: 全ての難易度からランダムに出題
  */
 
 /**
@@ -107,7 +108,7 @@ export const MADMAX_SHORTCUTS = new Set([
  * @param normalizedShortcut - 正規化されたショートカット
  * @returns 難易度（'basic' | 'standard' | 'madmax'）
  */
-export const getShortcutDifficulty = (normalizedShortcut: string): 'basic' | 'standard' | 'madmax' => {
+export const getShortcutDifficulty = (normalizedShortcut: string): 'basic' | 'standard' | 'madmax' | 'allrange' => {
   if (BASIC_SHORTCUTS.has(normalizedShortcut)) {
     return 'basic';
   }
@@ -125,12 +126,12 @@ export const getShortcutDifficulty = (normalizedShortcut: string): 'basic' | 'st
  */
 export const matchesDifficulty = (
   normalizedShortcut: string,
-  targetDifficulty: 'basic' | 'standard' | 'madmax'
+  targetDifficulty: 'basic' | 'standard' | 'madmax' | 'allrange'
 ): boolean => {
   const shortcutDifficulty = getShortcutDifficulty(normalizedShortcut);
 
-  // standardは全てのショートカットを含む
-  if (targetDifficulty === 'standard') {
+  // allrangeは全てのショートカットを含む
+  if (targetDifficulty === 'allrange') {
     return true;
   }
 
@@ -139,9 +140,14 @@ export const matchesDifficulty = (
     return shortcutDifficulty === 'basic';
   }
 
-  // madmaxはbasic以外の全て（standard + madmax）を含む
+  // standardはstandardのみ（basic、madmax以外）
+  if (targetDifficulty === 'standard') {
+    return shortcutDifficulty === 'standard';
+  }
+
+  // madmaxはmadmaxのみ
   if (targetDifficulty === 'madmax') {
-    return shortcutDifficulty !== 'basic';
+    return shortcutDifficulty === 'madmax';
   }
 
   return false;

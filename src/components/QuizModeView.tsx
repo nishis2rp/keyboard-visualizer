@@ -38,7 +38,7 @@ const QuizModeView = () => {
       openMacWarningModalRef.current();
     }
     // quizAppを渡す（nullの場合はselectedAppを使用）
-    startQuiz(quizApp || selectedApp, isFullscreenMode, keyboardLayout, (quizDifficulty as 'basic' | 'standard' | 'madmax') || 'standard');
+    startQuiz(quizApp || selectedApp, isFullscreenMode, keyboardLayout, (quizDifficulty as 'basic' | 'standard' | 'madmax' | 'allrange') || 'standard');
 
     return () => {
       dispatch({ type: 'RESET_QUIZ' });

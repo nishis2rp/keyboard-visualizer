@@ -86,19 +86,25 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
       id: 'basic',
       name: 'Basic',
       icon: '🌟',
-      description: 'よく使われるショートカットのみ出題'
+      description: '初心者向け：よく使われるショートカット'
     },
     {
       id: 'standard',
       name: 'Standard',
       icon: '⚡',
-      description: 'すべてのショートカットからランダムに出題'
+      description: '中級者向け：適度な難易度のショートカット'
     },
     {
       id: 'madmax',
       name: 'MadMax',
       icon: '🔥',
-      description: 'あまり使わないショートカットのみ出題'
+      description: '上級者向け：高度なショートカット'
+    },
+    {
+      id: 'allrange',
+      name: 'All Range',
+      icon: '🎲',
+      description: '全難易度：あらゆるショートカットからランダム'
     }
   ]
 

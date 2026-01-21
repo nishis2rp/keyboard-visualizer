@@ -176,10 +176,10 @@ export const getCompatibleApps = (keyboardLayout) => {
  * @param {string} quizMode - The quiz mode ('default' or 'hardcore').
  * @param {boolean} isFullscreen - Whether fullscreen mode is active.
  * @param {Set<string>} usedShortcuts - Set of already used normalized shortcuts to avoid duplicates.
- * @param {'basic' | 'standard' | 'madmax'} difficulty - The difficulty level.
+ * @param {'basic' | 'standard' | 'madmax' | 'allrange'} difficulty - The difficulty level.
  * @returns {{question: string, correctShortcut: string, normalizedCorrectShortcut: string, appName: string} | null} A question object, or null if no shortcuts are available.
  */
-export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false, usedShortcuts = new Set(), difficulty: 'basic' | 'standard' | 'madmax' = 'standard') => {
+export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false, usedShortcuts = new Set(), difficulty: 'basic' | 'standard' | 'madmax' | 'allrange' = 'standard') => {
   // 全ての許可されたアプリのショートカットを収集
   const allSafeShortcuts = [];
 
