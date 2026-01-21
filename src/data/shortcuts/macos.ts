@@ -88,6 +88,10 @@ export const macosShortcuts = {
   'Cmd + ↓ (Text)': '文書の末尾へ',
   'Cmd + Shift + → (Text)': '行末まで選択',
   'Cmd + Shift + ← (Text)': '行頭まで選択',
+  'Cmd + Shift + ↑': '文書の先頭まで選択',
+  'Cmd + Shift + ↓': '文書の末尾まで選択',
+  'Option + Shift + →': '次の単語まで選択',
+  'Option + Shift + ←': '前の単語まで選択',
   'Option + Delete': '前の単語を削除',
   'Fn + Delete': '後ろの文字を削除',
   'Ctrl + H': '前の文字を削除',
@@ -98,6 +102,10 @@ export const macosShortcuts = {
   'Ctrl + N': '下の行に移動',
   'Ctrl + F': '右の文字に移動',
   'Ctrl + B': '左の文字に移動',
+  'Ctrl + A': '行頭に移動',
+  'Ctrl + E': '行末に移動',
+  'Ctrl + K': 'カーソルから行末まで削除',
+  'Ctrl + Y': '削除した文字列を貼り付け',
 
   // Safari/ブラウザ
   'Cmd + R': '再読み込み (Safari)',
@@ -123,6 +131,12 @@ export const macosShortcuts = {
   'Cmd + . (Safari)': '読み込みを停止 (Safari)',
   'Cmd + [ (Safari)': '戻る (Safari)',
   'Cmd + ] (Safari)': '進む (Safari)',
+  'Cmd + D (Safari)': 'ブックマークに追加 (Safari)',
+  'Cmd + Option + I (Safari)': 'Webインスペクタ (Safari)',
+  'Cmd + Option + C (Safari)': 'JavaScriptコンソール (Safari)',
+  'Cmd + Option + A (Safari)': 'アクティビティ (Safari)',
+  'Cmd + Shift + L (Safari)': 'サイドバーを表示/非表示 (Safari)',
+  'Cmd + Shift + B': 'お気に入りバーを表示/非表示 (Safari)',
 
   // その他
   'Ctrl + Cmd + Q': '画面をロック',

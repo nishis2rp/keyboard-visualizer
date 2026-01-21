@@ -14,18 +14,23 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
   // === 基本操作 ===
   // コピー
   'Ctrl+C': ['Ctrl+Insert'],
+  'Ctrl+Insert': ['Ctrl+C'],
 
   // 切り取り
   'Ctrl+X': ['Shift+Delete'],
+  'Shift+Delete': ['Ctrl+X'],
 
   // 貼り付け
   'Ctrl+V': ['Shift+Insert'],
+  'Shift+Insert': ['Ctrl+V'],
 
   // 元に戻す
   'Ctrl+Z': ['Alt+Backspace'],
+  'Alt+Backspace': ['Ctrl+Z'],
 
   // やり直し
   'Ctrl+Y': ['Ctrl+Shift+Z'],
+  'Ctrl+Shift+Z': ['Ctrl+Y'],
 
   // すべて選択
   'Ctrl+A': [],
@@ -51,13 +56,16 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
 
   // タブを閉じる（ブラウザ）
   'Ctrl+W': ['Ctrl+F4'],
+  'Ctrl+F4': ['Ctrl+W'],
 
   // 新しいタブ（ブラウザ）
   'Ctrl+T': [],
 
   // タブ切り替え（ブラウザ）
   'Ctrl+Tab': ['Ctrl+PageDown'],
+  'Ctrl+PageDown': ['Ctrl+Tab'],
   'Ctrl+Shift+Tab': ['Ctrl+PageUp'],
+  'Ctrl+PageUp': ['Ctrl+Shift+Tab'],
 
   // アプリケーション切り替え
   'Alt+Tab': [],
@@ -65,12 +73,16 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
   // === ブラウザ操作 ===
   // ページ更新
   'Ctrl+R': ['F5'],
+  'F5': ['Ctrl+R'],
 
   // 強制更新
   'Ctrl+Shift+R': ['Ctrl+F5'],
+  'Ctrl+F5': ['Ctrl+Shift+R'],
 
   // アドレスバーにフォーカス
   'Ctrl+L': ['Alt+D', 'F6'],
+  'Alt+D': ['Ctrl+L', 'F6'],
+  'F6': ['Ctrl+L', 'Alt+D'],
 
   // ブックマーク
   'Ctrl+D': [],
@@ -80,12 +92,14 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
 
   // デベロッパーツール
   'Ctrl+Shift+I': ['F12'],
+  'F12': ['Ctrl+Shift+I'],
 
   // 全画面
   'F11': [],
 
   // ズームイン
   'Ctrl++': ['Ctrl+='],
+  'Ctrl+=': ['Ctrl++'],
 
   // ズームアウト
   'Ctrl+-': [],
@@ -99,18 +113,22 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
 
   // 太字
   'Ctrl+B': ['Ctrl+2'],
+  'Ctrl+2': ['Ctrl+B'],
 
   // 斜体
   'Ctrl+I': ['Ctrl+3'],
+  'Ctrl+3': ['Ctrl+I'],
 
   // 下線
   'Ctrl+U': ['Ctrl+4'],
+  'Ctrl+4': ['Ctrl+U'],
 
   // セルの書式設定
   'Ctrl+1': [],
 
   // 名前を付けて保存
   'F12': ['Ctrl+Shift+S'],
+  'Ctrl+Shift+S': ['F12'],
 
   // シート移動（右）
   'Ctrl+PageDown': [],

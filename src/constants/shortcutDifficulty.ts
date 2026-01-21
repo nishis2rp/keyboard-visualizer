@@ -134,6 +134,15 @@ export const matchesDifficulty = (
     return true;
   }
 
-  // basicとmadmaxは完全一致のみ
-  return shortcutDifficulty === targetDifficulty;
+  // basicはbasicのみ
+  if (targetDifficulty === 'basic') {
+    return shortcutDifficulty === 'basic';
+  }
+
+  // madmaxはbasic以外の全て（standard + madmax）を含む
+  if (targetDifficulty === 'madmax') {
+    return shortcutDifficulty !== 'basic';
+  }
+
+  return false;
 };
