@@ -3,6 +3,7 @@ import {
   FULLSCREEN_PREVENTABLE_SHORTCUTS,
   detectOS
 } from '../constants/systemProtectedShortcuts';
+import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
 import { allShortcuts } from '../data/shortcuts';
 
 // OSを検出
@@ -235,28 +236,32 @@ export const GRACE_PERIOD_MS = 300;
 
 /**
  * Checks if the user's answer is correct.
+ * Supports alternative shortcuts (e.g., Ctrl+C and Ctrl+Insert for copy).
  * @param {string} userAnswer - The normalized shortcut entered by the user.
  * @param {string} normalizedCorrectAnswer - The normalized correct shortcut.
  * @returns {boolean} True if correct.
  */
 export const checkAnswer = (userAnswer, normalizedCorrectAnswer) => {
-  return userAnswer === normalizedCorrectAnswer;
+  // 完全一致チェック
+  if (userAnswer === normalizedCorrectAnswer) {
+    return true;
+  }
+
+  // 代替ショートカットチェック
+  return areShortcutsEquivalent(userAnswer, normalizedCorrectAnswer);
 };
 
 /**
  * Checks if the user's answer is correct with grace period consideration.
+ * Supports alternative shortcuts (e.g., Ctrl+C and Ctrl+Insert for copy).
  * @param {string} userAnswer - The normalized shortcut entered by the user.
  * @param {string} normalizedCorrectAnswer - The normalized correct shortcut.
  * @param {number} answerTimeMs - Time taken to answer (in milliseconds).
  * @returns {boolean} True if correct.
  */
 export const checkAnswerWithGracePeriod = (userAnswer, normalizedCorrectAnswer, answerTimeMs) => {
-  // Within grace period, allow answer
-  if (answerTimeMs <= GRACE_PERIOD_MS) {
-    return userAnswer === normalizedCorrectAnswer;
-  }
-  // After grace period, still check for correctness
-  return userAnswer === normalizedCorrectAnswer;
+  // Use the same logic as checkAnswer (supports alternative shortcuts)
+  return checkAnswer(userAnswer, normalizedCorrectAnswer);
 };
 
 // --- Test exports (only used during development) ---
