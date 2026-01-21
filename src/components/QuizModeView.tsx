@@ -23,6 +23,9 @@ const QuizModeView = () => {
   // 回答判定用: キーが離されたときに判定するため、前回のpressedKeysをキャッシュ
   const previousPressedKeysRef = useRef(new Set());
 
+  // 問題切り替え時のクールダウン（キー入力を一時的に無視）
+  const cooldownRef = useRef(false);
+
   const openMacWarningModalRef = useRef(null);
   const onMacWarningModalRequest = (openModalFunc) => {
     openMacWarningModalRef.current = openModalFunc;
@@ -59,10 +62,25 @@ const QuizModeView = () => {
     getNextQuestionRef.current = getNextQuestion;
   }, [handleAnswer, getNextQuestion]);
 
+  // 問題が切り替わったときにクールダウンを設定
+  useEffect(() => {
+    if (quizState.status === 'playing' && quizState.currentQuestion && !quizState.showAnswer) {
+      // 新しい問題が表示されたとき、300msのクールダウンを設定
+      cooldownRef.current = true;
+      previousPressedKeysRef.current = new Set(); // キー状態をクリア
+
+      const timer = setTimeout(() => {
+        cooldownRef.current = false;
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [quizState.currentQuestion, quizState.showAnswer, quizState.status]);
+
   // 回答判定ロジック: 非修飾キーが離されたときに判定
   useEffect(() => {
-    if (quizState.status !== 'playing' || quizState.showAnswer) {
-      return;
+    if (quizState.status !== 'playing' || quizState.showAnswer || cooldownRef.current) {
+      return; // クールダウン中は判定しない
     }
 
     const previousKeys = previousPressedKeysRef.current;
@@ -112,15 +130,18 @@ const QuizModeView = () => {
     return () => clearInterval(timer);
   }, [quizState.status, quizState.currentQuestion, quizState.timeRemaining, quizState.showAnswer, dispatch]);
 
-  // →キーで次の問題へ進む
+  // →キーまたはEnterキーで次の問題へ進む
   useEffect(() => {
     if (quizState.status !== 'playing' || !quizState.showAnswer) {
       return;
     }
 
     const handleKeyPress = (event) => {
-      if (event.key === 'ArrowRight') {
+      if (event.key === 'ArrowRight' || event.key === 'Enter') {
         event.preventDefault();
+        // 次の問題に進む前にキーの状態をクリア
+        previousPressedKeysRef.current = new Set();
+        cooldownRef.current = true; // クールダウンを即座に開始
         getNextQuestionRef.current();
       }
     };
