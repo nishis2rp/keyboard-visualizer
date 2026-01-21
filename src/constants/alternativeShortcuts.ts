@@ -127,14 +127,7 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
   'Ctrl+1': [],
 
   // 名前を付けて保存
-  'F12': ['Ctrl+Shift+S'],
-  'Ctrl+Shift+S': ['F12'],
-
-  // シート移動（右）
-  'Ctrl+PageDown': [],
-
-  // シート移動（左）
-  'Ctrl+PageUp': [],
+  'Ctrl+Shift+S': [],
 
   // 行全体を選択
   'Shift+Space': [],

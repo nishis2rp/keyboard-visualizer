@@ -184,6 +184,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         {/* 全画面モード選択 */}
         <div className="setup-divider">
           <h3>表示モードを選択してください</h3>
+          <p className="setup-recommendation">💡 全画面モード推奨：より没入感のある学習体験</p>
         </div>
 
         <div className="setup-options setup-modes">

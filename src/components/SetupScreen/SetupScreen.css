@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,9 +22,10 @@
 }
 
 .setup-container {
-  background: white;
+  background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(90, 103, 216, 0.3);
   max-width: 800px;
   max-height: 90vh;
   width: 90%;
@@ -91,6 +92,17 @@
   font-size: 16px;
   color: #2d3748;
   margin: 0;
+}
+
+.setup-recommendation {
+  font-size: 13px;
+  color: #5a67d8;
+  font-weight: 600;
+  margin: 4px 0 0 0;
+  padding: 6px 12px;
+  background: rgba(90, 103, 216, 0.1);
+  border-radius: 8px;
+  display: inline-block;
 }
 
 .setup-modes {

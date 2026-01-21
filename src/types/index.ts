@@ -60,6 +60,7 @@ export interface QuizQuestion {
   normalizedCorrectShortcut: string;
   appId: string;
   appName: string;
+  isSequential?: boolean; // 順序押しショートカットかどうか
 }
 
 export interface QuizStats {

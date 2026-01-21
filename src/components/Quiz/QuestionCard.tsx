@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuiz } from '../../context/QuizContext';
 import { getCodeDisplayName } from '../../utils/keyMapping';
+import { formatSequentialShortcut } from '../../utils/sequentialShortcuts';
 import styles from './QuestionCard.module.css';
 
 function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' }) {
@@ -74,12 +75,26 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
           {currentQuestion.question.replace(/^【.*?】/, '')}
         </div>
 
+        {/* 順序押しバッジ */}
+        {currentQuestion.isSequential && (
+          <div className={styles.sequentialBadge}>
+            <span className={styles.sequentialIcon}>🔢</span>
+            <span className={styles.sequentialText}>順序押し</span>
+            <span className={styles.sequentialExample}>
+              {formatSequentialShortcut(currentQuestion.correctShortcut)}
+            </span>
+          </div>
+        )}
+
         {/* 指示テキストと押したキー表示 */}
         <div className={styles.instructionBox}>
           <div className={styles.instructionText}>
             <span className={styles.instructionIcon}>⌨️</span>
             <span className={styles.instructionLabel}>
-              正しいショートカットキーを押してください
+              {currentQuestion.isSequential
+                ? 'キーを順番に押してください（Alt を押したまま順番に押す）'
+                : '正しいショートカットキーを押してください'
+              }
             </span>
           </div>
 

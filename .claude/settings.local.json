@@ -14,7 +14,13 @@
       "Bash(do sed -i \"/^import.*''prop-types''/d\" \"$file\")",
       "Bash(done)",
       "Bash(git commit:*)",
-      "Bash(timeout 30 npm run build:*)"
+      "Bash(timeout 30 npm run build:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(bc:*)",
+      "Bash(npm run deploy:*)",
+      "Bash(npm run:*)",
+      "Bash(timeout 60 npm run build:*)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []

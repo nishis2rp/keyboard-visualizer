@@ -6,6 +6,7 @@ import {
 import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
 import { matchesDifficulty } from '../constants/shortcutDifficulty';
 import { allShortcuts } from '../data/shortcuts';
+import { isSequentialShortcut } from './sequentialShortcuts';
 
 // OSを検出
 const currentOS = detectOS();
@@ -222,12 +223,15 @@ export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default'
   const randomIndex = Math.floor(Math.random() * allSafeShortcuts.length);
   const selected = allSafeShortcuts[randomIndex];
 
+  const isSeq = isSequentialShortcut(selected.shortcut);
+
   const question = {
     question: `【${selected.appName}】${selected.description}のショートカットは？`,
     correctShortcut: selected.shortcut,
     normalizedCorrectShortcut: normalizeShortcut(selected.shortcut),
     appName: selected.appName,
     appId: selected.appId,
+    isSequential: isSeq,
   };
 
   return question;
