@@ -4,6 +4,7 @@ import {
   detectOS
 } from '../constants/systemProtectedShortcuts';
 import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
+import { matchesDifficulty } from '../constants/shortcutDifficulty';
 import { allShortcuts } from '../data/shortcuts';
 
 // OSを検出
@@ -175,9 +176,10 @@ export const getCompatibleApps = (keyboardLayout) => {
  * @param {string} quizMode - The quiz mode ('default' or 'hardcore').
  * @param {boolean} isFullscreen - Whether fullscreen mode is active.
  * @param {Set<string>} usedShortcuts - Set of already used normalized shortcuts to avoid duplicates.
+ * @param {'basic' | 'standard' | 'madmax'} difficulty - The difficulty level.
  * @returns {{question: string, correctShortcut: string, normalizedCorrectShortcut: string, appName: string} | null} A question object, or null if no shortcuts are available.
  */
-export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false, usedShortcuts = new Set()) => {
+export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false, usedShortcuts = new Set(), difficulty: 'basic' | 'standard' | 'madmax' = 'standard') => {
   // 全ての許可されたアプリのショートカットを収集
   const allSafeShortcuts = [];
 
@@ -194,17 +196,20 @@ export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default'
       return isShortcutSafe(shortcut, quizMode, isFullscreen);
     });
 
-    // 各ショートカットにアプリ情報を追加（未使用のもののみ）
+    // 各ショートカットにアプリ情報を追加（未使用 & 難易度に適合するもののみ）
     safeShortcuts.forEach(([shortcut, description]) => {
       const normalized = normalizeShortcut(shortcut);
       // 既に出題済みのショートカットは除外
       if (!usedShortcuts.has(normalized)) {
-        allSafeShortcuts.push({
-          appId,
-          appName: APP_DISPLAY_NAMES[appId] || appId,
-          shortcut,
-          description
-        });
+        // 難易度フィルタリング
+        if (matchesDifficulty(normalized, difficulty)) {
+          allSafeShortcuts.push({
+            appId,
+            appName: APP_DISPLAY_NAMES[appId] || appId,
+            shortcut,
+            description
+          });
+        }
       }
     });
   });

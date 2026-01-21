@@ -120,39 +120,39 @@
 .setup-quiz-apps {
   margin-bottom: 16px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
 
 .setup-quiz-apps .setup-option {
   flex-direction: column;
   text-align: center;
-  padding: 12px 10px;
+  padding: 10px 8px;
   position: relative;
 }
 
 .setup-quiz-apps .option-icon {
   margin-right: 0;
-  margin-bottom: 6px;
-  font-size: 28px;
+  margin-bottom: 4px;
+  font-size: 24px;
 }
 
 .setup-quiz-apps .option-check {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  font-size: 16px;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
 }
 
 .setup-quiz-apps .option-content h3 {
-  font-size: 16px;
+  font-size: 14px;
   margin: 0 0 2px 0;
 }
 
 .setup-quiz-apps .option-content p {
-  font-size: 12px;
+  font-size: 11px;
   margin: 0;
 }
 
@@ -297,10 +297,18 @@
   }
 
   .setup-quiz-apps {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .setup-quiz-apps .option-icon {
-    font-size: 36px;
+    font-size: 28px;
+  }
+
+  .setup-quiz-apps .option-content h3 {
+    font-size: 16px;
+  }
+
+  .setup-quiz-apps .option-content p {
+    font-size: 12px;
   }
 }

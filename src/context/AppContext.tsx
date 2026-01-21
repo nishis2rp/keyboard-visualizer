@@ -25,6 +25,7 @@ interface AppContextType {
   keyboardLayout: string;
   isQuizMode: boolean;
   quizApp: string | null;
+  quizDifficulty: string | null;
   shortcutDescriptions: ShortcutData;
   keyboardLayouts: KeyboardLayoutOption[];
   apps: App[];
@@ -34,7 +35,8 @@ interface AppContextType {
   setKeyboardLayout: (layout: string) => void;
   setIsQuizMode: (mode: boolean) => void;
   setQuizApp: (app: string | null) => void;
-  handleSetupComplete: (app: string, layout: string, mode?: string, quizApp?: string | null) => void;
+  setQuizDifficulty: (difficulty: string | null) => void;
+  handleSetupComplete: (app: string, layout: string, mode?: string, quizApp?: string | null, difficulty?: string) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -59,13 +61,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [keyboardLayout, setKeyboardLayout] = useState(setup.layout || DEFAULTS.LAYOUT);
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizApp, setQuizApp] = useState<string | null>(null);
+  const [quizDifficulty, setQuizDifficulty] = useState<string | null>(null);
   const [apps] = useState(appConfig); // stateとして保持
 
-  const handleSetupComplete = useCallback((app, layout, mode = 'visualizer', quizAppParam = null) => {
+  const handleSetupComplete = useCallback((app, layout, mode = 'visualizer', quizAppParam = null, difficulty = null) => {
     setSelectedApp(app);
     setKeyboardLayout(layout);
     setIsQuizMode(mode === 'quiz');
     setQuizApp(quizAppParam);
+    setQuizDifficulty(difficulty);
     setSetup({
       setupCompleted: true,
       app,
@@ -95,6 +99,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     keyboardLayout,
     isQuizMode,
     quizApp,
+    quizDifficulty,
     shortcutDescriptions,
     keyboardLayouts,
     apps, // appsを提供
@@ -106,6 +111,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setKeyboardLayout,
     setIsQuizMode,
     setQuizApp,
+    setQuizDifficulty,
     handleSetupComplete,
   };
 

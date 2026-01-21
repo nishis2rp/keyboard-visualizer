@@ -6,6 +6,7 @@ import { ALWAYS_PROTECTED_SHORTCUTS, FULLSCREEN_PREVENTABLE_SHORTCUTS } from '..
 
 interface QuizSettings {
   quizMode: 'default' | 'hardcore';
+  difficulty: 'basic' | 'standard' | 'madmax';
   timeLimit: number;
   totalQuestions: number;
   isFullscreen: boolean;
@@ -38,7 +39,7 @@ interface QuizState {
 }
 
 type QuizAction =
-  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean } }
+  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: string } }
   | { type: 'SET_QUESTION'; payload: { question: QuizQuestion } }
   | { type: 'ANSWER_QUESTION'; payload: { userAnswer: string; isCorrect: boolean; answerTimeMs: number } }
   | { type: 'SKIP_QUESTION' }
@@ -56,7 +57,7 @@ type QuizAction =
 interface QuizContextType {
   quizState: QuizState;
   dispatch: Dispatch<QuizAction>;
-  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string) => void;
+  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: 'basic' | 'standard' | 'madmax') => void;
   handleAnswer: (pressedCodes: Set<string>) => void;
   getNextQuestion: () => void;
   updateFullscreen: (isFullscreen: boolean) => void;
@@ -81,6 +82,7 @@ const initialQuizState: QuizState = {
   endTime: null,
   settings: {
     quizMode: 'default',
+    difficulty: 'standard',
     timeLimit: 10,
     totalQuestions: 10,
     isFullscreen: false,
@@ -99,6 +101,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         settings: {
           ...state.settings,
           isFullscreen: action.payload.isFullscreen, // 現在のフルスクリーン状態を反映
+          difficulty: action.payload.difficulty as 'basic' | 'standard' | 'madmax', // 難易度を設定
         },
         startTime: Date.now(),
       };
@@ -252,7 +255,8 @@ export function QuizProvider({ children }: QuizProviderProps) {
       compatibleApps,
       'default', // デフォルトモードを使用
       quizState.settings.isFullscreen,
-      quizState.usedShortcuts
+      quizState.usedShortcuts,
+      quizState.settings.difficulty // 難易度を渡す
     );
 
     if (newQuestion) {
@@ -265,9 +269,9 @@ export function QuizProvider({ children }: QuizProviderProps) {
 
 
   // クイズを開始する
-  const startQuiz = useCallback((app, isFullscreen, keyboardLayout) => {
+  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'madmax' = 'standard') => {
 
-    dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout } });
+    dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
 
     // キーボードレイアウトに基づいて互換性のあるアプリを取得
     let compatibleApps = getCompatibleApps(keyboardLayout);
@@ -285,7 +289,8 @@ export function QuizProvider({ children }: QuizProviderProps) {
         compatibleApps,
         'default', // デフォルトモードを使用
         isFullscreen,
-        new Set() // 最初の問題なので空のSet
+        new Set(), // 最初の問題なので空のSet
+        difficulty // 難易度を渡す
       );
 
       if (newQuestion) {

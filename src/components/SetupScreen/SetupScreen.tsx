@@ -5,7 +5,7 @@ import { useAppContext } from '../../context/AppContext'
 import './SetupScreen.css'
 
 interface SetupScreenProps {
-  onSetupComplete: (app: string, layout: string, mode: string, quizApp: string | null) => void;
+  onSetupComplete: (app: string, layout: string, mode: string, quizApp: string | null, difficulty?: string) => void;
 }
 
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
@@ -13,6 +13,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const [selectedOption, setSelectedOption] = useState(null)
   const [selectedMode, setSelectedMode] = useState(null)
   const [selectedQuizApp, setSelectedQuizApp] = useState(null)
+  const [selectedDifficulty, setSelectedDifficulty] = useState(null)
 
   // クイズモードが既に有効な場合、モード選択をスキップ
   useEffect(() => {
@@ -63,6 +64,28 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     }
   ]
 
+  // 難易度選択肢
+  const difficultyOptions = [
+    {
+      id: 'basic',
+      name: 'Basic',
+      icon: '🌟',
+      description: 'よく使われるショートカットのみ出題'
+    },
+    {
+      id: 'standard',
+      name: 'Standard',
+      icon: '⚡',
+      description: 'すべてのショートカットからランダムに出題'
+    },
+    {
+      id: 'madmax',
+      name: 'MadMax',
+      icon: '🔥',
+      description: 'あまり使わないショートカットのみ出題'
+    }
+  ]
+
   // クイズ用のアプリ選択肢（ランダムを含む）
   const quizAppOptions = [
     {
@@ -83,9 +106,10 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
 
   const handleSelectMode = (mode) => {
     setSelectedMode(mode)
-    // クイズモード以外を選択した場合、アプリ選択をリセット
+    // クイズモード以外を選択した場合、アプリ選択と難易度をリセット
     if (mode.id !== 'quiz') {
       setSelectedQuizApp(null)
+      setSelectedDifficulty(null)
     }
   }
 
@@ -93,10 +117,14 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     setSelectedQuizApp(app)
   }
 
+  const handleSelectDifficulty = (difficulty) => {
+    setSelectedDifficulty(difficulty)
+  }
+
   const handleConfirm = () => {
-    // ビジュアライザーモードの場合、またはクイズモードでアプリが選択されている場合
+    // ビジュアライザーモードの場合、またはクイズモードでアプリと難易度が選択されている場合
     const canProceed = selectedOption && selectedMode &&
-      (selectedMode.id !== 'quiz' || selectedQuizApp)
+      (selectedMode.id !== 'quiz' || (selectedQuizApp && selectedDifficulty))
 
     if (canProceed) {
       localStorage.setItem('keyboard-visualizer-setup', JSON.stringify({
@@ -106,12 +134,13 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         version: SETUP_VERSION
       }))
 
-      // クイズモードの場合は選択されたアプリも渡す
+      // クイズモードの場合は選択されたアプリと難易度も渡す
       onSetupComplete(
         selectedOption.app,
         selectedOption.layout,
         selectedMode.id,
-        selectedMode.id === 'quiz' ? selectedQuizApp.id : null
+        selectedMode.id === 'quiz' ? selectedQuizApp.id : null,
+        selectedMode.id === 'quiz' ? selectedDifficulty.id : undefined
       )
     }
   }
@@ -172,6 +201,34 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
           </>
         )}
 
+        {/* クイズモードが選択された場合、難易度選択を表示 */}
+        {selectedMode?.id === 'quiz' && (
+          <>
+            <div className="setup-divider">
+              <h3>難易度を選択してください</h3>
+            </div>
+
+            <div className="setup-options setup-modes">
+              {difficultyOptions.map((difficulty) => (
+                <div
+                  key={difficulty.id}
+                  className={`setup-option ${selectedDifficulty?.id === difficulty.id ? 'selected' : ''}`}
+                  onClick={() => handleSelectDifficulty(difficulty)}
+                >
+                  <div className="option-icon">{difficulty.icon}</div>
+                  <div className="option-content">
+                    <h3>{difficulty.name}</h3>
+                    <p>{difficulty.description}</p>
+                  </div>
+                  <div className="option-check">
+                    {selectedDifficulty?.id === difficulty.id && '✓'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
         {/* クイズモードが選択された場合、アプリケーション選択を表示 */}
         {selectedMode?.id === 'quiz' && (
           <>
@@ -204,12 +261,14 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
           <button
             className="setup-confirm-btn"
             onClick={handleConfirm}
-            disabled={!selectedOption || !selectedMode || (selectedMode?.id === 'quiz' && !selectedQuizApp)}
+            disabled={!selectedOption || !selectedMode || (selectedMode?.id === 'quiz' && (!selectedDifficulty || !selectedQuizApp))}
           >
             {!selectedOption
               ? '環境を選択してください'
               : !selectedMode
               ? 'モードを選択してください'
+              : selectedMode.id === 'quiz' && !selectedDifficulty
+              ? '難易度を選択してください'
               : selectedMode.id === 'quiz' && !selectedQuizApp
               ? 'アプリケーションを選択してください'
               : '開始する'}
