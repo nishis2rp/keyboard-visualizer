@@ -15,7 +15,7 @@ function App() {
     isQuizMode,
     setIsQuizMode
   } = useAppContext();
-  
+
   const { isFullscreenMode, toggleFullscreenMode } = useFullscreen();
 
   const handleQuizModeToggle = () => {
@@ -29,8 +29,27 @@ function App() {
     }
   };
 
+  const handleSetupCompleteWithFullscreen = (
+    app: string,
+    layout: string,
+    mode: string,
+    quizApp: string | null,
+    difficulty?: string,
+    shouldBeFullscreen?: boolean
+  ) => {
+    // 全画面モードの状態を適用
+    if (shouldBeFullscreen && !isFullscreenMode) {
+      toggleFullscreenMode();
+    } else if (!shouldBeFullscreen && isFullscreenMode) {
+      toggleFullscreenMode();
+    }
+
+    // 元のhandleSetupCompleteを呼び出す
+    handleSetupComplete(app, layout, mode, quizApp, difficulty, shouldBeFullscreen);
+  };
+
   if (showSetup) {
-    return <SetupScreen onSetupComplete={handleSetupComplete} />;
+    return <SetupScreen onSetupComplete={handleSetupCompleteWithFullscreen} />;
   }
 
   return (

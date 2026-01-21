@@ -36,7 +36,7 @@ interface AppContextType {
   setIsQuizMode: (mode: boolean) => void;
   setQuizApp: (app: string | null) => void;
   setQuizDifficulty: (difficulty: string | null) => void;
-  handleSetupComplete: (app: string, layout: string, mode?: string, quizApp?: string | null, difficulty?: string) => void;
+  handleSetupComplete: (app: string, layout: string, mode?: string, quizApp?: string | null, difficulty?: string, isFullscreen?: boolean) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -64,7 +64,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [quizDifficulty, setQuizDifficulty] = useState<string | null>(null);
   const [apps] = useState(appConfig); // stateとして保持
 
-  const handleSetupComplete = useCallback((app, layout, mode = 'visualizer', quizAppParam = null, difficulty = null) => {
+  const handleSetupComplete = useCallback((app, layout, mode = 'visualizer', quizAppParam = null, difficulty = null, isFullscreen = false) => {
     setSelectedApp(app);
     setKeyboardLayout(layout);
     setIsQuizMode(mode === 'quiz');
@@ -76,6 +76,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       layout
     });
     setShowSetup(false);
+    // 全画面モードの情報はApp.tsxで処理される
   }, [setSetup]);
 
   const shortcutDescriptions = useMemo(

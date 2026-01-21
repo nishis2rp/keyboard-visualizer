@@ -5,11 +5,12 @@ import { useAppContext } from '../../context/AppContext'
 import './SetupScreen.css'
 
 interface SetupScreenProps {
-  onSetupComplete: (app: string, layout: string, mode: string, quizApp: string | null, difficulty?: string) => void;
+  onSetupComplete: (app: string, layout: string, mode: string, quizApp: string | null, difficulty?: string, isFullscreen?: boolean) => void;
 }
 
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const { isQuizMode } = useAppContext()
+  const [selectedFullscreen, setSelectedFullscreen] = useState(null)
   const [selectedOption, setSelectedOption] = useState(null)
   const [selectedMode, setSelectedMode] = useState(null)
   const [selectedQuizApp, setSelectedQuizApp] = useState(null)
@@ -21,6 +22,21 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
       setSelectedMode({ id: 'quiz', title: 'クイズモード', icon: '🎯' })
     }
   }, [isQuizMode])
+
+  const fullscreenOptions = [
+    {
+      id: 'fullscreen',
+      title: '全画面モード',
+      icon: '🖥️',
+      description: 'フルスクリーン表示で集中して学習'
+    },
+    {
+      id: 'windowed',
+      title: 'ウィンドウモード',
+      icon: '🪟',
+      description: '他のウィンドウと並べて使用'
+    }
+  ]
 
   const options = [
     {
@@ -100,6 +116,10 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     }))
   ]
 
+  const handleSelectFullscreen = (option) => {
+    setSelectedFullscreen(option)
+  }
+
   const handleSelect = (option) => {
     setSelectedOption(option)
   }
@@ -123,7 +143,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
 
   const handleConfirm = () => {
     // ビジュアライザーモードの場合、またはクイズモードでアプリと難易度が選択されている場合
-    const canProceed = selectedOption && selectedMode &&
+    const canProceed = selectedFullscreen && selectedOption && selectedMode &&
       (selectedMode.id !== 'quiz' || (selectedQuizApp && selectedDifficulty))
 
     if (canProceed) {
@@ -140,7 +160,8 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         selectedOption.layout,
         selectedMode.id,
         selectedMode.id === 'quiz' ? selectedQuizApp.id : null,
-        selectedMode.id === 'quiz' ? selectedDifficulty.id : undefined
+        selectedMode.id === 'quiz' ? selectedDifficulty.id : undefined,
+        selectedFullscreen.id === 'fullscreen'
       )
     }
   }
@@ -154,7 +175,36 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
           <p>お使いの環境を選択してください</p>
         </div>
 
-        <div className="setup-options">
+        {/* 全画面モード選択 */}
+        <div className="setup-divider">
+          <h3>表示モードを選択してください</h3>
+        </div>
+
+        <div className="setup-options setup-modes">
+          {fullscreenOptions.map((option) => (
+            <div
+              key={option.id}
+              className={`setup-option ${selectedFullscreen?.id === option.id ? 'selected' : ''}`}
+              onClick={() => handleSelectFullscreen(option)}
+            >
+              <div className="option-icon">{option.icon}</div>
+              <div className="option-content">
+                <h3>{option.title}</h3>
+                <p>{option.description}</p>
+              </div>
+              <div className="option-check">
+                {selectedFullscreen?.id === option.id && '✓'}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* キーボードレイアウト選択 */}
+        <div className="setup-divider">
+          <h3>キーボード環境を選択してください</h3>
+        </div>
+
+        <div className="setup-options setup-layouts">
           {options.map((option) => (
             <div
               key={option.id}
@@ -261,10 +311,12 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
           <button
             className="setup-confirm-btn"
             onClick={handleConfirm}
-            disabled={!selectedOption || !selectedMode || (selectedMode?.id === 'quiz' && (!selectedDifficulty || !selectedQuizApp))}
+            disabled={!selectedFullscreen || !selectedOption || !selectedMode || (selectedMode?.id === 'quiz' && (!selectedDifficulty || !selectedQuizApp))}
           >
-            {!selectedOption
-              ? '環境を選択してください'
+            {!selectedFullscreen
+              ? '表示モードを選択してください'
+              : !selectedOption
+              ? 'キーボード環境を選択してください'
               : !selectedMode
               ? 'モードを選択してください'
               : selectedMode.id === 'quiz' && !selectedDifficulty

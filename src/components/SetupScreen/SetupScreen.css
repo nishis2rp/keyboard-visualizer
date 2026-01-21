@@ -23,12 +23,12 @@
 
 .setup-container {
   background: white;
-  border-radius: 24px;
+  border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   max-width: 800px;
   max-height: 90vh;
   width: 90%;
-  padding: 40px;
+  padding: 20px 32px;
   overflow-y: auto;
   animation: slideUp 0.4s ease;
 }
@@ -46,23 +46,23 @@
 
 .setup-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 12px;
 }
 
 .setup-header h1 {
-  font-size: 32px;
-  margin: 0 0 8px 0;
+  font-size: 24px;
+  margin: 0 0 4px 0;
   color: #1a202c;
 }
 
 .setup-header h2 {
-  font-size: 24px;
-  margin: 0 0 8px 0;
+  font-size: 18px;
+  margin: 0 0 4px 0;
   color: #2d3748;
 }
 
 .setup-header p {
-  font-size: 16px;
+  font-size: 13px;
   color: #718096;
   margin: 0;
 }
@@ -70,50 +70,85 @@
 .setup-options {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 32px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .setup-divider {
   text-align: center;
-  margin: 32px 0 24px 0;
-  padding-top: 24px;
+  margin: 12px 0 8px 0;
+  padding-top: 12px;
   border-top: 2px solid #e2e8f0;
 }
 
+.setup-divider:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
 .setup-divider h3 {
-  font-size: 20px;
+  font-size: 16px;
   color: #2d3748;
   margin: 0;
 }
 
 .setup-modes {
-  margin-bottom: 24px;
+  margin-bottom: 8px;
   flex-direction: row;
-  gap: 12px;
+  gap: 8px;
 }
 
 .setup-modes .setup-option {
   flex: 1;
   flex-direction: column;
   text-align: center;
-  padding: 24px 16px;
+  padding: 12px 10px;
 }
 
 .setup-modes .option-icon {
   margin-right: 0;
-  margin-bottom: 12px;
-  font-size: 56px;
+  margin-bottom: 6px;
+  font-size: 40px;
 }
 
 .setup-modes .option-check {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 8px;
+  font-size: 16px;
 }
 
 .setup-modes .setup-option {
   position: relative;
+}
+
+/* キーボードレイアウト選択のスタイル */
+.setup-layouts {
+  margin-bottom: 8px;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.setup-layouts .setup-option {
+  flex: 1;
+  flex-direction: column;
+  text-align: center;
+  padding: 12px 10px;
+  position: relative;
+}
+
+.setup-layouts .option-icon {
+  margin-right: 0;
+  margin-bottom: 6px;
+  font-size: 40px;
+}
+
+.setup-layouts .option-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 16px;
 }
 
 /* クイズアプリ選択のスタイル */
@@ -191,14 +226,14 @@
 }
 
 .option-content h3 {
-  margin: 0 0 4px 0;
-  font-size: 20px;
+  margin: 0 0 3px 0;
+  font-size: 16px;
   color: #1a202c;
 }
 
 .option-content p {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   color: #718096;
 }
 
@@ -224,17 +259,18 @@
 
 .setup-footer {
   text-align: center;
+  margin-top: 12px;
 }
 
 .setup-confirm-btn {
   width: 100%;
-  padding: 16px 32px;
-  font-size: 18px;
+  padding: 12px 28px;
+  font-size: 15px;
   font-weight: 600;
   color: white;
   background: linear-gradient(135deg, #667eea, #764ba2);
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
@@ -256,8 +292,8 @@
 }
 
 .setup-note {
-  margin-top: 16px;
-  font-size: 14px;
+  margin-top: 10px;
+  font-size: 12px;
   color: #718096;
 }
 
