@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import { getProtectionLevel } from '../../constants'
 import { isSequentialShortcut } from '../../utils/shortcutUtils'
+import { isModifierKeyName, isWindowsKeyName } from '../../utils/keyUtils'
 
 /**
  * ショートカットカードコンポーネント
@@ -73,15 +74,6 @@ const ShortcutCard = memo(({ shortcut, description, appContext = null, showDebug
     }
   }
 
-  // 修飾キーかどうかを判定
-  const isModifierKey = (keyName: string) => {
-    return ['Ctrl', 'Shift', 'Alt', 'Cmd', 'Option'].includes(keyName)
-  }
-
-  // Windowsキーかどうかを判定
-  const isWindowsKey = (keyName: string) => {
-    return keyName === 'Win'
-  }
 
   // ショートカット文字列をパースしてキーをボタンとして表示
   const renderShortcut = () => {
@@ -105,7 +97,7 @@ const ShortcutCard = memo(({ shortcut, description, appContext = null, showDebug
               </span>
             )}
             <span
-              className={`key ${isWindowsKey(part) ? 'windows-key' : (isModifierKey(part) ? 'modifier-key' : '')}`}
+              className={`key ${isWindowsKeyName(part) ? 'windows-key' : (isModifierKeyName(part) ? 'modifier-key' : '')}`}
               style={{
                 padding: '2px 6px',
                 fontSize: '0.75em',

@@ -1,5 +1,5 @@
-import { memo } from 'react'
 import { App } from '../../types'
+import { Selector } from '../common/Selector'
 
 interface AppSelectorProps {
   apps: App[];
@@ -12,26 +12,15 @@ interface AppSelectorProps {
  *
  * 利用可能なアプリケーションの一覧を表示し、選択できるようにする
  */
-const AppSelector = memo<AppSelectorProps>(({ apps, selectedApp, onSelectApp }) => {
+const AppSelector = ({ apps, selectedApp, onSelectApp }: AppSelectorProps) => {
   return (
-    <div className="selector-section">
-      <h3 className="selector-title">アプリケーション</h3>
-      <div className="app-selector">
-        {apps.map(app => (
-          <button
-            key={app.id}
-            className={`app-tab ${selectedApp === app.id ? 'active' : ''}`}
-            onClick={() => onSelectApp(app.id)}
-          >
-            <span className="app-icon">{app.icon}</span>
-            <span className="app-name">{app.name}</span>
-          </button>
-        ))}
-      </div>
-    </div>
+    <Selector
+      title="アプリケーション"
+      items={apps}
+      selectedId={selectedApp}
+      onSelect={onSelectApp}
+    />
   )
-})
-
-AppSelector.displayName = 'AppSelector'
+}
 
 export default AppSelector

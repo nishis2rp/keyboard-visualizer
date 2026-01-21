@@ -2,24 +2,12 @@ import { memo } from 'react'
 import { getSingleKeyShortcuts } from '../../utils'
 import ShortcutCard from '../ShortcutCard'
 import { getCodeDisplayName } from '../../utils/keyMapping'
-
-// 修飾キーのコードベースの表示順序
-const MODIFIER_CODE_DISPLAY_ORDER = [
-  'ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight',
-  'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'
-]
-
-// 修飾キーのコードリスト
-const MODIFIER_CODES = new Set(MODIFIER_CODE_DISPLAY_ORDER)
-
-// Windowsキーのコードリスト
-const WINDOWS_KEY_CODES = new Set(['MetaLeft', 'MetaRight'])
-
-// 修飾キーかどうかを判定する関数
-const isModifierKey = (code) => MODIFIER_CODES.has(code)
-
-// Windowsキーかどうかを判定する関数
-const isWindowsKey = (code) => WINDOWS_KEY_CODES.has(code)
+import {
+  MODIFIER_CODE_DISPLAY_ORDER,
+  MODIFIER_CODES,
+  isModifierKey,
+  isWindowsKey
+} from '../../utils/keyUtils'
 
 const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), description, availableShortcuts = [], selectedApp, shortcutDescriptions = {}, keyboardLayout }) => {
   // Shiftキーが押されているか判定（getCodeDisplayNameに渡すため）

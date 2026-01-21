@@ -1,4 +1,5 @@
 import { getCodeDisplayName, getShiftedSymbolForKey } from './keyMapping'
+import { MODIFIER_ORDER } from './keyUtils'
 
 /**
  * キー名 (KeyboardEvent.key) を正規化する。
@@ -12,14 +13,6 @@ export const normalizeKey = (key) => {
     return key.toLowerCase()
   }
   return key
-}
-
-/** 修飾キーのソート順序 (KeyboardEvent.code) */
-const MODIFIER_ORDER = {
-  'ControlLeft': 1, 'ControlRight': 1,
-  'ShiftLeft': 2, 'ShiftRight': 2,
-  'AltLeft': 3, 'AltRight': 3,
-  'MetaLeft': 4, 'MetaRight': 4,
 }
 
 /** 利用可能なショートカットの最大表示数 */

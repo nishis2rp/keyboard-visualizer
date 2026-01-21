@@ -11,24 +11,8 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
   const [currentDescription, setCurrentDescription] = useState(null);
   const [availableShortcuts, setAvailableShortcuts] = useState([]);
 
-  // イベントリスナー内で最新のProps/Stateを参照するためのRef
-  const isQuizModeRef = useRef(isQuizMode);
-  const keyboardLayoutRef = useRef(keyboardLayout);
-  const shortcutDescriptionsRef = useRef(shortcutDescriptions);
+  // pressedKeys は頻繁に更新されるため、イベントハンドラ内で最新の値を参照するために Ref を使用
   const pressedKeysRef = useRef(pressedKeys);
-
-  // isQuizMode, keyboardLayout, shortcutDescriptions, pressedKeysが変更されたらRefも更新
-  useEffect(() => {
-    isQuizModeRef.current = isQuizMode;
-  }, [isQuizMode]);
-
-  useEffect(() => {
-    keyboardLayoutRef.current = keyboardLayout;
-  }, [keyboardLayout]);
-
-  useEffect(() => {
-    shortcutDescriptionsRef.current = shortcutDescriptions;
-  }, [shortcutDescriptions]);
 
   useEffect(() => {
     pressedKeysRef.current = pressedKeys;
@@ -37,18 +21,18 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
   // すべてのキーをクリアする関数
   const clearAllKeys = useCallback(() => {
     setPressedKeys(new Set());
-    if (!isQuizModeRef.current) {
+    if (!isQuizMode) {
       setCurrentDescription(null);
       setAvailableShortcuts([]);
     }
-  }, []);
+  }, [isQuizMode]);
 
   // 履歴にショートカットを追加する関数
   const addToHistory = useCallback((codes) => {
-    if (isQuizModeRef.current) return;
+    if (isQuizMode) return;
 
-    const comboText = getKeyComboText(codes, keyboardLayoutRef.current);
-    const description = getShortcutDescription(comboText, shortcutDescriptionsRef.current);
+    const comboText = getKeyComboText(codes, keyboardLayout);
+    const description = getShortcutDescription(comboText, shortcutDescriptions);
 
     setHistory(prev => {
       if (prev.length === 0 || prev[0].combo !== comboText) {
@@ -56,7 +40,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
       }
       return prev;
     });
-  }, []);
+  }, [isQuizMode, keyboardLayout, shortcutDescriptions]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -85,8 +69,8 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
       // キーリピート時の処理：現在のキー組み合わせがショートカットの場合はpreventDefaultする
       if (repeat || pressedKeysRef.current.has(code)) {
         // 現在押されているキーの組み合わせがショートカットかチェック
-        const currentComboText = getKeyComboText(Array.from(pressedKeysRef.current), keyboardLayoutRef.current);
-        const currentDescription = getShortcutDescription(currentComboText, shortcutDescriptionsRef.current);
+        const currentComboText = getKeyComboText(Array.from(pressedKeysRef.current), keyboardLayout);
+        const currentDescription = getShortcutDescription(currentComboText, shortcutDescriptions);
         const isCurrentShortcut = !!currentDescription;
 
         // ショートカットの場合、またはシステムショートカットの場合はpreventDefault
@@ -101,16 +85,16 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
 
       const newPressedKeys = new Set(pressedKeysRef.current);
       newPressedKeys.add(code);
-      
-      const comboText = getKeyComboText(Array.from(newPressedKeys), keyboardLayoutRef.current);
-      const description = getShortcutDescription(comboText, shortcutDescriptionsRef.current);
+
+      const comboText = getKeyComboText(Array.from(newPressedKeys), keyboardLayout);
+      const description = getShortcutDescription(comboText, shortcutDescriptions);
       const isShortcut = !!description;
 
       // クイズモード中は、開発用キー（F5, F12）を除き、全ての修飾キー付き入力をブロック
       const isDevelopmentKey = ['F5', 'F12'].includes(code);
       const hasModifier = metaKey || ctrlKey || altKey || (shiftKey && (metaKey || ctrlKey || altKey));
 
-      if (isQuizModeRef.current) {
+      if (isQuizMode) {
         // クイズモード: 開発用キー以外の修飾キー付き入力をすべてブロック
         if (hasModifier && !isDevelopmentKey) {
           e.preventDefault();
@@ -125,9 +109,9 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
 
       setPressedKeys(newPressedKeys);
 
-      if (!isQuizModeRef.current) {
+      if (!isQuizMode) {
         setCurrentDescription(description);
-        const shortcuts = getAvailableShortcuts(Array.from(newPressedKeys), keyboardLayoutRef.current, shortcutDescriptionsRef.current);
+        const shortcuts = getAvailableShortcuts(Array.from(newPressedKeys), keyboardLayout, shortcutDescriptions);
         setAvailableShortcuts(shortcuts);
       }
     };
@@ -146,7 +130,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
         setPressedKeys(newPressedKeys);
 
         // クイズモードでない場合は、残っているキーに基づいて説明とショートカット候補を更新
-        if (!isQuizModeRef.current) {
+        if (!isQuizMode) {
           const remainingKeys = Array.from(newPressedKeys);
 
           if (remainingKeys.length === 0) {
@@ -162,14 +146,14 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
             if (allModifiers) {
               // 修飾キーのみが残っている場合は、その修飾キーで利用可能なショートカット候補を表示
               setCurrentDescription(null);
-              const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayoutRef.current, shortcutDescriptionsRef.current);
+              const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayout, shortcutDescriptions);
               setAvailableShortcuts(shortcuts);
             } else {
               // 非修飾キーが残っている場合は、新しい組み合わせの説明を更新
-              const comboText = getKeyComboText(remainingKeys, keyboardLayoutRef.current);
-              const description = getShortcutDescription(comboText, shortcutDescriptionsRef.current);
+              const comboText = getKeyComboText(remainingKeys, keyboardLayout);
+              const description = getShortcutDescription(comboText, shortcutDescriptions);
               setCurrentDescription(description);
-              const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayoutRef.current, shortcutDescriptionsRef.current);
+              const shortcuts = getAvailableShortcuts(remainingKeys, keyboardLayout, shortcutDescriptions);
               setAvailableShortcuts(shortcuts);
             }
           }
@@ -191,7 +175,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
       document.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('blur', handleBlur);
     };
-  }, []); // マウント時のみイベントリスナーを登録
+  }, [isQuizMode, keyboardLayout, shortcutDescriptions, addToHistory, clearAllKeys]); // 依存関係を適切に設定
 
   const handleClearHistory = () => {
     setHistory([]);

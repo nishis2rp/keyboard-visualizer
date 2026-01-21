@@ -1,6 +1,6 @@
-import { memo } from 'react'
+import { Selector, SelectorItem } from '../common/Selector'
 
-interface KeyboardLayoutOption {
+interface KeyboardLayoutOption extends SelectorItem {
   id: string;
   icon: string;
   name: string;
@@ -17,26 +17,15 @@ interface KeyboardLayoutSelectorProps {
  *
  * 利用可能なキーボード配列の一覧を表示し、選択できるようにする
  */
-const KeyboardLayoutSelector = memo<KeyboardLayoutSelectorProps>(({ layouts, selectedLayout, onSelectLayout }) => {
+const KeyboardLayoutSelector = ({ layouts, selectedLayout, onSelectLayout }: KeyboardLayoutSelectorProps) => {
   return (
-    <div className="selector-section">
-      <h3 className="selector-title">キーボード配列</h3>
-      <div className="app-selector">
-        {layouts.map(layout => (
-          <button
-            key={layout.id}
-            className={`app-tab ${selectedLayout === layout.id ? 'active' : ''}`}
-            onClick={() => onSelectLayout(layout.id)}
-          >
-            <span className="app-icon">{layout.icon}</span>
-            <span className="app-name">{layout.name}</span>
-          </button>
-        ))}
-      </div>
-    </div>
+    <Selector
+      title="キーボード配列"
+      items={layouts}
+      selectedId={selectedLayout}
+      onSelect={onSelectLayout}
+    />
   )
-})
-
-KeyboardLayoutSelector.displayName = 'KeyboardLayoutSelector'
+}
 
 export default KeyboardLayoutSelector

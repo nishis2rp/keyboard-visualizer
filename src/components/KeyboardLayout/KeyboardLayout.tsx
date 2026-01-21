@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo, useCallback } from 'react'
 import { getKeyboardLayoutByName, getLayoutDisplayName } from '../../data/layouts'
 import { getCodeDisplayName } from '../../utils/keyMapping'
 import { PressedKeys, ShortcutData } from '../../types'
@@ -15,8 +15,8 @@ interface KeyboardLayoutProps {
 
 const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), specialKeys = new Set(), shortcutDescriptions = {}, keyboardLayout = 'windows-jis' }) => {
   // 現在のレイアウトを取得
-  const keyboardRows = getKeyboardLayoutByName(keyboardLayout)
-  const layoutName = getLayoutDisplayName(keyboardLayout)
+  const keyboardRows = useMemo(() => getKeyboardLayoutByName(keyboardLayout), [keyboardLayout])
+  const layoutName = useMemo(() => getLayoutDisplayName(keyboardLayout), [keyboardLayout])
 
   // キーが押されているかチェック
   const isKeyPressed = (keyObj) => { // keyObjを引数に
@@ -36,23 +36,27 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
     return isCodePressed; // codeがpressedKeysにあるかで判定
   }
 
-  // キーに関連するショートカットを取得
-  const getKeyShortcuts = (keyObj) => { // keyObjを引数に
+  // Shiftキーが押されているか確認（メモ化）
+  const shiftPressed = useMemo(
+    () => pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight'),
+    [pressedKeys]
+  );
+
+  // キーに関連するショートカットを取得（メモ化）
+  const getKeyShortcuts = useCallback((keyObj) => {
     if (!keyObj.code) return [];
 
-    const shiftPressed = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight');
-    const keyDisplayName = getCodeDisplayName(keyObj.code, keyObj.key, keyboardLayout, shiftPressed); // codeから表示名を取得
+    const keyDisplayName = getCodeDisplayName(keyObj.code, keyObj.key, keyboardLayout, shiftPressed);
     const shortcuts = []
 
     // 単一キーのショートカット
-    // shortcutDescriptionsは表示名（keyベース）で定義されていると仮定
     if (shortcutDescriptions[keyDisplayName]) {
       shortcuts.push({ combo: keyDisplayName, desc: shortcutDescriptions[keyDisplayName] })
     }
 
     // 修飾キーとの組み合わせ
     Object.entries(shortcutDescriptions).forEach(([combo, desc]) => {
-      const comboKeys = combo.split(' + ') // shortcutDescriptionsのキーは表示名ベース
+      const comboKeys = combo.split(' + ')
       const lastKey = comboKeys[comboKeys.length - 1]
 
       // キーの表示名がショートカットの最後のキーと一致するか
@@ -71,55 +75,57 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
       }
     });
 
-    return uniqueShortcuts // すべてのショートカットを表示
-  }
+    return uniqueShortcuts
+  }, [keyboardLayout, shortcutDescriptions, shiftPressed])
 
-  // Calculate grid positions for all keys
+  // Calculate grid positions for all keys（メモ化）
   // Grid columns: 72 (allows 0.25 increments: 1.0 = 4 cols, 1.25 = 5 cols, etc.)
   // Main keyboard: 62 cols (15.5 * 4), Gap: 2 cols, Navigation: 12 cols (3 * 4)
-  const GRID_MULTIPLIER = 4
-  const MAIN_KEYBOARD_END = 62
-  const NAV_BLOCK_START = 64
+  const keysWithPositions = useMemo(() => {
+    const GRID_MULTIPLIER = 4
+    const MAIN_KEYBOARD_END = 62
+    const NAV_BLOCK_START = 64
 
-  // Navigation keys that should be positioned on the right
-  const navKeys = new Set(['Fn', 'Home', 'PageUp', 'Delete', 'End', 'PageDown', 'Insert', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight', 'PrintScreen', 'ScrollLock', 'Pause', 'F13', 'F14', 'F15'])
+    // Navigation keys that should be positioned on the right
+    const navKeys = new Set(['Fn', 'Home', 'PageUp', 'Delete', 'End', 'PageDown', 'Insert', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight', 'PrintScreen', 'ScrollLock', 'Pause', 'F13', 'F14', 'F15'])
 
-  const keysWithPositions = keyboardRows.flatMap((row, rowIndex) => {
-    let mainColStart = 1
-    let navColStart = NAV_BLOCK_START
+    return keyboardRows.flatMap((row, rowIndex) => {
+      let mainColStart = 1
+      let navColStart = NAV_BLOCK_START
 
-    return row.map((keyObj) => {
-      const widthInCols = Math.round((keyObj.width || 1) * GRID_MULTIPLIER)
-      const isNavKey = navKeys.has(keyObj.code)
+      return row.map((keyObj) => {
+        const widthInCols = Math.round((keyObj.width || 1) * GRID_MULTIPLIER)
+        const isNavKey = navKeys.has(keyObj.code)
 
-      let colStart, colEnd
-      if (isNavKey) {
-        // Special handling for ArrowUp - center it in the nav block
-        if (keyObj.code === 'ArrowUp') {
-          colStart = NAV_BLOCK_START + 4 // Center position (skip 1 column)
-          colEnd = colStart + widthInCols
+        let colStart, colEnd
+        if (isNavKey) {
+          // Special handling for ArrowUp - center it in the nav block
+          if (keyObj.code === 'ArrowUp') {
+            colStart = NAV_BLOCK_START + 4 // Center position (skip 1 column)
+            colEnd = colStart + widthInCols
+          } else {
+            colStart = navColStart
+            colEnd = navColStart + widthInCols
+            navColStart = colEnd
+          }
         } else {
-          colStart = navColStart
-          colEnd = navColStart + widthInCols
-          navColStart = colEnd
+          colStart = mainColStart
+          colEnd = mainColStart + widthInCols
+          mainColStart = colEnd
         }
-      } else {
-        colStart = mainColStart
-        colEnd = mainColStart + widthInCols
-        mainColStart = colEnd
-      }
 
-      const rowStart = rowIndex + 1
-      const rowEnd = rowStart + (keyObj.rowSpan || 1)
-      const position = {
-        gridColumn: `${colStart} / ${colEnd}`,
-        gridRow: `${rowStart} / ${rowEnd}`,
-        width: keyObj.width || 1
-      }
+        const rowStart = rowIndex + 1
+        const rowEnd = rowStart + (keyObj.rowSpan || 1)
+        const position = {
+          gridColumn: `${colStart} / ${colEnd}`,
+          gridRow: `${rowStart} / ${rowEnd}`,
+          width: keyObj.width || 1
+        }
 
-      return { ...keyObj, ...position }
+        return { ...keyObj, ...position }
+      })
     })
-  })
+  }, [keyboardRows])
 
   return (
     <div className="keyboard-layout">

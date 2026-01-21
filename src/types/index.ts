@@ -3,6 +3,7 @@
 export interface App {
   id: string;
   name: string;
+  icon: string;
   os: 'windows' | 'mac' | 'cross-platform';
 }
 
@@ -13,17 +14,33 @@ export interface KeyboardLayout {
 }
 
 export interface KeyDefinition {
+  key?: string;
   code: string;
-  x: number;
-  y: number;
+  display?: string;
+  width?: number;
+  rowSpan?: number;
+  x?: number;
+  y?: number;
   w?: number;
   h?: number;
   label?: string;
   shiftLabel?: string;
 }
 
+/**
+ * ショートカットデータベースの型
+ * { "Ctrl + A": "すべて選択" } のような形式
+ */
 export interface ShortcutData {
-  [key: string]: string;
+  [shortcutCombo: string]: string;
+}
+
+/**
+ * アプリケーション別のショートカットデータベース
+ * { "chrome": { "Ctrl + T": "新しいタブを開く" }, ... }
+ */
+export type ShortcutDatabase = {
+  [appId: string]: ShortcutData;
 }
 
 export interface PressedKeys {
@@ -38,8 +55,9 @@ export interface SpecialKeys {
 }
 
 export interface QuizQuestion {
-  shortcut: string;
-  description: string;
+  question: string;
+  correctShortcut: string;
+  normalizedCorrectShortcut: string;
   appId: string;
   appName: string;
 }

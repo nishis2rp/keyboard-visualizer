@@ -61,7 +61,7 @@ const QuizModeView = () => {
 
   // 回答判定ロジック: 非修飾キーが離されたときに判定
   useEffect(() => {
-    if (quizState.status !== 'playing') {
+    if (quizState.status !== 'playing' || quizState.showAnswer) {
       return;
     }
 
@@ -91,7 +91,7 @@ const QuizModeView = () => {
         }
       }
     }
-  }, [pressedKeys, quizState.status]);
+  }, [pressedKeys, quizState.status, quizState.showAnswer]);
 
   // タイマーロジック
   useEffect(() => {
@@ -111,6 +111,23 @@ const QuizModeView = () => {
 
     return () => clearInterval(timer);
   }, [quizState.status, quizState.currentQuestion, quizState.timeRemaining, quizState.showAnswer, dispatch]);
+
+  // →キーで次の問題へ進む
+  useEffect(() => {
+    if (quizState.status !== 'playing' || !quizState.showAnswer) {
+      return;
+    }
+
+    const handleKeyPress = (event) => {
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        getNextQuestionRef.current();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [quizState.status, quizState.showAnswer]);
 
   const pauseQuiz = () => dispatch({ type: 'PAUSE_QUIZ' });
   const resumeQuiz = () => dispatch({ type: 'RESUME_QUIZ' });
