@@ -55,7 +55,7 @@ const QuizModeView = () => {
 
   return (
     <>
-      <SystemShortcutWarning onOpenRequest={onMacWarningModalRef} />
+      <SystemShortcutWarning onOpenRequest={onMacWarningModalRequest} />
 
       <div className="quiz-container">
         {/* コントロールパネル */}

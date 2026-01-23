@@ -341,7 +341,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
     }
   }, [quizState.keyboardLayout, quizState.settings.isFullscreen, quizState.selectedApp, quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts, quizState.settings.difficulty]);
 
-  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'madmax' | 'allrange' = 'standard') => {
+  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' = 'standard') => {
     dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
     setTimeout(() => {
       let compatibleApps = getCompatibleApps(keyboardLayout);

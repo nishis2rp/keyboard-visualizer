@@ -185,7 +185,7 @@ export const getCompatibleApps = (keyboardLayout) => {
  * @param {'basic' | 'standard' | 'madmax' | 'allrange'} difficulty - The difficulty level.
  * @returns {{question: string, correctShortcut: string, normalizedCorrectShortcut: string, appName: string} | null} A question object, or null if no shortcuts are available.
  */
-export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false, usedShortcuts = new Set(), difficulty: 'basic' | 'standard' | 'madmax' | 'allrange' = 'standard') => {
+export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false, usedShortcuts = new Set(), difficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' = 'standard') => {
   // 全ての許可されたアプリのショートカットを収集
   const allSafeShortcuts = [];
   if (!allowedApps || !Array.isArray(allowedApps)) return null;
