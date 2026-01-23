@@ -16,9 +16,13 @@ export const isSequentialShortcut = (shortcut: string): boolean => {
   // スペースを削除して分割
   const keys = shortcut.replace(/ /g, '').split('+');
 
-  // Altで始まり、3つ以上のキーがある場合は順序押し
-  // 例: Alt + H + O + I (4つのキー)
-  if (keys.length >= 3 && keys[0].toLowerCase() === 'alt') {
+  // Check if the first key is a recognized modifier
+  const firstKeyLower = keys[0].toLowerCase();
+  const isModifier = ['alt', 'ctrl', 'shift', 'meta'].includes(firstKeyLower);
+
+  // If it starts with a modifier and has 3 or more keys, consider it sequential
+  // 例: Alt + H + O + I (4つのキー), Ctrl + K + S
+  if (keys.length >= 3 && isModifier) {
     return true;
   }
 

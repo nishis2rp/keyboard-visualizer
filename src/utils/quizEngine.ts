@@ -6,6 +6,7 @@ import {
 import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
 import { matchesDifficulty } from '../constants/shortcutDifficulty';
 import { isSequentialShortcut } from './sequentialShortcuts';
+import { getCodeDisplayName } from './keyMapping'; // Import getCodeDisplayName
 
 // OSを検出
 const currentOS = detectOS();
@@ -65,7 +66,9 @@ export const normalizeShortcut = (shortcutString) => {
  * @param {Set<string>} pressedCodes - A set of codes for currently pressed keys (e.g., new Set(['ControlLeft', 'KeyA'])).
  * @returns {string} The normalized shortcut string.
  */
-export const normalizePressedKeys = (pressedCodes) => {
+export const normalizePressedKeys = (pressedCodes, keyboardLayout) => { // Added keyboardLayout parameter
+  const shiftPressed = pressedCodes.has('ShiftLeft') || pressedCodes.has('ShiftRight');
+
   const keys = Array.from(pressedCodes)
     .map(code => {
       // 修飾キーのコードを正規化された名前に変換
@@ -74,25 +77,16 @@ export const normalizePressedKeys = (pressedCodes) => {
       if (code.startsWith('Alt')) return 'Alt';
       if (code.startsWith('Meta')) return 'Meta'; // Metaキーは常にMetaに統一
 
-      // その他のキーはKeyboardEvent.codeからキー名を推測する
-      let cleanKey = code.replace(/^(Key|Digit|Numpad)/, '');
+      // 非修飾キーの場合、getCodeDisplayNameを使用してシンボルを決定
+      // KeyboardEvent.keyは pressedCodes からは取得できないので null を渡す
+      const displayName = getCodeDisplayName(code, null, keyboardLayout, shiftPressed);
 
-      // アルファベットキー
-      if (cleanKey.length === 1 && /[a-zA-Z]/.test(cleanKey)) {
-        return cleanKey.toUpperCase(); // normalizeShortcutと同じく大文字に統一
+      // displayNameが単一のアルファベットで、かつshiftが押されていない場合は大文字に変換
+      // shiftが押されている場合は、getCodeDisplayNameが適切なshifted symbolを返すと期待
+      if (displayName.length === 1 && /[a-zA-Z]/.test(displayName) && !shiftPressed) {
+        return displayName.toUpperCase();
       }
-      // 矢印キー
-      else if (cleanKey.startsWith('Arrow')) {
-        switch(cleanKey) {
-          case 'ArrowUp': return '↑';
-          case 'ArrowDown': return '↓';
-          case 'ArrowLeft': return '←';
-          case 'ArrowRight': return '→';
-          default: return cleanKey;
-        }
-      }
-      // その他の特殊キー
-      return cleanKey;
+      return displayName;
     })
     .filter(Boolean); // 空のキーを除外
 

@@ -3,7 +3,7 @@ import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps,
 import { QuizQuestion, QuizStats, QuizResult, ShortcutData } from '../types';
 import { ALWAYS_PROTECTED_SHORTCUTS, FULLSCREEN_PREVENTABLE_SHORTCUTS } from '../constants/systemProtectedShortcuts';
 import { isModifierKey } from '../utils/keyUtils';
-import { isSequentialShortcut } from '../utils/shortcutUtils';
+import { isSequentialShortcut, SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts'; // Updated import
 import { useAppContext } from './AppContext';
 
 
@@ -240,6 +240,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
   // ★ 回答判定のためのロジックをコンテキスト内に移動
   const previousPressedKeysRef = useRef(new Set());
   const cooldownRef = useRef(false);
+  const sequentialKeyRecorderRef = useRef(new SequentialKeyRecorder());
 
   // 回答を処理する
   const handleAnswer = useCallback((pressedKeys) => {
@@ -247,7 +248,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
       return;
     }
     const answerTimeMs = Date.now() - quizState.questionStartTime;
-    const userAnswer = normalizePressedKeys(pressedKeys);
+    const userAnswer = normalizePressedKeys(pressedKeys, quizState.keyboardLayout);
     const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
   }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, quizState.showAnswer]);
@@ -275,9 +276,42 @@ export function QuizProvider({ children }: QuizProviderProps) {
           const currentQuestion = quizState.currentQuestion;
           const isSequential = currentQuestion && isSequentialShortcut(currentQuestion.correctShortcut);
 
-          if (isSequential && currentKeys.size > 0) {
-            previousPressedKeysRef.current = new Set(currentKeys);
+          if (isSequential && currentQuestion && quizState.keyboardLayout) { // Check keyboardLayout is not null
+            const correctSequentialKeys = getSequentialKeys(currentQuestion.correctShortcut);
+            // Identify the non-modifier key that was released
+            const releasedNonModifierKeys = Array.from(releasedKeys).filter(key => !isModifierKey(key));
+
+            if (releasedNonModifierKeys.length > 0) {
+              // Assuming only one non-modifier key is released at a time for sequential input
+              const lastReleasedKey = releasedNonModifierKeys[releasedNonModifierKeys.length - 1];
+              // Normalize the released key using normalizePressedKeys for consistency with how shortcuts are stored
+              // We create a new Set for the single key to pass to normalizePressedKeys
+              const normalizedReleasedKey = normalizePressedKeys(new Set([lastReleasedKey]), quizState.keyboardLayout);
+
+              // Add the normalized key to the sequential recorder
+              const currentSequence = sequentialKeyRecorderRef.current.addKey(normalizedReleasedKey);
+
+              // Check if the current sequence matches the full correct sequence
+              if (sequentialKeyRecorderRef.current.matches(correctSequentialKeys)) {
+                const answerTimeMs = Date.now() - (quizState.questionStartTime || Date.now());
+                // Correct sequential answer: join the sequence to form the userAnswer string
+                const userAnswer = currentSequence.join('+');
+                dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect: true, answerTimeMs } });
+                sequentialKeyRecorderRef.current.reset(); // Reset after correct answer
+                previousPressedKeysRef.current = new Set(); // Clear pressed keys
+              } else if (!sequentialKeyRecorderRef.current.isPartialMatch(correctSequentialKeys)) {
+                // If it's not a partial match, the sequence is wrong or too long
+                const answerTimeMs = Date.now() - (quizState.questionStartTime || Date.now());
+                const userAnswer = currentSequence.join('+');
+                dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect: false, answerTimeMs } });
+                sequentialKeyRecorderRef.current.reset(); // Reset after incorrect answer
+                previousPressedKeysRef.current = new Set(); // Clear pressed keys
+              }
+              // If it's a partial match, do nothing and wait for the next key
+            }
+            previousPressedKeysRef.current = new Set(currentKeys); // Keep tracking for next press
           } else {
+            // Standard multi-key shortcut logic (original logic)
             handleAnswer(previousKeys);
             previousPressedKeysRef.current = new Set();
           }
@@ -301,7 +335,21 @@ export function QuizProvider({ children }: QuizProviderProps) {
 
       return () => clearTimeout(timer);
     }
+    // Also reset sequential recorder if quiz is not playing
+    sequentialKeyRecorderRef.current.reset();
   }, [quizState.currentQuestion, quizState.showAnswer, quizState.status]);
+
+  // Reset sequential recorder on quiz state changes (new question, quiz end/reset)
+  useEffect(() => {
+    if (
+      quizState.status === 'idle' ||
+      quizState.status === 'finished' ||
+      quizState.status === 'paused' ||
+      (quizState.status === 'playing' && quizState.currentQuestion !== null) // When a new question is set while playing
+    ) {
+      sequentialKeyRecorderRef.current.reset();
+    }
+  }, [quizState.status, quizState.currentQuestion]);
 
   // ★ タイマーロジック
   useEffect(() => {
@@ -379,7 +427,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
   const handleAnswerInternal = useCallback((pressedKeys) => {
     if (quizState.status !== 'playing' || !quizState.currentQuestion || quizState.showAnswer) return;
     const answerTimeMs = Date.now() - quizState.questionStartTime;
-    const userAnswer = normalizePressedKeys(pressedKeys);
+    const userAnswer = normalizePressedKeys(pressedKeys, quizState.keyboardLayout);
     const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
   }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, quizState.showAnswer]);
