@@ -200,6 +200,8 @@ keyboard-visualizer/
 │   └── workflows/
 │       └── deploy.yml              # GitHub Actions自動デプロイ設定
 ├── public/                         # 静的アセット
+├── supabase/                       # Supabase関連ファイル
+│   └── migrations/                 # データベースマイグレーション
 ├── src/
 │   ├── components/                 # Reactコンポーネント
 │   │   ├── common/                 # 共通コンポーネント
@@ -235,6 +237,9 @@ keyboard-visualizer/
 │   │   │   ├── macJis.ts
 │   │   │   ├── macUs.ts
 │   │   │   └── index.ts
+
+│   ├── lib/                        # ライブラリ、ユーティリティ
+│   │   └── supabase.ts             # Supabaseクライアント初期化
 
 │   ├── hooks/                      # カスタムフック
 │   │   ├── useKeyboardShortcuts.ts # キーボード入力管理（リファクタリング済み）
