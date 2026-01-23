@@ -34,7 +34,7 @@ function App() {
     layout: string,
     mode: string,
     quizApp: string | null,
-    difficulty?: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' | null,
+    difficulty?: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null,
     shouldBeFullscreen?: boolean
   ) => {
     // 全画面モードの状態を適用

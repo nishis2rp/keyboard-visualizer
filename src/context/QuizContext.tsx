@@ -9,7 +9,7 @@ import { isSequentialShortcut } from '../utils/shortcutUtils';
 
 interface QuizSettings {
   quizMode: 'default' | 'hardcore';
-  difficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange';
+  difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange';
   timeLimit: number;
   totalQuestions: number;
   isFullscreen: boolean;
@@ -43,7 +43,7 @@ interface QuizState {
 }
 
 type QuizAction =
-  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' } }
+  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' } }
   | { type: 'SET_QUESTION'; payload: { question: QuizQuestion } }
   | { type: 'ANSWER_QUESTION'; payload: { userAnswer: string; isCorrect: boolean; answerTimeMs: number } }
   | { type: 'SKIP_QUESTION' }
@@ -62,7 +62,7 @@ type QuizAction =
 interface QuizContextType {
   quizState: QuizState;
   dispatch: Dispatch<QuizAction>;
-  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange') => void;
+  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange') => void;
   handleAnswer: (pressedCodes: Set<string>) => void;
   getNextQuestion: () => void;
   updateFullscreen: (isFullscreen: boolean) => void;
@@ -341,7 +341,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
     }
   }, [quizState.keyboardLayout, quizState.settings.isFullscreen, quizState.selectedApp, quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts, quizState.settings.difficulty]);
 
-  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' = 'standard') => {
+  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard') => {
     dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
     setTimeout(() => {
       let compatibleApps = getCompatibleApps(keyboardLayout);

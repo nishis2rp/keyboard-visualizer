@@ -19,7 +19,7 @@ interface AppContextType {
   keyboardLayout: string;
   isQuizMode: boolean;
   quizApp: string | null;
-  quizDifficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' | null;
+  quizDifficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null;
   shortcutDescriptions: ShortcutData;
   keyboardLayouts: KeyboardLayoutOption[];
   apps: App[];
@@ -29,8 +29,8 @@ interface AppContextType {
   setKeyboardLayout: (layout: string) => void;
   setIsQuizMode: (mode: boolean) => void;
   setQuizApp: (app: string | null) => void;
-  setQuizDifficulty: (difficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' | null) => void;
-  handleSetupComplete: (app: string, layout: string, mode?: string, quizApp?: string | null, difficulty?: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange', isFullscreen?: boolean) => void;
+  setQuizDifficulty: (difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null) => void;
+  handleSetupComplete: (app: string, layout: string, mode?: string, quizApp?: string | null, difficulty?: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange', isFullscreen?: boolean) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -55,7 +55,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [keyboardLayout, setKeyboardLayout] = useState(setup.layout || DEFAULTS.LAYOUT);
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizApp, setQuizApp] = useState<string | null>(null);
-  const [quizDifficulty, setQuizDifficulty] = useState<'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' | null>(null);
+  const [quizDifficulty, setQuizDifficulty] = useState<'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null>(null);
   const [apps] = useState(appConfig); // stateとして保持
 
   const handleSetupComplete = useCallback((app, layout, mode = 'visualizer', quizAppParam = null, difficulty = null, isFullscreen = false) => {

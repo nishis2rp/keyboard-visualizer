@@ -30,7 +30,7 @@ const QuizModeView = () => {
     if (os === 'macos' && openMacWarningModalRef.current) {
       openMacWarningModalRef.current();
     }
-    startQuiz(quizApp || selectedApp, isFullscreenMode, keyboardLayout, (quizDifficulty as 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange') || 'standard');
+    startQuiz(quizApp || selectedApp, isFullscreenMode, keyboardLayout, (quizDifficulty as 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange') || 'standard');
 
     return () => {
       dispatch({ type: 'RESET_QUIZ' });
