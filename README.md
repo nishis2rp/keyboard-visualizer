@@ -241,6 +241,9 @@ keyboard-visualizer/
 │   ├── lib/                        # ライブラリ、ユーティリティ
 │   │   └── supabase.ts             # Supabaseクライアント初期化
 
+│   ├── lib/                        # ライブラリ、ユーティリティ
+│   │   └── supabase.ts             # Supabaseクライアント初期化
+
 │   ├── hooks/                      # カスタムフック
 │   │   ├── useKeyboardShortcuts.ts # キーボード入力管理（リファクタリング済み）
 │   │   ├── useLocalStorage.ts      # ローカルストレージ永続化
