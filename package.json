@@ -10,7 +10,8 @@
     "test": "vitest --run",
     "db:migrate": "tsx scripts/migrate.ts",
     "api": "tsx src/server/api.ts",
-    "dev:all": "npm run api & npm run dev"
+    "dev:all": "npm run api & npm run dev",
+    "start": "npm run db:migrate && npm run api"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",

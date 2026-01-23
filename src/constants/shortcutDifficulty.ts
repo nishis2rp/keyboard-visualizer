@@ -59,6 +59,7 @@ export const BASIC_SHORTCUTS = new Set([
   'Win+P',           // プレゼンテーション表示モード
   'Win+R',           // ファイル名を指定して実行
   'Win+M',           // すべてのウィンドウを最小化
+  'Win+Tab',         // タスクビュー
   'Win+↑',           // ウィンドウを最大化
   'Win+↓',           // ウィンドウを最小化/元に戻す
   'Win+←',           // ウィンドウを画面左半分にスナップ
@@ -127,7 +128,6 @@ export const STANDARD_SHORTCUTS = new Set([
   'Shift+Home',      // 行の先頭まで選択
   'Shift+End',       // 行の末尾まで選択
   'Meta+G',          // 次を検索（Mac）
-  'Meta+Tab',        // アプリケーション切り替え（Mac）
 
   // Gmail基本（よく使うもののみ）
   'c',               // 作成
@@ -142,7 +142,6 @@ export const STANDARD_SHORTCUTS = new Set([
   'Ctrl++',          // ズームイン
   'Ctrl+-',          // ズームアウト
   'Ctrl+0',          // ズームリセット
-  'Win+Tab',         // タスクビュー
   'Shift+Delete',    // 完全に削除
   'Ctrl+Shift+V',    // 書式なしで貼り付け (Windows/汎用)
   'Meta+Shift+V',    // 書式なしで貼り付け (Mac/汎用)
@@ -716,6 +715,7 @@ export const MADMAX_SHORTCUTS = new Set([
   'Alt+N+S+L',       // 折れ線スパークラインを挿入
   'Alt+N+S+C',       // 縦棒スパークラインを挿入
   'Alt+N+S+W',       // 勝敗スパークラインを挿入
+  'Alt+E+S',         // 形式を選択して貼り付け
 
   // Windows特殊
   'Win+Ctrl+D',      // 新しい仮想デスクトップを追加
@@ -732,7 +732,6 @@ export const MADMAX_SHORTCUTS = new Set([
   'Win+Alt+Print Screen', // ゲームウィンドウのスクリーンショット
   'Win+Alt+G',       // 最後の30秒を録画
   'Ctrl+Shift+Escape', // タスクマネージャーを開く
-  'Ctrl+Alt+Delete', // セキュリティオプション画面
   'Left Alt+Left Shift+Print Screen', // ハイコントラストのオン/オフ
   'Ctrl+Tab',        // 次のタブに切り替え
   'Ctrl+Shift+Tab',  // 前のタブに切り替え
@@ -744,7 +743,6 @@ export const MADMAX_SHORTCUTS = new Set([
   'Enter',           // ボタンを実行
 
   // macOS最難関
-  'Meta+Option+Escape',// 強制終了
   'Ctrl+Cmd+Q',      // 画面をロック
   'Meta+Shift+Q',    // ログアウト
   'Meta+Ctrl+Power', // 再起動
