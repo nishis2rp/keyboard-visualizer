@@ -5,7 +5,6 @@ import {
 } from '../constants/systemProtectedShortcuts';
 import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
 import { matchesDifficulty } from '../constants/shortcutDifficulty';
-import { allShortcuts } from '../data/shortcuts';
 import { isSequentialShortcut } from './sequentialShortcuts';
 
 // OSを検出

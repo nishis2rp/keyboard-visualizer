@@ -29,8 +29,12 @@ dist-ssr
 *.backup3
 nul
 
-# Scripts and temporary files
-scripts/
+# Environment variables
+.env
+.env.local
+
+# Database
+data/
 
 # Claude Code settings
 .claude/settings.local.json

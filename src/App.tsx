@@ -13,7 +13,9 @@ function App() {
     setShowSetup,
     handleSetupComplete,
     isQuizMode,
-    setIsQuizMode
+    setIsQuizMode,
+    loading,
+    error
   } = useAppContext();
 
   const { isFullscreenMode, toggleFullscreenMode } = useFullscreen();
@@ -47,6 +49,33 @@ function App() {
     // 元のhandleSetupCompleteを呼び出す
     handleSetupComplete(app, layout, mode, quizApp, difficulty, shouldBeFullscreen);
   };
+
+  // ローディング中の表示
+  if (loading) {
+    return (
+      <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2>Loading shortcuts...</h2>
+          <p>Fetching data from API server...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // エラーの表示
+  if (error) {
+    return (
+      <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div style={{ textAlign: 'center', color: 'red' }}>
+          <h2>Error loading shortcuts</h2>
+          <p>{error.message}</p>
+          <p style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
+            Make sure the API server is running on http://localhost:3001
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (showSetup) {
     return <SetupScreen onSetupComplete={handleSetupCompleteWithFullscreen} />;

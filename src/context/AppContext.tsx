@@ -1,7 +1,7 @@
 import React, { createContext, useState, useMemo, useCallback, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '../hooks';
+import { useShortcuts } from '../hooks/useShortcuts';
 import { SETUP_VERSION, STORAGE_KEYS, DEFAULTS } from '../constants';
-import { allShortcuts } from '../data/shortcuts';
 import { getLayoutDisplayName, keyboardLayoutOptions, KeyboardLayoutOption } from '../data/layouts';
 import { apps as appConfig } from '../config/apps';
 import { App, ShortcutData } from '../types';
@@ -21,8 +21,11 @@ interface AppContextType {
   quizApp: string | null;
   quizDifficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null;
   shortcutDescriptions: ShortcutData;
+  allShortcuts: Record<string, ShortcutData> | null;
   keyboardLayouts: KeyboardLayoutOption[];
   apps: App[];
+  loading: boolean;
+  error: Error | null;
   setSetup: (setup: SetupData) => void;
   setShowSetup: (show: boolean) => void;
   setSelectedApp: (app: string) => void;
@@ -40,6 +43,9 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+  // APIからショートカットデータを取得
+  const { shortcuts: allShortcuts, loading, error } = useShortcuts();
+
   const [setup, setSetup] = useLocalStorage(
     STORAGE_KEYS.SETUP,
     { setupCompleted: false, app: DEFAULTS.APP, layout: DEFAULTS.LAYOUT },
@@ -74,8 +80,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, [setSetup]);
 
   const shortcutDescriptions = useMemo(
-    () => allShortcuts[selectedApp],
-    [selectedApp]
+    () => allShortcuts?.[selectedApp] || {},
+    [allShortcuts, selectedApp]
   );
 
   const value = {
@@ -88,8 +94,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     quizApp,
     quizDifficulty,
     shortcutDescriptions,
+    allShortcuts,
     keyboardLayouts: keyboardLayoutOptions,
     apps, // appsを提供
+    loading,
+    error,
 
     // Actions
     setSetup,

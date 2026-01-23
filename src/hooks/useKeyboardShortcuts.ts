@@ -36,11 +36,15 @@ const shouldPreventDefault = (e: KeyboardEvent, pressedKeys: Set<string>, layout
   if (['AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'].includes(code)) {
     return true;
   }
-  
-  // 成立済みのショートカットキーがリピートされる場合
-  if (repeat) {
-    const { description } = getShortcutInfo(Array.from(pressedKeys), layout, descriptions);
-    if (description) return true;
+
+  // 通常モードでのOS標準ショートカットとの競合を防ぐ（最優先）
+  // (e.g., Ctrl+S, Cmd+W, Ctrl+A)
+  const keyLower = key.toLowerCase();
+  const isSystemShortcut =
+    (metaKey && ['s', 'p', 'r', 'w', 'q', 'a'].includes(keyLower)) ||
+    (ctrlKey && ['s', 'p', 'r', 'w', 'q', 'a', 'tab'].includes(keyLower));
+  if (isSystemShortcut) {
+    return true;
   }
 
   // クイズモード中は、開発用キー（F12など）を除くすべての修飾キー付き入力を防ぐ
@@ -49,14 +53,10 @@ const shouldPreventDefault = (e: KeyboardEvent, pressedKeys: Set<string>, layout
     return true;
   }
 
-  // 通常モードでのOS標準ショートカットとの競合を防ぐ
-  // (e.g., Ctrl+S, Cmd+W)
-  const keyLower = key.toLowerCase();
-  const isSystemShortcut =
-    (metaKey && ['s', 'p', 'r', 'w', 'q', 'a'].includes(keyLower)) ||
-    (ctrlKey && ['s', 'p', 'r', 'w', 'q', 'a', 'tab'].includes(keyLower));
-  if (isSystemShortcut) {
-    return true;
+  // キーリピートの場合、現在押されているキーの組み合わせでショートカットが成立しているかチェック
+  if (repeat && pressedKeys.has(code)) {
+    const { description } = getShortcutInfo(Array.from(pressedKeys), layout, descriptions);
+    if (description) return true;
   }
 
   // 新しくキーが押された結果、ショートカットが成立する場合
@@ -125,8 +125,16 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isTypingInInputElement(e)) return;
-      if (pressedKeysRef.current.has(e.code)) return;
-      
+
+      // キーリピート（長押し）の場合
+      if (pressedKeysRef.current.has(e.code)) {
+        // ショートカットが成立している場合はブラウザのデフォルト動作を防ぐ
+        if (shouldPreventDefault(e, pressedKeysRef.current, keyboardLayout, shortcutDescriptions, isQuizMode)) {
+          e.preventDefault();
+        }
+        return; // 状態は更新しない
+      }
+
       if (shouldPreventDefault(e, pressedKeysRef.current, keyboardLayout, shortcutDescriptions, isQuizMode)) {
         e.preventDefault();
       }
@@ -134,7 +142,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
       const newPressedKeys = new Set(pressedKeysRef.current);
       newPressedKeys.add(e.code);
       setPressedKeys(newPressedKeys);
-      
+
       if (!isQuizMode) {
         updateNormalModeState(Array.from(newPressedKeys));
       }

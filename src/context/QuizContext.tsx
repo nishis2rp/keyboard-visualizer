@@ -1,10 +1,10 @@
 import React, { createContext, useReducer, useContext, useCallback, ReactNode, Dispatch, useRef, useEffect } from 'react';
 import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps, normalizeShortcut } from '../utils/quizEngine';
-import { allShortcuts } from '../data/shortcuts';
-import { QuizQuestion, QuizStats, QuizResult } from '../types';
+import { QuizQuestion, QuizStats, QuizResult, ShortcutData } from '../types';
 import { ALWAYS_PROTECTED_SHORTCUTS, FULLSCREEN_PREVENTABLE_SHORTCUTS } from '../constants/systemProtectedShortcuts';
 import { isModifierKey } from '../utils/keyUtils';
 import { isSequentialShortcut } from '../utils/shortcutUtils';
+import { useAppContext } from './AppContext';
 
 
 interface QuizSettings {
@@ -224,9 +224,17 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
 
 interface QuizProviderProps {
   children: ReactNode;
+  allShortcuts: Record<string, ShortcutData> | null;
+}
+
+interface QuizProviderProps {
+  children: ReactNode;
 }
 
 export function QuizProvider({ children }: QuizProviderProps) {
+  // AppContextからショートカットデータを取得
+  const { allShortcuts } = useAppContext();
+
   const [quizState, dispatch] = useReducer(quizReducer, initialQuizState);
   
   // ★ 回答判定のためのロジックをコンテキスト内に移動
@@ -319,7 +327,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
   }, []);
 
   const getNextQuestion = useCallback(() => {
-    if (!quizState.keyboardLayout) {
+    if (!allShortcuts || !quizState.keyboardLayout) {
       dispatch({ type: 'FINISH_QUIZ' });
       return;
     }
@@ -344,9 +352,13 @@ export function QuizProvider({ children }: QuizProviderProps) {
     } else {
       dispatch({ type: 'FINISH_QUIZ' });
     }
-  }, [quizState.keyboardLayout, quizState.settings.isFullscreen, quizState.selectedApp, quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts, quizState.settings.difficulty]);
+  }, [allShortcuts, quizState.keyboardLayout, quizState.settings.isFullscreen, quizState.selectedApp, quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts, quizState.settings.difficulty]);
 
   const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard') => {
+    if (!allShortcuts) {
+      console.error('Shortcuts data not loaded yet');
+      return;
+    }
     dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
     setTimeout(() => {
       let compatibleApps = getCompatibleApps(keyboardLayout);
@@ -362,7 +374,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
         dispatch({ type: 'FINISH_QUIZ' });
       }
     }, 0);
-  }, []);
+  }, [allShortcuts]);
 
   const handleAnswerInternal = useCallback((pressedKeys) => {
     if (quizState.status !== 'playing' || !quizState.currentQuestion || quizState.showAnswer) return;
