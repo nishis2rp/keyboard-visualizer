@@ -32,7 +32,7 @@
 - **アプリ別学習**: 特定のアプリケーションのショートカットを集中的に練習
 - **代替ショートカット対応**: 同じ処理を行う異なるショートカットも正解として認識（例: Ctrl+C / Ctrl+Insert）
 
-### 🎯 対応アプリケーション
+### 🎯 対応アプリケーション (データはバックエンドサービスから動的に取得)
 
 | アプリ | ショートカット数 | 特徴 |
 |--------|-----------------|------|
@@ -234,14 +234,7 @@ keyboard-visualizer/
 │   │   │   ├── macJis.ts
 │   │   │   ├── macUs.ts
 │   │   │   └── index.ts
-│   │   └── shortcuts/              # アプリケーション別ショートカット
-│   │       ├── windows11.ts        # Windows 11ショートカット
-│   │       ├── macos.ts            # macOSショートカット
-│   │       ├── chrome.ts           # Chromeショートカット
-│   │       ├── excel.ts            # Excelショートカット
-│   │       ├── slack.ts            # Slackショートカット
-│   │       ├── gmail.ts            # Gmailショートカット
-│   │       └── index.ts
+
 │   ├── hooks/                      # カスタムフック
 │   │   ├── useKeyboardShortcuts.ts # キーボード入力管理（リファクタリング済み）
 │   │   ├── useLocalStorage.ts      # ローカルストレージ永続化
@@ -338,44 +331,35 @@ keyboard-visualizer/
 
 ## 🔧 カスタマイズガイド
 
-### 新しいアプリケーションの追加
+### 新しいアプリケーションの追加 (バックエンドサービス経由)
 
-#### 1. ショートカットデータの作成
+新しいアプリケーションのショートカットを追加するには、バックエンドサービス（Supabase）の `shortcuts` テーブルにデータを挿入する必要があります。
 
-`src/data/shortcuts/myapp.ts` を作成：
+Supabaseの管理画面またはSQLクエリを使用して、以下の形式でデータを追加してください。
 
-```typescript
-export const myappShortcuts = {
-  'Ctrl + N': '新規作成',
-  'Ctrl + S': '保存',
-  'Ctrl + Shift + S': '名前を付けて保存',
-  'F1': 'ヘルプを開く',
-  // ...
-}
+| カラム名     | 型       | 説明                                   |
+|--------------|----------|----------------------------------------|
+| `application`| `TEXT`   | アプリケーションID (例: `my_app`)      |
+| `keys`       | `TEXT`   | ショートカットキー (例: `Ctrl + N`)    |
+| `description`| `TEXT`   | ショートカットの説明 (例: `新規作成`)  |
+| `category`   | `TEXT`   | カテゴリ (オプション、例: `File Operations`) |
+
+**例 (SQL):**
+
+```sql
+INSERT INTO shortcuts (application, keys, description)
+VALUES ('my_app', 'Ctrl + N', '新規作成');
 ```
 
-#### 2. ショートカットのエクスポート
+**フロントエンド側の設定:**
 
-`src/data/shortcuts/index.ts` に追加：
-
-```typescript
-export { myappShortcuts } from './myapp'
-
-export const allShortcuts = {
-  // 既存のアプリ...
-  myapp: myappShortcuts,
-}
-```
-
-#### 3. アプリ設定の追加
-
-`src/config/apps.ts` に追加：
+`src/config/apps.ts` に新しいアプリケーションの定義を追加します。
 
 ```typescript
 export const apps: App[] = [
   // 既存のアプリ...
   {
-    id: 'myapp',
+    id: 'my_app', // Supabaseに登録したapplicationカラムの値と一致させる
     name: 'My App',
     icon: '🚀',
     os: 'cross-platform'  // または 'windows' | 'mac'
