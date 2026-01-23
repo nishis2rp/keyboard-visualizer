@@ -1,70 +1,116 @@
-# デプロイ手順
+# デプロイ手順 (Supabase版)
 
-このプロジェクトは以下の2つの部分で構成されています：
+このプロジェクトは以下の構成で動作します：
 - **フロントエンド**: GitHub Pagesで自動デプロイ
-- **バックエンドAPI**: Railwayで手動デプロイ
+- **データベース & API**: Supabaseで管理
 
-## 1. バックエンドAPIのデプロイ (Railway)
+## 1. Supabase プロジェクトのセットアップ
 
 ### 前提条件
 - GitHubアカウント
-- Railwayアカウント（https://railway.app/ でサインアップ）
+- Supabaseアカウント（https://supabase.com/ でサインアップ）
 
 ### 手順
 
-#### ステップ1: Railwayプロジェクトの作成
+#### ステップ1: Supabase プロジェクトの作成
 
-1. [Railway](https://railway.app/)にアクセスしてログイン
+1. [Supabase Dashboard](https://supabase.com/dashboard)にアクセス
 2. 「New Project」をクリック
-3. 「Deploy from GitHub repo」を選択
-4. `nishis2rp/keyboard-visualizer` リポジトリを選択
-5. プロジェクトが作成されます
+3. プロジェクト情報を入力：
+   - Name: `keyboard-visualizer`（任意）
+   - Database Password: 強力なパスワードを生成（保存しておく）
+   - Region: `Northeast Asia (Tokyo)` または最寄りのリージョン
+4. 「Create new project」をクリック
+5. プロジェクトの初期化を待つ（約2分）
 
-#### ステップ2: 環境変数の設定（オプション）
+#### ステップ2: データベーステーブルの作成
 
-デフォルトではPORT環境変数が自動的に設定されます。追加の設定は不要です。
+1. Supabase Dashboard で「SQL Editor」を開く
+2. 「New query」をクリック
+3. 以下のSQLを実行：
 
-必要に応じて以下を設定：
-- `NODE_ENV`: `production`
+\`\`\`sql
+-- Create shortcuts table
+CREATE TABLE IF NOT EXISTS shortcuts (
+  id BIGSERIAL PRIMARY KEY,
+  application VARCHAR(50) NOT NULL,
+  keys VARCHAR(100) NOT NULL,
+  description TEXT NOT NULL,
+  category VARCHAR(100),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  UNIQUE(application, keys)
+);
 
-#### ステップ3: デプロイ確認
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_shortcuts_application ON shortcuts(application);
+CREATE INDEX IF NOT EXISTS idx_shortcuts_keys ON shortcuts(keys);
 
-1. Railwayダッシュボードで「Deployments」タブを開く
-2. 最新のデプロイが成功していることを確認
-3. 「Settings」→「Networking」→「Generate Domain」をクリック
-4. 生成されたドメイン（例: `https://your-app.up.railway.app`）をコピー
+-- Enable Row Level Security
+ALTER TABLE shortcuts ENABLE ROW LEVEL SECURITY;
 
-#### ステップ4: デプロイされたAPIの動作確認
+-- Create policy for public read access
+CREATE POLICY "Allow public read access" ON shortcuts
+  FOR SELECT
+  USING (true);
+\`\`\`
 
-生成されたドメインにアクセスして確認：
-```bash
-curl https://your-app.up.railway.app/health
-# 期待される結果: {"status":"ok","message":"API server is running"}
+4. 「Run」をクリックして実行
 
-curl https://your-app.up.railway.app/api/applications
-# アプリケーション一覧が返ってくることを確認
-```
+#### ステップ3: API認証情報の取得
 
-## 2. フロントエンドの環境変数更新
+1. Supabase Dashboard で「Settings」→「API」を開く
+2. 以下の情報をコピー：
+   - **Project URL**: `https://xxxxx.supabase.co`
+   - **anon (public) key**: `eyJhbGciOiJIUzI1NiIs...`
+
+#### ステップ4: データのマイグレーション
+
+ローカル環境でデータを投入：
+
+1. `.env`ファイルを作成（`.env.example`をコピー）：
+\`\`\`bash
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+DATABASE_URL=postgresql://postgres:[your-password]@db.your-project-id.supabase.co:5432/postgres
+\`\`\`
+
+2. マイグレーションを実行：
+\`\`\`bash
+npm run db:migrate
+\`\`\`
+
+3. 成功すると「Migration completed successfully!」が表示される
+
+4. Supabase Dashboard の「Table Editor」で`shortcuts`テーブルを確認
+   - 866個のレコードが作成されているはず
+
+## 2. フロントエンドの環境変数設定
 
 ### GitHub Secretsの設定
 
 1. GitHubリポジトリの「Settings」→「Secrets and variables」→「Actions」を開く
 2. 「New repository secret」をクリック
 3. 以下のシークレットを追加：
-   - Name: `VITE_API_URL`
-   - Value: Railwayで生成されたドメイン（例: `https://your-app.up.railway.app`）
+
+**VITE_SUPABASE_URL**
+- Name: `VITE_SUPABASE_URL`
+- Value: Supabaseの Project URL（例: `https://xxxxx.supabase.co`）
+
+**VITE_SUPABASE_ANON_KEY**
+- Name: `VITE_SUPABASE_ANON_KEY`
+- Value: Supabaseの anon key
 
 ### GitHub Actions ワークフローの更新
 
 `.github/workflows/deploy.yml`の`Build`ステップに環境変数を追加：
 
-```yaml
+\`\`\`yaml
 - name: Build
   run: npm run build
   env:
-    VITE_API_URL: ${{ secrets.VITE_API_URL }}
-```
+    VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+    VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+\`\`\`
 
 変更をプッシュすると、GitHub Actionsが自動的にビルド・デプロイします。
 
@@ -74,40 +120,56 @@ curl https://your-app.up.railway.app/api/applications
    - https://nishis2rp.github.io/keyboard-visualizer/ にアクセス
    - ローディング画面が表示され、その後アプリが正常に動作することを確認
 
-2. **APIとの連携確認**
+2. **Supabaseとの連携確認**
    - ブラウザの開発者ツール（F12）を開く
-   - Networkタブで`/api/shortcuts`へのリクエストが成功していることを確認
+   - Networkタブでsupabase.coへのリクエストが成功していることを確認
 
 ## トラブルシューティング
 
-### APIサーバーが起動しない
-- Railwayのログを確認: Dashboard → Deployments → 最新のデプロイ → View Logs
-- `npm run db:migrate`が成功しているか確認
-
-### フロントエンドがAPIに接続できない
-- CORS設定を確認（`src/server/api.ts`の`cors()`設定）
-- ブラウザのコンソールにCORSエラーが表示されていないか確認
-- `VITE_API_URL`が正しく設定されているか確認
-
 ### データベースが空
 - マイグレーションが実行されているか確認
-- Railwayのログで`Migration completed successfully!`が表示されているか確認
+- Supabase Dashboard の Table Editor で shortcuts テーブルを確認
+- マイグレーションスクリプトを再実行: `npm run db:migrate`
+
+### フロントエンドがSupabaseに接続できない
+- CORS設定を確認（Supabaseはデフォルトで全てのオリジンを許可）
+- ブラウザのコンソールにエラーが表示されていないか確認
+- 環境変数が正しく設定されているか確認
+  - `VITE_SUPABASE_URL`
+  - `VITE_SUPABASE_ANON_KEY`
+
+### Row Level Security (RLS) エラー
+- Supabase Dashboard で「Authentication」→「Policies」を確認
+- `shortcuts`テーブルに「Allow public read access」ポリシーが存在するか確認
 
 ## コスト
 
-**Railway無料プラン**:
-- 月500時間の実行時間
-- $5のクレジット
-- 小規模なアプリには十分
+**Supabase 無料プラン**:
+- データベース容量: 500MB
+- 帯域幅: 5GB/月
+- API リクエスト: 無制限
+- Row Level Security
+- 自動バックアップ: 7日間
 
 **GitHub Pages**:
 - 完全無料
 - 帯域幅制限: 月100GB
 
+小規模なアプリには十分です。
+
 ## 更新方法
 
-### バックエンドの更新
-mainブランチにプッシュすると、Railwayが自動的に再デプロイします。
+### データの更新
+1. ローカルで`src/data/shortcuts/`のファイルを編集
+2. マイグレーションスクリプトを再実行: `npm run db:migrate`
+3. Supabaseに自動的に反映されます
 
 ### フロントエンドの更新
 mainブランチにプッシュすると、GitHub Actionsが自動的に再デプロイします。
+
+## セキュリティ
+
+- **anon key**は公開しても安全です（フロントエンドで使用）
+- **service_role key**は絶対に公開しないでください
+- Row Level Security (RLS)を使用して、データアクセスを制御
+- 読み取り専用アクセスのみを許可（現在の設定）

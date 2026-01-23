@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase, Shortcut } from '../lib/supabase';
 import { ShortcutData } from '../types';
 
 interface UseShortcutsReturn {
@@ -8,10 +9,8 @@ interface UseShortcutsReturn {
   refetch: () => void;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
 /**
- * APIからショートカットデータを取得するカスタムフック
+ * Supabaseからショートカットデータを取得するカスタムフック
  */
 export function useShortcuts(): UseShortcutsReturn {
   const [shortcuts, setShortcuts] = useState<Record<string, ShortcutData> | null>(null);
@@ -23,18 +22,18 @@ export function useShortcuts(): UseShortcutsReturn {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/api/shortcuts`);
+      const { data, error: supabaseError } = await supabase
+        .from('shortcuts')
+        .select('*');
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch shortcuts: ${response.statusText}`);
+      if (supabaseError) {
+        throw new Error(`Failed to fetch shortcuts: ${supabaseError.message}`);
       }
 
-      const data = await response.json();
-
-      // APIレスポンスを allShortcuts の形式に変換
+      // Supabaseレスポンスを allShortcuts の形式に変換
       const shortcutsMap: Record<string, ShortcutData> = {};
 
-      data.shortcuts.forEach((item: any) => {
+      (data as Shortcut[]).forEach((item) => {
         if (!shortcutsMap[item.application]) {
           shortcutsMap[item.application] = {};
         }
@@ -75,18 +74,19 @@ export function useAppShortcuts(app: string): UseShortcutsReturn {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/api/shortcuts?app=${app}`);
+      const { data, error: supabaseError } = await supabase
+        .from('shortcuts')
+        .select('*')
+        .eq('application', app);
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch shortcuts: ${response.statusText}`);
+      if (supabaseError) {
+        throw new Error(`Failed to fetch shortcuts: ${supabaseError.message}`);
       }
 
-      const data = await response.json();
-
-      // APIレスポンスを ShortcutData の形式に変換
+      // Supabaseレスポンスを ShortcutData の形式に変換
       const shortcutsData: ShortcutData = {};
 
-      data.shortcuts.forEach((item: any) => {
+      (data as Shortcut[]).forEach((item) => {
         shortcutsData[item.keys] = item.description;
       });
 
