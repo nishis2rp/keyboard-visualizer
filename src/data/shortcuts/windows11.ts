@@ -114,6 +114,7 @@ export const windows11Shortcuts = {
   'Alt + P': 'プレビューウィンドウを表示',
   'Alt + Enter': '選択した項目のプロパティ',
   'Backspace': '親フォルダーに移動',
+  'Alt + ↑': '親フォルダーに移動',
   'Ctrl + L': 'アドレスバーにフォーカス',
 
   // スクリーンショット・録画

@@ -106,10 +106,10 @@ export const normalizePressedKeys = (pressedCodes) => {
 
 
 // 保護されたショートカットを正規化したSetを作成
-const normalizedAlwaysProtected = new Set(
+let normalizedAlwaysProtected = new Set(
   Array.from(ALWAYS_PROTECTED_SHORTCUTS).map(s => normalizeShortcut(s))
 );
-const normalizedFullscreenPreventable = new Set(
+let normalizedFullscreenPreventable = new Set(
   Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map(s => normalizeShortcut(s))
 );
 
@@ -128,12 +128,17 @@ const isShortcutSafe = (shortcut, quizMode, isFullscreen) => {
     return false;
   }
 
-  // 全画面モードでない場合、フルスクリーンで防止可能なショートカットも除外
+  // ハードコアモードでは、フルスクリーン防止可能ショートカットは常に安全と見なす
+  if (quizMode === 'hardcore') {
+    return true;
+  }
+
+  // デフォルトモードで、フルスクリーンでなく、かつ防止可能リストにある場合は安全ではない
   if (!isFullscreen && normalizedFullscreenPreventable.has(normalizedShortcut)) {
     return false;
   }
 
-  // システム保護されたショートカット以外はすべて許可
+  // 上記以外は安全
   return true;
 };
 
@@ -183,6 +188,7 @@ export const getCompatibleApps = (keyboardLayout) => {
 export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false, usedShortcuts = new Set(), difficulty: 'basic' | 'standard' | 'madmax' | 'allrange' = 'standard') => {
   // 全ての許可されたアプリのショートカットを収集
   const allSafeShortcuts = [];
+  if (!allowedApps || !Array.isArray(allowedApps)) return null;
 
   allowedApps.forEach(appId => {
     const appShortcuts = allShortcuts[appId];
@@ -274,4 +280,13 @@ export const checkAnswerWithGracePeriod = (userAnswer, normalizedCorrectAnswer, 
 };
 
 // --- Test exports (only used during development) ---
-export const _testExports = process.env.NODE_ENV === 'test' ? { isShortcutSafe } : {};
+const reinitializeProtectedSetsForTesting = () => {
+  normalizedAlwaysProtected = new Set(
+    Array.from(ALWAYS_PROTECTED_SHORTCUTS).map(s => normalizeShortcut(s))
+  );
+  normalizedFullscreenPreventable = new Set(
+    Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map(s => normalizeShortcut(s))
+  );
+};
+
+export const _testExports = process.env.NODE_ENV === 'test' ? { isShortcutSafe, reinitializeProtectedSetsForTesting } : {};

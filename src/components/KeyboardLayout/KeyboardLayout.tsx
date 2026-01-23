@@ -1,6 +1,6 @@
 import { memo, useMemo, useCallback } from 'react'
 import { getKeyboardLayoutByName, getLayoutDisplayName } from '../../data/layouts'
-import { getCodeDisplayName } from '../../utils/keyMapping'
+import { getCodeDisplayName, getPossibleKeyNamesFromDisplay } from '../../utils/keyMapping'
 import { PressedKeys, ShortcutData } from '../../types'
 import { isModifierKey, isWindowsKey } from '../../utils/keyUtils'
 
@@ -47,11 +47,15 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
     if (!keyObj.code) return [];
 
     const keyDisplayName = getCodeDisplayName(keyObj.code, keyObj.key, keyboardLayout, shiftPressed);
+    const possibleKeyNames = getPossibleKeyNamesFromDisplay(keyDisplayName);
     const shortcuts = []
 
     // 単一キーのショートカット
-    if (shortcutDescriptions[keyDisplayName]) {
-      shortcuts.push({ combo: keyDisplayName, desc: shortcutDescriptions[keyDisplayName] })
+    // Try all possible key names (display name + actual key code)
+    for (const keyName of possibleKeyNames) {
+      if (shortcutDescriptions[keyName]) {
+        shortcuts.push({ combo: keyName, desc: shortcutDescriptions[keyName] })
+      }
     }
 
     // 修飾キーとの組み合わせ
@@ -59,8 +63,8 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
       const comboKeys = combo.split(' + ')
       const lastKey = comboKeys[comboKeys.length - 1]
 
-      // キーの表示名がショートカットの最後のキーと一致するか
-      if (lastKey.toUpperCase() === keyDisplayName.toUpperCase()) {
+      // キーの表示名または実際のキー名がショートカットの最後のキーと一致するか
+      if (possibleKeyNames.some(name => lastKey.toUpperCase() === name.toUpperCase())) {
         shortcuts.push({ combo, desc })
       }
     })

@@ -2,7 +2,7 @@ import React, { createContext, useState, useMemo, useCallback, useContext, React
 import { useLocalStorage } from '../hooks';
 import { SETUP_VERSION, STORAGE_KEYS, DEFAULTS } from '../constants';
 import { allShortcuts } from '../data/shortcuts';
-import { getLayoutDisplayName } from '../data/layouts';
+import { getLayoutDisplayName, keyboardLayoutOptions, KeyboardLayoutOption } from '../data/layouts';
 import { apps as appConfig } from '../config/apps';
 import { App, ShortcutData } from '../types';
 
@@ -12,12 +12,6 @@ interface SetupData {
   layout: string;
 }
 
-interface KeyboardLayoutOption {
-  id: string;
-  icon: string;
-  name: string;
-}
-
 interface AppContextType {
   setup: SetupData;
   showSetup: boolean;
@@ -25,7 +19,7 @@ interface AppContextType {
   keyboardLayout: string;
   isQuizMode: boolean;
   quizApp: string | null;
-  quizDifficulty: string | null;
+  quizDifficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' | null;
   shortcutDescriptions: ShortcutData;
   keyboardLayouts: KeyboardLayoutOption[];
   apps: App[];
@@ -35,8 +29,8 @@ interface AppContextType {
   setKeyboardLayout: (layout: string) => void;
   setIsQuizMode: (mode: boolean) => void;
   setQuizApp: (app: string | null) => void;
-  setQuizDifficulty: (difficulty: string | null) => void;
-  handleSetupComplete: (app: string, layout: string, mode?: string, quizApp?: string | null, difficulty?: string, isFullscreen?: boolean) => void;
+  setQuizDifficulty: (difficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' | null) => void;
+  handleSetupComplete: (app: string, layout: string, mode?: string, quizApp?: string | null, difficulty?: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange', isFullscreen?: boolean) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -61,7 +55,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [keyboardLayout, setKeyboardLayout] = useState(setup.layout || DEFAULTS.LAYOUT);
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizApp, setQuizApp] = useState<string | null>(null);
-  const [quizDifficulty, setQuizDifficulty] = useState<string | null>(null);
+  const [quizDifficulty, setQuizDifficulty] = useState<'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' | null>(null);
   const [apps] = useState(appConfig); // stateとして保持
 
   const handleSetupComplete = useCallback((app, layout, mode = 'visualizer', quizAppParam = null, difficulty = null, isFullscreen = false) => {
@@ -84,14 +78,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     [selectedApp]
   );
 
-  const keyboardLayouts = useMemo(() => {
-    return [
-      { id: 'windows-jis', icon: '⊞', name: 'Windows JIS' },
-      { id: 'mac-jis', icon: '⌘', name: 'Mac JIS' },
-      { id: 'mac-us', icon: '⌘', name: 'Mac US' },
-    ];
-  }, []);
-
   const value = {
     // State
     setup,
@@ -102,7 +88,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     quizApp,
     quizDifficulty,
     shortcutDescriptions,
-    keyboardLayouts,
+    keyboardLayouts: keyboardLayoutOptions,
     apps, // appsを提供
 
     // Actions

@@ -1,4 +1,4 @@
-import { getCodeDisplayName, getShiftedSymbolForKey } from './keyMapping'
+import { getCodeDisplayName, getShiftedSymbolForKey, getPossibleKeyNamesFromDisplay } from './keyMapping'
 import { MODIFIER_ORDER } from './keyUtils'
 
 /**
@@ -94,6 +94,21 @@ export const getShortcutDescription = (currentDisplayComboText, shortcutDescript
   for (const alt of alternatives) {
     if (shortcutDescriptions[alt]) {
       return shortcutDescriptions[alt]
+    }
+  }
+
+  // キー名の別名を考慮した検索（PgUp <-> PageUp など）
+  const parts = currentDisplayComboText.split(' + ')
+  const lastKey = parts[parts.length - 1]
+  const possibleLastKeys = getPossibleKeyNamesFromDisplay(lastKey)
+
+  // 最後のキーの別名を試す
+  for (const possibleLastKey of possibleLastKeys) {
+    if (possibleLastKey !== lastKey) {
+      const alternativeCombo = [...parts.slice(0, -1), possibleLastKey].join(' + ')
+      if (shortcutDescriptions[alternativeCombo]) {
+        return shortcutDescriptions[alternativeCombo]
+      }
     }
   }
 

@@ -187,7 +187,7 @@ export const getCodeDisplayName = (code, key, layout, shiftPressed) => {
  */
 export const getDisplayNamesFromCodes = (pressedCodes, layout) => {
   const shiftPressed = pressedCodes.has('ShiftLeft') || pressedCodes.has('ShiftRight');
-  
+
   const displayNames = Array.from(pressedCodes).map(code => {
     // Since pressedCodes only contains 'code', 'key' is unknown.
     // We could pass null for the key argument to getCodeDisplayName,
@@ -196,4 +196,37 @@ export const getDisplayNamesFromCodes = (pressedCodes, layout) => {
   });
 
   return displayNames;
+};
+
+/**
+ * Gets possible key names (codes) from a display name.
+ * This is useful for matching shortcuts defined with full key names (e.g., 'PageUp')
+ * against display names (e.g., 'PgUp').
+ * @param {string} displayName - The display name (e.g., 'PgUp', 'Del', 'Esc')
+ * @returns {string[]} Array of possible key codes/names that could produce this display
+ */
+export const getPossibleKeyNamesFromDisplay = (displayName) => {
+  const possibleNames = [displayName]; // Always include the display name itself
+
+  // Create a reverse mapping from display names to key codes
+  const reverseMap = {
+    'PgUp': 'PageUp',
+    'PgDn': 'PageDown',
+    'Ins': 'Insert',
+    'Del': 'Delete',
+    'Bksp': 'Backspace',
+    'Esc': 'Escape',
+    'PrtSc': 'PrintScreen',
+    '↑': 'ArrowUp',
+    '↓': 'ArrowDown',
+    '←': 'ArrowLeft',
+    '→': 'ArrowRight',
+  };
+
+  // Add the reverse mapped name if it exists
+  if (reverseMap[displayName]) {
+    possibleNames.push(reverseMap[displayName]);
+  }
+
+  return possibleNames;
 };

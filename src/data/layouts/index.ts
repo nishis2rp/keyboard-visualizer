@@ -29,5 +29,18 @@ export const getLayoutDisplayName = (layoutName) => {
   }
 }
 
+// キーボードレイアウトの選択肢リスト
+export interface KeyboardLayoutOption {
+  id: string;
+  icon: string;
+  name: string;
+}
+
+export const keyboardLayoutOptions: KeyboardLayoutOption[] = [
+  { id: 'windows-jis', icon: '⊞', name: 'Windows JIS' },
+  { id: 'mac-jis', icon: '⌘', name: 'Mac JIS' },
+  { id: 'mac-us', icon: '⌘', name: 'Mac US' },
+];
+
 // 個別のレイアウトもエクスポート
 export { windowsJisLayout, macJisLayout, macUsLayout }

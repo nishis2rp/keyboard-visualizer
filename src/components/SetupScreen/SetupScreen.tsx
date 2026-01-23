@@ -86,7 +86,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
       id: 'basic',
       name: 'Basic',
       icon: '🌟',
-      description: '初心者向け：よく使われるショートカット'
+      description: '初心者向け：よく使われる基本的なショートカット'
     },
     {
       id: 'standard',
@@ -95,10 +95,16 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
       description: '中級者向け：適度な難易度のショートカット'
     },
     {
+      id: 'hard',
+      name: 'Hard',
+      icon: '💪',
+      description: '上級者向け：より高度で実践的なショートカット'
+    },
+    {
       id: 'madmax',
       name: 'MadMax',
       icon: '🔥',
-      description: '上級者向け：高度なショートカット'
+      description: '最難関：非常に特殊で習得が難しいプロフェッショナル向けショートカット'
     },
     {
       id: 'allrange',

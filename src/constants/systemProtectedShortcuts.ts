@@ -12,72 +12,19 @@
  * これらは通常はブラウザやOSに取られるが、フルスクリーン+Keyboard Lock APIで防げる
  *
  * 注意: 一般的な編集ショートカット（Ctrl+S, Ctrl+Pなど）はここに含めない
- * それらはアプリケーション内で正常に動作するため、全画面表示の必要はない
+ * それらはアプリケーション内でpreventDefault()で制御できるため、全画面表示の必要はない
+ *
+ * このリストには、ブラウザのタブ/ウィンドウ操作など、フルスクリーンが必要なもののみを含める
  */
 export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   // ===== Windows =====
 
   // ブラウザタブ操作（フルスクリーンで防げる）
   'Ctrl + W',                   // タブを閉じる
-  'Ctrl + F4',                  // タブを閉じる
   'Ctrl + T',                   // 新しいタブ
   'Ctrl + N',                   // 新しいウィンドウ
   'Ctrl + Shift + N',           // シークレットウィンドウ
-  'Ctrl + Tab',                 // 次のタブ
-  'Ctrl + Shift + Tab',         // 前のタブ
-  'Ctrl + Page Down',           // 次のタブ
-  'Ctrl + Page Up',             // 前のタブ
-  'Ctrl + Shift + Page Down',   // タブを右に移動
-  'Ctrl + Shift + Page Up',     // タブを左に移動
-  'Ctrl + 1',                   // 1番目のタブ
-  'Ctrl + 2',                   // 2番目のタブ
-  'Ctrl + 3',                   // 3番目のタブ
-  'Ctrl + 4',                   // 4番目のタブ
-  'Ctrl + 5',                   // 5番目のタブ
-  'Ctrl + 6',                   // 6番目のタブ
-  'Ctrl + 7',                   // 7番目のタブ
-  'Ctrl + 8',                   // 8番目のタブ
-  'Ctrl + 9',                   // 最後のタブ
   'Ctrl + Shift + T',           // 閉じたタブを再度開く
-
-  // ブラウザナビゲーション（フルスクリーンで防げる）
-  'Alt + ←',                    // 戻る
-  'Alt + →',                    // 進む
-  'Backspace',                  // 前のページに戻る
-  'Shift + Backspace',          // 次のページに進む
-  'Ctrl + R',                   // ページを更新
-  'Ctrl + +',                   // ズームイン
-  'Ctrl + -',                   // ズームアウト
-  'Ctrl + 0',                   // ズームリセット
-  'Ctrl + L',                   // アドレスバーにフォーカス
-  'Alt + D',                    // アドレスバーにフォーカス
-  'Ctrl + K',                   // 検索バーにフォーカス
-  'Ctrl + E',                   // 検索バーにフォーカス
-
-  // ブラウザ機能（フルスクリーンで防げる）
-  // 注: Ctrl+F, Ctrl+H, Ctrl+Jなどの検索・履歴・ダウンロードは
-  // オーバーレイ/サイドパネルで表示されるため、全画面表示不要
-  'Ctrl + D',                   // ブックマーク
-  'Ctrl + Shift + D',           // 全てブックマーク
-  'Ctrl + Shift + B',           // ブックマークバー
-  'Ctrl + Shift + O',           // ブックマークマネージャ
-  'Ctrl + U',                   // ソース表示
-  'Ctrl + O',                   // ファイルを開く
-  'Ctrl + Shift + S',           // 名前を付けて保存
-  'Ctrl + A',                   // すべて選択
-  'F7',                         // カーソルブラウジング
-  'Ctrl + Shift + Delete',      // 閲覧データを削除
-  'F12',                        // デベロッパーツール
-  'Ctrl + Shift + I',           // デベロッパーツール
-  'Ctrl + Shift + J',           // コンソールを開く
-  'Ctrl + Shift + C',           // 要素を検証
-  'Ctrl + Shift + M',           // デバイスツールバー
-  'Ctrl + [',                   // DevTools前のパネル
-  'Ctrl + ]',                   // DevTools次のパネル
-  'Ctrl + Enter',               // .comを追加
-  'Ctrl + Shift + A',           // タブを検索
-  'Ctrl + Shift + E',           // 拡張機能ページ
-  'Shift + Escape',             // タスクマネージャー
 
   // Windows UI操作（フルスクリーンで防げる）
   'Win + D',                    // デスクトップ表示
@@ -161,45 +108,7 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Cmd + T',                    // 新しいタブ
   'Cmd + N',                    // 新しいウィンドウ
   'Cmd + Shift + N',            // シークレットウィンドウ
-  'Cmd + Option + ←',           // 前のタブ
-  'Cmd + Option + →',           // 次のタブ
-  'Cmd + Shift + [',            // 前のタブ
-  'Cmd + Shift + ]',            // 次のタブ
-  'Cmd + 1',                    // 1番目のタブ
-  'Cmd + 2',                    // 2番目のタブ
-  'Cmd + 3',                    // 3番目のタブ
-  'Cmd + 4',                    // 4番目のタブ
-  'Cmd + 5',                    // 5番目のタブ
-  'Cmd + 6',                    // 6番目のタブ
-  'Cmd + 7',                    // 7番目のタブ
-  'Cmd + 8',                    // 8番目のタブ
-  'Cmd + 9',                    // 最後のタブ
   'Cmd + Shift + T',            // 閉じたタブを再度開く
-
-  // ブラウザナビゲーション（フルスクリーンで防げる）
-  'Cmd + [',                    // 戻る
-  'Cmd + ]',                    // 進む
-  'Cmd + R',                    // ページを更新
-  'Cmd + Shift + R',            // キャッシュをクリアして強制再読み込み
-  'Cmd + +',                    // ズームイン
-  'Cmd + -',                    // ズームアウト
-  'Cmd + 0',                    // ズームリセット
-  'Cmd + L',                    // アドレスバーにフォーカス
-
-  // ブラウザ機能（フルスクリーンで防げる）
-  // 注: Cmd+Fなどの検索機能はオーバーレイで表示されるため、全画面表示不要
-  'Cmd + D',                    // ブックマーク
-  'Cmd + Shift + D',            // 全てブックマーク
-  'Cmd + Option + B',           // ブックマークバー
-  'Cmd + Option + U',           // ソース表示
-  'Cmd + Shift + S',            // 名前を付けて保存
-  'Cmd + O',                    // ファイルを開く
-  'Cmd + Shift + Delete',       // 閲覧データを削除
-  'Cmd + Option + I',           // デベロッパーツール
-  'Cmd + Option + J',           // コンソールを開く
-  'Cmd + Option + C',           // 要素を検証
-  'Cmd + Shift + A',            // タブを検索
-  'Cmd + Shift + E',            // 拡張機能ページ
 ])
 
 /**

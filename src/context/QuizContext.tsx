@@ -1,12 +1,15 @@
-import React, { createContext, useReducer, useContext, useCallback, ReactNode, Dispatch } from 'react';
+import React, { createContext, useReducer, useContext, useCallback, ReactNode, Dispatch, useRef, useEffect } from 'react';
 import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps, normalizeShortcut } from '../utils/quizEngine';
 import { allShortcuts } from '../data/shortcuts';
 import { QuizQuestion, QuizStats, QuizResult } from '../types';
 import { ALWAYS_PROTECTED_SHORTCUTS, FULLSCREEN_PREVENTABLE_SHORTCUTS } from '../constants/systemProtectedShortcuts';
+import { isModifierKey } from '../utils/keyUtils';
+import { isSequentialShortcut } from '../utils/shortcutUtils';
+
 
 interface QuizSettings {
   quizMode: 'default' | 'hardcore';
-  difficulty: 'basic' | 'standard' | 'madmax' | 'allrange';
+  difficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange';
   timeLimit: number;
   totalQuestions: number;
   isFullscreen: boolean;
@@ -36,10 +39,11 @@ interface QuizState {
   startTime: number | null;
   endTime: number | null;
   settings: QuizSettings;
+  pressedKeys: Set<string>; // ★ 追加: 現在押されているキー
 }
 
 type QuizAction =
-  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: string } }
+  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange' } }
   | { type: 'SET_QUESTION'; payload: { question: QuizQuestion } }
   | { type: 'ANSWER_QUESTION'; payload: { userAnswer: string; isCorrect: boolean; answerTimeMs: number } }
   | { type: 'SKIP_QUESTION' }
@@ -52,20 +56,21 @@ type QuizAction =
   | { type: 'UPDATE_TIMER'; payload: number }
   | { type: 'TIMEOUT' }
   | { type: 'FINISH_QUIZ' }
-  | { type: 'NEXT_QUESTION' };
+  | { type: 'NEXT_QUESTION' }
+  | { type: 'UPDATE_PRESSED_KEYS'; payload: Set<string> }; // ★ 追加
 
 interface QuizContextType {
   quizState: QuizState;
   dispatch: Dispatch<QuizAction>;
-  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: 'basic' | 'standard' | 'madmax' | 'allrange') => void;
+  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: 'basic' | 'standard' | 'madmax' | 'hard' | 'allrange') => void;
   handleAnswer: (pressedCodes: Set<string>) => void;
   getNextQuestion: () => void;
   updateFullscreen: (isFullscreen: boolean) => void;
+  handleKeyPress: (pressedKeys: Set<string>) => void; // ★ 追加
 }
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
 
-// --- 2. 初期状態の定義 ---
 const initialQuizState: QuizState = {
   status: 'idle',
   selectedApp: null,
@@ -87,21 +92,21 @@ const initialQuizState: QuizState = {
     totalQuestions: 10,
     isFullscreen: false,
   },
+  pressedKeys: new Set(), // ★ 追加
 };
 
-// --- 3. Reducer関数の定義 ---
 function quizReducer(state: QuizState, action: QuizAction): QuizState {
   switch (action.type) {
     case 'START_QUIZ':
       return {
-        ...initialQuizState, // 初期状態に戻す
+        ...initialQuizState,
         status: 'playing',
         selectedApp: action.payload.app,
         keyboardLayout: action.payload.keyboardLayout,
         settings: {
           ...state.settings,
-          isFullscreen: action.payload.isFullscreen, // 現在のフルスクリーン状態を反映
-          difficulty: action.payload.difficulty as 'basic' | 'standard' | 'madmax' | 'allrange', // 難易度を設定
+          isFullscreen: action.payload.isFullscreen,
+          difficulty: action.payload.difficulty,
         },
         startTime: Date.now(),
       };
@@ -125,7 +130,6 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
 
       const newScore = state.score + (isCorrect ? 1 : 0);
 
-      // Categorize answer speed
       const getSpeedCategory = (timeMs) => {
         if (timeMs < 1000) return 'fast';
         if (timeMs < 3000) return 'normal';
@@ -147,6 +151,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         lastAnswerResult: isCorrect ? 'correct' : 'incorrect',
         showAnswer: true,
         quizHistory: [...state.quizHistory, historyEntry],
+        pressedKeys: new Set(), // 回答後はキーをクリア
       };
     }
     case 'FINISH_QUIZ':
@@ -167,21 +172,12 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
       };
     case 'RESET_QUIZ':
       return initialQuizState;
-    case 'TOGGLE_QUIZ_MODE': // 'default' <-> 'hardcore'
-      return {
-        ...state,
-        settings: {
-          ...state.settings,
-          quizMode: state.settings.quizMode === 'default' ? 'hardcore' : 'default',
-        },
-      };
-    case 'SET_FULLSCREEN_MODE':
     case 'UPDATE_FULLSCREEN':
       return {
         ...state,
         settings: {
           ...state.settings,
-          isFullscreen: action.payload.isFullscreen || action.payload,
+          isFullscreen: action.payload.isFullscreen,
         },
       };
     case 'UPDATE_TIMER':
@@ -190,7 +186,6 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         timeRemaining: action.payload,
       };
     case 'TIMEOUT':
-      // 時間切れで不正解扱い
       return {
         ...state,
         showAnswer: true,
@@ -206,156 +201,214 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         ],
       };
     case 'NEXT_QUESTION':
-      // 次の問題へ進む準備（showAnswerをリセット）
       return {
         ...state,
         showAnswer: false,
         lastAnswerResult: null,
+        pressedKeys: new Set(), // 次の問題へ進む前にキーをクリア
+      };
+    case 'UPDATE_PRESSED_KEYS': // ★ 追加
+      return {
+        ...state,
+        pressedKeys: action.payload,
       };
     default:
       return state;
   }
 }
 
-// --- 4. Providerコンポーネント ---
 interface QuizProviderProps {
   children: ReactNode;
 }
 
 export function QuizProvider({ children }: QuizProviderProps) {
   const [quizState, dispatch] = useReducer(quizReducer, initialQuizState);
-
-  // 次の問題を生成してセットする関数
-  const getNextQuestion = useCallback(() => {
-    if (!quizState.keyboardLayout) {
-      dispatch({ type: 'FINISH_QUIZ' });
-      return;
-    }
-
-    // 10問に達したかチェック
-    if (quizState.quizHistory.length >= quizState.settings.totalQuestions) {
-      dispatch({ type: 'FINISH_QUIZ' });
-      return;
-    }
-
-    // 次の問題へ進む準備
-    dispatch({ type: 'NEXT_QUESTION' });
-
-    // キーボードレイアウトに基づいて互換性のあるアプリを取得
-    let compatibleApps = getCompatibleApps(quizState.keyboardLayout);
-
-    // selectedAppが'random'でない場合、指定されたアプリのみに絞る
-    if (quizState.selectedApp && quizState.selectedApp !== 'random' && compatibleApps.includes(quizState.selectedApp)) {
-      compatibleApps = [quizState.selectedApp];
-    }
-
-
-    const newQuestion = generateQuestion(
-      allShortcuts,
-      compatibleApps,
-      'default', // デフォルトモードを使用
-      quizState.settings.isFullscreen,
-      quizState.usedShortcuts,
-      quizState.settings.difficulty // 難易度を渡す
-    );
-
-    if (newQuestion) {
-      dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
-    } else {
-      // 問題が生成できない場合、クイズを終了
-      dispatch({ type: 'FINISH_QUIZ' });
-    }
-  }, [quizState.keyboardLayout, quizState.settings.isFullscreen, quizState.selectedApp, quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts]);
-
-
-  // クイズを開始する
-  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'madmax' | 'allrange' = 'standard') => {
-
-    dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
-
-    // キーボードレイアウトに基づいて互換性のあるアプリを取得
-    let compatibleApps = getCompatibleApps(keyboardLayout);
-
-    // appが'random'でない場合、指定されたアプリのみに絞る
-    if (app !== 'random' && compatibleApps.includes(app)) {
-      compatibleApps = [app];
-    }
-
-
-    // state更新が反映されるのを待つ
-    setTimeout(() => {
-      const newQuestion = generateQuestion(
-        allShortcuts,
-        compatibleApps,
-        'default', // デフォルトモードを使用
-        isFullscreen,
-        new Set(), // 最初の問題なので空のSet
-        difficulty // 難易度を渡す
-      );
-
-      if (newQuestion) {
-        dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
-      } else {
-        dispatch({ type: 'FINISH_QUIZ' });
-      }
-    }, 0);
-  }, []); // 依存配列を空にして常に最新の値を使用
-
+  
+  // ★ 回答判定のためのロジックをコンテキスト内に移動
+  const previousPressedKeysRef = useRef(new Set());
+  const cooldownRef = useRef(false);
 
   // 回答を処理する
   const handleAnswer = useCallback((pressedKeys) => {
     if (quizState.status !== 'playing' || !quizState.currentQuestion || quizState.showAnswer) {
       return;
     }
-
-    // Calculate answer time
     const answerTimeMs = Date.now() - quizState.questionStartTime;
-
     const userAnswer = normalizePressedKeys(pressedKeys);
     const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
-
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
   }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, quizState.showAnswer]);
 
-  // フルスクリーン状態を更新し、現在の問題が安全かチェック
+  // ★ キー入力の変更をハンドリングするuseEffect
+  useEffect(() => {
+    if (quizState.status !== 'playing' || quizState.showAnswer || cooldownRef.current) {
+      return;
+    }
+
+    const previousKeys = previousPressedKeysRef.current;
+    const currentKeys = quizState.pressedKeys;
+
+    if (currentKeys.size > 0) {
+      previousPressedKeysRef.current = new Set(currentKeys);
+    }
+
+    if (previousKeys.size > 0) {
+      const releasedKeys = Array.from(previousKeys).filter(key => !currentKeys.has(key));
+
+      if (releasedKeys.length > 0) {
+        const hasNonModifierReleased = releasedKeys.some(key => !isModifierKey(key));
+
+        if (hasNonModifierReleased) {
+          const currentQuestion = quizState.currentQuestion;
+          const isSequential = currentQuestion && isSequentialShortcut(currentQuestion.correctShortcut);
+
+          if (isSequential && currentKeys.size > 0) {
+            previousPressedKeysRef.current = new Set(currentKeys);
+          } else {
+            handleAnswer(previousKeys);
+            previousPressedKeysRef.current = new Set();
+          }
+        } else {
+          previousPressedKeysRef.current = new Set(currentKeys);
+        }
+      }
+    }
+  }, [quizState.pressedKeys, quizState.status, quizState.showAnswer, quizState.currentQuestion, handleAnswer]);
+  
+  // ★ 問題切り替え時のクールダウン
+  useEffect(() => {
+    if (quizState.status === 'playing' && quizState.currentQuestion && !quizState.showAnswer) {
+      cooldownRef.current = true;
+      previousPressedKeysRef.current = new Set();
+      dispatch({ type: 'UPDATE_PRESSED_KEYS', payload: new Set() });
+
+      const timer = setTimeout(() => {
+        cooldownRef.current = false;
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [quizState.currentQuestion, quizState.showAnswer, quizState.status]);
+
+  // ★ タイマーロジック
+  useEffect(() => {
+    if (quizState.status !== 'playing' || !quizState.currentQuestion || quizState.showAnswer) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      const newTime = Math.max(0, quizState.timeRemaining - 0.1);
+
+      if (newTime <= 0) {
+        dispatch({ type: 'TIMEOUT' });
+      } else {
+        dispatch({ type: 'UPDATE_TIMER', payload: newTime });
+      }
+    }, 100);
+
+    return () => clearInterval(timer);
+  }, [quizState.status, quizState.currentQuestion, quizState.timeRemaining, quizState.showAnswer]);
+
+  const handleKeyPress = useCallback((pressedKeys: Set<string>) => {
+    dispatch({ type: 'UPDATE_PRESSED_KEYS', payload: pressedKeys });
+  }, []);
+
+  const getNextQuestion = useCallback(() => {
+    if (!quizState.keyboardLayout) {
+      dispatch({ type: 'FINISH_QUIZ' });
+      return;
+    }
+    if (quizState.quizHistory.length >= quizState.settings.totalQuestions) {
+      dispatch({ type: 'FINISH_QUIZ' });
+      return;
+    }
+    dispatch({ type: 'NEXT_QUESTION' });
+
+    let compatibleApps = getCompatibleApps(quizState.keyboardLayout);
+    if (quizState.selectedApp && quizState.selectedApp !== 'random' && compatibleApps.includes(quizState.selectedApp)) {
+      compatibleApps = [quizState.selectedApp];
+    }
+
+    const newQuestion = generateQuestion(
+      allShortcuts, compatibleApps, 'default',
+      quizState.settings.isFullscreen, quizState.usedShortcuts, quizState.settings.difficulty
+    );
+
+    if (newQuestion) {
+      dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
+    } else {
+      dispatch({ type: 'FINISH_QUIZ' });
+    }
+  }, [quizState.keyboardLayout, quizState.settings.isFullscreen, quizState.selectedApp, quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts, quizState.settings.difficulty]);
+
+  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'madmax' | 'allrange' = 'standard') => {
+    dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
+    setTimeout(() => {
+      let compatibleApps = getCompatibleApps(keyboardLayout);
+      if (app !== 'random' && compatibleApps.includes(app)) {
+        compatibleApps = [app];
+      }
+      const newQuestion = generateQuestion(
+        allShortcuts, compatibleApps, 'default', isFullscreen, new Set(), difficulty
+      );
+      if (newQuestion) {
+        dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
+      } else {
+        dispatch({ type: 'FINISH_QUIZ' });
+      }
+    }, 0);
+  }, []);
+
+  const handleAnswerInternal = useCallback((pressedKeys) => {
+    if (quizState.status !== 'playing' || !quizState.currentQuestion || quizState.showAnswer) return;
+    const answerTimeMs = Date.now() - quizState.questionStartTime;
+    const userAnswer = normalizePressedKeys(pressedKeys);
+    const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
+    dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
+  }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, quizState.showAnswer]);
+
   const updateFullscreen = useCallback((isFullscreen: boolean) => {
-
-    // フルスクリーン状態を更新
     dispatch({ type: 'UPDATE_FULLSCREEN', payload: { isFullscreen } });
-
-    // 現在プレイ中で問題がある場合、その問題が新しいフルスクリーン状態で安全かチェック
     if (quizState.status === 'playing' && quizState.currentQuestion) {
       const normalizedShortcut = quizState.currentQuestion.normalizedCorrectShortcut;
+      const normalizedAlwaysProtected = new Set(Array.from(ALWAYS_PROTECTED_SHORTCUTS).map(s => normalizeShortcut(s)));
+      const normalizedFullscreenPreventable = new Set(Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map(s => normalizeShortcut(s)));
 
-      // 正規化されたショートカットのセットを作成
-      const normalizedAlwaysProtected = new Set(
-        Array.from(ALWAYS_PROTECTED_SHORTCUTS).map(s => normalizeShortcut(s))
-      );
-      const normalizedFullscreenPreventable = new Set(
-        Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map(s => normalizeShortcut(s))
-      );
-
-      // 常に保護されているショートカットは問題外（これは出題されないはず）
       if (normalizedAlwaysProtected.has(normalizedShortcut)) {
         getNextQuestion();
         return;
       }
-
-      // 全画面でない場合、フルスクリーンで防止可能なショートカットは安全でない
       if (!isFullscreen && normalizedFullscreenPreventable.has(normalizedShortcut)) {
         getNextQuestion();
       }
     }
   }, [quizState.status, quizState.currentQuestion, getNextQuestion]);
 
-  // コンテキストに渡す値
+  // ★ →キーまたはEnterキーで次の問題へ進む
+  useEffect(() => {
+    if (quizState.status !== 'playing' || !quizState.showAnswer) {
+      return;
+    }
+
+    const handleKeyPressEvent = (event) => {
+      if (event.key === 'ArrowRight' || event.key === 'Enter') {
+        event.preventDefault();
+        getNextQuestion();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPressEvent);
+    return () => window.removeEventListener('keydown', handleKeyPressEvent);
+  }, [quizState.status, quizState.showAnswer, getNextQuestion]);
+
   const value = {
     quizState,
     dispatch,
     startQuiz,
-    handleAnswer,
-    getNextQuestion, // 外部からも次問取得できるようにエクスポート
+    handleAnswer: handleAnswerInternal,
+    getNextQuestion,
     updateFullscreen,
+    handleKeyPress, // ★ 追加
   };
 
   return (
@@ -365,7 +418,6 @@ export function QuizProvider({ children }: QuizProviderProps) {
   );
 }
 
-// --- 5. Contextを使用するためのカスタムフック ---
 export function useQuiz() {
   const context = useContext(QuizContext);
   if (context === undefined) {
