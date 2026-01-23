@@ -32,6 +32,7 @@ interface QuizState {
   questionStartTime: number | null;
   timeRemaining: number;
   lastAnswerResult: 'correct' | 'incorrect' | null;
+  lastWrongAnswer: string | null; // ★ 追加: 間違った回答を記録
   showAnswer: boolean; // 正解を表示するかどうか
   score: number;
   quizHistory: QuizHistoryEntry[];
@@ -79,6 +80,7 @@ const initialQuizState: QuizState = {
   questionStartTime: null,
   timeRemaining: 10,
   lastAnswerResult: null,
+  lastWrongAnswer: null, // ★ 追加
   showAnswer: false,
   score: 0,
   quizHistory: [],
@@ -149,6 +151,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         ...state,
         score: newScore,
         lastAnswerResult: isCorrect ? 'correct' : 'incorrect',
+        lastWrongAnswer: isCorrect ? null : userAnswer, // ★ 追加: 間違った回答を記録
         showAnswer: true,
         quizHistory: [...state.quizHistory, historyEntry],
         pressedKeys: new Set(), // 回答後はキーをクリア
@@ -190,6 +193,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         ...state,
         showAnswer: true,
         lastAnswerResult: 'incorrect',
+        lastWrongAnswer: '（時間切れ）', // ★ 追加
         quizHistory: [
           ...state.quizHistory,
           {
@@ -205,6 +209,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         ...state,
         showAnswer: false,
         lastAnswerResult: null,
+        lastWrongAnswer: null, // ★ 追加
         pressedKeys: new Set(), // 次の問題へ進む前にキーをクリア
       };
     case 'UPDATE_PRESSED_KEYS': // ★ 追加

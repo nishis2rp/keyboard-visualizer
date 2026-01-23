@@ -2,11 +2,13 @@ import React from 'react';
 import { useQuiz } from '../../context/QuizContext';
 import { getCodeDisplayName } from '../../utils/keyMapping';
 import { formatSequentialShortcut } from '../../utils/sequentialShortcuts';
+import { getAlternativeShortcuts } from '../../constants/alternativeShortcuts';
+import { normalizeShortcut } from '../../utils/quizEngine';
 import styles from './QuestionCard.module.css';
 
 function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' }) {
   const { quizState, getNextQuestion } = useQuiz();
-  const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer } = quizState;
+  const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer, lastWrongAnswer } = quizState;
 
   if (status !== 'playing' || !currentQuestion) {
     return null;
@@ -117,6 +119,15 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
         {/* 正解表示と次の問題ボタン */}
         {showAnswer && (
           <div className={styles.answerSection}>
+            {/* 間違った回答を表示 */}
+            {lastAnswerResult === 'incorrect' && lastWrongAnswer && (
+              <div className={styles.wrongAnswer}>
+                <div className={styles.wrongAnswerLabel}>あなたの回答：</div>
+                <div className={styles.wrongAnswerValue}>{lastWrongAnswer}</div>
+              </div>
+            )}
+
+            {/* 正解表示 */}
             <div className={styles.correctAnswer}>
               <div className={styles.correctAnswerLabel}>
                 {lastAnswerResult === 'correct' ? '正解！' : '正解は：'}
@@ -124,7 +135,30 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
               <div className={styles.correctAnswerValue}>
                 {currentQuestion.correctShortcut}
               </div>
+
+              {/* 代替ショートカットを表示 */}
+              {(() => {
+                const normalized = normalizeShortcut(currentQuestion.correctShortcut);
+                const alternatives = getAlternativeShortcuts(normalized);
+                // 元のショートカット以外の代替を取得
+                const otherAlternatives = alternatives.filter(alt => alt !== normalized);
+
+                if (otherAlternatives.length > 0) {
+                  return (
+                    <div className={styles.alternativeShortcuts}>
+                      <div className={styles.alternativeLabel}>他の正解：</div>
+                      <div className={styles.alternativeList}>
+                        {otherAlternatives.map((alt, idx) => (
+                          <span key={idx} className={styles.alternativeItem}>{alt}</span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </div>
+
             <button
               className={styles.nextButton}
               onClick={getNextQuestion}

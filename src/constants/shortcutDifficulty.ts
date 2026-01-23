@@ -57,6 +57,8 @@ export const BASIC_SHORTCUTS = new Set([
   'Win+X',           // クイックリンクメニュー
   'Win+K',           // キャスト（ワイヤレスディスプレイ）
   'Win+P',           // プレゼンテーション表示モード
+  'Win+R',           // ファイル名を指定して実行
+  'Win+M',           // すべてのウィンドウを最小化
   'Win+↑',           // ウィンドウを最大化
   'Win+↓',           // ウィンドウを最小化/元に戻す
   'Win+←',           // ウィンドウを画面左半分にスナップ
@@ -64,15 +66,13 @@ export const BASIC_SHORTCUTS = new Set([
   'Win+1',           // タスクバーの1番目のアプリを起動
   'Win+2',           // タスクバーの2番目のアプリを起動
   'Win+3',           // タスクバーの3番目のアプリを起動
-  'Win+4',           // タンスバーの4番目のアプリを起動
-  'Win+5',           // タンスバーの5番目のアプリを起動
-  'Win+6',           // タンスバーの6番目のアプリを起動
-  'Win+7',           // タンスバーの7番目のアプリを起動
-  'Win+8',           // タンスバーの8番目のアプリを起動
-  'Win+9',           // タンスバーの9番目のアプリを起動
-  'Win+0',           // タンスバーの10番目のアプリを起動
-  'Win+M',           // すべてのウィンドウを最小化
-  'Win+R',           // ファイル名を指定して実行
+  'Win+4',           // タスクバーの4番目のアプリを起動
+  'Win+5',           // タスクバーの5番目のアプリを起動
+  'Win+6',           // タスクバーの6番目のアプリを起動
+  'Win+7',           // タスクバーの7番目のアプリを起動
+  'Win+8',           // タスクバーの8番目のアプリを起動
+  'Win+9',           // タスクバーの9番目のアプリを起動
+  'Win+0',           // タスクバーの10番目のアプリを起動
 
   // 書式設定基本
   'Ctrl+B',          // 太字
@@ -85,17 +85,14 @@ export const BASIC_SHORTCUTS = new Set([
   'Meta+V',          // 貼り付け（Mac）
   'Meta+X',          // 切り取り（Mac）
   'Meta+Z',          // 元に戻す（Mac）
-  'Meta+Shift+Z',    // やり直し（Mac）
   'Meta+S',          // 保存 (Mac)
   'Meta+F',          // 検索 (Mac)
-  'Meta+G',          // 次を検索（Mac）
   'Meta+P',          // 印刷 (Mac)
   'Meta+N',          // 新規ウィンドウ (Mac)
   'Meta+O',          // 開く (Mac)
   'Meta+W',          // ウィンドウを閉じる (Mac)
   'Meta+Q',          // アプリを終了 (Mac)
   'Meta+T',          // 新規タブ (Mac)
-  'Meta+Tab',        // アプリケーション切り替え（Mac）
   'Meta+Space',      // Spotlight検索
   'Meta+R',          // ブラウザ更新（Mac）
   'Meta+L',          // アドレスバー（Mac）
@@ -109,22 +106,10 @@ export const BASIC_SHORTCUTS = new Set([
   'Shift+↓',         // 1行下を選択
   'Shift+←',         // 1文字左を選択
   'Shift+→',         // 1文字右を選択
-  'Shift+Home',      // 行の先頭まで選択
-  'Shift+End',       // 行の末尾まで選択
-
-  // よく使うWindows操作
-  'Win+I',           // 設定を開く
-  'Win+↑',           // ウィンドウを最大化
-  'Win+↓',           // ウィンドウを最小化/元に戻す
-  'Win+←',           // ウィンドウを画面左半分にスナップ
-  'Win+→',           // ウィンドウを画面右半分にスナップ
 
   // よく使うブラウザ操作
   'Alt+←',           // 前に戻る
   'Alt+→',           // 次に進む
-
-  // よく使うエクスプローラー操作
-  'Ctrl+Shift+N',    // 新しいフォルダーを作成
 
   // Slack
   'Shift+Enter',     // 改行する
@@ -136,6 +121,21 @@ export const BASIC_SHORTCUTS = new Set([
  * BASICほど頻繁には使わないが、知っていると便利なもの
  */
 export const STANDARD_SHORTCUTS = new Set([
+  // BASIC から移動（複数修飾キー）
+  'Meta+Shift+Z',    // やり直し（Mac）
+  'Ctrl+Shift+N',    // 新しいフォルダーを作成
+  'Shift+Home',      // 行の先頭まで選択
+  'Shift+End',       // 行の末尾まで選択
+  'Meta+G',          // 次を検索（Mac）
+  'Meta+Tab',        // アプリケーション切り替え（Mac）
+
+  // Gmail基本（よく使うもののみ）
+  'c',               // 作成
+  'r',               // 返信
+  '/',               // 検索
+  'k',               // 次のメール
+  'j',               // 前のメール
+
   'Ctrl+Shift+Tab',  // タブ切り替え（前）
   'Ctrl+Shift+T',    // 閉じたタブを再度開く
   'Ctrl+H',          // 履歴
@@ -161,26 +161,14 @@ export const STANDARD_SHORTCUTS = new Set([
   'Meta+Shift+3',    // スクリーン全体をキャプチャ
   'Meta+Shift+4',    // 選択範囲をキャプチャ
 
-  // Excel中級（移動系）
-  'Ctrl+Home',       // A1セルに移動
-  'Ctrl+End',        // 使用範囲の最後のセルに移動
-  'Ctrl+↑',          // 上方向の端に移動
-  'Ctrl+↓',          // 下方向の端に移動
-  'Ctrl+←',          // 左方向の端に移動
-  'Ctrl+→',          // 右方向の端に移動
+  // Excel中級（シート移動のみ）
   'Ctrl+PageDown',   // 次のシート
   'Ctrl+PageUp',     // 前のシート
-  'Shift+F3',        // 関数を挿入
 
-  // Gmail（単一キー - 特殊）
-  'c',               // 作成
-  'r',               // 返信
+  // Gmail中級（特殊な単独キー）
   'a',               // 全員に返信
   'f',               // 転送
   'e',               // アーカイブ
-  '/',               // 検索
-  'k',               // 次のメール
-  'j',               // 前のメール
   'u',               // スレッドリストに戻る
   's',               // スターを付ける
   'x',               // メールを選択
@@ -429,6 +417,15 @@ export const HARD_SHORTCUTS = new Set([
   'Ctrl+=',          // ズームイン（代替）
   'Ctrl+Shift+M',    // デバイスツールバーの切り替え
   'Ctrl+Shift+V',    // クリップボード履歴から貼り付け
+
+  // Excel上級（移動系 - STANDARDから移動）
+  'Ctrl+Home',       // A1セルに移動
+  'Ctrl+End',        // 使用範囲の最後のセルに移動
+  'Ctrl+↑',          // 上方向の端に移動
+  'Ctrl+↓',          // 下方向の端に移動
+  'Ctrl+←',          // 左方向の端に移動
+  'Ctrl+→',          // 右方向の端に移動
+  'Shift+F3',        // 関数を挿入
 
   // Excel上級
   'Ctrl+1',          // セルの書式設定

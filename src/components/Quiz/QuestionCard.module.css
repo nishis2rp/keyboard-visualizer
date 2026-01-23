@@ -303,6 +303,64 @@
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
+/* Wrong Answer */
+.wrongAnswer {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.wrongAnswerLabel {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.wrongAnswerValue {
+  font-size: 24px;
+  font-weight: bold;
+  color: rgba(255, 100, 100, 1);
+  font-family: monospace;
+  background: rgba(255, 0, 0, 0.15);
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 100, 100, 0.5);
+}
+
+/* Alternative Shortcuts */
+.alternativeShortcuts {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.alternativeLabel {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.alternativeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.alternativeItem {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  font-family: monospace;
+  background: rgba(59, 130, 246, 0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
 .nextButton {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%);
   border: 2px solid rgba(255, 255, 255, 0.4);
