@@ -174,6 +174,7 @@ npm run deploy
 - **React 18.3.1** - UIライブラリ
 - **TypeScript 5.9** - 型安全性とコード品質の向上
 - **Vite 5.4** - 高速ビルドツール & 開発サーバー
+- **Supabase (PostgreSQL)** - バックエンドサービス、認証、データベース
 - **Vitest** - 高速テストフレームワーク
 
 ### 主要API
