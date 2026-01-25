@@ -29,7 +29,7 @@
   max-width: 800px;
   max-height: 90vh;
   width: 90%;
-  padding: 20px 32px;
+  padding: 16px 28px;
   overflow-y: auto;
   animation: slideUp 0.4s ease;
 }
@@ -47,23 +47,23 @@
 
 .setup-header {
   text-align: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .setup-header h1 {
-  font-size: 24px;
-  margin: 0 0 4px 0;
+  font-size: 20px;
+  margin: 0 0 2px 0;
   color: #1a202c;
 }
 
 .setup-header h2 {
-  font-size: 18px;
-  margin: 0 0 4px 0;
+  font-size: 16px;
+  margin: 0 0 2px 0;
   color: #2d3748;
 }
 
 .setup-header p {
-  font-size: 13px;
+  font-size: 12px;
   color: #718096;
   margin: 0;
 }
@@ -71,14 +71,14 @@
 .setup-options {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 .setup-divider {
   text-align: center;
-  margin: 12px 0 8px 0;
-  padding-top: 12px;
+  margin: 8px 0 6px 0;
+  padding-top: 8px;
   border-top: 2px solid #e2e8f0;
 }
 
@@ -89,39 +89,39 @@
 }
 
 .setup-divider h3 {
-  font-size: 16px;
+  font-size: 14px;
   color: #2d3748;
   margin: 0;
 }
 
 .setup-recommendation {
-  font-size: 13px;
+  font-size: 10px;
   color: #5a67d8;
   font-weight: 600;
   margin: 4px 0 0 0;
-  padding: 6px 12px;
-  background: rgba(90, 103, 216, 0.1);
-  border-radius: 8px;
-  display: inline-block;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  display: block;
 }
 
 .setup-modes {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   flex-direction: row;
-  gap: 8px;
+  gap: 6px;
 }
 
 .setup-modes .setup-option {
   flex: 1;
   flex-direction: column;
   text-align: center;
-  padding: 12px 10px;
+  padding: 8px 8px;
 }
 
 .setup-modes .option-icon {
   margin-right: 0;
-  margin-bottom: 6px;
-  font-size: 40px;
+  margin-bottom: 4px;
+  font-size: 32px;
 }
 
 .setup-modes .option-check {
@@ -137,23 +137,23 @@
 
 /* キーボードレイアウト選択のスタイル */
 .setup-layouts {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   flex-direction: row;
-  gap: 8px;
+  gap: 6px;
 }
 
 .setup-layouts .setup-option {
   flex: 1;
   flex-direction: column;
   text-align: center;
-  padding: 12px 10px;
+  padding: 8px 8px;
   position: relative;
 }
 
 .setup-layouts .option-icon {
   margin-right: 0;
-  margin-bottom: 6px;
-  font-size: 40px;
+  margin-bottom: 4px;
+  font-size: 32px;
 }
 
 .setup-layouts .option-check {
@@ -165,50 +165,50 @@
 
 /* クイズアプリ選択のスタイル */
 .setup-quiz-apps {
-  margin-bottom: 16px;
+  margin-bottom: 6px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .setup-quiz-apps .setup-option {
   flex-direction: column;
   text-align: center;
-  padding: 10px 8px;
+  padding: 6px 6px;
   position: relative;
 }
 
 .setup-quiz-apps .option-icon {
   margin-right: 0;
-  margin-bottom: 4px;
-  font-size: 24px;
+  margin-bottom: 2px;
+  font-size: 20px;
 }
 
 .setup-quiz-apps .option-check {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 20px;
-  height: 20px;
-  font-size: 14px;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
 }
 
 .setup-quiz-apps .option-content h3 {
-  font-size: 14px;
-  margin: 0 0 2px 0;
+  font-size: 12px;
+  margin: 0 0 1px 0;
 }
 
 .setup-quiz-apps .option-content p {
-  font-size: 11px;
+  font-size: 10px;
   margin: 0;
 }
 
 .setup-option {
   display: flex;
   align-items: center;
-  padding: 20px;
+  padding: 14px;
   border: 2px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
   background: white;
@@ -238,14 +238,14 @@
 }
 
 .option-content h3 {
-  margin: 0 0 3px 0;
-  font-size: 16px;
+  margin: 0 0 2px 0;
+  font-size: 14px;
   color: #1a202c;
 }
 
 .option-content p {
   margin: 0;
-  font-size: 12px;
+  font-size: 11px;
   color: #718096;
 }
 
@@ -271,18 +271,28 @@
 
 .setup-footer {
   text-align: center;
-  margin-top: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 2px solid #e2e8f0;
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+  margin-left: -28px;
+  margin-right: -28px;
+  padding-left: 28px;
+  padding-right: 28px;
+  padding-bottom: 12px;
 }
 
 .setup-confirm-btn {
   width: 100%;
-  padding: 12px 28px;
-  font-size: 15px;
+  padding: 10px 24px;
+  font-size: 14px;
   font-weight: 600;
   color: white;
   background: linear-gradient(135deg, #667eea, #764ba2);
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
@@ -304,8 +314,8 @@
 }
 
 .setup-note {
-  margin-top: 10px;
-  font-size: 12px;
+  margin-top: 6px;
+  font-size: 11px;
   color: #718096;
 }
 

@@ -190,7 +190,6 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         {/* 全画面モード選択 */}
         <div className="setup-divider">
           <h3>表示モードを選択してください</h3>
-          <p className="setup-recommendation">💡 全画面モード推奨：より没入感のある学習体験</p>
         </div>
 
         <div className="setup-options setup-modes">
@@ -204,6 +203,9 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
               <div className="option-content">
                 <h3>{option.title}</h3>
                 <p>{option.description}</p>
+                {option.id === 'fullscreen' && (
+                  <p className="setup-recommendation">💡 推奨：より没入感のある学習体験</p>
+                )}
               </div>
               <div className="option-check">
                 {selectedFullscreen?.id === option.id && '✓'}
