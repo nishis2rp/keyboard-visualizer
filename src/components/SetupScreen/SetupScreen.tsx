@@ -11,8 +11,9 @@ interface SetupScreenProps {
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const { isQuizMode } = useAppContext()
   const [selectedFullscreen, setSelectedFullscreen] = useState(null)
-  const [selectedOption, setSelectedOption] = useState(null)
+  const [selectedLayout, setSelectedLayout] = useState(null)
   const [selectedMode, setSelectedMode] = useState(null)
+  const [selectedApp, setSelectedApp] = useState(null)
   const [selectedQuizApp, setSelectedQuizApp] = useState(null)
   const [selectedDifficulty, setSelectedDifficulty] = useState(null)
 
@@ -38,32 +39,32 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     }
   ]
 
-  const options = [
+  const layoutOptions = [
     {
       id: 'windows-jis',
-      title: 'Windows 11 & JIS',
+      title: 'Windows JIS',
       icon: '🪟',
-      description: 'Windows 11 + 日本語キーボード',
-      app: 'windows11',
-      layout: 'windows-jis'
+      description: '日本語キーボード（Windows）'
     },
     {
-      id: 'macos-jis',
-      title: 'macOS & JIS',
+      id: 'mac-jis',
+      title: 'Mac JIS',
       icon: '🍎',
-      description: 'macOS + 日本語キーボード',
-      app: 'macos',
-      layout: 'mac-jis'
+      description: '日本語キーボード（Mac）'
     },
     {
-      id: 'macos-us',
-      title: 'macOS & US',
+      id: 'mac-us',
+      title: 'Mac US',
       icon: '🇺🇸',
-      description: 'macOS + US（英語）キーボード',
-      app: 'macos',
-      layout: 'mac-us'
+      description: 'US（英語）キーボード（Mac）'
     }
   ]
+
+  // ビジュアライザーモード用のアプリケーション選択肢
+  const visualizerAppOptions = appConfig.map(app => ({
+    ...app,
+    description: `${app.name}のショートカットを表示`
+  }))
 
   const modes = [
     {
@@ -132,17 +133,23 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     setSelectedFullscreen(option)
   }
 
-  const handleSelect = (option) => {
-    setSelectedOption(option)
+  const handleSelectLayout = (layout) => {
+    setSelectedLayout(layout)
   }
 
   const handleSelectMode = (mode) => {
     setSelectedMode(mode)
-    // クイズモード以外を選択した場合、アプリ選択と難易度をリセット
+    // モード変更時にアプリ選択をリセット
+    setSelectedApp(null)
+    // クイズモード以外を選択した場合、クイズアプリと難易度をリセット
     if (mode.id !== 'quiz') {
       setSelectedQuizApp(null)
       setSelectedDifficulty(null)
     }
+  }
+
+  const handleSelectApp = (app) => {
+    setSelectedApp(app)
   }
 
   const handleSelectQuizApp = (app) => {
@@ -154,22 +161,34 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   }
 
   const handleConfirm = () => {
-    // ビジュアライザーモードの場合、またはクイズモードでアプリと難易度が選択されている場合
-    const canProceed = selectedFullscreen && selectedOption && selectedMode &&
-      (selectedMode.id !== 'quiz' || (selectedQuizApp && selectedDifficulty))
+    // すべての必須項目が選択されているかチェック
+    let canProceed = false
+
+    if (selectedMode?.id === 'quiz') {
+      // クイズモードの場合
+      canProceed = selectedFullscreen && selectedLayout && selectedMode && selectedQuizApp && selectedDifficulty
+    } else if (selectedMode?.id === 'visualizer') {
+      // ビジュアライザーモードの場合
+      canProceed = selectedFullscreen && selectedLayout && selectedMode && selectedApp
+    }
 
     if (canProceed) {
+      // 使用するアプリIDを決定（クイズモードの場合はquizAppを使わず、デフォルトのアプリを使う）
+      const appId = selectedMode.id === 'quiz'
+        ? (selectedLayout.id === 'windows-jis' ? 'windows11' : 'macos')
+        : selectedApp.id
+
       localStorage.setItem('keyboard-visualizer-setup', JSON.stringify({
-        app: selectedOption.app,
-        layout: selectedOption.layout,
+        app: appId,
+        layout: selectedLayout.id,
         setupCompleted: true,
         version: SETUP_VERSION
       }))
 
       // クイズモードの場合は選択されたアプリと難易度も渡す
       onSetupComplete(
-        selectedOption.app,
-        selectedOption.layout,
+        appId,
+        selectedLayout.id,
         selectedMode.id,
         selectedMode.id === 'quiz' ? selectedQuizApp.id : null,
         selectedMode.id === 'quiz' ? selectedDifficulty.id : undefined,
@@ -216,23 +235,23 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
 
         {/* キーボードレイアウト選択 */}
         <div className="setup-divider">
-          <h3>キーボード環境を選択してください</h3>
+          <h3>キーボードレイアウトを選択してください</h3>
         </div>
 
         <div className="setup-options setup-layouts">
-          {options.map((option) => (
+          {layoutOptions.map((layout) => (
             <div
-              key={option.id}
-              className={`setup-option ${selectedOption?.id === option.id ? 'selected' : ''}`}
-              onClick={() => handleSelect(option)}
+              key={layout.id}
+              className={`setup-option ${selectedLayout?.id === layout.id ? 'selected' : ''}`}
+              onClick={() => handleSelectLayout(layout)}
             >
-              <div className="option-icon">{option.icon}</div>
+              <div className="option-icon">{layout.icon}</div>
               <div className="option-content">
-                <h3>{option.title}</h3>
-                <p>{option.description}</p>
+                <h3>{layout.title}</h3>
+                <p>{layout.description}</p>
               </div>
               <div className="option-check">
-                {selectedOption?.id === option.id && '✓'}
+                {selectedLayout?.id === layout.id && '✓'}
               </div>
             </div>
           ))}
@@ -259,6 +278,34 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
                   </div>
                   <div className="option-check">
                     {selectedMode?.id === mode.id && '✓'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ビジュアライザーモードが選択された場合、アプリケーション選択を表示 */}
+        {selectedMode?.id === 'visualizer' && (
+          <>
+            <div className="setup-divider">
+              <h3>アプリケーションを選択してください</h3>
+            </div>
+
+            <div className="setup-options setup-quiz-apps">
+              {visualizerAppOptions.map((app) => (
+                <div
+                  key={app.id}
+                  className={`setup-option ${selectedApp?.id === app.id ? 'selected' : ''}`}
+                  onClick={() => handleSelectApp(app)}
+                >
+                  <div className="option-icon">{app.icon}</div>
+                  <div className="option-content">
+                    <h3>{app.name}</h3>
+                    <p>{app.description}</p>
+                  </div>
+                  <div className="option-check">
+                    {selectedApp?.id === app.id && '✓'}
                   </div>
                 </div>
               ))}
@@ -326,14 +373,22 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
           <button
             className="setup-confirm-btn"
             onClick={handleConfirm}
-            disabled={!selectedFullscreen || !selectedOption || !selectedMode || (selectedMode?.id === 'quiz' && (!selectedDifficulty || !selectedQuizApp))}
+            disabled={
+              !selectedFullscreen ||
+              !selectedLayout ||
+              !selectedMode ||
+              (selectedMode?.id === 'visualizer' && !selectedApp) ||
+              (selectedMode?.id === 'quiz' && (!selectedDifficulty || !selectedQuizApp))
+            }
           >
             {!selectedFullscreen
               ? '表示モードを選択してください'
-              : !selectedOption
-              ? 'キーボード環境を選択してください'
+              : !selectedLayout
+              ? 'キーボードレイアウトを選択してください'
               : !selectedMode
               ? 'モードを選択してください'
+              : selectedMode.id === 'visualizer' && !selectedApp
+              ? 'アプリケーションを選択してください'
               : selectedMode.id === 'quiz' && !selectedDifficulty
               ? '難易度を選択してください'
               : selectedMode.id === 'quiz' && !selectedQuizApp

@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest --run",
     "db:migrate": "tsx scripts/migrate-supabase.ts",
-    "db:generate-sql": "tsx scripts/generate-sql.ts"
+    "db:generate-sql": "tsx scripts/generate-sql.ts",
+    "db:run-migration": "tsx scripts/run-migration.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",
