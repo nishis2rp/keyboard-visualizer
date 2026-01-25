@@ -4,12 +4,12 @@
  * @type {Array<{id: string, name: string, icon: string}>}
  */
 export const apps = [
-  { id: 'windows11', name: 'Windows 11', icon: '🪟' },
-  { id: 'macos', name: 'macOS', icon: '🍎' },
-  { id: 'chrome', name: 'Chrome', icon: '🌐' },
-  { id: 'excel', name: 'Excel', icon: '📊' },
-  { id: 'slack', name: 'Slack', icon: '💬' },
-  { id: 'gmail', name: 'Gmail', icon: '📧' },
+  { id: 'windows11', name: 'Windows 11', icon: '🪟', os: 'windows' },
+  { id: 'macos', name: 'macOS', icon: '🍎', os: 'mac' },
+  { id: 'chrome', name: 'Chrome', icon: '🌐', os: 'cross-platform' },
+  { id: 'excel', name: 'Excel', icon: '📊', os: 'cross-platform' },
+  { id: 'slack', name: 'Slack', icon: '💬', os: 'cross-platform' },
+  { id: 'gmail', name: 'Gmail', icon: '📧', os: 'cross-platform' },
 ]
 
 /**

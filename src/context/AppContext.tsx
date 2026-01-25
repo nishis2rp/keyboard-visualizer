@@ -4,7 +4,7 @@ import { useShortcuts } from '../hooks/useShortcuts';
 import { SETUP_VERSION, STORAGE_KEYS, DEFAULTS } from '../constants';
 import { getLayoutDisplayName, keyboardLayoutOptions, KeyboardLayoutOption } from '../data/layouts';
 import { apps as appConfig } from '../config/apps';
-import { App, ShortcutData } from '../types';
+import { App, AppShortcuts, AllShortcuts, RichShortcut } from '../types';
 
 interface SetupData {
   setupCompleted: boolean;
@@ -20,8 +20,9 @@ interface AppContextType {
   isQuizMode: boolean;
   quizApp: string | null;
   quizDifficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null;
-  shortcutDescriptions: ShortcutData;
-  allShortcuts: Record<string, ShortcutData> | null;
+  shortcutDescriptions: AppShortcuts;
+  allShortcuts: AllShortcuts | null;
+  richShortcuts: RichShortcut[] | null;
   keyboardLayouts: KeyboardLayoutOption[];
   apps: App[];
   loading: boolean;
@@ -44,7 +45,7 @@ interface AppProviderProps {
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // APIからショートカットデータを取得
-  const { shortcuts: allShortcuts, loading, error } = useShortcuts();
+  const { shortcuts: allShortcuts, richShortcuts, loading, error } = useShortcuts();
 
   const [setup, setSetup] = useLocalStorage(
     STORAGE_KEYS.SETUP,
@@ -62,7 +63,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizApp, setQuizApp] = useState<string | null>(null);
   const [quizDifficulty, setQuizDifficulty] = useState<'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null>(null);
-  const [apps] = useState(appConfig); // stateとして保持
+  const [apps] = useState<App[]>(appConfig); // stateとして保持
 
   const handleSetupComplete = useCallback((app, layout, mode = 'visualizer', quizAppParam = null, difficulty = null, isFullscreen = false) => {
     setSelectedApp(app);
@@ -79,7 +80,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // 全画面モードの情報はApp.tsxで処理される
   }, [setSetup]);
 
-  const shortcutDescriptions = useMemo(
+  const shortcutDescriptions: AppShortcuts = useMemo(
     () => allShortcuts?.[selectedApp] || {},
     [allShortcuts, selectedApp]
   );
@@ -95,6 +96,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     quizDifficulty,
     shortcutDescriptions,
     allShortcuts,
+    richShortcuts,
     keyboardLayouts: keyboardLayoutOptions,
     apps, // appsを提供
     loading,

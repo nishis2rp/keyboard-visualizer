@@ -41,6 +41,7 @@ interface QuizState {
   endTime: number | null;
   settings: QuizSettings;
   pressedKeys: Set<string>; // ★ 追加: 現在押されているキー
+  currentSequentialProgress: string[]; // ★ 追加: 順押しショートカットの途中経過
 }
 
 type QuizAction =
@@ -58,7 +59,8 @@ type QuizAction =
   | { type: 'TIMEOUT' }
   | { type: 'FINISH_QUIZ' }
   | { type: 'NEXT_QUESTION' }
-  | { type: 'UPDATE_PRESSED_KEYS'; payload: Set<string> }; // ★ 追加
+  | { type: 'UPDATE_PRESSED_KEYS'; payload: Set<string> } // ★ 追加
+  | { type: 'UPDATE_SEQUENTIAL_PROGRESS'; payload: string[] }; // ★ 追加: 順押し途中経過を更新
 
 interface QuizContextType {
   quizState: QuizState;
@@ -95,6 +97,7 @@ const initialQuizState: QuizState = {
     isFullscreen: false,
   },
   pressedKeys: new Set(), // ★ 追加
+  currentSequentialProgress: [], // ★ 追加: 順押しショートカットの途中経過
 };
 
 function quizReducer(state: QuizState, action: QuizAction): QuizState {
@@ -132,15 +135,15 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
 
       const newScore = state.score + (isCorrect ? 1 : 0);
 
-      const getSpeedCategory = (timeMs) => {
+      const getSpeedCategory = (timeMs: number): 'fast' | 'normal' | 'slow' => {
         if (timeMs < 1000) return 'fast';
         if (timeMs < 3000) return 'normal';
         return 'slow';
       };
 
       const historyEntry = {
-        question: state.currentQuestion.question,
-        correctShortcut: state.currentQuestion.correctShortcut,
+        question: state.currentQuestion!.question,
+        correctShortcut: state.currentQuestion!.correctShortcut,
         userAnswer: userAnswer,
         isCorrect: isCorrect,
         answerTimeMs: answerTimeMs,
@@ -155,6 +158,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         showAnswer: true,
         quizHistory: [...state.quizHistory, historyEntry],
         pressedKeys: new Set(), // 回答後はキーをクリア
+        currentSequentialProgress: [], // ★ 追加: 回答後は途中経過をクリア
       };
     }
     case 'FINISH_QUIZ':
@@ -211,21 +215,24 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         lastAnswerResult: null,
         lastWrongAnswer: null, // ★ 追加
         pressedKeys: new Set(), // 次の問題へ進む前にキーをクリア
+        currentSequentialProgress: [], // ★ 追加: 次の問題へ進む前に途中経過をクリア
       };
     case 'UPDATE_PRESSED_KEYS': // ★ 追加
       return {
         ...state,
         pressedKeys: action.payload,
       };
+    case 'UPDATE_SEQUENTIAL_PROGRESS': // ★ 追加: 順押し途中経過を更新
+      return {
+        ...state,
+        currentSequentialProgress: action.payload,
+      };
     default:
       return state;
   }
 }
 
-interface QuizProviderProps {
-  children: ReactNode;
-  allShortcuts: Record<string, ShortcutData> | null;
-}
+
 
 interface QuizProviderProps {
   children: ReactNode;
@@ -267,10 +274,10 @@ export function QuizProvider({ children }: QuizProviderProps) {
     }
 
     if (previousKeys.size > 0) {
-      const releasedKeys = Array.from(previousKeys).filter(key => !currentKeys.has(key));
+      const releasedKeys: string[] = (Array.from(previousKeys) as string[]).filter((key: string) => !currentKeys.has(key));
 
       if (releasedKeys.length > 0) {
-        const hasNonModifierReleased = releasedKeys.some(key => !isModifierKey(key));
+        const hasNonModifierReleased = releasedKeys.some((key: string) => !isModifierKey(key));
 
         if (hasNonModifierReleased) {
           const currentQuestion = quizState.currentQuestion;
@@ -279,7 +286,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
           if (isSequential && currentQuestion && quizState.keyboardLayout) { // Check keyboardLayout is not null
             const correctSequentialKeys = getSequentialKeys(currentQuestion.correctShortcut);
             // Identify the non-modifier key that was released
-            const releasedNonModifierKeys = Array.from(releasedKeys).filter(key => !isModifierKey(key));
+            const releasedNonModifierKeys: string[] = releasedKeys.filter((key: string) => !isModifierKey(key));
 
             if (releasedNonModifierKeys.length > 0) {
               // Assuming only one non-modifier key is released at a time for sequential input
@@ -290,6 +297,9 @@ export function QuizProvider({ children }: QuizProviderProps) {
 
               // Add the normalized key to the sequential recorder
               const currentSequence = sequentialKeyRecorderRef.current.addKey(normalizedReleasedKey);
+
+              // ★ 追加: 途中経過を更新
+              dispatch({ type: 'UPDATE_SEQUENTIAL_PROGRESS', payload: currentSequence });
 
               // Check if the current sequence matches the full correct sequence
               if (sequentialKeyRecorderRef.current.matches(correctSequentialKeys)) {

@@ -16,4 +16,5 @@ export interface Shortcut {
   description: string;
   category: string | null;
   created_at: string;
+  difficulty: string | null;
 }

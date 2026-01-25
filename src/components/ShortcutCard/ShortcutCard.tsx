@@ -17,7 +17,14 @@ import { isModifierKeyName, isWindowsKeyName } from '../../utils/keyUtils'
  * @param {string} appContext - アプリケーションコンテキスト（例: "excel", "chrome"など）
  * @param {boolean} showDebugLog - デバッグログを表示するか（開発モードのみ）
  */
-const ShortcutCard = memo(({ shortcut, description, appContext = null, showDebugLog = false }) => {
+interface ShortcutCardProps {
+  shortcut: string;
+  description: string;
+  appContext?: string | null;
+  showDebugLog?: boolean;
+}
+
+const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false }) => {
   const protectionLevel = getProtectionLevel(shortcut, appContext)
 
   // デバッグログ（開発時のみ） - 全てのショートカットでログ出力

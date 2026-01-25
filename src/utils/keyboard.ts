@@ -1,5 +1,6 @@
 import { getCodeDisplayName, getShiftedSymbolForKey, getPossibleKeyNamesFromDisplay } from './keyMapping'
 import { MODIFIER_ORDER } from './keyUtils'
+import { AppShortcuts, ShortcutDetails } from '../types'
 
 /**
  * キー名 (KeyboardEvent.key) を正規化する。
@@ -79,21 +80,21 @@ const getKeyComboAlternatives = (displayComboText, layout) => {
 /**
  * ショートカットの説明を取得（代替表現にも対応）
  * @param {string} currentDisplayComboText - 現在押されているキーの表示名形式の組み合わせ文字列
- * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト (keyベース、例: {'Ctrl + A': '選択'})
+ * @param {AppShortcuts} shortcutDescriptions - ショートカット定義オブジェクト (keyベース、例: {'Ctrl + A': '選択'})
  * @param {string} layout - キーボードレイアウト
  * @returns {string|null} ショートカットの説明、見つからない場合はnull
  */
-export const getShortcutDescription = (currentDisplayComboText, shortcutDescriptions, layout) => {
+export const getShortcutDescription = (currentDisplayComboText: string, shortcutDescriptions: AppShortcuts, layout: string): string | null => {
   // まず、現在の表示名で直接検索
   if (shortcutDescriptions[currentDisplayComboText]) {
-    return shortcutDescriptions[currentDisplayComboText]
+    return shortcutDescriptions[currentDisplayComboText].description
   }
 
   // 代替表現で検索
   const alternatives = getKeyComboAlternatives(currentDisplayComboText, layout)
   for (const alt of alternatives) {
     if (shortcutDescriptions[alt]) {
-      return shortcutDescriptions[alt]
+      return shortcutDescriptions[alt].description
     }
   }
 
@@ -107,7 +108,7 @@ export const getShortcutDescription = (currentDisplayComboText, shortcutDescript
     if (possibleLastKey !== lastKey) {
       const alternativeCombo = [...parts.slice(0, -1), possibleLastKey].join(' + ')
       if (shortcutDescriptions[alternativeCombo]) {
-        return shortcutDescriptions[alternativeCombo]
+        return shortcutDescriptions[alternativeCombo].description
       }
     }
   }
@@ -121,7 +122,7 @@ export const getShortcutDescription = (currentDisplayComboText, shortcutDescript
  * @param {string} shortcut - ショートカット文字列（例: "Win + A"）
  * @returns {string} 最後のキー（例: "A"）
  */
-const getLastKey = (shortcut) => {
+const getLastKey = (shortcut: string): string => {
   const parts = shortcut.split(' + ')
   return parts[parts.length - 1]
 }
@@ -138,37 +139,37 @@ const MODIFIER_KEY_NAMES = new Set([
  * @param {string} shortcut - ショートカット文字列（例: "Win + Shift + S"）
  * @returns {number} 修飾キーの数
  */
-const countModifierKeys = (shortcut) => {
+const countModifierKeys = (shortcut: string): number => {
   const parts = shortcut.split(' + ')
-  const modifierCount = parts.filter(key => MODIFIER_KEY_NAMES.has(key)).length
+  const modifierCount = parts.filter((key: string) => MODIFIER_KEY_NAMES.has(key)).length
   return modifierCount
 }
 
 /**
  * 利用可能なショートカット一覧を取得
  * 現在押されているキーで始まるショートカットをすべて取得
- * @param {Array<string>} pressedCodes - 現在押されているキーの配列 (KeyboardEvent.code)
+ * @param {string[]} pressedCodes - 現在押されているキーの配列 (KeyboardEvent.code)
  * @param {string} layout - キーボードレイアウト
- * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト (keyベース)
+ * @param {AppShortcuts} shortcutDescriptions - ショートカット定義オブジェクト (keyベース)
  * @returns {Array<{shortcut: string, description: string}>} ショートカット一覧
  */
-export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions) => {
+export const getAvailableShortcuts = (pressedCodes: string[], layout: string, shortcutDescriptions: AppShortcuts): { shortcut: string, description: string }[] => {
   // 押されているキーのcodeから表示名（keyベースの表現）のセットを作成
   const shiftPressed = pressedCodes.includes('ShiftLeft') || pressedCodes.includes('ShiftRight');
   const pressedDisplayNames = new Set(pressedCodes.map(code => getCodeDisplayName(code, null, layout, shiftPressed)));
 
   // デバッグログ
 
-  const shortcuts = Object.entries(shortcutDescriptions)
+  const shortcuts = (Object.entries(shortcutDescriptions) as [string, ShortcutDetails][])
     .filter(([shortcut]) => {
       const shortcutKeys = shortcut.split(' + '); // shortcutDescriptionsのキーは表示名ベース
 
       // 押されているキーがすべてショートカットのキーに含まれているか
-      const allPressedKeysInShortcut = Array.from(pressedDisplayNames).every(pressedKey => shortcutKeys.includes(pressedKey));
+      const allPressedKeysInShortcut = Array.from(pressedDisplayNames).every((pressedKey: string) => shortcutKeys.includes(pressedKey));
 
       // 押されているキーの数とショートカットのキー数が一致するか、
       // あるいは押されているキーがショートカットの修飾キー部分と一致するか
-      const pressedModifiers = Array.from(pressedDisplayNames).filter(key => MODIFIER_KEY_NAMES.has(key));
+      const pressedModifiers = Array.from(pressedDisplayNames).filter((key: string) => MODIFIER_KEY_NAMES.has(key));
       const shortcutModifiers = shortcutKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
 
       // 1. 完全一致
@@ -179,14 +180,14 @@ export const getAvailableShortcuts = (pressedCodes, layout, shortcutDescriptions
       if (
           pressedModifiers.length > 0 && // 何らかの修飾キーが押されている
           pressedModifiers.length === shortcutModifiers.length && // 押されている修飾キーがショートカットの修飾キー数と一致
-          Array.from(pressedModifiers).every(mod => shortcutModifiers.includes(mod)) && // 押されている修飾キーがすべてショートカットの修飾キーに含まれる
+          pressedModifiers.every((mod: string) => shortcutModifiers.includes(mod)) && // 押されている修飾キーがすべてショートカットの修飾キーに含まれる
           pressedDisplayNames.size < shortcutKeys.length // まだメインキーが押されていない
          ) {
            return true;
       }
       return false;
     })
-    .map(([shortcut, description]) => ({ shortcut, description }))
+    .map(([shortcut, details]: [string, ShortcutDetails]) => ({ shortcut, description: details.description }))
     .filter((item, index, self) =>
       index === self.findIndex(t => t.shortcut === item.shortcut)
     );
@@ -264,7 +265,7 @@ const KEYBOARD_LAYOUT_ORDER = [
  * @param {string} key - キー名
  * @returns {number} キーボード配列でのインデックス（見つからない場合は999）
  */
-const getKeyboardLayoutIndex = (key) => {
+const getKeyboardLayoutIndex = (key: string): number => {
   const lowerKey = key.toLowerCase()
   const index = KEYBOARD_LAYOUT_ORDER.indexOf(lowerKey)
   return index === -1 ? 999 : index
@@ -272,13 +273,13 @@ const getKeyboardLayoutIndex = (key) => {
 
 /**
  * 単独キー（修飾キーなし）のショートカット一覧を取得
- * @param {Object} shortcutDescriptions - ショートカット定義オブジェクト
+ * @param {AppShortcuts} shortcutDescriptions - ショートカット定義オブジェクト
  * @returns {Array<{shortcut: string, description: string}>} 単独キーショートカット一覧
  */
-export const getSingleKeyShortcuts = (shortcutDescriptions) => {
-  return Object.entries(shortcutDescriptions)
+export const getSingleKeyShortcuts = (shortcutDescriptions: AppShortcuts): { shortcut: string, description: string }[] => {
+  return (Object.entries(shortcutDescriptions) as [string, ShortcutDetails][])
     .filter(([shortcut]) => !shortcut.includes(' + '))
-    .map(([shortcut, description]) => ({ shortcut, description }))
+    .map(([shortcut, details]) => ({ shortcut, description: details.description }))
     .sort((a, b) => {
       const aKey = a.shortcut
       const bKey = b.shortcut

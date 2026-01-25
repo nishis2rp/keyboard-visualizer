@@ -7,6 +7,7 @@ import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
 import { matchesDifficulty } from '../constants/shortcutDifficulty';
 import { isSequentialShortcut } from './sequentialShortcuts';
 import { getCodeDisplayName } from './keyMapping'; // Import getCodeDisplayName
+import { AllShortcuts, ShortcutDetails } from '../types';
 
 // OSを検出
 const currentOS = detectOS();
@@ -20,13 +21,13 @@ const currentOS = detectOS();
  * @param {string} shortcutString - A shortcut string like 'Ctrl + Shift + A'.
  * @returns {string} The normalized shortcut string.
  */
-export const normalizeShortcut = (shortcutString) => {
+export const normalizeShortcut = (shortcutString: string): string => {
   if (!shortcutString) return '';
 
   const keys = shortcutString
     .replace(/ /g, '') // スペースを削除
     .split('+')
-    .map(key => {
+    .map((key: string) => {
       const lowerKey = key.toLowerCase();
       // 'Win'キーは'Meta'に変換し、'Cmd'も'Meta'に変換
       if (lowerKey === 'win' || lowerKey === 'cmd') return 'Meta';
@@ -39,10 +40,10 @@ export const normalizeShortcut = (shortcutString) => {
       return key.length === 1 && /[a-zA-Z]/.test(key) ? key.toUpperCase() : key;
     });
 
-  const modifiers = [];
-  const mainKeys = [];
+  const modifiers: string[] = [];
+  const mainKeys: string[] = [];
 
-  keys.forEach(key => {
+  keys.forEach((key: string) => {
     // 既に正規化された後なので、'Ctrl', 'Alt', 'Shift', 'Meta' のいずれかかをチェック
     if (key === 'Ctrl' || key === 'Alt' || key === 'Shift' || key === 'Meta') {
       modifiers.push(key);
@@ -53,7 +54,7 @@ export const normalizeShortcut = (shortcutString) => {
 
   // 修飾キーをソート (Ctrl, Alt, Meta, Shiftの順)
   modifiers.sort((a, b) => {
-    const order = { 'Ctrl': 1, 'Alt': 2, 'Meta': 3, 'Shift': 4 }; // MetaをShiftの前に
+    const order: { [key: string]: number } = { 'Ctrl': 1, 'Alt': 2, 'Meta': 3, 'Shift': 4 }; // MetaをShiftの前に
     return order[a] - order[b];
   });
 
@@ -66,11 +67,11 @@ export const normalizeShortcut = (shortcutString) => {
  * @param {Set<string>} pressedCodes - A set of codes for currently pressed keys (e.g., new Set(['ControlLeft', 'KeyA'])).
  * @returns {string} The normalized shortcut string.
  */
-export const normalizePressedKeys = (pressedCodes, keyboardLayout) => { // Added keyboardLayout parameter
+export const normalizePressedKeys = (pressedCodes: Set<string>, keyboardLayout: any): string => { // Added keyboardLayout parameter
   const shiftPressed = pressedCodes.has('ShiftLeft') || pressedCodes.has('ShiftRight');
 
   const keys = Array.from(pressedCodes)
-    .map(code => {
+    .map((code: string) => {
       // 修飾キーのコードを正規化された名前に変換
       if (code.startsWith('Control')) return 'Ctrl';
       if (code.startsWith('Shift')) return 'Shift';
@@ -100,10 +101,10 @@ export const normalizePressedKeys = (pressedCodes, keyboardLayout) => { // Added
 
 // 保護されたショートカットを正規化したSetを作成
 let normalizedAlwaysProtected = new Set(
-  Array.from(ALWAYS_PROTECTED_SHORTCUTS).map(s => normalizeShortcut(s))
+  Array.from(ALWAYS_PROTECTED_SHORTCUTS).map((s: string) => normalizeShortcut(s))
 );
 let normalizedFullscreenPreventable = new Set(
-  Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map(s => normalizeShortcut(s))
+  Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map((s: string) => normalizeShortcut(s))
 );
 
 /**
@@ -113,7 +114,7 @@ let normalizedFullscreenPreventable = new Set(
  * @param {boolean} isFullscreen - Whether fullscreen mode is active.
  * @returns {boolean} True if it can be safely presented.
  */
-const isShortcutSafe = (shortcut, quizMode, isFullscreen) => {
+const isShortcutSafe = (shortcut: string, quizMode: string, isFullscreen: boolean): boolean => {
   const normalizedShortcut = normalizeShortcut(shortcut);
 
   // 常に保護されているショートカットは、どのモードでも安全ではない
@@ -136,7 +137,7 @@ const isShortcutSafe = (shortcut, quizMode, isFullscreen) => {
 };
 
 // アプリケーション名の日本語表示マップ
-const APP_DISPLAY_NAMES = {
+const APP_DISPLAY_NAMES: { [key: string]: string } = {
   'windows11': 'Windows 11',
   'macos': 'macOS',
   'chrome': 'Chrome',
@@ -150,7 +151,7 @@ const APP_DISPLAY_NAMES = {
  * @param {string} keyboardLayout - キーボードレイアウト (e.g., 'windows-jis', 'mac-jis', 'mac-us')
  * @returns {string[]} 使用可能なアプリIDの配列
  */
-export const getCompatibleApps = (keyboardLayout) => {
+export const getCompatibleApps = (keyboardLayout: string): string[] => {
   const isMac = keyboardLayout.startsWith('mac-');
 
   const allApps = ['windows11', 'macos', 'chrome', 'excel', 'slack', 'gmail'];
@@ -178,9 +179,16 @@ export const getCompatibleApps = (keyboardLayout) => {
  * @param {'basic' | 'standard' | 'madmax' | 'allrange'} difficulty - The difficulty level.
  * @returns {{question: string, correctShortcut: string, normalizedCorrectShortcut: string, appName: string} | null} A question object, or null if no shortcuts are available.
  */
-export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default', isFullscreen = false, usedShortcuts = new Set(), difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard') => {
+export const generateQuestion = (
+  allShortcuts: AllShortcuts,
+  allowedApps: string[],
+  quizMode = 'default',
+  isFullscreen = false,
+  usedShortcuts = new Set<string>(),
+  difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard'
+) => {
   // 全ての許可されたアプリのショートカットを収集
-  const allSafeShortcuts = [];
+  const allSafeShortcuts: any[] = [];
   if (!allowedApps || !Array.isArray(allowedApps)) return null;
 
   allowedApps.forEach(appId => {
@@ -197,17 +205,17 @@ export const generateQuestion = (allShortcuts, allowedApps, quizMode = 'default'
     });
 
     // 各ショートカットにアプリ情報を追加（未使用 & 難易度に適合するもののみ）
-    safeShortcuts.forEach(([shortcut, description]) => {
+    safeShortcuts.forEach(([shortcut, details]: [string, ShortcutDetails]) => {
       const normalized = normalizeShortcut(shortcut);
       // 既に出題済みのショートカットは除外
       if (!usedShortcuts.has(normalized)) {
         // 難易度フィルタリング
-        if (matchesDifficulty(normalized, difficulty)) {
+        if (difficulty === 'allrange' || details.difficulty === difficulty) {
           allSafeShortcuts.push({
             appId,
             appName: APP_DISPLAY_NAMES[appId] || appId,
             shortcut,
-            description
+            description: details.description,
           });
         }
       }
@@ -249,7 +257,7 @@ export const GRACE_PERIOD_MS = 300;
  * @param {string} normalizedCorrectAnswer - The normalized correct shortcut.
  * @returns {boolean} True if correct.
  */
-export const checkAnswer = (userAnswer, normalizedCorrectAnswer) => {
+export const checkAnswer = (userAnswer: string, normalizedCorrectAnswer: string): boolean => {
   // 完全一致チェック
   if (userAnswer === normalizedCorrectAnswer) {
     return true;
@@ -267,7 +275,7 @@ export const checkAnswer = (userAnswer, normalizedCorrectAnswer) => {
  * @param {number} answerTimeMs - Time taken to answer (in milliseconds).
  * @returns {boolean} True if correct.
  */
-export const checkAnswerWithGracePeriod = (userAnswer, normalizedCorrectAnswer, answerTimeMs) => {
+export const checkAnswerWithGracePeriod = (userAnswer: string, normalizedCorrectAnswer: string, answerTimeMs: number): boolean => {
   // Use the same logic as checkAnswer (supports alternative shortcuts)
   return checkAnswer(userAnswer, normalizedCorrectAnswer);
 };
@@ -275,10 +283,10 @@ export const checkAnswerWithGracePeriod = (userAnswer, normalizedCorrectAnswer, 
 // --- Test exports (only used during development) ---
 const reinitializeProtectedSetsForTesting = () => {
   normalizedAlwaysProtected = new Set(
-    Array.from(ALWAYS_PROTECTED_SHORTCUTS).map(s => normalizeShortcut(s))
+    Array.from(ALWAYS_PROTECTED_SHORTCUTS).map((s: string) => normalizeShortcut(s))
   );
   normalizedFullscreenPreventable = new Set(
-    Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map(s => normalizeShortcut(s))
+    Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map((s: string) => normalizeShortcut(s))
   );
 };
 

@@ -10,7 +10,7 @@ export interface App {
 export interface KeyboardLayout {
   id: string;
   name: string;
-  keys: KeyDefinition[];
+  keys: KeyDefinition[][];
 }
 
 export interface KeyDefinition {
@@ -27,8 +27,36 @@ export interface KeyDefinition {
   shiftLabel?: string;
 }
 
+export type ShortcutDifficulty = 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange';
+
+export interface ShortcutDetails {
+  description: string;
+  difficulty: ShortcutDifficulty;
+}
+
+export interface AppShortcuts {
+  [shortcut: string]: ShortcutDetails;
+}
+
+export type AllShortcuts = Record<string, AppShortcuts>;
+
 /**
- * ショートカットデータベースの型
+ * リッチショートカット型
+ * データベースから取得したショートカット情報をより詳細に表現する型
+ */
+export interface RichShortcut {
+  id: number;
+  keys: string;
+  description: string;
+  difficulty: ShortcutDifficulty;
+  application: string;
+  category: string | null;
+  created_at: string;
+}
+
+
+/**
+ * ショートカットデータベースの型 (旧形式)
  * { "Ctrl + A": "すべて選択" } のような形式
  */
 export interface ShortcutData {
@@ -36,7 +64,7 @@ export interface ShortcutData {
 }
 
 /**
- * アプリケーション別のショートカットデータベース
+ * アプリケーション別のショートカットデータベース (旧形式)
  * { "chrome": { "Ctrl + T": "新しいタブを開く" }, ... }
  */
 export type ShortcutDatabase = {

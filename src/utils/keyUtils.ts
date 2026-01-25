@@ -1,15 +1,15 @@
 /**
  * 修飾キーのコードベース表示順序
  */
-export const MODIFIER_CODE_DISPLAY_ORDER = [
+export const MODIFIER_CODE_DISPLAY_ORDER: readonly string[] = [
   'ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight',
   'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'
-] as const;
+];
 
 /**
  * 修飾キーのコードリスト
  */
-export const MODIFIER_CODES = new Set(MODIFIER_CODE_DISPLAY_ORDER);
+export const MODIFIER_CODES = new Set(Array.from(MODIFIER_CODE_DISPLAY_ORDER));
 
 /**
  * Windowsキー(Metaキー)のコードリスト

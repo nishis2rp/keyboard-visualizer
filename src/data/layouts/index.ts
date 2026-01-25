@@ -1,10 +1,12 @@
+import { KeyboardLayout } from '../../types'
+
 // すべてのキーボードレイアウトを統合してエクスポート
 import { windowsJisLayout } from './windowsJis'
 import { macJisLayout } from './macJis'
 import { macUsLayout } from './macUs'
 
 // レイアウト取得用のヘルパー関数
-export const getKeyboardLayoutByName = (layoutName) => {
+export const getKeyboardLayoutByName = (layoutName: string): KeyboardLayout => {
   switch (layoutName) {
     case 'mac-jis':
       return macJisLayout

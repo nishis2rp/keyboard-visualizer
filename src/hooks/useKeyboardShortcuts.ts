@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getKeyComboText, getShortcutDescription, getAvailableShortcuts } from '../utils';
-import { ShortcutData } from '../types';
+import { AppShortcuts } from '../types';
 
 const MAX_HISTORY_SIZE = 10;
 
@@ -11,7 +11,7 @@ const MAX_HISTORY_SIZE = 10;
  */
 const getShortcutInfo = (keys, layout, descriptions) => {
   const comboText = getKeyComboText(keys, layout);
-  const description = getShortcutDescription(comboText, descriptions);
+  const description = getShortcutDescription(comboText, descriptions, layout);
   return { comboText, description };
 };
 
@@ -29,12 +29,18 @@ const isTypingInInputElement = (e: KeyboardEvent) => {
 /**
  * ブラウザやOSのデフォルト動作を妨げるべきか判定します。
  */
-const shouldPreventDefault = (e: KeyboardEvent, pressedKeys: Set<string>, layout: string, descriptions: ShortcutData, isQuizMode: boolean) => {
+const shouldPreventDefault = (e: KeyboardEvent, pressedKeys: Set<string>, layout: string, descriptions: AppShortcuts, isQuizMode: boolean) => {
   const { code, key, metaKey, ctrlKey, altKey, repeat } = e;
 
   // 修飾キー（Alt, Win/Cmd）単体押下は常に防ぐ
   if (['AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'].includes(code)) {
     return true;
+  }
+
+  // Ctrl+矢印キーは常にブラウザのデフォルト動作を許可（カーソル移動など）
+  const isArrowKey = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(code);
+  if (ctrlKey && isArrowKey) {
+    return false;
   }
 
   // 通常モードでのOS標準ショートカットとの競合を防ぐ（最優先）
@@ -73,7 +79,7 @@ const shouldPreventDefault = (e: KeyboardEvent, pressedKeys: Set<string>, layout
 
 // --- Main Hook ---
 
-export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboardLayout: string, isQuizMode = false) => {
+export const useKeyboardShortcuts = (shortcutDescriptions: AppShortcuts, keyboardLayout: string, isQuizMode = false) => {
   const [pressedKeys, setPressedKeys] = useState(new Set<string>());
   const [history, setHistory] = useState<{ combo: string; description: string | null }[]>([]);
   const [currentDescription, setCurrentDescription] = useState<string | null>(null);
@@ -125,6 +131,12 @@ export const useKeyboardShortcuts = (shortcutDescriptions: ShortcutData, keyboar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isTypingInInputElement(e)) return;
+
+      // Ctrl+矢印キーは完全に無視（ブラウザのデフォルト動作を優先）
+      const isArrowKey = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code);
+      if (e.ctrlKey && isArrowKey) {
+        return;
+      }
 
       // キーリピート（長押し）の場合
       if (pressedKeysRef.current.has(e.code)) {

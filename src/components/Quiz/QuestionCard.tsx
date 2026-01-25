@@ -1,14 +1,14 @@
 import React from 'react';
 import { useQuiz } from '../../context/QuizContext';
 import { getCodeDisplayName } from '../../utils/keyMapping';
-import { formatSequentialShortcut } from '../../utils/sequentialShortcuts';
+import { formatSequentialShortcut, getSequentialKeys } from '../../utils/sequentialShortcuts';
 import { getAlternativeShortcuts } from '../../constants/alternativeShortcuts';
 import { normalizeShortcut } from '../../utils/quizEngine';
 import styles from './QuestionCard.module.css';
 
 function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' }) {
   const { quizState, getNextQuestion } = useQuiz();
-  const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer, lastWrongAnswer } = quizState;
+  const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer, lastWrongAnswer, currentSequentialProgress } = quizState;
 
   if (status !== 'playing' || !currentQuestion) {
     return null;
@@ -35,10 +35,10 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
   // キー表示用のヘルパー関数
   const getKeyComboText = () => {
     if (pressedKeys.size === 0) return '';
-    const keys = Array.from(pressedKeys);
-    const shiftPressed = keys.some(code => code.startsWith('Shift'));
+    const keys: string[] = Array.from(pressedKeys) as string[];
+    const shiftPressed = keys.some((code: string) => code.startsWith('Shift'));
 
-    return keys.map(code => {
+    return keys.map((code: string) => {
       // getCodeDisplayNameを使用してキー表示名を取得
       return getCodeDisplayName(code, null, keyboardLayout, shiftPressed);
     }).join(' + ');
@@ -100,8 +100,29 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
             </span>
           </div>
 
-          {/* 押したキー表示 */}
-          {pressedKeys.size > 0 && (
+          {/* 順押しの途中経過表示 */}
+          {currentQuestion.isSequential && currentSequentialProgress.length > 0 && (
+            <div className={styles.sequentialProgress}>
+              <div className={styles.progressLabel}>入力中...</div>
+              <div className={styles.progressSequence}>
+                {currentSequentialProgress.map((key, index) => {
+                  const expectedKeys = getSequentialKeys(currentQuestion.correctShortcut);
+                  const isCorrect = key.toLowerCase() === expectedKeys[index]?.toLowerCase();
+                  return (
+                    <React.Fragment key={index}>
+                      {index > 0 && <span className={styles.progressSeparator}>→</span>}
+                      <span className={isCorrect ? styles.progressKeyCorrect : styles.progressKeyIncorrect}>
+                        {key}
+                      </span>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* 押したキー表示（非順押しの場合のみ） */}
+          {!currentQuestion.isSequential && pressedKeys.size > 0 && (
             <div className={styles.pressedKeys}>
               <div className={styles.pressedKeysLabel}>入力中...</div>
               <div className={styles.pressedKeysValue}>{getKeyComboText()}</div>

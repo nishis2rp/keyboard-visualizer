@@ -255,6 +255,56 @@
   text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
+/* Sequential Progress Display */
+.sequentialProgress {
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.4) 0%, rgba(255, 120, 0, 0.4) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 12px 20px;
+  border: 2px solid rgba(255, 149, 0, 0.6);
+  box-shadow: 0 0 20px rgba(255, 149, 0, 0.3);
+}
+
+.progressLabel {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 8px;
+}
+
+.progressSequence {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+.progressSeparator {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 4px;
+}
+
+.progressKeyCorrect {
+  color: #34c759;
+  background: rgba(52, 199, 89, 0.2);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 2px solid rgba(52, 199, 89, 0.5);
+  text-shadow: 0 0 10px rgba(52, 199, 89, 0.5);
+}
+
+.progressKeyIncorrect {
+  color: #ff3b30;
+  background: rgba(255, 59, 48, 0.2);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 59, 48, 0.5);
+  text-shadow: 0 0 10px rgba(255, 59, 48, 0.5);
+}
+
 /* Feedback Icon */
 .feedbackIcon {
   position: absolute;

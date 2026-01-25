@@ -145,10 +145,6 @@ export const ALWAYS_PROTECTED_SHORTCUTS = new Set([
   'Cmd + Option + Space',       // Finderの検索ウィンドウを表示
 
   // Mission Control・ウィンドウ管理（システムレベル）
-  'Ctrl + ↑',                   // Mission Controlを表示
-  'Ctrl + ↓',                   // アプリケーションWindowsを表示
-  'Ctrl + ←',                   // Mission Control左へ
-  'Ctrl + →',                   // Mission Control右へ
 
   // スクリーンショット（システムレベル）
   'Cmd + Shift + 3',            // スクリーン全体をキャプチャ

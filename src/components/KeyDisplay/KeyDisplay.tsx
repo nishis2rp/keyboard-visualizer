@@ -1,15 +1,26 @@
-import { memo } from 'react'
-import { getSingleKeyShortcuts } from '../../utils'
-import ShortcutCard from '../ShortcutCard'
-import { getCodeDisplayName } from '../../utils/keyMapping'
+import { memo } from 'react';
+import { getSingleKeyShortcuts } from '../../utils';
+import ShortcutCard from '../ShortcutCard';
+import { getCodeDisplayName } from '../../utils/keyMapping';
 import {
   MODIFIER_CODE_DISPLAY_ORDER,
   MODIFIER_CODES,
   isModifierKey,
   isWindowsKey
-} from '../../utils/keyUtils'
+} from '../../utils/keyUtils';
+import { AppShortcuts } from '../../types';
 
-const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), description, availableShortcuts = [], selectedApp, shortcutDescriptions = {}, keyboardLayout }) => {
+interface KeyDisplayProps {
+  pressedKeys?: Set<string>;
+  specialKeys?: Set<string>;
+  description?: string | null;
+  availableShortcuts?: { shortcut: string; description: string }[];
+  selectedApp?: string;
+  shortcutDescriptions?: AppShortcuts;
+  keyboardLayout?: string;
+}
+
+const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys = new Set(), description, availableShortcuts = [], selectedApp, shortcutDescriptions = {}, keyboardLayout }) => {
   // Shiftキーが押されているか判定（getCodeDisplayNameに渡すため）
   const shiftPressed = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight');
 
@@ -71,7 +82,7 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
   }
 
   // pressedKeysはcodeのSetなので、表示用に変換し、ソートする
-  const sortedCodes = Array.from(pressedKeys).sort((a, b) => {
+  const sortedCodes = Array.from(pressedKeys).sort((a: string, b: string) => {
     const aIndex = MODIFIER_CODE_DISPLAY_ORDER.indexOf(a)
     const bIndex = MODIFIER_CODE_DISPLAY_ORDER.indexOf(b)
 
@@ -82,7 +93,7 @@ const KeyDisplay = memo(({ pressedKeys = new Set(), specialKeys = new Set(), des
   })
 
   // 修飾キーのみが押されているかチェック (codeベースで)
-  const isOnlyModifierKeys = sortedCodes.every(code => MODIFIER_CODES.has(code))
+  const isOnlyModifierKeys = sortedCodes.every((code: string) => MODIFIER_CODES.has(code))
 
   // 完全なショートカットが押されている場合（説明がある）
   // ただし、修飾キーのみの場合は、利用可能なショートカット一覧も表示

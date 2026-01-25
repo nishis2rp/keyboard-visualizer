@@ -1,23 +1,28 @@
-import { useState, useEffect } from 'react';
-import { supabase, Shortcut } from '../lib/supabase';
-import { ShortcutData } from '../types';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
+import { AllShortcuts, ShortcutDetails, RichShortcut } from '../types';
+import { getShortcutDifficulty } from '../constants/shortcutDifficulty';
+import { normalizeShortcut } from '../utils/quizEngine';
+import { Shortcut } from '../lib/supabase';
 
 interface UseShortcutsReturn {
-  shortcuts: Record<string, ShortcutData> | null;
+  shortcuts: AllShortcuts | null;
+  richShortcuts: RichShortcut[] | null;
   loading: boolean;
   error: Error | null;
   refetch: () => void;
 }
 
 /**
- * Supabaseからショートカットデータを取得するカスタムフック
+ * Supabaseからすべてのショートカットデータを取得し、難易度情報を含む形式に加工するカスタムフック
  */
 export function useShortcuts(): UseShortcutsReturn {
-  const [shortcuts, setShortcuts] = useState<Record<string, ShortcutData> | null>(null);
+  const [shortcuts, setShortcuts] = useState<AllShortcuts | null>(null);
+  const [richShortcuts, setRichShortcuts] = useState<RichShortcut[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchShortcuts = async () => {
+  const fetchShortcuts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -30,83 +35,52 @@ export function useShortcuts(): UseShortcutsReturn {
         throw new Error(`Failed to fetch shortcuts: ${supabaseError.message}`);
       }
 
-      // Supabaseレスポンスを allShortcuts の形式に変換
-      const shortcutsMap: Record<string, ShortcutData> = {};
+      // Supabaseレスポンスを AllShortcuts の形式に変換
+      const shortcutsMap: AllShortcuts = {};
+      const richShortcutsArray: RichShortcut[] = [];
 
       (data as Shortcut[]).forEach((item) => {
         if (!shortcutsMap[item.application]) {
           shortcutsMap[item.application] = {};
         }
-        shortcutsMap[item.application][item.keys] = item.description;
+
+        const normalizedShortcut = normalizeShortcut(item.keys);
+        const difficulty = item.difficulty ?? getShortcutDifficulty(normalizedShortcut);
+
+        shortcutsMap[item.application][item.keys] = {
+          description: item.description,
+          difficulty: difficulty as ShortcutDetails['difficulty'],
+        };
+
+        // RichShortcut配列も作成
+        richShortcutsArray.push({
+          id: item.id,
+          keys: item.keys,
+          description: item.description,
+          difficulty: difficulty as ShortcutDetails['difficulty'],
+          application: item.application,
+          category: item.category,
+          created_at: item.created_at,
+        });
       });
 
       setShortcuts(shortcutsMap);
+      setRichShortcuts(richShortcutsArray);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error'));
       console.error('Error fetching shortcuts:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchShortcuts();
-  }, []);
+  }, [fetchShortcuts]);
 
   return {
     shortcuts,
-    loading,
-    error,
-    refetch: fetchShortcuts,
-  };
-}
-
-/**
- * 特定のアプリケーションのショートカットを取得するカスタムフック
- */
-export function useAppShortcuts(app: string): UseShortcutsReturn {
-  const [shortcuts, setShortcuts] = useState<Record<string, ShortcutData> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchShortcuts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const { data, error: supabaseError } = await supabase
-        .from('shortcuts')
-        .select('*')
-        .eq('application', app);
-
-      if (supabaseError) {
-        throw new Error(`Failed to fetch shortcuts: ${supabaseError.message}`);
-      }
-
-      // Supabaseレスポンスを ShortcutData の形式に変換
-      const shortcutsData: ShortcutData = {};
-
-      (data as Shortcut[]).forEach((item) => {
-        shortcutsData[item.keys] = item.description;
-      });
-
-      setShortcuts({ [app]: shortcutsData });
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
-      console.error('Error fetching shortcuts:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (app) {
-      fetchShortcuts();
-    }
-  }, [app]);
-
-  return {
-    shortcuts,
+    richShortcuts,
     loading,
     error,
     refetch: fetchShortcuts,
