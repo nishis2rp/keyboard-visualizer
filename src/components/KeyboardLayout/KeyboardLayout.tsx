@@ -93,11 +93,11 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
     // Navigation keys that should be positioned on the right
     const navKeys = new Set(['Fn', 'Home', 'PageUp', 'Delete', 'End', 'PageDown', 'Insert', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight', 'PrintScreen', 'ScrollLock', 'Pause', 'F13', 'F14', 'F15'])
 
-    return keyboardRows.keys.flatMap((row) => {
+    return keyboardRows.keys.flatMap((row, rowIndex) => {
       let mainColStart = 1
       let navColStart = NAV_BLOCK_START
 
-      return row.map((keyObj: KeyDefinition, rowIndex) => {
+      return row.map((keyObj: KeyDefinition) => {
         const widthInCols = Math.round((keyObj.width || 1) * GRID_MULTIPLIER)
         const isNavKey = navKeys.has(keyObj.code)
 
