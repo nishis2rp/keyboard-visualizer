@@ -281,7 +281,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
 
         if (hasNonModifierReleased) {
           const currentQuestion = quizState.currentQuestion;
-          const isSequential = currentQuestion && isSequentialShortcut(currentQuestion.correctShortcut);
+          const isSequential = currentQuestion && isSequentialShortcut(currentQuestion.correctShortcut, currentQuestion.appId);
 
           if (isSequential && currentQuestion && quizState.keyboardLayout) { // Check keyboardLayout is not null
             const correctSequentialKeys = getSequentialKeys(currentQuestion.correctShortcut);

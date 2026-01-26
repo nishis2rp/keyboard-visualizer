@@ -8,22 +8,41 @@
 /**
  * ショートカットが順序押しかどうかを判定
  * @param shortcut - ショートカット文字列（例: "Alt + H + O + I"）
+ * @param application - アプリケーション名（オプション）
  * @returns 順序押しの場合true
  */
-export const isSequentialShortcut = (shortcut: string): boolean => {
+export const isSequentialShortcut = (shortcut: string, application?: string): boolean => {
   if (!shortcut) return false;
+
+  // Windows 11とmacOSは順押しショートカットを持たない（すべて同時押し）
+  if (application === 'windows11' || application === 'macos') {
+    return false;
+  }
 
   // スペースを削除して分割
   const keys = shortcut.replace(/ /g, '').split('+');
 
-  // Check if the first key is a recognized modifier
-  const firstKeyLower = keys[0].toLowerCase();
-  const isModifier = ['alt', 'ctrl', 'shift', 'meta'].includes(firstKeyLower);
-
-  // If it starts with a modifier and has 3 or more keys, consider it sequential
-  // 例: Alt + H + O + I (4つのキー), Ctrl + K + S
-  if (keys.length >= 3 && isModifier) {
+  // Gmailの単独キーシーケンス（例: "g, i"）
+  if (application === 'gmail' && shortcut.includes(',')) {
     return true;
+  }
+
+  // VS Codeの2段階コマンド（例: "Ctrl + K, Ctrl + S"）
+  if (application === 'vscode' && shortcut.includes(',')) {
+    return true;
+  }
+
+  // Excelのリボン操作（Alt + 文字キー3つ以上）
+  if (application === 'excel') {
+    const firstKeyLower = keys[0].toLowerCase();
+    // Altで始まり、4つ以上のキー、かつ2番目以降が文字キー
+    if (firstKeyLower === 'alt' && keys.length >= 4) {
+      // 2番目以降がすべて1文字の英字かチェック
+      const hasOnlyLetters = keys.slice(1).every(k => /^[a-zA-Z]$/.test(k));
+      if (hasOnlyLetters) {
+        return true;
+      }
+    }
   }
 
   return false;
@@ -48,8 +67,8 @@ export const getSequentialKeys = (shortcut: string): string[] => {
  * @param shortcut - ショートカット文字列
  * @returns 表示用文字列（例: "Alt → H → O → I"）
  */
-export const formatSequentialShortcut = (shortcut: string): string => {
-  if (!isSequentialShortcut(shortcut)) {
+export const formatSequentialShortcut = (shortcut: string, application?: string): string => {
+  if (!isSequentialShortcut(shortcut, application)) {
     return shortcut;
   }
 
@@ -139,9 +158,10 @@ export class SequentialKeyRecorder {
  */
 export const checkSequentialShortcut = (
   userSequence: string[],
-  correctShortcut: string
+  correctShortcut: string,
+  application?: string
 ): boolean => {
-  if (!isSequentialShortcut(correctShortcut)) {
+  if (!isSequentialShortcut(correctShortcut, application)) {
     return false;
   }
 

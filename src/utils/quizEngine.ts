@@ -230,7 +230,7 @@ export const generateQuestion = (
   const randomIndex = Math.floor(Math.random() * allSafeShortcuts.length);
   const selected = allSafeShortcuts[randomIndex];
 
-  const isSeq = isSequentialShortcut(selected.shortcut);
+  const isSeq = isSequentialShortcut(selected.shortcut, selected.appId);
 
   const question = {
     question: `【${selected.appName}】${selected.description}のショートカットは？`,

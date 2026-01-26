@@ -23,7 +23,22 @@
       "Bash(wc:*)",
       "Bash(npm install)",
       "Bash(node -e:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(grep:*)",
+      "Bash(echo:*)",
+      "Bash(timeout 120 npm run build:*)",
+      "Bash(git restore:*)",
+      "Bash(dir:*)",
+      "Bash(ls:*)",
+      "Bash(npx supabase status)",
+      "Bash(npx supabase:*)",
+      "Bash(if [ -f .env ])",
+      "Bash(then echo \"DATABASE_URL exists:\")",
+      "Bash(else echo \".env file not found\")",
+      "Bash(fi)",
+      "Bash(comm:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": [],
     "ask": []

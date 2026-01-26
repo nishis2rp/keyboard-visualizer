@@ -86,7 +86,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
   const renderShortcut = () => {
     // ショートカットを " + " で分割
     const parts = shortcut.split(' + ')
-    const isSequential = isSequentialShortcut(shortcut)
+    const isSequential = isSequentialShortcut(shortcut, appContext || undefined)
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
