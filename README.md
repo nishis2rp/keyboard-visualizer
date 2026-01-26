@@ -39,15 +39,23 @@
 
 ### 🎯 対応アプリケーション (データはバックエンドサービスから動的に取得)
 
-| アプリ | ショートカット数 | 特徴 |
-|--------|-----------------|------|
-| **Windows 11** | 100+ | システムレベルショートカット（Win+X、Win+Lなど） |
-| **macOS** | 80+ | macOS固有のショートカット（Cmd+Space、Cmd+Tabなど） |
-| **Chrome** | 60+ | ブラウザショートカット（Ctrl+T、Ctrl+Wなど） |
-| **VS Code** | 325+ | 開発エディタ（Windows: 163個、Mac: 162個）編集、ナビゲーション、デバッグ、Git操作など |
-| **Excel** | 150+ | スプレッドシート操作（Alt+E+S、Ctrl+矢印など） |
-| **Slack** | 50+ | チャットアプリ（Ctrl+K、Ctrl+/など） |
-| **Gmail** | 40+ | メール操作（単独キー: c, e, r など） |
+**総ショートカット数: 1,146個**
+
+| アプリ | ショートカット数 | 難易度分布 | 特徴 |
+|--------|-----------------|-----------|------|
+| **macOS** | 290 | Basic, Standard, Hard | macOS固有のショートカット（Cmd+Space、Mission Controlなど） |
+| **VS Code** | 279 | Basic~Madmax | 開発エディタ - 全難易度対応、編集、ナビゲーション、デバッグ、Git操作 |
+| **Excel** | 179 | Basic, Standard, Hard | スプレッドシート操作（ピボット、マクロ、VBAなど高度な機能含む） |
+| **Windows 11** | 151 | Basic, Standard, Hard | システムレベルショートカット（Win+X、仮想デスクトップなど） |
+| **Chrome** | 91 | Basic, Standard, Hard | ブラウザショートカット（デベロッパーツール含む） |
+| **Gmail** | 82 | Basic, Standard, Hard | メール操作（フィルタ、高度な検索など） |
+| **Slack** | 74 | Basic, Standard, Hard | チャットアプリ（ワークスペース管理含む） |
+
+**難易度分布（全体）:**
+- 🌟 Basic: 約200個 (20-25%) - 日常的に使う基本操作
+- ⚡ Standard: 約600個 (50-60%) - 標準的なショートカット
+- 🔥 Hard: 約200個 (20-25%) - 高度な機能・専門的な操作
+- 💀 Madmax: 64個 (5-6%) - VS Code専用、最上級者向け
 
 ### ⌨️ キーボード配列対応
 
@@ -355,25 +363,69 @@ keyboard-visualizer/
 
 ## 🔧 カスタマイズガイド
 
+### データベース構造
+
+Supabase PostgreSQLの `shortcuts` テーブル構造：
+
+| カラム名       | 型       | 説明                                   |
+|---------------|----------|----------------------------------------|
+| `id`          | `BIGSERIAL` | 主キー（自動採番）                 |
+| `application` | `VARCHAR(50)` | アプリケーションID (例: `windows11`, `macos`, `chrome`) |
+| `keys`        | `VARCHAR(100)` | ショートカットキー (例: `Ctrl + N`, `Cmd + A`) |
+| `description` | `TEXT`   | ショートカットの説明 (例: `新規作成`)  |
+| `category`    | `VARCHAR(100)` | カテゴリ (オプション) |
+| `difficulty`  | `TEXT`   | 難易度: `basic`, `standard`, `hard`, `madmax`, `allrange` |
+| `platform`    | `TEXT`   | プラットフォーム: `Windows`, `macOS`, `Cross-Platform` |
+| `windows_keys`| `TEXT`   | Windows版のキー組み合わせ（参照用） |
+| `macos_keys`  | `TEXT`   | macOS版のキー組み合わせ（参照用） |
+| `created_at`  | `TIMESTAMP` | 作成日時 |
+
+**インデックス:**
+- `idx_shortcuts_application` - アプリケーション別の高速検索
+- `idx_shortcuts_keys` - キー組み合わせの検索
+- `idx_shortcuts_platform` - プラットフォーム別フィルタリング
+
 ### 新しいアプリケーションの追加 (バックエンドサービス経由)
 
 新しいアプリケーションのショートカットを追加するには、バックエンドサービス（Supabase）の `shortcuts` テーブルにデータを挿入する必要があります。
 
 Supabaseの管理画面またはSQLクエリを使用して、以下の形式でデータを追加してください。
 
-| カラム名     | 型       | 説明                                   |
-|--------------|----------|----------------------------------------|
-| `application`| `TEXT`   | アプリケーションID (例: `my_app`)      |
-| `keys`       | `TEXT`   | ショートカットキー (例: `Ctrl + N`)    |
-| `description`| `TEXT`   | ショートカットの説明 (例: `新規作成`)  |
-| `category`   | `TEXT`   | カテゴリ (オプション、例: `File Operations`) |
-
 **例 (SQL):**
 
 ```sql
-INSERT INTO shortcuts (application, keys, description)
-VALUES ('my_app', 'Ctrl + N', '新規作成');
+INSERT INTO shortcuts (application, keys, description, difficulty, platform)
+VALUES ('my_app', 'Ctrl + N', '新規作成', 'basic', 'Cross-Platform');
 ```
+
+### データベースマイグレーション
+
+プロジェクトには `supabase/migrations/` ディレクトリにマイグレーションファイルが含まれています：
+
+```bash
+supabase/migrations/
+├── 001_create_shortcuts_table.sql         # テーブル作成
+├── 002_insert_data.sql                    # 初期データ投入
+├── 003_add_difficulty_to_shortcuts.sql    # 難易度カラム追加
+├── 004_add_vscode_shortcuts.sql           # VS Codeショートカット追加
+├── 005_add_more_vscode_shortcuts.sql      # VS Code追加ショートカット
+├── 006_add_vscode_mac_shortcuts.sql       # VS Code macOS版
+├── 007_add_platform_keys_to_shortcuts.sql # プラットフォームカラム追加
+├── 008_merge_common_os_shortcuts.sql      # 共通OSショートカット統合（一時的）
+├── 009_revert_os_common_to_separate_os.sql # OS別レコードに分離
+└── 010_increase_basic_difficulty_shortcuts.sql # 難易度バランス調整
+```
+
+**マイグレーション実行方法:**
+
+1. `.env` ファイルに Supabase 接続情報を設定
+2. マイグレーションスクリプトを実行
+
+```bash
+npm run db:run-migration
+```
+
+または Supabase ダッシュボードの SQL Editor で各マイグレーションファイルを順番に実行
 
 **フロントエンド側の設定:**
 

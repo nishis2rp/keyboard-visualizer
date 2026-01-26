@@ -40,6 +40,7 @@ async function main() {
       '007_add_platform_keys_to_shortcuts.sql',
       '008_merge_common_os_shortcuts.sql',
       '009_revert_os_common_to_separate_os.sql',
+      '010_increase_basic_difficulty_shortcuts.sql',
     ];
 
     for (const migration of migrations) {
