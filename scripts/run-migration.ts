@@ -35,6 +35,11 @@ async function main() {
       '002_insert_data.sql',
       '003_add_difficulty_to_shortcuts.sql',
       '004_add_vscode_shortcuts.sql',
+      '005_add_more_vscode_shortcuts.sql',
+      '006_add_vscode_mac_shortcuts.sql',
+      '007_add_platform_keys_to_shortcuts.sql',
+      '008_merge_common_os_shortcuts.sql',
+      '009_revert_os_common_to_separate_os.sql',
     ];
 
     for (const migration of migrations) {

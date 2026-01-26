@@ -61,6 +61,9 @@ export function useShortcuts(): UseShortcutsReturn {
           application: item.application,
           category: item.category,
           created_at: item.created_at,
+          platform: item.platform,
+          windows_keys: item.windows_keys,
+          macos_keys: item.macos_keys,
         });
       });
 

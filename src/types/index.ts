@@ -52,6 +52,9 @@ export interface RichShortcut {
   application: string;
   category: string | null;
   created_at: string;
+  platform?: 'Windows' | 'macOS' | 'Cross-Platform';
+  windows_keys?: string | null;
+  macos_keys?: string | null;
 }
 
 
