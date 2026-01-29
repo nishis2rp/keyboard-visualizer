@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import QuestionCard from './Quiz/QuestionCard';
 import ScoreBoard from './Quiz/ScoreBoard';
+import QuizProgressBar from './Quiz/QuizProgressBar'; // Import the new component
 import ResultModal from './Quiz/ResultModal';
 import SystemShortcutWarning from './SystemShortcutWarning';
 import KeyboardLayout from './KeyboardLayout/KeyboardLayout';
@@ -14,10 +15,11 @@ import '../styles/quiz.css';
 
 const QuizModeView = () => {
   const { isFullscreenMode } = useFullscreen();
-  const { selectedApp, keyboardLayout, shortcutDescriptions, quizApp, quizDifficulty } = useAppContext();
+  const { selectedApp, keyboardLayout, richShortcuts, shortcutDescriptions, quizApp, quizDifficulty } = useAppContext();
   const { quizState, startQuiz, getNextQuestion, dispatch, updateFullscreen, handleKeyPress } = useQuiz();
 
-  const { pressedKeys } = useKeyboardShortcuts(shortcutDescriptions, keyboardLayout, true);
+  const currentRichShortcuts = richShortcuts || [];
+  const { pressedKeys } = useKeyboardShortcuts(currentRichShortcuts, keyboardLayout, selectedApp, true);
 
   const openMacWarningModalRef = useRef(null);
   const onMacWarningModalRequest = (openModalFunc) => {
@@ -74,7 +76,16 @@ const QuizModeView = () => {
           </div>
         )}
 
-        <ScoreBoard />
+        <ScoreBoard
+          status={quizState.status}
+          quizHistory={quizState.quizHistory}
+          settings={quizState.settings}
+        />
+        <QuizProgressBar
+          status={quizState.status}
+          quizHistory={quizState.quizHistory}
+          settings={quizState.settings}
+        />
         <QuestionCard pressedKeys={quizState.pressedKeys} keyboardLayout={keyboardLayout} />
 
         {/* キーボードビジュアライザー */}

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useQuiz } from '../../context/QuizContext';
 import { useAppContext } from '../../context/AppContext';
 import { StyledButton } from '../common/StyledButton';
@@ -7,10 +7,21 @@ function ResultModal() {
   const { quizState, dispatch, startQuiz } = useQuiz();
   const { setShowSetup, setIsQuizMode } = useAppContext();
   const { status, score, quizHistory, selectedApp, keyboardLayout, startTime, endTime, settings } = quizState;
+  const [isCopied, setIsCopied] = useState(false);
 
   if (status !== 'finished') {
     return null; // クイズが終了していない場合は何も表示しない
   }
+  
+  const handleShare = () => {
+    const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+    const shareText = `キーボード早打ちクイズで【${selectedApp}】のスコアは ${totalQuestions}問中${correctAnswers}問正解でした！ 正答率: ${accuracy.toFixed(0)}% #キーボードビジュアライザー`;
+
+    navigator.clipboard.writeText(shareText).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    });
+  };
 
   // スコア計算
   const totalQuestions = quizHistory.length;
@@ -125,6 +136,18 @@ function ResultModal() {
             variant="color"
           >
             🔄 もう一度挑戦
+          </StyledButton>
+
+          <StyledButton
+            onClick={handleShare}
+            backgroundColor="#0ea5e9"
+            hoverBackgroundColor="#0284c7"
+            padding="12px 25px"
+            fontSize="1.1rem"
+            fontWeight="bold"
+            variant="color"
+          >
+            {isCopied ? '✅ コピーしました！' : '🔗 結果をシェア'}
           </StyledButton>
 
           <StyledButton

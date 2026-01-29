@@ -1,14 +1,13 @@
 import { getCodeDisplayName, getShiftedSymbolForKey, getPossibleKeyNamesFromDisplay } from './keyMapping'
 import { MODIFIER_ORDER } from './keyUtils'
-import { AppShortcuts, ShortcutDetails } from '../types'
+import { AppShortcuts, ShortcutDetails, RichShortcut, AvailableShortcut } from '../types' // ★ RichShortcut, AvailableShortcutを追加
+import { detectOS } from '../constants' // ★ detectOSを追加
 
 /**
- * キー名 (KeyboardEvent.key) を正規化する。
- * 主にuseKeyboardShortcutsでのe.keyの処理のために残されている。
- * @param {string} key - キー名 (KeyboardEvent.key)
- * @returns {string} 正規化されたキー名
+ * キーの正規化
+ * アルファベット1文字の場合は小文字に統一
  */
-export const normalizeKey = (key) => {
+export const normalizeKey = (key: string): string => {
   // アルファベット1文字の場合は小文字に統一（macOSのCmd+キーの大文字小文字問題対策）
   if (key.length === 1 && /[a-zA-Z]/.test(key)) {
     return key.toLowerCase()
@@ -84,37 +83,49 @@ const getKeyComboAlternatives = (displayComboText, layout) => {
  * @param {string} layout - キーボードレイアウト
  * @returns {string|null} ショートカットの説明、見つからない場合はnull
  */
-export const getShortcutDescription = (currentDisplayComboText: string, shortcutDescriptions: AppShortcuts, layout: string): string | null => {
+export const getShortcutDescription = (currentDisplayComboText: string, richShortcuts: RichShortcut[], selectedApp: string, layout: string): string | null => {
+  const os = detectOS();
+  // 選択されたアプリのショートカットのみをフィルタ
+  const appRichShortcuts = richShortcuts.filter(item => item.application === selectedApp);
+
+  const findDescription = (targetCombo: string) => {
+    for (const item of appRichShortcuts) {
+      // OSごとのキー、なければkeysにフォールバック
+      const shortcutKeys = (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys;
+      if (shortcutKeys === targetCombo) {
+        return item.description;
+      }
+    }
+    return null;
+  };
+
   // まず、現在の表示名で直接検索
-  if (shortcutDescriptions[currentDisplayComboText]) {
-    return shortcutDescriptions[currentDisplayComboText].description
-  }
+  let description = findDescription(currentDisplayComboText);
+  if (description) return description;
 
   // 代替表現で検索
-  const alternatives = getKeyComboAlternatives(currentDisplayComboText, layout)
+  const alternatives = getKeyComboAlternatives(currentDisplayComboText, layout);
   for (const alt of alternatives) {
-    if (shortcutDescriptions[alt]) {
-      return shortcutDescriptions[alt].description
-    }
+    description = findDescription(alt);
+    if (description) return description;
   }
 
   // キー名の別名を考慮した検索（PgUp <-> PageUp など）
-  const parts = currentDisplayComboText.split(' + ')
-  const lastKey = parts[parts.length - 1]
-  const possibleLastKeys = getPossibleKeyNamesFromDisplay(lastKey)
+  const parts = currentDisplayComboText.split(' + ');
+  const lastKey = parts[parts.length - 1];
+  const possibleLastKeys = getPossibleKeyNamesFromDisplay(lastKey);
 
   // 最後のキーの別名を試す
   for (const possibleLastKey of possibleLastKeys) {
     if (possibleLastKey !== lastKey) {
-      const alternativeCombo = [...parts.slice(0, -1), possibleLastKey].join(' + ')
-      if (shortcutDescriptions[alternativeCombo]) {
-        return shortcutDescriptions[alternativeCombo].description
-      }
+      const alternativeCombo = [...parts.slice(0, -1), possibleLastKey].join(' + ');
+      description = findDescription(alternativeCombo);
+      if (description) return description;
     }
   }
 
-  return null
-}
+  return null;
+};
 
 
 /**
@@ -150,51 +161,70 @@ const countModifierKeys = (shortcut: string): number => {
  * 現在押されているキーで始まるショートカットをすべて取得
  * @param {string[]} pressedCodes - 現在押されているキーの配列 (KeyboardEvent.code)
  * @param {string} layout - キーボードレイアウト
- * @param {AppShortcuts} shortcutDescriptions - ショートカット定義オブジェクト (keyベース)
- * @returns {Array<{shortcut: string, description: string}>} ショートカット一覧
+ * @param {RichShortcut[]} richShortcuts - 全てのRichShortcutデータ
+ * @param {string} selectedApp - 現在選択されているアプリケーション
+ * @returns {AvailableShortcut[]} ショートカット一覧
  */
-export const getAvailableShortcuts = (pressedCodes: string[], layout: string, shortcutDescriptions: AppShortcuts): { shortcut: string, description: string }[] => {
-  // 押されているキーのcodeから表示名（keyベースの表現）のセットを作成
+export const getAvailableShortcuts = (pressedCodes: string[], layout: string, richShortcuts: RichShortcut[], selectedApp: string): AvailableShortcut[] => {
   const shiftPressed = pressedCodes.includes('ShiftLeft') || pressedCodes.includes('ShiftRight');
   const pressedDisplayNames = new Set(pressedCodes.map(code => getCodeDisplayName(code, null, layout, shiftPressed)));
+  const os = detectOS();
 
-  // デバッグログ
+  const filteredRichShortcuts = richShortcuts
+    .filter(item => item.application === selectedApp)
+    .filter(item => {
+      // OSごとのキー、なければkeysにフォールバック
+      const targetShortcut = (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys;
+      if (!targetShortcut) {
+        // console.log(`    Skipping item (no target shortcut for OS ${os}):`, item);
+        return false;
+      }
 
-  const shortcuts = (Object.entries(shortcutDescriptions) as [string, ShortcutDetails][])
-    .filter(([shortcut]) => {
-      const shortcutKeys = shortcut.split(' + '); // shortcutDescriptionsのキーは表示名ベース
-
-      // 押されているキーがすべてショートカットのキーに含まれているか
+      const shortcutKeys = targetShortcut.split(' + ');
       const allPressedKeysInShortcut = Array.from(pressedDisplayNames).every((pressedKey: string) => shortcutKeys.includes(pressedKey));
-
-      // 押されているキーの数とショートカットのキー数が一致するか、
-      // あるいは押されているキーがショートカットの修飾キー部分と一致するか
       const pressedModifiers = Array.from(pressedDisplayNames).filter((key: string) => MODIFIER_KEY_NAMES.has(key));
       const shortcutModifiers = shortcutKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
 
+      let shouldInclude = false;
       // 1. 完全一致
       if (allPressedKeysInShortcut && pressedDisplayNames.size === shortcutKeys.length) {
-        return true;
+        shouldInclude = true;
       }
       // 2. 修飾キーのみが一致（まだメインキーが押されていないショートカット候補）
-      if (
-          pressedModifiers.length > 0 && // 何らかの修飾キーが押されている
-          pressedModifiers.length === shortcutModifiers.length && // 押されている修飾キーがショートカットの修飾キー数と一致
-          pressedModifiers.every((mod: string) => shortcutModifiers.includes(mod)) && // 押されている修飾キーがすべてショートカットの修飾キーに含まれる
-          pressedDisplayNames.size < shortcutKeys.length // まだメインキーが押されていない
+      else if (
+          pressedModifiers.length > 0 &&
+          pressedModifiers.length === shortcutModifiers.length &&
+          pressedModifiers.every((mod: string) => shortcutModifiers.includes(mod)) &&
+          pressedDisplayNames.size < shortcutKeys.length
          ) {
-           return true;
+           shouldInclude = true;
       }
-      return false;
+
+      // if (!shouldInclude) {
+      //   console.log(`    Skipping item (filter out):`, {
+      //     itemShortcut: targetShortcut,
+      //     pressedDisplayNames: Array.from(pressedDisplayNames),
+      //     shortcutKeys,
+      //     allPressedKeysInShortcut,
+      //     pressedModifiers,
+      //     shortcutModifiers,
+      //     shouldInclude,
+      //   });
+      // }
+      return shouldInclude;
     })
-    .map(([shortcut, details]: [string, ShortcutDetails]) => ({ shortcut, description: details.description }))
+    .map(item => ({
+      ...item, // RichShortcutのプロパティをすべてコピー
+      shortcut: (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys || '', // 表示用のショートカット文字列
+      windows_protection_level: item.windows_protection_level || 'none', // non-nullableにする
+      macos_protection_level: item.macos_protection_level || 'none',     // non-nullableにする
+    }))
     .filter((item, index, self) =>
       index === self.findIndex(t => t.shortcut === item.shortcut)
     );
 
-  // フィルタ後の結果をログ出力
 
-  const sortedShortcuts = shortcuts.sort((a, b) => {
+  const sortedShortcuts = filteredRichShortcuts.sort((a, b) => {
       // ソートロジック：修飾キーの数 → キーボード配列順
       const aModifierCount = countModifierKeys(a.shortcut)
       const bModifierCount = countModifierKeys(b.shortcut)
@@ -219,10 +249,7 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, sh
     })
     .slice(0, MAX_SHORTCUTS_DISPLAY);
 
-  if (sortedShortcuts.length > 0) {
-  }
-
-  return sortedShortcuts
+  return sortedShortcuts;
 }
 
 /** キーボード配列順の定義（物理的な配置順） */
@@ -273,13 +300,28 @@ const getKeyboardLayoutIndex = (key: string): number => {
 
 /**
  * 単独キー（修飾キーなし）のショートカット一覧を取得
- * @param {AppShortcuts} shortcutDescriptions - ショートカット定義オブジェクト
- * @returns {Array<{shortcut: string, description: string}>} 単独キーショートカット一覧
+ * @param {RichShortcut[]} richShortcuts - 全てのRichShortcutデータ
+ * @param {string} selectedApp - 現在選択されているアプリケーション
+ * @returns {AvailableShortcut[]} 単独キーショートカット一覧
  */
-export const getSingleKeyShortcuts = (shortcutDescriptions: AppShortcuts): { shortcut: string, description: string }[] => {
-  return (Object.entries(shortcutDescriptions) as [string, ShortcutDetails][])
-    .filter(([shortcut]) => !shortcut.includes(' + '))
-    .map(([shortcut, details]) => ({ shortcut, description: details.description }))
+export const getSingleKeyShortcuts = (richShortcuts: RichShortcut[], selectedApp: string): AvailableShortcut[] => {
+  const os = detectOS();
+
+  return richShortcuts
+    .filter(item => item.application === selectedApp) // 選択されたアプリのショートカットのみをフィルタ
+    .filter(item => {
+      // OSごとのキー、なければkeysにフォールバック
+      const targetKeys = (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys;
+      if (!targetKeys) return false;
+      return !targetKeys.includes(' + '); // 修飾キーなしの単独キーのみ
+    })
+    .map(item => ({
+      ...item,
+      // OSごとのキー、なければkeysにフォールバック
+      shortcut: (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys || '',
+      windows_protection_level: item.windows_protection_level || 'none',
+      macos_protection_level: item.macos_protection_level || 'none',
+    }))
     .sort((a, b) => {
       const aKey = a.shortcut
       const bKey = b.shortcut

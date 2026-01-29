@@ -18,23 +18,11 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
   const keyboardRows = useMemo(() => getKeyboardLayoutByName(keyboardLayout), [keyboardLayout])
   const layoutName = useMemo(() => getLayoutDisplayName(keyboardLayout), [keyboardLayout])
 
-  // キーが押されているかチェック
-  const isKeyPressed = (keyObj: KeyDefinition) => { // keyObjを引数に
-    if (!keyObj.code) return false; // codeがない場合は判定しない
-
-    // pressedKeysにはcodeが格納されている
-    const isCodePressed = pressedKeys.has(keyObj.code);
-
-    // Shiftキーが押されているか確認
-    const shiftPressed = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight');
-
-    // getCodeDisplayNameで表示名を取得し、そのキーもpressedKeysに含まれるか確認
-    // これは主に修飾キーの表示名をチェックする際に有効だが、今回はcodeベースで統一
-    // const displayKey = getCodeDisplayName(keyObj.code, keyObj.key, keyboardLayout, shiftPressed);
-    // const isDisplayKeyPressed = pressedKeys.has(displayKey); // これは不要、pressedKeysはcode
-
-    return isCodePressed; // codeがpressedKeysにあるかで判定
-  }
+  // キーが押されているかチェック（メモ化）
+  const isKeyPressed = useCallback((keyObj: KeyDefinition) => {
+    if (!keyObj.code) return false;
+    return pressedKeys.has(keyObj.code);
+  }, [pressedKeys])
 
   // Shiftキーが押されているか確認（メモ化）
   const shiftPressed = useMemo(
@@ -42,44 +30,38 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
     [pressedKeys]
   );
 
-  // キーに関連するショートカットを取得（メモ化）
+  // キーに関連するショートカットを取得（メモ化、重複排除最適化）
   const getKeyShortcuts = useCallback((keyObj: KeyDefinition) => {
     if (!keyObj.code) return [];
 
     const keyDisplayName = getCodeDisplayName(keyObj.code, keyObj.key, keyboardLayout, shiftPressed);
     const possibleKeyNames = getPossibleKeyNamesFromDisplay(keyDisplayName);
-    const shortcuts = []
+    const seenCombos = new Set<string>();
+    const shortcuts: { combo: string; desc: string }[] = [];
 
     // 単一キーのショートカット
-    // Try all possible key names (display name + actual key code)
     for (const keyName of possibleKeyNames) {
-      if (shortcutDescriptions[keyName]) {
-        shortcuts.push({ combo: keyName, desc: shortcutDescriptions[keyName].description })
+      if (shortcutDescriptions[keyName] && !seenCombos.has(keyName)) {
+        shortcuts.push({ combo: keyName, desc: shortcutDescriptions[keyName].description });
+        seenCombos.add(keyName);
       }
     }
 
     // 修飾キーとの組み合わせ
-    Object.entries(shortcutDescriptions).forEach(([combo, details]) => {
-      const comboKeys = combo.split(' + ')
-      const lastKey = comboKeys[comboKeys.length - 1]
+    for (const [combo, details] of Object.entries(shortcutDescriptions)) {
+      if (seenCombos.has(combo)) continue;
+
+      const comboKeys = combo.split(' + ');
+      const lastKey = comboKeys[comboKeys.length - 1];
 
       // キーの表示名または実際のキー名がショートカットの最後のキーと一致するか
       if (possibleKeyNames.some(name => lastKey.toUpperCase() === name.toUpperCase())) {
-        shortcuts.push({ combo, desc: details.description })
+        shortcuts.push({ combo, desc: details.description });
+        seenCombos.add(combo);
       }
-    })
+    }
 
-    // 重複を排除
-    const uniqueShortcuts = [];
-    const seenCombos = new Set();
-    shortcuts.forEach(s => {
-      if (!seenCombos.has(s.combo)) {
-        uniqueShortcuts.push(s);
-        seenCombos.add(s.combo);
-      }
-    });
-
-    return uniqueShortcuts
+    return shortcuts;
   }, [keyboardLayout, shortcutDescriptions, shiftPressed])
 
   // Calculate grid positions for all keys（メモ化）

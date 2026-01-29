@@ -16,13 +16,17 @@ const NormalModeView = () => {
     shortcutDescriptions,
     keyboardLayouts,
     apps,
+    richShortcuts, // ★ richShortcutsを取得
   } = useAppContext();
+
+  // richShortcuts が null の場合は空の配列を渡す
+  const currentRichShortcuts = richShortcuts || [];
 
   const {
     pressedKeys,
     currentDescription,
     availableShortcuts,
-  } = useKeyboardShortcuts(shortcutDescriptions, keyboardLayout, false);
+  } = useKeyboardShortcuts(currentRichShortcuts, keyboardLayout, selectedApp, false);
 
   return (
     <>
@@ -50,7 +54,7 @@ const NormalModeView = () => {
         description={currentDescription}
         availableShortcuts={availableShortcuts}
         selectedApp={selectedApp}
-        shortcutDescriptions={shortcutDescriptions}
+        richShortcuts={currentRichShortcuts}
         keyboardLayout={keyboardLayout}
       />
     </>

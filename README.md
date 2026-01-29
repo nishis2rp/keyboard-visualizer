@@ -68,9 +68,12 @@
 
 - **全画面モード**: ショートカットキーの競合を軽減
 - **Keyboard Lock API**: ブラウザレベルでキーをキャプチャ（Win+Tabなども取得可能）
-- **システム保護ショートカット表示**:
-  - 🔵 全画面で防げるショートカット（青色）
-  - 🔒 システム保護で防げないショートカット（赤色）
+- **データベース駆動の保護レベル管理**:
+  - 各ショートカットの保護レベルをデータベースで一元管理
+  - Windows/macOS別の保護レベルを自動判定
+  - 🔵 全画面表示で防げるショートカット（`fullscreen-preventable`）
+  - 🔒 システム保護で防げないショートカット（`always-protected`）
+  - OS固有の保護レベルに対応（Cmd+Tabなど）
 
 ### 💡 インテリジェントなショートカット表示
 
@@ -339,6 +342,13 @@ keyboard-visualizer/
    - `useShortcuts` フックを拡張し、`AllShortcuts`（アプリ別グループ化）と`RichShortcut[]`（配列形式）の両方を提供
    - 型安全性を保ちながら、フィルタリングやソートが容易な設計に改善
 
+8. **データベース駆動の保護レベル管理**（2026年1月）
+   - ハードコードされた保護レベル定義をデータベースに移行
+   - `windows_protection_level` と `macos_protection_level` カラムを追加
+   - 各OSごとに異なる保護レベルを正確に管理（例: Win+TabはWindowsで保護、Cmd+TabはmacOSで保護）
+   - `systemProtectedShortcuts.ts` のロジックを削除し、データベースから動的に取得する設計に変更
+   - 保護レベルの追加・変更がデータベース更新のみで可能に
+
 ### コンポーネント設計
 
 - **関心の分離**: 各コンポーネントが単一の責務を持つ設計
@@ -378,6 +388,8 @@ Supabase PostgreSQLの `shortcuts` テーブル構造：
 | `platform`    | `TEXT`   | プラットフォーム: `Windows`, `macOS`, `Cross-Platform` |
 | `windows_keys`| `TEXT`   | Windows版のキー組み合わせ（参照用） |
 | `macos_keys`  | `TEXT`   | macOS版のキー組み合わせ（参照用） |
+| `windows_protection_level` | `TEXT` | Windows保護レベル: `none`, `fullscreen-preventable`, `always-protected` |
+| `macos_protection_level` | `TEXT` | macOS保護レベル: `none`, `fullscreen-preventable`, `always-protected` |
 | `created_at`  | `TIMESTAMP` | 作成日時 |
 
 **インデックス:**
@@ -413,7 +425,15 @@ supabase/migrations/
 ├── 007_add_platform_keys_to_shortcuts.sql # プラットフォームカラム追加
 ├── 008_merge_common_os_shortcuts.sql      # 共通OSショートカット統合（一時的）
 ├── 009_revert_os_common_to_separate_os.sql # OS別レコードに分離
-└── 010_increase_basic_difficulty_shortcuts.sql # 難易度バランス調整
+├── 010_increase_basic_difficulty_shortcuts.sql # 難易度バランス調整
+├── 011_add_ctrl_esc_shortcut.sql          # Ctrl+Escショートカット追加
+├── 012_update_slack_shortcuts.sql         # Slackショートカット更新
+├── 013_add_more_vscode_shortcuts.sql      # VS Codeショートカット追加
+├── 014_refactor_vscode_shortcuts.sql      # VS Codeショートカットリファクタ
+├── 015_refactor_vscode_comment_shortcut.sql # VS Codeコメントショートカット修正
+├── 016_refactor_slack_quick_switcher.sql  # Slackクイックスイッチャー修正
+├── 017_refactor_os_common_select_all.sql  # OS共通の全選択修正
+└── 018_add_protection_level_columns.sql   # 保護レベルカラム追加（Windows/macOS別）
 ```
 
 **マイグレーション実行方法:**

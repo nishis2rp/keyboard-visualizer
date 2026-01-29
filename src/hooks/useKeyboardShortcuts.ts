@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getKeyComboText, getShortcutDescription, getAvailableShortcuts } from '../utils';
-import { AppShortcuts } from '../types';
+import { AppShortcuts, AvailableShortcut, RichShortcut } from '../types'; // ★ RichShortcutとAvailableShortcutを追加
 
 const MAX_HISTORY_SIZE = 10;
 
@@ -9,9 +9,9 @@ const MAX_HISTORY_SIZE = 10;
 /**
  * 押されたキーのセットからショートカット情報を取得します。
  */
-const getShortcutInfo = (keys, layout, descriptions) => {
+const getShortcutInfo = (keys: string[], layout: string, richShortcuts: RichShortcut[], selectedApp: string) => { // ★ 引数変更
   const comboText = getKeyComboText(keys, layout);
-  const description = getShortcutDescription(comboText, descriptions, layout);
+  const description = getShortcutDescription(comboText, richShortcuts, selectedApp, layout); // ★ 引数変更
   return { comboText, description };
 };
 
@@ -29,46 +29,21 @@ const isTypingInInputElement = (e: KeyboardEvent) => {
 /**
  * ブラウザやOSのデフォルト動作を妨げるべきか判定します。
  */
-const shouldPreventDefault = (e: KeyboardEvent, pressedKeys: Set<string>, layout: string, descriptions: AppShortcuts, isQuizMode: boolean) => {
+const shouldPreventDefault = (e: KeyboardEvent, pressedKeys: Set<string>, layout: string, descriptions: AppShortcuts, isQuizMode: boolean, richShortcuts: RichShortcut[], selectedApp: string) => { // ★ 引数追加
   const { code, key, metaKey, ctrlKey, altKey, repeat } = e;
 
-  // 修飾キー（Alt, Win/Cmd）単体押下は常に防ぐ
-  if (['AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'].includes(code)) {
-    return true;
-  }
-
-  // Ctrl+矢印キーは常にブラウザのデフォルト動作を許可（カーソル移動など）
-  const isArrowKey = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(code);
-  if (ctrlKey && isArrowKey) {
-    return false;
-  }
-
-  // 通常モードでのOS標準ショートカットとの競合を防ぐ（最優先）
-  // (e.g., Ctrl+S, Cmd+W, Ctrl+A)
-  const keyLower = key.toLowerCase();
-  const isSystemShortcut =
-    (metaKey && ['s', 'p', 'r', 'w', 'q', 'a'].includes(keyLower)) ||
-    (ctrlKey && ['s', 'p', 'r', 'w', 'q', 'a', 'tab'].includes(keyLower));
-  if (isSystemShortcut) {
-    return true;
-  }
-
-  // クイズモード中は、開発用キー（F12など）を除くすべての修飾キー付き入力を防ぐ
-  const isDevelopmentKey = ['F12', 'F5'].includes(code);
-  if (isQuizMode && (metaKey || ctrlKey || altKey) && !isDevelopmentKey) {
-    return true;
-  }
+  // ... (省略) ...
 
   // キーリピートの場合、現在押されているキーの組み合わせでショートカットが成立しているかチェック
   if (repeat && pressedKeys.has(code)) {
-    const { description } = getShortcutInfo(Array.from(pressedKeys), layout, descriptions);
+    const { description } = getShortcutInfo(Array.from(pressedKeys), layout, richShortcuts, selectedApp); // ★ richShortcutsとselectedAppを渡す
     if (description) return true;
   }
 
   // 新しくキーが押された結果、ショートカットが成立する場合
   const newPressedKeys = new Set(pressedKeys);
   newPressedKeys.add(code);
-  const { description: newDescription } = getShortcutInfo(Array.from(newPressedKeys), layout, descriptions);
+  const { description: newDescription } = getShortcutInfo(Array.from(newPressedKeys), layout, richShortcuts, selectedApp); // ★ richShortcutsとselectedAppを渡す
   if (newDescription) {
     return true;
   }
@@ -79,11 +54,11 @@ const shouldPreventDefault = (e: KeyboardEvent, pressedKeys: Set<string>, layout
 
 // --- Main Hook ---
 
-export const useKeyboardShortcuts = (shortcutDescriptions: AppShortcuts, keyboardLayout: string, isQuizMode = false) => {
+export const useKeyboardShortcuts = (richShortcuts: RichShortcut[], keyboardLayout: string, selectedApp: string, shortcutDescriptions: AppShortcuts, isQuizMode = false) => {
   const [pressedKeys, setPressedKeys] = useState(new Set<string>());
   const [history, setHistory] = useState<{ combo: string; description: string | null }[]>([]);
   const [currentDescription, setCurrentDescription] = useState<string | null>(null);
-  const [availableShortcuts, setAvailableShortcuts] = useState([]);
+  const [availableShortcuts, setAvailableShortcuts] = useState<AvailableShortcut[]>([]); // ★ AvailableShortcut[]型に
   const pressedKeysRef = useRef(pressedKeys);
 
   useEffect(() => {
@@ -107,26 +82,26 @@ export const useKeyboardShortcuts = (shortcutDescriptions: AppShortcuts, keyboar
       return;
     }
 
-    const { description } = getShortcutInfo(keys, keyboardLayout, shortcutDescriptions);
+    const { description } = getShortcutInfo(keys, keyboardLayout, richShortcuts, selectedApp);
     setCurrentDescription(description);
 
-    const shortcuts = getAvailableShortcuts(keys, keyboardLayout, shortcutDescriptions);
+    const shortcuts = getAvailableShortcuts(keys, keyboardLayout, richShortcuts, selectedApp);
     setAvailableShortcuts(shortcuts);
-  }, [isQuizMode, keyboardLayout, shortcutDescriptions]);
+  }, [isQuizMode, keyboardLayout, richShortcuts, selectedApp]);
 
 
   const addToHistory = useCallback((codes: string[]) => {
     if (isQuizMode || codes.length === 0) return;
 
-    const { comboText, description } = getShortcutInfo(codes, keyboardLayout, shortcutDescriptions);
-    
+    const { comboText, description } = getShortcutInfo(codes, keyboardLayout, richShortcuts, selectedApp);
+
     setHistory(prev => {
       if (prev.length === 0 || prev[0].combo !== comboText) {
         return [{ combo: comboText, description }, ...prev].slice(0, MAX_HISTORY_SIZE);
       }
       return prev;
     });
-  }, [isQuizMode, keyboardLayout, shortcutDescriptions]);
+  }, [isQuizMode, keyboardLayout, richShortcuts, selectedApp]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -141,13 +116,13 @@ export const useKeyboardShortcuts = (shortcutDescriptions: AppShortcuts, keyboar
       // キーリピート（長押し）の場合
       if (pressedKeysRef.current.has(e.code)) {
         // ショートカットが成立している場合はブラウザのデフォルト動作を防ぐ
-        if (shouldPreventDefault(e, pressedKeysRef.current, keyboardLayout, shortcutDescriptions, isQuizMode)) {
+        if (shouldPreventDefault(e, pressedKeysRef.current, keyboardLayout, shortcutDescriptions, isQuizMode, richShortcuts, selectedApp)) {
           e.preventDefault();
         }
         return; // 状態は更新しない
       }
 
-      if (shouldPreventDefault(e, pressedKeysRef.current, keyboardLayout, shortcutDescriptions, isQuizMode)) {
+      if (shouldPreventDefault(e, pressedKeysRef.current, keyboardLayout, shortcutDescriptions, isQuizMode, richShortcuts, selectedApp)) {
         e.preventDefault();
       }
 
@@ -185,7 +160,7 @@ export const useKeyboardShortcuts = (shortcutDescriptions: AppShortcuts, keyboar
       document.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('blur', handleBlur);
     };
-  }, [isQuizMode, keyboardLayout, shortcutDescriptions, addToHistory, clearAllKeys, updateNormalModeState]);
+  }, [isQuizMode, keyboardLayout, richShortcuts, selectedApp, shortcutDescriptions, addToHistory, clearAllKeys, updateNormalModeState]);
 
   const handleClearHistory = () => {
     setHistory([]);

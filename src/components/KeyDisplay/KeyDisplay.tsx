@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { getSingleKeyShortcuts } from '../../utils';
 import ShortcutCard from '../ShortcutCard';
 import { getCodeDisplayName } from '../../utils/keyMapping';
@@ -8,25 +8,49 @@ import {
   isModifierKey,
   isWindowsKey
 } from '../../utils/keyUtils';
-import { AppShortcuts } from '../../types';
+import { AvailableShortcut, RichShortcut } from '../../types'; // ★ AvailableShortcut, RichShortcutを追加
 
 interface KeyDisplayProps {
   pressedKeys?: Set<string>;
   specialKeys?: Set<string>;
   description?: string | null;
-  availableShortcuts?: { shortcut: string; description: string }[];
+  availableShortcuts?: AvailableShortcut[]; // ★ AvailableShortcut[]型に
   selectedApp?: string;
-  shortcutDescriptions?: AppShortcuts;
+  // shortcutDescriptions?: AppShortcuts; // ★ 削除
   keyboardLayout?: string;
+  richShortcuts?: RichShortcut[]; // ★ 追加
 }
 
-const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys = new Set(), description, availableShortcuts = [], selectedApp, shortcutDescriptions = {}, keyboardLayout }) => {
+const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys = new Set(), description, availableShortcuts = [], selectedApp, richShortcuts = [], keyboardLayout }) => {
   // Shiftキーが押されているか判定（getCodeDisplayNameに渡すため）
-  const shiftPressed = pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight');
+  const shiftPressed = useMemo(
+    () => pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight'),
+    [pressedKeys]
+  );
+
+  // pressedKeysはcodeのSetなので、表示用に変換し、ソートする（メモ化）
+  const sortedCodes = useMemo(
+    () => Array.from(pressedKeys).sort((a: string, b: string) => {
+      const aIndex = MODIFIER_CODE_DISPLAY_ORDER.indexOf(a)
+      const bIndex = MODIFIER_CODE_DISPLAY_ORDER.indexOf(b)
+
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
+      if (aIndex !== -1) return -1
+      if (bIndex !== -1) return 1
+      return 0
+    }),
+    [pressedKeys]
+  )
+
+  // 修飾キーのみが押されているかチェック (codeベースで、メモ化)
+  const isOnlyModifierKeys = useMemo(
+    () => sortedCodes.every((code: string) => MODIFIER_CODES.has(code)),
+    [sortedCodes]
+  )
 
   if (pressedKeys.size === 0) {
     // すべてのアプリケーションで単独キーショートカットを表示
-    const singleKeyShortcuts = getSingleKeyShortcuts(shortcutDescriptions)
+    const singleKeyShortcuts = getSingleKeyShortcuts(richShortcuts, selectedApp || '')
 
     if (singleKeyShortcuts.length > 0) {
       return (
@@ -66,6 +90,8 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
                   description={item.description}
                   appContext={selectedApp}
                   showDebugLog={true} // デバッグ用
+                  windows_protection_level={item.windows_protection_level}
+                  macos_protection_level={item.macos_protection_level}
                 />
               ))}
             </div>
@@ -80,20 +106,6 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
       </div>
     )
   }
-
-  // pressedKeysはcodeのSetなので、表示用に変換し、ソートする
-  const sortedCodes = Array.from(pressedKeys).sort((a: string, b: string) => {
-    const aIndex = MODIFIER_CODE_DISPLAY_ORDER.indexOf(a)
-    const bIndex = MODIFIER_CODE_DISPLAY_ORDER.indexOf(b)
-
-    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
-    if (aIndex !== -1) return -1
-    if (bIndex !== -1) return 1
-    return 0
-  })
-
-  // 修飾キーのみが押されているかチェック (codeベースで)
-  const isOnlyModifierKeys = sortedCodes.every((code: string) => MODIFIER_CODES.has(code))
 
   // 完全なショートカットが押されている場合（説明がある）
   // ただし、修飾キーのみの場合は、利用可能なショートカット一覧も表示
@@ -166,6 +178,8 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
                 description={item.description}
                 appContext={selectedApp}
                 showDebugLog={true} // デバッグ用
+                windows_protection_level={item.windows_protection_level}
+                macos_protection_level={item.macos_protection_level}
               />
             ))}
           </div>

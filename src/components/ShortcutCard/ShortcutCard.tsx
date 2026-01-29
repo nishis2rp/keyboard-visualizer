@@ -1,7 +1,13 @@
-import { memo } from 'react'
-import { getProtectionLevel } from '../../constants'
+import { memo, useMemo } from 'react'
+// import { getProtectionLevel } from '../../constants' // 削除
 import { isSequentialShortcut } from '../../utils/shortcutUtils'
 import { isModifierKeyName, isWindowsKeyName } from '../../utils/keyUtils'
+import { detectOS } from '../../constants' // detectOSをインポート
+// useAppContext はここで必要ない
+import { EXCEL_APP_SAFE_SHORTCUTS } from '../../constants/systemProtectedShortcuts' // Excelの除外リストをインポート
+
+// OSは実行時に変わらないため、モジュールレベルで1回だけ検出
+const CURRENT_OS = detectOS();
 
 /**
  * ショートカットカードコンポーネント
@@ -22,19 +28,38 @@ interface ShortcutCardProps {
   description: string;
   appContext?: string | null;
   showDebugLog?: boolean;
+  windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected'; // ★ 追加
+  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected';   // ★ 追加
 }
 
-const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false }) => {
-  const protectionLevel = getProtectionLevel(shortcut, appContext)
+const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none' }) => {
+  // 保護レベルを計算（メモ化）
+  const effectiveProtectionLevel = useMemo((): 'none' | 'fullscreen-preventable' | 'always-protected' => {
+    // Excelアプリのコンテキストで、Excel固有のショートカットは保護不要
+    if (appContext === 'excel' && EXCEL_APP_SAFE_SHORTCUTS.has(shortcut)) {
+      return 'none';
+    }
+
+    // OSに応じた保護レベルを返す
+    if (CURRENT_OS === 'windows') {
+      return windows_protection_level;
+    } else if (CURRENT_OS === 'macos') {
+      return macos_protection_level;
+    } else {
+      // デフォルトまたは不明なOSの場合、Windowsの保護レベルを適用
+      return windows_protection_level;
+    }
+  }, [shortcut, appContext, windows_protection_level, macos_protection_level]);
 
   // デバッグログ（開発時のみ） - 全てのショートカットでログ出力
   if (showDebugLog && import.meta.env.DEV) {
-    const emoji = protectionLevel === 'always-protected' ? '🔒' : protectionLevel === 'fullscreen-preventable' ? '🔵' : '⚪'
+    const emoji = effectiveProtectionLevel === 'always-protected' ? '🔒' : effectiveProtectionLevel === 'fullscreen-preventable' ? '🔵' : '⚪'
+    // console.log(`${emoji} ${shortcut}: ${description} (${effectiveProtectionLevel})`); // デバッグログ
   }
 
-  // 保護レベルに応じたスタイル
-  const getStyle = () => {
-    switch (protectionLevel) {
+  // 保護レベルに応じたスタイル（メモ化）
+  const style = useMemo(() => {
+    switch (effectiveProtectionLevel) {
       case 'always-protected':
         // 赤色: 全画面表示しても防げない（システムレベル保護）
         return {
@@ -79,11 +104,11 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
           tooltip: ''
         }
     }
-  }
+  }, [effectiveProtectionLevel]);
 
 
-  // ショートカット文字列をパースしてキーをボタンとして表示
-  const renderShortcut = () => {
+  // ショートカット表示JSXをメモ化
+  const shortcutDisplay = useMemo(() => {
     // ショートカットを " + " で分割
     const parts = shortcut.split(' + ')
     const isSequential = isSequentialShortcut(shortcut, appContext || undefined)
@@ -126,9 +151,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
         ))}
       </div>
     )
-  }
-
-  const style = getStyle()
+  }, [shortcut, appContext]);
 
   return (
     <div
@@ -139,7 +162,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
         {style.icon && <span style={{ fontSize: '0.9em' }}>{style.icon}</span>}
         <div className="shortcut-combo" style={{ ...style.combo, marginBottom: 0 }}>
-          {renderShortcut()}
+          {shortcutDisplay}
         </div>
       </div>
       <div className="shortcut-desc" style={style.description}>

@@ -204,3 +204,14 @@
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+/* Correct/Incorrect Flash Feedback */
+@keyframes flash-correct {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(76, 175, 80, 0.3); }
+}
+
+@keyframes flash-incorrect {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(244, 67, 54, 0.3); }
+}

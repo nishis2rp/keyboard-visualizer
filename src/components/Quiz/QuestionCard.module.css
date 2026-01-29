@@ -69,6 +69,7 @@
 }
 
 .questionCard.correct {
+  animation: flash-correct 0.5s ease-in-out;
   background: linear-gradient(135deg, var(--quiz-correct) 0%, var(--quiz-correct-dark) 100%);
   transform: scale(1.03);
   box-shadow:
@@ -79,6 +80,7 @@
 }
 
 .questionCard.incorrect {
+  animation: flash-incorrect 0.5s ease-in-out;
   background: linear-gradient(135deg, var(--quiz-incorrect) 0%, var(--quiz-incorrect-dark) 100%);
   transform: scale(1.03);
   box-shadow:

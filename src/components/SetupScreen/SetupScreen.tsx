@@ -14,7 +14,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const [selectedLayout, setSelectedLayout] = useState(null)
   const [selectedMode, setSelectedMode] = useState(null)
   const [selectedApp, setSelectedApp] = useState(null)
-  const [selectedQuizApp, setSelectedQuizApp] = useState(null)
+  const [selectedQuizApps, setSelectedQuizApps] = useState<any[]>([]) // 複数選択対応
   const [selectedDifficulty, setSelectedDifficulty] = useState(null)
 
   // クイズモードが既に有効な場合、モード選択をスキップ
@@ -143,7 +143,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     setSelectedApp(null)
     // クイズモード以外を選択した場合、クイズアプリと難易度をリセット
     if (mode.id !== 'quiz') {
-      setSelectedQuizApp(null)
+      setSelectedQuizApps([])
       setSelectedDifficulty(null)
     }
   }
@@ -153,7 +153,15 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   }
 
   const handleSelectQuizApp = (app) => {
-    setSelectedQuizApp(app)
+    // 複数選択対応
+    setSelectedQuizApps(prev => {
+      // 既に選択されている場合は削除
+      if (prev.some(a => a.id === app.id)) {
+        return prev.filter(a => a.id !== app.id)
+      }
+      // 選択されていない場合は追加
+      return [...prev, app]
+    })
   }
 
   const handleSelectDifficulty = (difficulty) => {
@@ -166,7 +174,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
 
     if (selectedMode?.id === 'quiz') {
       // クイズモードの場合
-      canProceed = selectedFullscreen && selectedLayout && selectedMode && selectedQuizApp && selectedDifficulty
+      canProceed = selectedFullscreen && selectedLayout && selectedMode && selectedQuizApps.length > 0 && selectedDifficulty
     } else if (selectedMode?.id === 'visualizer') {
       // ビジュアライザーモードの場合
       canProceed = selectedFullscreen && selectedLayout && selectedMode && selectedApp
@@ -185,12 +193,16 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         version: SETUP_VERSION
       }))
 
-      // クイズモードの場合は選択されたアプリと難易度も渡す
+      // クイズモードの場合は選択されたアプリ(複数)と難易度も渡す
+      const quizAppsIds = selectedMode.id === 'quiz'
+        ? selectedQuizApps.map(app => app.id).join(',')
+        : null
+
       onSetupComplete(
         appId,
         selectedLayout.id,
         selectedMode.id,
-        selectedMode.id === 'quiz' ? selectedQuizApp.id : null,
+        quizAppsIds,
         selectedMode.id === 'quiz' ? selectedDifficulty.id : undefined,
         selectedFullscreen.id === 'fullscreen'
       )
@@ -345,14 +357,14 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         {selectedMode?.id === 'quiz' && (
           <>
             <div className="setup-divider">
-              <h3>出題するアプリケーションを選択してください</h3>
+              <h3>出題するアプリケーションを選択してください（複数選択可）</h3>
             </div>
 
             <div className="setup-options setup-quiz-apps">
               {quizAppOptions.map((app) => (
                 <div
                   key={app.id}
-                  className={`setup-option ${selectedQuizApp?.id === app.id ? 'selected' : ''}`}
+                  className={`setup-option ${selectedQuizApps.some(a => a.id === app.id) ? 'selected' : ''}`}
                   onClick={() => handleSelectQuizApp(app)}
                 >
                   <div className="option-icon">{app.icon}</div>
@@ -361,7 +373,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
                     <p>{app.description}</p>
                   </div>
                   <div className="option-check">
-                    {selectedQuizApp?.id === app.id && '✓'}
+                    {selectedQuizApps.some(a => a.id === app.id) && '✓'}
                   </div>
                 </div>
               ))}
@@ -378,7 +390,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
               !selectedLayout ||
               !selectedMode ||
               (selectedMode?.id === 'visualizer' && !selectedApp) ||
-              (selectedMode?.id === 'quiz' && (!selectedDifficulty || !selectedQuizApp))
+              (selectedMode?.id === 'quiz' && (!selectedDifficulty || selectedQuizApps.length === 0))
             }
           >
             {!selectedFullscreen
@@ -391,7 +403,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
               ? 'アプリケーションを選択してください'
               : selectedMode.id === 'quiz' && !selectedDifficulty
               ? '難易度を選択してください'
-              : selectedMode.id === 'quiz' && !selectedQuizApp
+              : selectedMode.id === 'quiz' && selectedQuizApps.length === 0
               ? 'アプリケーションを選択してください'
               : '開始する'}
           </button>

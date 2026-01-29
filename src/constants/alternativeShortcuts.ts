@@ -41,9 +41,6 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
   // 上書き保存
   'Ctrl+S': [],
 
-  // 新規作成
-  'Ctrl+N': [],
-
   // 開く
   'Ctrl+O': [],
 
@@ -69,6 +66,11 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
 
   // アプリケーション切り替え
   'Alt+Tab': [],
+
+  // === Windows 11 操作 ===
+  // スタートメニューを開く
+  'Win': ['Ctrl+Esc'],
+  'Ctrl+Esc': ['Win'],
 
   // === ブラウザ操作 ===
   // ページ更新
@@ -177,6 +179,28 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
 
   // ズームリセット（Mac）
   'Cmd+0': [],
+
+  // === Slack固有の代替 ===
+  // 新規メッセージ
+  'Ctrl+N': ['Shift+Ctrl+K'],
+  'Shift+Ctrl+K': ['Ctrl+N'],
+
+  // 次に移動
+  'Ctrl+K': ['T'],
+  'T': ['Ctrl+K'],
+
+  // 直近のメッセージを編集
+  'ArrowUp': ['Ctrl+ArrowUp'],
+  'Ctrl+ArrowUp': ['ArrowUp'],
+
+  // アクティビティ
+  'Ctrl+Shift+3': ['Shift+Ctrl+M'],
+  'Shift+Ctrl+M': ['Ctrl+Shift+3'],
+
+  // === その他の代替 ===
+  // 削除キー
+  'Delete': ['Del'],
+  'Del': ['Delete'],
 };
 
 /**

@@ -2,7 +2,7 @@ import React, { createContext, useReducer, useContext, useCallback, ReactNode, D
 import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps, normalizeShortcut } from '../utils/quizEngine';
 import { QuizQuestion, QuizStats, QuizResult, ShortcutData } from '../types';
 import { ALWAYS_PROTECTED_SHORTCUTS, FULLSCREEN_PREVENTABLE_SHORTCUTS } from '../constants/systemProtectedShortcuts';
-import { isModifierKey } from '../utils/keyUtils';
+import { isModifierKey, isWindowsKey } from '../utils/keyUtils';
 import { isSequentialShortcut, SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts'; // Updated import
 import { useAppContext } from './AppContext';
 
@@ -55,8 +55,6 @@ type QuizAction =
   | { type: 'END_QUIZ' }
   | { type: 'RESET_QUIZ' }
   | { type: 'UPDATE_FULLSCREEN'; payload: { isFullscreen: boolean } }
-  | { type: 'UPDATE_TIMER'; payload: number }
-  | { type: 'TIMEOUT' }
   | { type: 'FINISH_QUIZ' }
   | { type: 'NEXT_QUESTION' }
   | { type: 'UPDATE_PRESSED_KEYS'; payload: Set<string> } // ★ 追加
@@ -66,10 +64,9 @@ interface QuizContextType {
   quizState: QuizState;
   dispatch: Dispatch<QuizAction>;
   startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange') => void;
-  handleAnswer: (pressedCodes: Set<string>) => void;
   getNextQuestion: () => void;
   updateFullscreen: (isFullscreen: boolean) => void;
-  handleKeyPress: (pressedKeys: Set<string>) => void; // ★ 追加
+  handleKeyPress: (pressedKeys: Set<string>) => void;
 }
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -187,17 +184,18 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
           isFullscreen: action.payload.isFullscreen,
         },
       };
-    case 'UPDATE_TIMER':
+    case 'TICK_TIMER': {
+      const newTime = Math.max(0, state.timeRemaining - 0.1);
+      if (newTime > 0) {
+        return { ...state, timeRemaining: newTime };
+      }
+      // Time is out
       return {
         ...state,
-        timeRemaining: action.payload,
-      };
-    case 'TIMEOUT':
-      return {
-        ...state,
+        timeRemaining: 0,
         showAnswer: true,
         lastAnswerResult: 'incorrect',
-        lastWrongAnswer: '（時間切れ）', // ★ 追加
+        lastWrongAnswer: '（時間切れ）',
         quizHistory: [
           ...state.quizHistory,
           {
@@ -208,6 +206,7 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
           },
         ],
       };
+    }
     case 'NEXT_QUESTION':
       return {
         ...state,
@@ -245,23 +244,60 @@ export function QuizProvider({ children }: QuizProviderProps) {
   const [quizState, dispatch] = useReducer(quizReducer, initialQuizState);
   
   // ★ 回答判定のためのロジックをコンテキスト内に移動
-  const previousPressedKeysRef = useRef(new Set());
-  const cooldownRef = useRef(false);
-  const sequentialKeyRecorderRef = useRef(new SequentialKeyRecorder());
+  const previousPressedKeysRef = useRef<Set<string>>(new Set());
+  const cooldownRef = useRef<boolean>(false);
+  const sequentialKeyRecorderRef = useRef<SequentialKeyRecorder>(new SequentialKeyRecorder());
 
-  // 回答を処理する
-  const handleAnswer = useCallback((pressedKeys) => {
-    if (quizState.status !== 'playing' || !quizState.currentQuestion || quizState.showAnswer) {
-      return;
+  // ★ 順押しショートカットの処理
+  const handleSequentialShortcut = useCallback((releasedKeys: string[], previousKeys: Set<string>) => {
+    const { currentQuestion, keyboardLayout, questionStartTime } = quizState;
+    if (!currentQuestion || !keyboardLayout || !questionStartTime) return;
+
+    const correctSequentialKeys = getSequentialKeys(currentQuestion.correctShortcut);
+    const releasedNonModifierKeys = releasedKeys.filter((key: string) => !isModifierKey(key));
+
+    if (releasedNonModifierKeys.length > 0) {
+      const lastReleasedKey = releasedNonModifierKeys[releasedNonModifierKeys.length - 1];
+      const normalizedReleasedKey = normalizePressedKeys(new Set([lastReleasedKey]), keyboardLayout);
+      const currentSequence = sequentialKeyRecorderRef.current.addKey(normalizedReleasedKey);
+
+      // 途中経過を更新
+      dispatch({ type: 'UPDATE_SEQUENTIAL_PROGRESS', payload: currentSequence });
+
+      // 完全一致チェック
+      if (sequentialKeyRecorderRef.current.matches(correctSequentialKeys)) {
+        const answerTimeMs = Date.now() - questionStartTime;
+        const userAnswer = currentSequence.join('+');
+        dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect: true, answerTimeMs } });
+        sequentialKeyRecorderRef.current.reset();
+        previousPressedKeysRef.current = new Set();
+      } else if (!sequentialKeyRecorderRef.current.isPartialMatch(correctSequentialKeys)) {
+        // 部分一致でない場合は不正解
+        const answerTimeMs = Date.now() - questionStartTime;
+        const userAnswer = currentSequence.join('+');
+        dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect: false, answerTimeMs } });
+        sequentialKeyRecorderRef.current.reset();
+        previousPressedKeysRef.current = new Set();
+      }
     }
-    const answerTimeMs = Date.now() - quizState.questionStartTime;
-    const userAnswer = normalizePressedKeys(pressedKeys, quizState.keyboardLayout);
-    const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
+  }, [quizState.currentQuestion, quizState.keyboardLayout, quizState.questionStartTime]);
+
+  // ★ 通常ショートカットの処理
+  const handleStandardShortcut = useCallback((pressedKeys: Set<string>) => {
+    const { currentQuestion, keyboardLayout, questionStartTime } = quizState;
+    if (!currentQuestion || !keyboardLayout || !questionStartTime) return;
+
+    const answerTimeMs = Date.now() - questionStartTime;
+    const userAnswer = normalizePressedKeys(pressedKeys, keyboardLayout);
+    const isCorrect = checkAnswer(userAnswer, currentQuestion.normalizedCorrectShortcut);
+
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
-  }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, quizState.showAnswer]);
+    previousPressedKeysRef.current = new Set();
+  }, [quizState.currentQuestion, quizState.keyboardLayout, quizState.questionStartTime]);
 
   // ★ キー入力の変更をハンドリングするuseEffect
   useEffect(() => {
+    // クイズが進行中でなく、回答が表示されている、またはクールダウン中の場合は何もしない
     if (quizState.status !== 'playing' || quizState.showAnswer || cooldownRef.current) {
       return;
     }
@@ -269,68 +305,42 @@ export function QuizProvider({ children }: QuizProviderProps) {
     const previousKeys = previousPressedKeysRef.current;
     const currentKeys = quizState.pressedKeys;
 
+    // 現在押されているキーを記録
     if (currentKeys.size > 0) {
       previousPressedKeysRef.current = new Set(currentKeys);
     }
 
+    // キーがリリースされた場合の処理
     if (previousKeys.size > 0) {
-      const releasedKeys: string[] = (Array.from(previousKeys) as string[]).filter((key: string) => !currentKeys.has(key));
+      const releasedKeys = Array.from(previousKeys).filter((key: string) => !currentKeys.has(key));
 
       if (releasedKeys.length > 0) {
         const hasNonModifierReleased = releasedKeys.some((key: string) => !isModifierKey(key));
+        const hasWindowsKeyReleased = releasedKeys.some((key: string) => isWindowsKey(key));
 
+        // Winキー単独でリリースされた場合の特別処理
+        if (hasWindowsKeyReleased && previousKeys.size === 1 && !hasNonModifierReleased) {
+          handleStandardShortcut(previousKeys);
+          return;
+        }
+
+        // 非修飾キーがリリースされた場合
         if (hasNonModifierReleased) {
-          const currentQuestion = quizState.currentQuestion;
+          const { currentQuestion } = quizState;
           const isSequential = currentQuestion && isSequentialShortcut(currentQuestion.correctShortcut, currentQuestion.appId);
 
-          if (isSequential && currentQuestion && quizState.keyboardLayout) { // Check keyboardLayout is not null
-            const correctSequentialKeys = getSequentialKeys(currentQuestion.correctShortcut);
-            // Identify the non-modifier key that was released
-            const releasedNonModifierKeys: string[] = releasedKeys.filter((key: string) => !isModifierKey(key));
-
-            if (releasedNonModifierKeys.length > 0) {
-              // Assuming only one non-modifier key is released at a time for sequential input
-              const lastReleasedKey = releasedNonModifierKeys[releasedNonModifierKeys.length - 1];
-              // Normalize the released key using normalizePressedKeys for consistency with how shortcuts are stored
-              // We create a new Set for the single key to pass to normalizePressedKeys
-              const normalizedReleasedKey = normalizePressedKeys(new Set([lastReleasedKey]), quizState.keyboardLayout);
-
-              // Add the normalized key to the sequential recorder
-              const currentSequence = sequentialKeyRecorderRef.current.addKey(normalizedReleasedKey);
-
-              // ★ 追加: 途中経過を更新
-              dispatch({ type: 'UPDATE_SEQUENTIAL_PROGRESS', payload: currentSequence });
-
-              // Check if the current sequence matches the full correct sequence
-              if (sequentialKeyRecorderRef.current.matches(correctSequentialKeys)) {
-                const answerTimeMs = Date.now() - (quizState.questionStartTime || Date.now());
-                // Correct sequential answer: join the sequence to form the userAnswer string
-                const userAnswer = currentSequence.join('+');
-                dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect: true, answerTimeMs } });
-                sequentialKeyRecorderRef.current.reset(); // Reset after correct answer
-                previousPressedKeysRef.current = new Set(); // Clear pressed keys
-              } else if (!sequentialKeyRecorderRef.current.isPartialMatch(correctSequentialKeys)) {
-                // If it's not a partial match, the sequence is wrong or too long
-                const answerTimeMs = Date.now() - (quizState.questionStartTime || Date.now());
-                const userAnswer = currentSequence.join('+');
-                dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect: false, answerTimeMs } });
-                sequentialKeyRecorderRef.current.reset(); // Reset after incorrect answer
-                previousPressedKeysRef.current = new Set(); // Clear pressed keys
-              }
-              // If it's a partial match, do nothing and wait for the next key
-            }
-            previousPressedKeysRef.current = new Set(currentKeys); // Keep tracking for next press
+          if (isSequential) {
+            handleSequentialShortcut(releasedKeys, previousKeys);
           } else {
-            // Standard multi-key shortcut logic (original logic)
-            handleAnswer(previousKeys);
-            previousPressedKeysRef.current = new Set();
+            handleStandardShortcut(previousKeys);
           }
         } else {
+          // 修飾キーのみがリリースされた場合は、次のキー入力を待つ
           previousPressedKeysRef.current = new Set(currentKeys);
         }
       }
     }
-  }, [quizState.pressedKeys, quizState.status, quizState.showAnswer, quizState.currentQuestion, handleAnswer]);
+  }, [quizState.pressedKeys, quizState.status, quizState.showAnswer, quizState.currentQuestion, handleSequentialShortcut, handleStandardShortcut]);
   
   // ★ 問題切り替え時のクールダウン
   useEffect(() => {
@@ -368,17 +378,38 @@ export function QuizProvider({ children }: QuizProviderProps) {
     }
 
     const timer = setInterval(() => {
-      const newTime = Math.max(0, quizState.timeRemaining - 0.1);
-
-      if (newTime <= 0) {
-        dispatch({ type: 'TIMEOUT' });
-      } else {
-        dispatch({ type: 'UPDATE_TIMER', payload: newTime });
-      }
+      dispatch({ type: 'TICK_TIMER' });
     }, 100);
 
     return () => clearInterval(timer);
-  }, [quizState.status, quizState.currentQuestion, quizState.timeRemaining, quizState.showAnswer]);
+  }, [quizState.status, quizState.currentQuestion, quizState.showAnswer]);
+
+  // ★ クイズ開始時に最初の問題を取得する
+  useEffect(() => {
+    if (quizState.status === 'playing' && !quizState.currentQuestion && allShortcuts && quizState.keyboardLayout) {
+      let compatibleApps = getCompatibleApps(quizState.keyboardLayout);
+      const selectedApps = (quizState.selectedApp || '').split(',').filter(a => a && a !== 'random');
+
+      if (selectedApps.length > 0) {
+        compatibleApps = compatibleApps.filter(a => selectedApps.includes(a));
+      }
+
+      const newQuestion = generateQuestion(
+        allShortcuts,
+        compatibleApps,
+        'default',
+        quizState.settings.isFullscreen,
+        new Set(), // 最初は出題済みショートカットはない
+        quizState.settings.difficulty
+      );
+
+      if (newQuestion) {
+        dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
+      } else {
+        dispatch({ type: 'FINISH_QUIZ' });
+      }
+    }
+  }, [quizState.status, quizState.currentQuestion, allShortcuts, quizState.keyboardLayout, quizState.selectedApp, quizState.settings.isFullscreen, quizState.settings.difficulty]);
 
   const handleKeyPress = useCallback((pressedKeys: Set<string>) => {
     dispatch({ type: 'UPDATE_PRESSED_KEYS', payload: pressedKeys });
@@ -396,8 +427,15 @@ export function QuizProvider({ children }: QuizProviderProps) {
     dispatch({ type: 'NEXT_QUESTION' });
 
     let compatibleApps = getCompatibleApps(quizState.keyboardLayout);
-    if (quizState.selectedApp && quizState.selectedApp !== 'random' && compatibleApps.includes(quizState.selectedApp)) {
-      compatibleApps = [quizState.selectedApp];
+
+    // 複数アプリ選択対応：カンマ区切りの文字列を配列に変換
+    if (quizState.selectedApp) {
+      const selectedApps = quizState.selectedApp.split(',').filter(a => a && a !== 'random');
+
+      // ランダムではなく、特定のアプリが選択されている場合
+      if (selectedApps.length > 0) {
+        compatibleApps = compatibleApps.filter(a => selectedApps.includes(a));
+      }
     }
 
     const newQuestion = generateQuestion(
@@ -418,29 +456,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
       return;
     }
     dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
-    setTimeout(() => {
-      let compatibleApps = getCompatibleApps(keyboardLayout);
-      if (app !== 'random' && compatibleApps.includes(app)) {
-        compatibleApps = [app];
-      }
-      const newQuestion = generateQuestion(
-        allShortcuts, compatibleApps, 'default', isFullscreen, new Set(), difficulty
-      );
-      if (newQuestion) {
-        dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
-      } else {
-        dispatch({ type: 'FINISH_QUIZ' });
-      }
-    }, 0);
   }, [allShortcuts]);
-
-  const handleAnswerInternal = useCallback((pressedKeys) => {
-    if (quizState.status !== 'playing' || !quizState.currentQuestion || quizState.showAnswer) return;
-    const answerTimeMs = Date.now() - quizState.questionStartTime;
-    const userAnswer = normalizePressedKeys(pressedKeys, quizState.keyboardLayout);
-    const isCorrect = checkAnswer(userAnswer, quizState.currentQuestion.normalizedCorrectShortcut);
-    dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
-  }, [quizState.status, quizState.currentQuestion, quizState.questionStartTime, quizState.showAnswer]);
 
   const updateFullscreen = useCallback((isFullscreen: boolean) => {
     dispatch({ type: 'UPDATE_FULLSCREEN', payload: { isFullscreen } });
@@ -480,10 +496,9 @@ export function QuizProvider({ children }: QuizProviderProps) {
     quizState,
     dispatch,
     startQuiz,
-    handleAnswer: handleAnswerInternal,
     getNextQuestion,
     updateFullscreen,
-    handleKeyPress, // ★ 追加
+    handleKeyPress,
   };
 
   return (

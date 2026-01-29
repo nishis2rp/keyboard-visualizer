@@ -116,6 +116,14 @@ let normalizedFullscreenPreventable = new Set(
  */
 const isShortcutSafe = (shortcut: string, quizMode: string, isFullscreen: boolean): boolean => {
   const normalizedShortcut = normalizeShortcut(shortcut);
+  console.log('isShortcutSafe:', {
+    shortcut,
+    normalizedShortcut,
+    quizMode,
+    isFullscreen,
+    normalizedAlwaysProtected: Array.from(normalizedAlwaysProtected),
+    normalizedFullscreenPreventable: Array.from(normalizedFullscreenPreventable),
+  });
 
   // 常に保護されているショートカットは、どのモードでも安全ではない
   if (normalizedAlwaysProtected.has(normalizedShortcut)) {

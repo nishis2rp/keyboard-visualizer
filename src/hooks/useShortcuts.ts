@@ -64,6 +64,8 @@ export function useShortcuts(): UseShortcutsReturn {
           platform: item.platform,
           windows_keys: item.windows_keys,
           macos_keys: item.macos_keys,
+          windows_protection_level: item.windows_protection_level,
+          macos_protection_level: item.macos_protection_level,
         });
       });
 

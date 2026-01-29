@@ -29,19 +29,16 @@ async function main() {
     await client.connect();
     console.log('✓ Connected to Supabase PostgreSQL\n');
 
-    // Run migrations in order
-    const migrations = [
-      '001_create_shortcuts_table.sql',
-      '002_insert_data.sql',
-      '003_add_difficulty_to_shortcuts.sql',
-      '004_add_vscode_shortcuts.sql',
-      '005_add_more_vscode_shortcuts.sql',
-      '006_add_vscode_mac_shortcuts.sql',
-      '007_add_platform_keys_to_shortcuts.sql',
-      '008_merge_common_os_shortcuts.sql',
-      '009_revert_os_common_to_separate_os.sql',
-      '010_increase_basic_difficulty_shortcuts.sql',
-    ];
+    const migrationsDir = path.join(__dirname, '../supabase/migrations');
+    const files = await fs.readdir(migrationsDir);
+
+    const migrations = files
+      .filter(file => file.endsWith('.sql'))
+      .sort((a, b) => {
+        const numA = parseInt(a.split('_')[0]);
+        const numB = parseInt(b.split('_')[0]);
+        return numA - numB;
+      });
 
     for (const migration of migrations) {
       await runMigration(migration);

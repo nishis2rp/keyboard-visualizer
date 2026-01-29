@@ -55,8 +55,15 @@ export interface RichShortcut {
   platform?: 'Windows' | 'macOS' | 'Cross-Platform';
   windows_keys?: string | null;
   macos_keys?: string | null;
+  windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected';
+  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected';   // ★ 追加
 }
 
+export interface AvailableShortcut extends RichShortcut {
+  shortcut: string; // 表示用のショートカット文字列
+  windows_protection_level: 'none' | 'fullscreen-preventable' | 'always-protected';
+  macos_protection_level: 'none' | 'fullscreen-preventable' | 'always-protected';
+}
 
 /**
  * ショートカットデータベースの型 (旧形式)
