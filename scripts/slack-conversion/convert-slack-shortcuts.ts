@@ -1,4 +1,4 @@
-// Slackショートカットデータを変換するスクリプト（重複対応版）
+// Slackショートカットデータを変換するスクリプト
 const data = `基本,新規メッセージ,"Ctrl + N または Shift + Ctrl + K"
 基本,新しい canvas,"Ctrl + Shift + N"
 基本,次に移動...,"Ctrl + K または T"
@@ -125,26 +125,9 @@ canvas の編集,番号付きリストスタイル,"Ctrl + Shift + 7"
 ハドルミーティング,ハドルミーティングの開始 / 終了を切り替える,"Ctrl + Shift + H"
 ハドルミーティング,ハドルミーティングのミュート / ミュート解除を切り替える,"Ctrl + Shift + Space"`;
 
-// キーを正規化する関数（App.jsxのsortKeysと同じロジック）
-const normalizeKeyCombo = (keyCombo) => {
-  const modifierOrder = { 'Ctrl': 1, 'Shift': 2, 'Alt': 3, 'Win': 4, 'Control': 1, 'Meta': 4 };
-
-  // ' + ' で分割
-  const keys = keyCombo.split(' + ').map(k => k.trim());
-
-  // ソート
-  keys.sort((a, b) => {
-    const aOrder = modifierOrder[a] || 999;
-    const bOrder = modifierOrder[b] || 999;
-    return aOrder - bOrder;
-  });
-
-  // 結合
-  return keys.join(' + ');
-};
-
 const lines = data.split('\n');
-const shortcuts = {}; // キー -> [{category, action}] の形式
+const shortcuts: Record<string, Record<string, string>> = {};
+let currentCategory = '';
 
 lines.forEach(line => {
   const match = line.match(/^([^,]+),([^,]+),"(.+)"$/);
@@ -153,6 +136,11 @@ lines.forEach(line => {
     const action = match[2].trim();
     let shortcutKeys = match[3].trim();
 
+    // カテゴリが変わったらコメントを追加
+    if (category !== currentCategory) {
+      currentCategory = category;
+    }
+
     // 「または」で区切られているショートカットを分割
     const keyVariations = shortcutKeys.split(/\s*または\s*/);
 
@@ -160,45 +148,28 @@ lines.forEach(line => {
       // 矢印記号を統一
       key = key.replace(/▲/g, '↑').replace(/▼/g, '↓');
 
-      // 特殊な表記（クリック操作など）は除外
+      // 特殊な表記を処理
       if (!key.includes('クリック') && !key.includes('メッセージを')) {
-        // キー組み合わせを正規化
-        const normalizedKey = normalizeKeyCombo(key);
-
-        if (!shortcuts[normalizedKey]) {
-          shortcuts[normalizedKey] = [];
+        const description = `${action}`;
+        if (!shortcuts[category]) {
+          shortcuts[category] = {};
         }
-        shortcuts[normalizedKey].push({ category, action });
+        shortcuts[category][key] = description;
       }
     });
   }
 });
 
-// 出力用のオブジェクトを作成
-const output = {};
-Object.keys(shortcuts).sort().forEach(key => {
-  const entries = shortcuts[key];
-
-  if (entries.length === 1) {
-    // 単一の定義の場合
-    const entry = entries[0];
-    output[key] = `[${entry.category}] ${entry.action}`;
-  } else {
-    // 複数の定義がある場合、結合
-    const descriptions = entries
-      .map(e => `[${e.category}] ${e.action}`)
-      .join(' / ');
-    output[key] = descriptions;
-  }
-});
-
 // JavaScript形式で出力
 console.log('    slack: {');
-const keys = Object.keys(output);
-keys.forEach((key, index) => {
-  const comma = (index === keys.length - 1) ? '' : ',';
-  const escapedKey = key.replace(/'/g, "\\'");
-  const escapedValue = output[key].replace(/'/g, "\\'");
-  console.log(`      '${escapedKey}': '${escapedValue}'${comma}`);
+Object.keys(shortcuts).forEach((category, index) => {
+  console.log(`      // ${category}`);
+  const categoryShortcuts = shortcuts[category];
+  Object.keys(categoryShortcuts).forEach((shortcut, i) => {
+    const comma = (index === Object.keys(shortcuts).length - 1 &&
+                   i === Object.keys(categoryShortcuts).length - 1) ? '' : ',';
+    console.log(`      '${shortcut}': '${categoryShortcuts[shortcut]}'${comma}`);
+  });
+  console.log('');
 });
 console.log('    },');
