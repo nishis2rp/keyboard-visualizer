@@ -2,10 +2,13 @@
 
 **アプリケーション別のキーボードショートカットをリアルタイムで視覚的に表示し、クイズで学習できるWebアプリケーション**
 
+バックエンドに **Supabase (PostgreSQL)** を使用し、1,146個以上のショートカットデータを動的に管理・提供しています。
+
 [![GitHub Pages](https://img.shields.io/badge/demo-live-success)](https://nishis2rp.github.io/keyboard-visualizer/)
 [![React](https://img.shields.io/badge/React-18.3.1-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF)](https://vitejs.dev/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E)](https://supabase.com/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 🔗 **Live Demo**: https://nishis2rp.github.io/keyboard-visualizer/
@@ -195,7 +198,10 @@ npm run deploy
 - **React 18.3.1** - UIライブラリ
 - **TypeScript 5.9** - 型安全性とコード品質の向上
 - **Vite 5.4** - 高速ビルドツール & 開発サーバー
-- **Supabase (PostgreSQL)** - バックエンドサービス、認証、データベース
+- **Supabase (PostgreSQL)** - バックエンドサービス
+  - PostgreSQLデータベースによるショートカットデータの一元管理
+  - リアルタイムデータ取得とマイグレーション管理
+  - 1,146個以上のショートカット、保護レベル、難易度情報を管理
 - **Vitest** - 高速テストフレームワーク
 
 ### 主要API
@@ -576,6 +582,7 @@ MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照してくださ�
 - [React](https://react.dev/) - UIライブラリ
 - [TypeScript](https://www.typescriptlang.org/) - 型安全性
 - [Vite](https://vitejs.dev/) - 高速ビルドツール
+- [Supabase](https://supabase.com/) - PostgreSQLバックエンドサービス
 - [Vitest](https://vitest.dev/) - テストフレームワーク
 - [MDN Web Docs](https://developer.mozilla.org/) - Keyboard Lock API / Fullscreen API リファレンス
 
