@@ -1,13 +1,47 @@
-# Scripts
+# Scripts Directory
 
-このディレクトリには開発時に使用した一時的なスクリプトやデータファイルが含まれています。
+This directory contains utility scripts for database management and data analysis.
 
-## slack-conversion/
+## Active Scripts
 
-Slackのショートカットデータを変換するために使用したスクリプトとその出力ファイルです。
+These scripts are actively used for database management:
 
-- `convert-slack-shortcuts.js` - 初回変換スクリプト
-- `convert-slack-shortcuts-v2.js` - 改良版変換スクリプト
-- `*.txt` - 変換処理の中間/最終出力
+- **`migrate-supabase.ts`** - Run all database migrations sequentially
+- **`generate-sql.ts`** - Generate SQL INSERT statements from data files
+- **`run-migration.ts`** - Run database migrations
+- **`check-protection-levels.ts`** - Check protection levels for specific shortcuts
+- **`find-shortcut.ts`** - Find a specific shortcut in the database
+- **`check-table-structure.ts`** - Check database table structure
 
-これらのファイルは開発の記録として保存されていますが、プロダクションコードには含まれません。
+## Usage
+
+\`\`\`bash
+# Run all migrations
+npm run db:migrate
+
+# Or use individual scripts
+npx tsx scripts/migrate-supabase.ts
+
+# Check protection levels
+npx tsx scripts/check-protection-levels.ts
+
+# Find a shortcut
+npx tsx scripts/find-shortcut.ts "Ctrl + C"
+\`\`\`
+
+## Archive Directory
+
+The \`archive/\` directory contains one-time utility scripts that were used for:
+- Data analysis and statistics
+- One-time data migrations
+- Duplicate detection and cleanup
+- Protection level configuration
+
+These scripts are kept for historical reference but are not actively used in the current workflow.
+
+## Environment Requirements
+
+Scripts require \`.env\` file with:
+\`\`\`bash
+DATABASE_URL=postgresql://postgres:[password]@db.your-project-id.supabase.co:5432/postgres
+\`\`\`

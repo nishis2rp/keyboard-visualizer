@@ -395,95 +395,35 @@ keyboard-visualizer/
 
 ## 🔧 カスタマイズガイド
 
-### データベース構造
+### データベース・デプロイメント
 
-Supabase PostgreSQLの `shortcuts` テーブル構造：
+データベース構造、Supabaseのセットアップ、マイグレーション方法については、[DEPLOY.md](DEPLOY.md) を参照してください。
 
-| カラム名       | 型       | 説明                                   |
-|---------------|----------|----------------------------------------|
-| `id`          | `BIGSERIAL` | 主キー（自動採番）                 |
-| `application` | `VARCHAR(50)` | アプリケーションID (例: `windows11`, `macos`, `chrome`) |
-| `keys`        | `VARCHAR(100)` | ショートカットキー (例: `Ctrl + N`, `Cmd + A`) |
-| `description` | `TEXT`   | ショートカットの説明 (例: `新規作成`)  |
-| `category`    | `VARCHAR(100)` | カテゴリ (オプション) |
-| `difficulty`  | `TEXT`   | 難易度: `basic`, `standard`, `hard`, `madmax`, `allrange` |
-| `platform`    | `TEXT`   | プラットフォーム: `Windows`, `macOS`, `Cross-Platform` |
-| `windows_keys`| `TEXT`   | Windows版のキー組み合わせ（参照用） |
-| `macos_keys`  | `TEXT`   | macOS版のキー組み合わせ（参照用） |
-| `windows_protection_level` | `TEXT` | Windows保護レベル: `none`, `fullscreen-preventable`, `always-protected` |
-| `macos_protection_level` | `TEXT` | macOS保護レベル: `none`, `fullscreen-preventable`, `always-protected` |
-| `created_at`  | `TIMESTAMP` | 作成日時 |
+### 新しいアプリケーションの追加
 
-**インデックス:**
-- `idx_shortcuts_application` - アプリケーション別の高速検索
-- `idx_shortcuts_keys` - キー組み合わせの検索
-- `idx_shortcuts_platform` - プラットフォーム別フィルタリング
+新しいアプリケーションのショートカットを追加する手順：
 
-### 新しいアプリケーションの追加 (バックエンドサービス経由)
+1. **データベースにショートカットを追加:**
+   ```sql
+   INSERT INTO shortcuts (application, keys, description, difficulty, platform)
+   VALUES ('my_app', 'Ctrl + N', '新規作成', 'basic', 'Cross-Platform');
+   ```
 
-新しいアプリケーションのショートカットを追加するには、バックエンドサービス（Supabase）の `shortcuts` テーブルにデータを挿入する必要があります。
+2. **フロントエンド側の設定:**
+   `src/config/apps.ts` に新しいアプリケーションの定義を追加：
+   ```typescript
+   export const apps: App[] = [
+     // 既存のアプリ...
+     {
+       id: 'my_app', // Supabaseに登録したapplicationカラムの値と一致させる
+       name: 'My App',
+       icon: '🚀',
+       os: 'cross-platform'  // または 'windows' | 'mac'
+     },
+   ]
+   ```
 
-Supabaseの管理画面またはSQLクエリを使用して、以下の形式でデータを追加してください。
-
-**例 (SQL):**
-
-```sql
-INSERT INTO shortcuts (application, keys, description, difficulty, platform)
-VALUES ('my_app', 'Ctrl + N', '新規作成', 'basic', 'Cross-Platform');
-```
-
-### データベースマイグレーション
-
-プロジェクトには `supabase/migrations/` ディレクトリにマイグレーションファイルが含まれています：
-
-```bash
-supabase/migrations/
-├── 001_create_shortcuts_table.sql         # テーブル作成
-├── 002_insert_data.sql                    # 初期データ投入
-├── 003_add_difficulty_to_shortcuts.sql    # 難易度カラム追加
-├── 004_add_vscode_shortcuts.sql           # VS Codeショートカット追加
-├── 005_add_more_vscode_shortcuts.sql      # VS Code追加ショートカット
-├── 006_add_vscode_mac_shortcuts.sql       # VS Code macOS版
-├── 007_add_platform_keys_to_shortcuts.sql # プラットフォームカラム追加
-├── 008_merge_common_os_shortcuts.sql      # 共通OSショートカット統合（一時的）
-├── 009_revert_os_common_to_separate_os.sql # OS別レコードに分離
-├── 010_increase_basic_difficulty_shortcuts.sql # 難易度バランス調整
-├── 011_add_ctrl_esc_shortcut.sql          # Ctrl+Escショートカット追加
-├── 012_update_slack_shortcuts.sql         # Slackショートカット更新
-├── 013_add_more_vscode_shortcuts.sql      # VS Codeショートカット追加
-├── 014_refactor_vscode_shortcuts.sql      # VS Codeショートカットリファクタ
-├── 015_refactor_vscode_comment_shortcut.sql # VS Codeコメントショートカット修正
-├── 016_refactor_slack_quick_switcher.sql  # Slackクイックスイッチャー修正
-├── 017_refactor_os_common_select_all.sql  # OS共通の全選択修正
-└── 018_add_protection_level_columns.sql   # 保護レベルカラム追加（Windows/macOS別）
-```
-
-**マイグレーション実行方法:**
-
-1. `.env` ファイルに Supabase 接続情報を設定
-2. マイグレーションスクリプトを実行
-
-```bash
-npm run db:run-migration
-```
-
-または Supabase ダッシュボードの SQL Editor で各マイグレーションファイルを順番に実行
-
-**フロントエンド側の設定:**
-
-`src/config/apps.ts` に新しいアプリケーションの定義を追加します。
-
-```typescript
-export const apps: App[] = [
-  // 既存のアプリ...
-  {
-    id: 'my_app', // Supabaseに登録したapplicationカラムの値と一致させる
-    name: 'My App',
-    icon: '🚀',
-    os: 'cross-platform'  // または 'windows' | 'mac'
-  },
-]
-```
+詳細な手順とデータベース構造については [DEPLOY.md](DEPLOY.md) と [CLAUDE.md](CLAUDE.md) を参照してください。
 
 ### キーボードレイアウトの追加
 

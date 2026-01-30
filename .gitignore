@@ -29,6 +29,12 @@ dist-ssr
 *.backup3
 nul
 
+# Temporary files
+_ul
+_ul-*
+build.txt
+build-output.txt
+
 # Environment variables
 .env
 .env.local
