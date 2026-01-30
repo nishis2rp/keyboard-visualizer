@@ -43,11 +43,10 @@
 .app-selector {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 5px;
   flex-wrap: nowrap;
   overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 16px;
+  padding: 4px 8px;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -60,15 +59,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 12px 18px;
+  gap: 3px;
+  padding: 6px 8px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
   border: 1.5px solid var(--border-color-light);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-base);
   font-size: var(--font-size-sm);
-  min-width: 95px;
+  min-width: 72px;
+  max-width: 88px;
   flex-shrink: 0;
   box-shadow: var(--shadow-sm);
   position: relative;
@@ -111,7 +111,7 @@
 }
 
 .app-icon {
-  font-size: 1.75em;
+  font-size: 1.4em;
   filter: grayscale(0.2) brightness(1.1);
   transition: all var(--transition-base);
   transform-origin: center;
@@ -129,8 +129,12 @@
 
 .app-name {
   font-weight: 600;
-  font-size: 0.9em;
+  font-size: 0.78em;
   color: var(--text-primary);
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  width: 100%;
 }
 
 .app-tab.active .app-name {

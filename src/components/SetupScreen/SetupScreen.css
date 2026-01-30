@@ -167,40 +167,43 @@
 .setup-quiz-apps {
   margin-bottom: 6px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
 }
 
 .setup-quiz-apps .setup-option {
   flex-direction: column;
   text-align: center;
-  padding: 6px 6px;
+  padding: 4px 4px;
   position: relative;
+  min-height: 70px;
 }
 
 .setup-quiz-apps .option-icon {
   margin-right: 0;
   margin-bottom: 2px;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .setup-quiz-apps .option-check {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 18px;
-  height: 18px;
-  font-size: 12px;
+  top: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
 }
 
 .setup-quiz-apps .option-content h3 {
-  font-size: 12px;
+  font-size: 10px;
   margin: 0 0 1px 0;
+  line-height: 1.2;
 }
 
 .setup-quiz-apps .option-content p {
-  font-size: 10px;
+  font-size: 8px;
   margin: 0;
+  line-height: 1.2;
 }
 
 .setup-option {
@@ -355,18 +358,18 @@
   }
 
   .setup-quiz-apps {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .setup-quiz-apps .option-icon {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .setup-quiz-apps .option-content h3 {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .setup-quiz-apps .option-content p {
-    font-size: 12px;
+    font-size: 11px;
   }
 }
