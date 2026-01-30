@@ -184,6 +184,33 @@
   background-color: rgba(0, 120, 212, 0.4);
 }
 
+/* ShortcutCard 保護レベル別スタイル */
+.shortcut-card.always-protected {
+  border-color: #FF3B30;
+  background-color: rgba(255, 59, 48, 0.08);
+}
+
+.shortcut-card.always-protected .shortcut-combo {
+  color: #FF3B30;
+}
+
+.shortcut-card.always-protected .shortcut-desc {
+  color: #E62E24;
+}
+
+.shortcut-card.preventable-fullscreen {
+  border-color: #0078D4;
+  background-color: rgba(0, 120, 212, 0.08); /* 既存の青色に合わせる */
+}
+
+.shortcut-card.preventable-fullscreen .shortcut-combo {
+  color: #0078D4;
+}
+
+.shortcut-card.preventable-fullscreen .shortcut-desc {
+  color: #0078D4;
+}
+
 .keyboard-key.spacer {
   background: linear-gradient(145deg, #D0D2D4 0%, #C0C2C4 50%, #B0B2B4 100%);
   border: none;

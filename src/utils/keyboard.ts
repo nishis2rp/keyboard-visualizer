@@ -1,7 +1,7 @@
 import { getCodeDisplayName, getShiftedSymbolForKey, getPossibleKeyNamesFromDisplay } from './keyMapping'
 import { MODIFIER_ORDER } from './keyUtils'
 import { AppShortcuts, ShortcutDetails, RichShortcut, AvailableShortcut } from '../types' // ★ RichShortcut, AvailableShortcutを追加
-import { detectOS } from '../constants' // ★ detectOSを追加
+import { detectOS } from './os' // ★ detectOSを追加
 
 /**
  * キーの正規化

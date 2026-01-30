@@ -45,19 +45,13 @@ export function useShortcuts(): UseShortcutsReturn {
         }
 
         const normalizedShortcut = normalizeShortcut(item.keys);
-        const difficulty = item.difficulty ?? getShortcutDifficulty(normalizedShortcut);
+        const difficulty: ShortcutDetails['difficulty'] = item.difficulty ? (item.difficulty as ShortcutDetails['difficulty']) : getShortcutDifficulty(normalizedShortcut); // item.difficultyがnull/undefinedでない場合はそのまま使用し、型アサーションで補完。そうでない場合はgetShortcutDifficultyの結果を使用。
 
-        shortcutsMap[item.application][item.keys] = {
-          description: item.description,
-          difficulty: difficulty as ShortcutDetails['difficulty'],
-        };
-
-        // RichShortcut配列も作成
-        richShortcutsArray.push({
+        const richShortcut: RichShortcut = {
           id: item.id,
           keys: item.keys,
           description: item.description,
-          difficulty: difficulty as ShortcutDetails['difficulty'],
+          difficulty: difficulty,
           application: item.application,
           category: item.category,
           created_at: item.created_at,
@@ -66,7 +60,13 @@ export function useShortcuts(): UseShortcutsReturn {
           macos_keys: item.macos_keys,
           windows_protection_level: item.windows_protection_level,
           macos_protection_level: item.macos_protection_level,
-        });
+        };
+        richShortcutsArray.push(richShortcut);
+
+        shortcutsMap[richShortcut.application][richShortcut.keys] = {
+          description: richShortcut.description,
+          difficulty: richShortcut.difficulty,
+        };
       });
 
       setShortcuts(shortcutsMap);

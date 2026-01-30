@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react'
 // import { getProtectionLevel } from '../../constants' // 削除
 import { isSequentialShortcut } from '../../utils/shortcutUtils'
 import { isModifierKeyName, isWindowsKeyName } from '../../utils/keyUtils'
-import { detectOS } from '../../constants' // detectOSをインポート
+import { detectOS } from '../../utils/os' // detectOSをインポート
 // useAppContext はここで必要ない
 import { EXCEL_APP_SAFE_SHORTCUTS } from '../../constants/systemProtectedShortcuts' // Excelの除外リストをインポート
 
@@ -40,7 +40,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
       return 'none';
     }
 
-    let protectionLevel: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen' | undefined;
+    let protectionLevel: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
     if (CURRENT_OS === 'windows') {
       protectionLevel = windows_protection_level;
     } else if (CURRENT_OS === 'macos') {
@@ -69,12 +69,8 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
         // 赤色: 全画面表示しても防げない（システムレベル保護）
         return {
           cardClass: 'always-protected', // クラス名を直接適用
-          combo: {
-            color: '#FF3B30'
-          },
-          description: {
-            color: '#E62E24'
-          },
+          combo: {}, // CSSクラスで制御
+          description: {}, // CSSクラスで制御
           icon: '🔒',
           tooltip: '⚠️ このショートカットはOSレベルで保護されており、全画面表示してもキャプチャできません'
         }
@@ -82,12 +78,8 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
       case 'preventable_fullscreen': // 新しい保護レベル名を使用
         return {
           cardClass: 'preventable-fullscreen', // クラス名を直接適用
-          combo: {
-            color: '#0078D4' // CSSクラスで定義した色に合わせる
-          },
-          description: {
-            color: '#0078D4' // CSSクラスで定義した色に合わせる
-          },
+          combo: {}, // CSSクラスで制御
+          description: {}, // CSSクラスで制御
           icon: '🔵',
           tooltip: 'ℹ️ このショートカットは全画面表示にするとキャプチャできます'
         }

@@ -1,4 +1,4 @@
-import { detectOS } from '../constants/systemProtectedShortcuts';
+import { detectOS } from './os';
 
 const currentOS = detectOS();
 

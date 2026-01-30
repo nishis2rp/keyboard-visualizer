@@ -1,3 +1,4 @@
+-- Ctrl+Shift+Tab, Ctrl+W, Ctrl+N以外の青枠を全て消す（2026-01-30更新）
 UPDATE shortcuts
 SET
     windows_protection_level = 'preventable_fullscreen',
@@ -5,21 +6,6 @@ SET
 WHERE
     keys IN (
         'Ctrl + W',
-        'Ctrl + T',
-        'Ctrl + L',
         'Ctrl + N',
-        'Ctrl + Shift + N',
-        'Ctrl + P',
-        'Ctrl + S',
-        'Ctrl + F',
-        'Ctrl + R',
-        'F5',
-        'Ctrl + H',
-        'Ctrl + J',
-        'Ctrl + O',
-        'Ctrl + PageUp',
-        'Ctrl + PageDown',
-        'Ctrl + Tab',
-        'Ctrl + Shift + Tab',
-        'F11'
+        'Ctrl + Shift + Tab'
     );

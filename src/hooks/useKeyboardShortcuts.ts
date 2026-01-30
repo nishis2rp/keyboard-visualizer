@@ -107,6 +107,11 @@ export const useKeyboardShortcuts = (richShortcuts: RichShortcut[], keyboardLayo
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isTypingInInputElement(e)) return;
 
+      // Alt単独押しのデフォルト動作（メニューバーへのフォーカス）を防ぐ
+      if (e.code === 'AltLeft' || e.code === 'AltRight') {
+        e.preventDefault();
+      }
+
       // Ctrl+矢印キーは完全に無視（ブラウザのデフォルト動作を優先）
       const isArrowKey = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code);
       if (e.ctrlKey && isArrowKey) {

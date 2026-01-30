@@ -1,18 +1,39 @@
 import React from 'react';
 import { useQuiz } from '../../context/QuizContext';
-import { getCodeDisplayName } from '../../utils/keyMapping';
+import { getKeyComboText } from '../../utils/keyboard'; // 追加
 import { formatSequentialShortcut, getSequentialKeys } from '../../utils/sequentialShortcuts';
 import { getAlternativeShortcuts } from '../../constants/alternativeShortcuts';
 import { normalizeShortcut } from '../../utils/quizEngine';
 import styles from './QuestionCard.module.css';
 
-function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' }) {
+function QuestionCard() {
   const { quizState, getNextQuestion } = useQuiz();
-  const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer, lastWrongAnswer, currentSequentialProgress } = quizState;
+  const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer, lastWrongAnswer, currentSequentialProgress, pressedKeys, keyboardLayout } = quizState;
 
   if (status !== 'playing' || !currentQuestion) {
     return null;
   }
+
+  // 代替ショートカット表示ロジックをuseMemoで抽出
+  const alternativeShortcutsDisplay = useMemo(() => {
+    const normalized = normalizeShortcut(currentQuestion.correctShortcut);
+    const alternatives = getAlternativeShortcuts(normalized);
+    const otherAlternatives = alternatives.filter(alt => alt !== normalized);
+
+    if (otherAlternatives.length > 0) {
+      return (
+        <div className={styles.alternativeShortcuts}>
+          <div className={styles.alternativeLabel}>他の正解：</div>
+          <div className={styles.alternativeList}>
+            {otherAlternatives.map((alt, idx) => (
+              <span key={idx} className={styles.alternativeItem}>{alt}</span>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }, [currentQuestion.correctShortcut]);
 
   // タイマーの色クラスを時間に応じて変更
   const getTimerClass = () => {
@@ -32,17 +53,7 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
     return styles.questionCard;
   };
 
-  // キー表示用のヘルパー関数
-  const getKeyComboText = () => {
-    if (pressedKeys.size === 0) return '';
-    const keys: string[] = Array.from(pressedKeys) as string[];
-    const shiftPressed = keys.some((code: string) => code.startsWith('Shift'));
 
-    return keys.map((code: string) => {
-      // getCodeDisplayNameを使用してキー表示名を取得
-      return getCodeDisplayName(code, null, keyboardLayout, shiftPressed);
-    }).join(' + ');
-  };
 
   return (
     <div className={styles.questionCardWrapper}>
@@ -125,7 +136,7 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
           {!currentQuestion.isSequential && pressedKeys.size > 0 && (
             <div className={styles.pressedKeys}>
               <div className={styles.pressedKeysLabel}>入力中...</div>
-              <div className={styles.pressedKeysValue}>{getKeyComboText()}</div>
+              <div className={styles.pressedKeysValue}>{getKeyComboText(Array.from(pressedKeys), keyboardLayout)}</div>
             </div>
           )}
         </div>
@@ -158,26 +169,7 @@ function QuestionCard({ pressedKeys = new Set(), keyboardLayout = 'windows-jis' 
               </div>
 
               {/* 代替ショートカットを表示 */}
-              {(() => {
-                const normalized = normalizeShortcut(currentQuestion.correctShortcut);
-                const alternatives = getAlternativeShortcuts(normalized);
-                // 元のショートカット以外の代替を取得
-                const otherAlternatives = alternatives.filter(alt => alt !== normalized);
-
-                if (otherAlternatives.length > 0) {
-                  return (
-                    <div className={styles.alternativeShortcuts}>
-                      <div className={styles.alternativeLabel}>他の正解：</div>
-                      <div className={styles.alternativeList}>
-                        {otherAlternatives.map((alt, idx) => (
-                          <span key={idx} className={styles.alternativeItem}>{alt}</span>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })()}
+              {alternativeShortcutsDisplay}
             </div>
 
             <button
