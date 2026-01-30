@@ -28,27 +28,32 @@ interface ShortcutCardProps {
   description: string;
   appContext?: string | null;
   showDebugLog?: boolean;
-  windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected'; // ★ 追加
-  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected';   // ★ 追加
+  windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
+  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
 }
 
 const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none' }) => {
   // 保護レベルを計算（メモ化）
-  const effectiveProtectionLevel = useMemo((): 'none' | 'fullscreen-preventable' | 'always-protected' => {
+  const effectiveProtectionLevel = useMemo((): 'none' | 'preventable_fullscreen' | 'always-protected' => {
     // Excelアプリのコンテキストで、Excel固有のショートカットは保護不要
     if (appContext === 'excel' && EXCEL_APP_SAFE_SHORTCUTS.has(shortcut)) {
       return 'none';
     }
 
-    // OSに応じた保護レベルを返す
+    let protectionLevel: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen' | undefined;
     if (CURRENT_OS === 'windows') {
-      return windows_protection_level;
+      protectionLevel = windows_protection_level;
     } else if (CURRENT_OS === 'macos') {
-      return macos_protection_level;
+      protectionLevel = macos_protection_level;
     } else {
-      // デフォルトまたは不明なOSの場合、Windowsの保護レベルを適用
-      return windows_protection_level;
+      protectionLevel = windows_protection_level; // デフォルトまたは不明なOSの場合
     }
+
+    // 古い 'fullscreen-preventable' を新しい 'preventable_fullscreen' にマッピング
+    if (protectionLevel === 'fullscreen-preventable') {
+      return 'preventable_fullscreen';
+    }
+    return protectionLevel || 'none'; // undefined の場合は 'none' にフォールバック
   }, [shortcut, appContext, windows_protection_level, macos_protection_level]);
 
   // デバッグログ（開発時のみ） - 全てのショートカットでログ出力
@@ -63,10 +68,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
       case 'always-protected':
         // 赤色: 全画面表示しても防げない（システムレベル保護）
         return {
-          card: {
-            borderColor: '#FF3B30',
-            backgroundColor: 'rgba(255, 59, 48, 0.08)'
-          },
+          cardClass: 'always-protected', // クラス名を直接適用
           combo: {
             color: '#FF3B30'
           },
@@ -77,18 +79,14 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
           tooltip: '⚠️ このショートカットはOSレベルで保護されており、全画面表示してもキャプチャできません'
         }
 
-      case 'fullscreen-preventable':
-        // 青色: 全画面表示で防げる（Keyboard Lock API）
+      case 'preventable_fullscreen': // 新しい保護レベル名を使用
         return {
-          card: {
-            borderColor: '#007AFF',
-            backgroundColor: 'rgba(0, 122, 255, 0.08)'
-          },
+          cardClass: 'preventable-fullscreen', // クラス名を直接適用
           combo: {
-            color: '#007AFF'
+            color: '#0078D4' // CSSクラスで定義した色に合わせる
           },
           description: {
-            color: '#0062CC'
+            color: '#0078D4' // CSSクラスで定義した色に合わせる
           },
           icon: '🔵',
           tooltip: 'ℹ️ このショートカットは全画面表示にするとキャプチャできます'
@@ -155,8 +153,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
 
   return (
     <div
-      className="shortcut-card"
-      style={style.card}
+      className={`shortcut-card ${style.cardClass || ''}`}
       title={style.tooltip}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>

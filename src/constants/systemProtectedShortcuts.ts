@@ -35,6 +35,11 @@ export const FULLSCREEN_PREVENTABLE_SHORTCUTS = new Set([
   'Ctrl + H',       // 履歴
   'Ctrl + J',       // ダウンロード
   'Ctrl + O',       // ファイルを開く
+  'Ctrl + PageUp',  // 前のタブへ移動
+  'Ctrl + PageDown',// 次のタブへ移動
+  'Ctrl + Tab',     // 次のタブへ移動
+  'Ctrl + Shift + Tab', // 前のタブへ移動
+  'F11',            // 全画面表示の切り替え
 ]);
 
 /**

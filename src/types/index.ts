@@ -55,14 +55,14 @@ export interface RichShortcut {
   platform?: 'Windows' | 'macOS' | 'Cross-Platform';
   windows_keys?: string | null;
   macos_keys?: string | null;
-  windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected';
-  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected';   // ★ 追加
+  windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
+  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';   // ★ 追加
 }
 
 export interface AvailableShortcut extends RichShortcut {
   shortcut: string; // 表示用のショートカット文字列
-  windows_protection_level: 'none' | 'fullscreen-preventable' | 'always-protected';
-  macos_protection_level: 'none' | 'fullscreen-preventable' | 'always-protected';
+  windows_protection_level: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
+  macos_protection_level: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
 }
 
 /**

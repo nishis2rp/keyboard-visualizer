@@ -390,3 +390,24 @@
   position: relative;
   z-index: 1;
 }
+
+/* Protection Level Styles for Shortcut Cards */
+.shortcut-card.preventable-fullscreen {
+  border: 2px solid #0078D4; /* Blue border for fullscreen-preventable shortcuts */
+  background: linear-gradient(135deg, rgba(0, 120, 212, 0.08) 0%, rgba(0, 120, 212, 0.05) 100%);
+}
+
+.shortcut-card.preventable-fullscreen:hover {
+  border-color: #0078D4;
+  box-shadow: var(--shadow-md), 0 4px 16px rgba(0, 120, 212, 0.25);
+}
+
+.shortcut-card.always-protected {
+  border: 2px solid #FF3B30; /* Red border for always-protected shortcuts */
+  background: linear-gradient(135deg, rgba(255, 59, 48, 0.08) 0%, rgba(255, 59, 48, 0.05) 100%);
+}
+
+.shortcut-card.always-protected:hover {
+  border-color: #FF3B30;
+  box-shadow: var(--shadow-md), 0 4px 16px rgba(255, 59, 48, 0.25);
+}
