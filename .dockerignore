@@ -1,0 +1,48 @@
+# 依存関係
+node_modules
+npm-debug.log
+yarn-error.log
+
+# ビルド成果物
+dist
+build
+*.local
+
+# 環境変数（コンテナ起動時に注入）
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+.github
+
+# IDEの設定
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# テストカバレッジ
+coverage
+.nyc_output
+
+# OS固有
+.DS_Store
+Thumbs.db
+
+# ログ
+*.log
+
+# ドキュメント
+README.md
+DEPLOY.md
+CLAUDE.md
+LICENSE
+
+# Docker関連
+Dockerfile
+docker-compose*.yml
+.dockerignore

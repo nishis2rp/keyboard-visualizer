@@ -107,6 +107,8 @@ npm install
 
 ### 開発
 
+#### ローカル環境
+
 ```bash
 # 開発サーバーの起動（ホットリロード対応）
 npm run dev
@@ -122,6 +124,20 @@ npm run test:watch
 ```
 
 ブラウザで `http://localhost:5173/keyboard-visualizer/` にアクセス
+
+#### Docker環境（推奨）
+
+```bash
+# Dockerコンテナで開発サーバーを起動
+docker-compose up
+
+# バックグラウンドで起動
+docker-compose up -d
+```
+
+ブラウザで `http://localhost:5173` にアクセス
+
+詳細は [DOCKER.md](DOCKER.md) を参照してください。
 
 ### ビルド & デプロイ
 

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # 開発サーバー
+  app:
+    build:
+      context: .
+      target: development
+    container_name: keyboard-visualizer-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      # ソースコードをマウント（ホットリロード用）
+      - .:/app
+      # node_modulesはコンテナ内のものを使用
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_BASE_PATH=/
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    env_file:
+      - .env
+    stdin_open: true
+    tty: true
+    networks:
+      - keyboard-visualizer-network
+
+networks:
+  keyboard-visualizer-network:
+    driver: bridge
