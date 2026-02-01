@@ -20,4 +20,6 @@ export interface Shortcut {
   platform?: 'Windows' | 'macOS' | 'Cross-Platform';
   windows_keys?: string | null;
   macos_keys?: string | null;
+  windows_protection_level?: string | null;
+  macos_protection_level?: string | null;
 }

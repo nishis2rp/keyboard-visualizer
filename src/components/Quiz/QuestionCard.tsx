@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useQuiz } from '../../context/QuizContext';
 import { getKeyComboText } from '../../utils/keyboard'; // 追加
 import { formatSequentialShortcut, getSequentialKeys } from '../../utils/sequentialShortcuts';

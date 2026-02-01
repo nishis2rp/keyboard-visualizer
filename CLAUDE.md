@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Keyboard Visualizer** is a React + TypeScript web application that visualizes keyboard shortcuts in real-time and provides an interactive quiz system for learning 1,146+ shortcuts across 7 applications (Windows 11, macOS, Chrome, Excel, Slack, Gmail, VS Code).
+**Keyboard Visualizer** is a React + TypeScript web application that visualizes keyboard shortcuts in real-time and provides an interactive quiz system for learning 1,146+ shortcuts across 9 applications (Windows 11, macOS, Chrome, Excel, Slack, Gmail, VS Code, Word, PowerPoint).
 
 **Tech Stack:**
 - React 18.3.1 + TypeScript 5.9
@@ -76,6 +76,9 @@ docker-compose -f docker-compose.prod.yml up --build
 # Run all migrations (requires .env with DATABASE_URL)
 npm run db:migrate
 
+# Run authentication tables migration
+npx tsx scripts/run-auth-migration.ts
+
 # Generate SQL from data files
 npm run db:generate-sql
 
@@ -85,20 +88,189 @@ npm run db:run-migration
 
 ### Utility Scripts
 
-Scripts in `scripts/` directory for database management:
+Scripts in `scripts/` directory for database management and debugging:
 
+**Database Query Scripts:**
 ```bash
-# Check protection levels for specific shortcuts
-npx tsx scripts/check-protection-levels.ts
-
 # Find a specific shortcut in the database
 npx tsx scripts/find-shortcut.ts "Ctrl + C"
 
-# Add new shortcuts to database
-npx tsx scripts/add-chrome-shortcuts.ts
+# Check protection levels for specific shortcuts
+npx tsx scripts/check-protection-levels.ts
 
-# Reset protection levels for specific shortcuts
-npx tsx scripts/reset-excluded-shortcuts.ts
+# Check all protection levels across the database
+npx tsx scripts/check-all-protection-levels.ts
+
+# Check table structure
+npx tsx scripts/check-table-structure.ts
+
+# Verify data integrity
+npx tsx scripts/verify-data.ts
+```
+
+**Migration Scripts:**
+```bash
+# Run new migrations
+npx tsx scripts/run-new-migrations.ts
+
+# Run protection level migrations
+npx tsx scripts/run-protection-migration.ts
+
+# Run protection level fixes
+npx tsx scripts/run-protection-fix.ts
+
+# Run PageUp/PageDown normalization
+npx tsx scripts/run-pageup-migration.ts
+```
+
+**Update Scripts:**
+```bash
+# Update Chrome Alt+Shift shortcuts (example)
+npx tsx scripts/update-chrome-alt-shift-shortcuts-pg.ts
+
+# Check Chrome Alt+Shift shortcuts
+npx tsx scripts/check-chrome-alt-shift-shortcuts.ts
+```
+
+**Important Notes:**
+- Read-only operations use Supabase client (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
+- Write operations require PostgreSQL client (DATABASE_URL)
+- Scripts ending with `-pg.ts` use direct PostgreSQL connection for write operations
+- Always test queries with check scripts before running update scripts
+
+## Authentication & User Features
+
+### Overview
+
+The application supports optional user authentication for saving quiz progress and scores. Users can:
+- Use the app without logging in (full functionality)
+- Log in to save quiz history and track progress
+- Sign in with Google, GitHub, or Email/Password
+
+### Authentication Architecture
+
+**Authentication Flow:**
+```
+User clicks "ログイン" button
+    ↓
+AuthModal opens
+    ↓
+User chooses auth method:
+├─→ Google OAuth → Supabase Auth → Redirect back
+├─→ GitHub OAuth → Supabase Auth → Redirect back
+└─→ Email/Password → Supabase Auth → Direct sign-in
+    ↓
+AuthContext updates with user session
+    ↓
+UserMenu appears in AppHeader
+    ↓
+Quiz progress automatically saved to database
+```
+
+**Key Components:**
+- `AuthContext.tsx`: Global authentication state management
+- `AuthModal.tsx`: Login/signup modal UI
+- `UserMenu.tsx`: User profile dropdown menu
+- `useQuizProgress.ts`: Hook for saving quiz sessions and history
+
+### Database Schema for Authentication
+
+**user_profiles** (extends Supabase Auth):
+- `id`: UUID (foreign key to auth.users)
+- `display_name`: User's display name
+- `avatar_url`: Profile picture URL
+- `created_at`, `updated_at`: Timestamps
+
+**quiz_sessions** (quiz session records):
+- `id`: Session ID
+- `user_id`: UUID (foreign key to user_profiles)
+- `application`: App being quizzed (chrome, excel, etc.)
+- `difficulty`: Quiz difficulty level
+- `score`: Final score (0-100)
+- `total_questions`: Number of questions
+- `correct_answers`: Number correct
+- `started_at`, `completed_at`: Timestamps
+
+**quiz_history** (detailed answer records):
+- `id`: Answer ID
+- `user_id`: UUID
+- `session_id`: Foreign key to quiz_sessions
+- `shortcut_id`: Foreign key to shortcuts
+- `was_correct`: Boolean
+- `answered_at`: Timestamp
+
+**user_quiz_stats** (view):
+- Aggregated statistics per user and application
+- Total sessions, accuracy, last quiz date
+
+### Supabase Auth Setup
+
+To enable authentication, configure OAuth providers in Supabase Dashboard:
+
+**Google OAuth:**
+1. Go to Authentication → Providers → Google
+2. Enable Google provider
+3. Add authorized redirect URLs:
+   - `https://nishis2rp.github.io/keyboard-visualizer/`
+   - `http://localhost:5173/keyboard-visualizer/` (for development)
+4. Enter Google OAuth Client ID and Secret
+
+**GitHub OAuth:**
+1. Go to Authentication → Providers → GitHub
+2. Enable GitHub provider
+3. Add authorized redirect URLs (same as above)
+4. Enter GitHub OAuth App credentials
+
+**Email/Password:**
+- Enabled by default
+- Email confirmation can be configured in Settings → Auth
+
+### Row-Level Security (RLS)
+
+All user data is protected with RLS policies:
+- Users can only read/write their own profiles
+- Users can only see their own quiz sessions and history
+- Shortcuts table is publicly readable
+
+### Using Authentication in Code
+
+**Check if user is logged in:**
+```typescript
+import { useAuth } from '../context/AuthContext';
+
+function MyComponent() {
+  const { user, profile } = useAuth();
+
+  if (user) {
+    // User is logged in
+    console.log('Display name:', profile?.display_name);
+  }
+}
+```
+
+**Save quiz progress:**
+```typescript
+import { useQuizProgress } from '../hooks/useQuizProgress';
+
+function QuizComponent() {
+  const { startQuizSession, recordAnswer, completeQuizSession } = useQuizProgress();
+
+  // Start quiz
+  const sessionId = await startQuizSession('chrome', 'standard');
+
+  // Record each answer
+  await recordAnswer(shortcutId, wasCorrect);
+
+  // Complete quiz
+  await completeQuizSession(score, totalQuestions, correctAnswers);
+}
+```
+
+**Get quiz statistics:**
+```typescript
+const { getQuizStats } = useQuizProgress();
+const stats = await getQuizStats('chrome');
+// Returns: total_sessions, total_correct, total_questions, overall_accuracy, last_quiz_date
 ```
 
 ## Architecture Overview
@@ -168,15 +340,39 @@ Three categories of shortcuts based on system behavior:
 
 ### Sequential Shortcuts
 
-Three types handled differently:
+Three types of sequential shortcuts with different input patterns:
 
-1. **Excel**: `Alt + H + O + I` - Alt held, keys pressed sequentially
-2. **VS Code**: `Ctrl + K, Ctrl + S` - Full release between sequences
-3. **Gmail**: `g + i` - Pure key sequences
+1. **Excel-style (modifier held)**: `Alt + H + O + I`
+   - Alt key held down while pressing H, O, I sequentially
+   - Detected by presence of `+` between all keys
+   - Common in ribbon-based applications
 
-Processing logic in:
-- `src/utils/sequentialShortcuts.ts`: `SequentialKeyRecorder` class
-- `src/utils/quizEngine.ts`: `checkAnswer()` function validates sequential input
+2. **VS Code-style (sequence with release)**: `Ctrl + K, Ctrl + S`
+   - Complete release between key combinations
+   - Separated by comma (`,`) in shortcut string
+   - First combination is "prefix", second is "suffix"
+
+3. **Gmail-style (pure sequence)**: `g + i`
+   - Simple key sequences without modifiers
+   - Each key pressed and released individually
+   - Used for single-letter command sequences
+
+**Processing logic:**
+- `src/utils/sequentialShortcuts.ts`:
+  - `isSequentialShortcut()`: Detects if a shortcut is sequential
+  - `getSequentialKeys()`: Extracts individual keys from sequential shortcut
+  - `SequentialKeyRecorder`: Class for tracking sequential input progress
+
+- `src/utils/quizEngine.ts`:
+  - `checkAnswer()`: Validates user input against correct shortcut
+  - Handles both normal and sequential shortcuts
+  - Returns `isCorrect` boolean and `sequentialProgress` array
+
+**Quiz visual feedback:**
+- Correct sequential keys displayed with green highlight
+- Incorrect keys displayed with red highlight
+- Arrow (→) between keys to show sequence
+- Example: `Alt + H` → `O` → `I` (O and I in green if correct)
 
 ### Alternative Shortcuts
 
@@ -244,10 +440,20 @@ Migrations are in `supabase/migrations/` with sequential numbering:
 - `003-017_*.sql`: Feature additions and refinements
 - `018_add_protection_level_columns.sql`: Add protection level support
 - `019_set_fullscreen_preventable_shortcuts_level.sql`: Set protection levels
+- `020_add_word_shortcuts.sql`: Add Microsoft Word shortcuts
+- `021_add_powerpoint_shortcuts.sql`: Add PowerPoint shortcuts
+- `022_set_word_powerpoint_protection_levels.sql`: Set protection levels for Word/PowerPoint
+- `023_normalize_pageup_pagedown.sql`: Normalize PageUp/PageDown key names
+- `024_fix_protection_levels.sql`: Fix protection level inconsistencies
 
 **Running migrations:**
 1. Set `.env` with `DATABASE_URL=postgresql://postgres:...`
 2. Run `npm run db:migrate`
+
+**Migration naming convention:**
+- Use sequential numbers (001, 002, etc.)
+- Use descriptive names with underscores
+- Prefix with action verb (add, create, update, fix, etc.)
 
 ## Component Architecture
 
@@ -321,6 +527,43 @@ Migrations are in `supabase/migrations/` with sequential numbering:
 - `nginx.conf`: Nginx configuration for production (Gzip, caching, SPA routing)
 - `.dockerignore`: Excludes node_modules, .env, dist from Docker context
 
+## Script Architecture Pattern
+
+### Two-Client Architecture
+
+The project uses a dual-client architecture for database operations:
+
+1. **Supabase Client** (Read-Only)
+   - Uses: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+   - Purpose: Read-only data fetching in frontend and check scripts
+   - Access: Public read access via Row-Level Security (RLS)
+   - Files: Frontend code, `check-*.ts` scripts
+
+2. **PostgreSQL Client** (Read-Write)
+   - Uses: `DATABASE_URL` (full connection string)
+   - Purpose: Database migrations and write operations
+   - Access: Full database access with credentials
+   - Files: Migration scripts, `*-pg.ts` update scripts
+
+### Script Naming Convention
+
+- **Check scripts**: `check-[feature].ts` - Use Supabase client for read-only verification
+- **Update scripts**: `update-[feature]-pg.ts` - Use PostgreSQL client for write operations
+- **Migration scripts**: `run-[feature]-migration.ts` - Use PostgreSQL client to execute SQL migrations
+
+### Creating Update Scripts
+
+When creating scripts to update the database:
+
+1. Create a check script first to verify current state
+2. Create an update script with `-pg` suffix
+3. Use the pattern from `scripts/update-chrome-alt-shift-shortcuts-pg.ts`:
+   - Import `pg` and `dotenv`
+   - Connect with `DATABASE_URL`
+   - Use parameterized queries or safe SQL
+   - Always use `RETURNING *` to verify changes
+   - Close connection in `finally` block
+
 ## Common Development Tasks
 
 ### Adding a New Application
@@ -347,24 +590,56 @@ Migrations are in `supabase/migrations/` with sequential numbering:
 
 ### Updating Protection Levels
 
-1. **Modify the migration file:**
-   Edit `supabase/migrations/019_set_fullscreen_preventable_shortcuts_level.sql`
+**Workflow for updating protection levels:**
 
-2. **Create a script to update existing data:**
+1. **Check current protection levels:**
+   ```bash
+   npx tsx scripts/check-chrome-alt-shift-shortcuts.ts
+   ```
+
+2. **Create an update script using PostgreSQL client:**
    ```typescript
-   // scripts/update-protection-levels.ts
+   // scripts/update-[feature]-shortcuts-pg.ts
+   import pg from 'pg';
+   import * as dotenv from 'dotenv';
+
+   dotenv.config();
+   const { Client } = pg;
+
+   const client = new Client({
+     connectionString: process.env.DATABASE_URL,
+     ssl: { rejectUnauthorized: false }
+   });
+
+   await client.connect();
+
    const result = await client.query(
      `UPDATE shortcuts
       SET windows_protection_level = 'preventable_fullscreen',
           macos_protection_level = 'preventable_fullscreen'
-      WHERE keys IN ('Ctrl + W', 'Ctrl + N', 'Ctrl + T')`
+      WHERE application = 'chrome'
+        AND id IN (80, 89)
+      RETURNING *`
    );
+
+   await client.end();
    ```
 
 3. **Run the script:**
    ```bash
-   npx tsx scripts/update-protection-levels.ts
+   npx tsx scripts/update-[feature]-shortcuts-pg.ts
    ```
+
+4. **Verify the update:**
+   ```bash
+   npx tsx scripts/check-chrome-alt-shift-shortcuts.ts
+   ```
+
+**Important Notes:**
+- Use Supabase client for read-only operations (check scripts)
+- Use PostgreSQL client (`pg`) for write operations (update scripts)
+- Supabase ANON_KEY has read-only access for security
+- Always verify changes after running update scripts
 
 ### Adding Visual Indicators
 
@@ -402,13 +677,67 @@ Enable debug logging in `ShortcutCard.tsx`:
 
 ## Testing
 
-- Framework: Vitest with jsdom environment
-- Test files: `src/tests/`
-- Key test file: `quizEngine.test.ts` (tests normalization, answer checking)
+### Test Framework Setup
+
+- **Framework:** Vitest with jsdom environment
+- **Configuration:** `vite.config.ts` (test section)
+- **Setup file:** `src/tests/setup.ts`
+- **Test files:** `src/tests/` directory
+
+### Running Tests
 
 ```bash
-npm test              # Run all tests
-npm run test:watch   # Watch mode
+npm test              # Run all tests once
+npm run test:watch   # Watch mode for development
+npm run test:coverage # Generate coverage report (not in package.json, add if needed)
+```
+
+### Key Test Files
+
+- **`quizEngine.test.ts`**: Core quiz logic tests
+  - Shortcut normalization (`normalizeShortcut`)
+  - Answer checking (`checkAnswer`)
+  - Sequential shortcut handling
+  - Alternative shortcut recognition
+
+### Test Configuration
+
+From `vite.config.ts`:
+```typescript
+test: {
+  globals: true,           // No need to import describe, it, expect
+  environment: 'jsdom',    // DOM environment for React components
+  setupFiles: './src/tests/setup.ts',
+  css: false,              // Skip CSS processing for speed
+  coverage: {
+    provider: 'v8',
+    reporter: ['text', 'html', 'lcov'],
+  },
+}
+```
+
+### Writing Tests
+
+- Use `describe()` blocks to group related tests
+- Use `it()` or `test()` for individual test cases
+- Import functions directly from source files
+- Mock Supabase client if testing data fetching
+- Test both normal and edge cases (empty strings, null values, etc.)
+
+**Example pattern:**
+```typescript
+import { describe, it, expect } from 'vitest';
+import { normalizeShortcut } from '../utils/quizEngine';
+
+describe('normalizeShortcut', () => {
+  it('should normalize modifier key order', () => {
+    expect(normalizeShortcut('Shift+Ctrl+A')).toBe('Ctrl+Shift+A');
+  });
+
+  it('should handle null input', () => {
+    expect(normalizeShortcut('')).toBe('');
+  });
+});
 ```
 
 ## Environment Variables
@@ -457,29 +786,102 @@ npm run preview  # Preview locally
 ## Code Style & Best Practices
 
 1. **TypeScript everywhere:** All files use TypeScript with proper type definitions
+   - **Note:** `strict` mode is disabled in `tsconfig.json` for gradual migration
+   - Use explicit types where possible, but `any` is allowed during refactoring
+   - All component props should have interface definitions
+
 2. **Normalization first:** Always normalize shortcuts before comparison
+   - Use `normalizeShortcut()` from `utils/quizEngine.ts`
+   - Modifier key order: Ctrl → Alt → Meta → Shift → MainKeys
+   - Example: `normalizeShortcut("ctrl + A")` → `"Ctrl+A"`
+
 3. **Set-based lookups:** Use `Set` for O(1) lookup performance
-4. **Context for global state:** `AppContext` for app data, `QuizContext` for quiz logic
+   - `pressedKeys: Set<string>` for keyboard input tracking
+   - `usedShortcuts: Set<string>` for quiz history
+   - Protection level checks use Sets for fast lookups
+
+4. **Context for global state:**
+   - `AppContext` for app data, shortcuts, layout selection
+   - `QuizContext` for quiz logic with reducer pattern
+   - Never mutate state directly; always create new objects/Sets
+
 5. **Custom hooks for logic:** Separate UI from business logic
+   - `useShortcuts`: Data fetching and transformation
+   - `useKeyboardShortcuts`: Keyboard event handling
+   - `useQuizInputHandler`: Quiz answer validation
+   - `useLocalStorage`: Settings persistence
+
 6. **Memo optimization:** Use `useMemo` and `useCallback` to prevent unnecessary re-renders
+   - Memoize expensive computations (filtering, sorting)
+   - Memoize callback functions passed to child components
+   - See `KeyboardLayout.tsx` for optimization examples
+
 7. **CSS className over inline styles:** Use className-based styling for better maintainability
+   - Protection level styles in `src/styles/components.css`
+   - Apply via className concatenation: `\`shortcut-card \${protectionClass}\``
+   - Avoid inline styles except for dynamic positioning
 
 ## Common Pitfalls
 
-1. **Don't mutate `pressedKeys` Set directly:** Always create a new Set
-2. **Always normalize shortcuts before comparison:** Use `normalizeShortcut()` from `quizEngine.ts`
-3. **Check OS before using protection levels:** Use `detectOS()` to get correct protection level column
-4. **Handle null values:** Database columns can be null, always provide fallbacks
-5. **Use proper key codes:** KeyboardEvent.code (e.g., "ControlLeft") not KeyboardEvent.key
-6. **Sequential shortcuts need special handling:** Use `SequentialKeyRecorder` class
+1. **Don't mutate `pressedKeys` Set directly**
+   - ❌ Wrong: `pressedKeys.add(key)` (mutates existing Set)
+   - ✅ Correct: `setPressedKeys(new Set([...pressedKeys, key]))` (creates new Set)
+   - React won't detect mutations to Sets/Maps; always create new instances
+
+2. **Always normalize shortcuts before comparison**
+   - ❌ Wrong: `if (userInput === "ctrl + A")` (case-sensitive, order-dependent)
+   - ✅ Correct: `if (normalizeShortcut(userInput) === normalizeShortcut(expected))`
+   - Use `normalizeShortcut()` from `quizEngine.ts`
+   - Handles modifier key order, case differences, and spacing variations
+
+3. **Check OS before using protection levels**
+   - ❌ Wrong: Using `windows_protection_level` on macOS
+   - ✅ Correct: `const level = currentOS === 'mac' ? shortcut.macos_protection_level : shortcut.windows_protection_level`
+   - Use `detectOS()` from `utils/os.ts` to get current operating system
+   - Protection levels are OS-specific (e.g., Cmd+Tab protected on Mac, not Windows)
+
+4. **Handle null values from database**
+   - ❌ Wrong: `shortcut.windows_protection_level.includes('protected')` (can be null)
+   - ✅ Correct: `shortcut.windows_protection_level?.includes('protected') ?? false`
+   - Database columns: `category`, `windows_keys`, `macos_keys`, `windows_protection_level`, `macos_protection_level` can all be null
+   - Always provide fallbacks: `shortcut.category || 'Uncategorized'`
+
+5. **Use proper key codes, not key values**
+   - ❌ Wrong: `KeyboardEvent.key` (returns character, varies by keyboard layout)
+   - ✅ Correct: `KeyboardEvent.code` (returns physical key position)
+   - Example: `code: "ControlLeft"` not `key: "Control"`
+   - Use `getCodeDisplayName()` from `keyMapping.ts` to convert codes to display names
+
+6. **Sequential shortcuts need special handling**
+   - ❌ Wrong: Treating `Alt + H + O + I` as a single simultaneous combination
+   - ✅ Correct: Use `SequentialKeyRecorder` class to track sequential input
+   - Check with `isSequentialShortcut()` before processing
+   - Handle three different sequential patterns (Excel, VS Code, Gmail)
+
+7. **Supabase client is read-only**
+   - ❌ Wrong: Using `supabase.from('shortcuts').update()` (will fail silently)
+   - ✅ Correct: Use PostgreSQL client with `DATABASE_URL` for write operations
+   - Create scripts with `-pg` suffix for database updates
+   - Use Supabase client only for frontend data fetching and check scripts
+
+8. **Base path differs between environments**
+   - ❌ Wrong: Hardcoding base path as `/` or `/keyboard-visualizer/`
+   - ✅ Correct: Use `process.env.VITE_BASE_PATH || '/keyboard-visualizer/'` in vite.config.ts
+   - Docker uses `/` (set in docker-compose.yml)
+   - GitHub Pages uses `/keyboard-visualizer/`
+   - Assets and routing must respect the base path
 
 ## Recent Major Changes
 
-1. **Full TypeScript migration** (commit 9e8ae89): Converted all .js to .ts/.tsx
-2. **Database-driven protection levels** (commit 8a5456d): Moved from constants to database columns
-3. **CSS refactoring** (commit b229689): Removed duplicate styles from global.css
-4. **Protection level visual indicators** (commit c6f063d): Added blue/red borders for shortcuts
-5. **PageUp/PageDown duplicate cleanup**: Removed old "Page Up" (space) variants, kept "PageUp" (no space)
+1. **Full TypeScript migration** (2025): Converted all .js to .ts/.tsx files
+2. **Database-driven protection levels** (2025): Moved from hardcoded constants to database columns with OS-specific support
+3. **CSS refactoring** (2025): Removed duplicate styles from global.css, consolidated to components.css
+4. **Protection level visual indicators** (2025): Added blue borders for `preventable_fullscreen` and red borders for `always-protected` shortcuts
+5. **PageUp/PageDown normalization** (2026-01): Normalized "Page Up" (with space) to "PageUp" (no space) across database
+6. **Word and PowerPoint support** (2026-01): Added Microsoft Word and PowerPoint shortcuts with protection levels
+7. **RichShortcut type refactoring** (2026-01): Introduced `RichShortcut` type for detailed shortcut data from database
+8. **Script organization** (2026-01): Separated read-only scripts (Supabase client) from write scripts (PostgreSQL client with `-pg` suffix)
+9. **User Authentication & Quiz Progress Tracking** (2026-02): Added optional authentication with Google, GitHub, and Email/Password. Users can now save quiz history and track progress across sessions. Implemented AuthContext, AuthModal, UserMenu, and useQuizProgress hook with database tables for user_profiles, quiz_sessions, and quiz_history
 
 ## Git Workflow
 

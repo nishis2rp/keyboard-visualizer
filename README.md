@@ -9,6 +9,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF)](https://vitejs.dev/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E)](https://supabase.com/)
+[![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 🔗 **Live Demo**: https://nishis2rp.github.io/keyboard-visualizer/
@@ -85,6 +86,15 @@
 - **単独キーショートカット**: Gmail等で単独キーで操作できるショートカットを一覧表示
 - **リアルタイム履歴**: 最近使用したショートカットの履歴を表示
 
+### 🔐 ユーザー認証とデータ保存
+
+- **オプショナルな認証**: アプリは未ログインでも完全に使用可能
+- **メール/パスワード認証**: Supabase Authによる安全な認証システム
+- **クイズ進捗の保存**: ログインユーザーのクイズセッション、スコア、回答履歴を自動保存
+- **統計データの追跡**: 正解率、平均速度、総回答数などの詳細な学習データを記録
+- **プロフィール管理**: 表示名とアバターのカスタマイズ
+- **Row-Level Security (RLS)**: データベースレベルでのセキュリティ保護
+
 ---
 
 ## 🚀 クイックスタート
@@ -156,6 +166,26 @@ npm run deploy
 
 ## 💻 使い方
 
+### 🔐 ユーザー認証（オプション）
+
+アカウントを作成すると、クイズの進捗とスコアが自動的に保存されます。
+
+1. **アカウント作成**
+   - ヘッダーまたはセットアップ画面の「ログイン」ボタンをクリック
+   - 「アカウント作成」タブを選択
+   - 表示名、メールアドレス、パスワード（6文字以上）を入力
+   - 確認メールが送信されるので、メール内のリンクをクリックして有効化
+
+2. **ログイン**
+   - 「ログイン」ボタンをクリック
+   - メールアドレスとパスワードを入力
+
+3. **プロフィール管理**
+   - ログイン後、ヘッダーの表示名をクリック
+   - 「ログアウト」でセッションを終了
+
+**注意**: 認証は完全にオプションです。アプリはログインなしでも全機能を使用できます。
+
 ### 通常モード（ビジュアライザー）
 
 1. **初回セットアップ**
@@ -218,6 +248,12 @@ npm run deploy
   - PostgreSQLデータベースによるショートカットデータの一元管理
   - リアルタイムデータ取得とマイグレーション管理
   - 1,146個以上のショートカット、保護レベル、難易度情報を管理
+  - Supabase Auth - ユーザー認証とセッション管理
+  - Row-Level Security (RLS) - データベースレベルのセキュリティ
+- **Docker** - コンテナ化された開発環境
+  - マルチステージビルドによる最適化
+  - 開発・本番環境の一貫性確保
+  - Nginxによる本番環境のサービング
 - **Vitest** - 高速テストフレームワーク
 
 ### 主要API
@@ -250,6 +286,9 @@ keyboard-visualizer/
 │   │   ├── common/                 # 共通コンポーネント
 │   │   │   ├── Selector.tsx       # 汎用セレクター（リファクタリング済み）
 │   │   │   └── StyledButton.tsx   # スタイル付きボタン
+│   │   ├── Auth/                   # 認証関連コンポーネント
+│   │   │   ├── AuthModal.tsx      # ログイン/サインアップモーダル
+│   │   │   └── UserMenu.tsx       # ユーザーメニュー（プロフィール、ログアウト）
 │   │   ├── Quiz/                   # クイズモード関連
 │   │   │   ├── QuestionCard.tsx   # 問題カード
 │   │   │   ├── ResultModal.tsx    # 結果表示モーダル
@@ -264,6 +303,7 @@ keyboard-visualizer/
 │   │   └── QuizModeView.tsx        # クイズモード画面
 │   ├── context/                    # Contextプロバイダー
 │   │   ├── AppContext.tsx          # アプリケーション状態管理
+│   │   ├── AuthContext.tsx         # 認証状態管理
 │   │   └── QuizContext.tsx         # クイズ状態管理（reducer使用）
 │   ├── config/                     # 設定ファイル
 │   │   ├── apps.ts                 # アプリケーション定義
@@ -290,6 +330,8 @@ keyboard-visualizer/
 │   ├── hooks/                      # カスタムフック
 │   │   ├── useKeyboardShortcuts.ts # キーボード入力管理（リファクタリング済み）
 │   │   ├── useLocalStorage.ts      # ローカルストレージ永続化
+│   │   ├── useShortcuts.ts         # Supabaseからショートカットデータ取得
+│   │   ├── useQuizProgress.ts      # クイズ進捗の保存と取得
 │   │   └── index.ts
 │   ├── styles/                     # スタイル
 │   │   ├── global.css              # グローバルスタイル
@@ -370,6 +412,19 @@ keyboard-visualizer/
    - 各OSごとに異なる保護レベルを正確に管理（例: Win+TabはWindowsで保護、Cmd+TabはmacOSで保護）
    - `systemProtectedShortcuts.ts` のロジックを削除し、データベースから動的に取得する設計に変更
    - 保護レベルの追加・変更がデータベース更新のみで可能に
+
+9. **ユーザー認証とデータ永続化**（2026年2月）
+   - Supabase Authによる安全な認証システムの統合
+   - メール/パスワード認証のサポート
+   - Row-Level Security (RLS) によるデータベースレベルのセキュリティ
+   - クイズ進捗、セッション、履歴の自動保存
+   - オプショナルな認証設計（未ログインでも完全利用可能）
+
+10. **Docker対応とインフラ整備**（2026年1-2月）
+   - マルチステージDockerfileによるビルド最適化
+   - docker-compose.ymlで開発環境の一貫性確保
+   - 本番環境用のNginx設定とGzip圧縮
+   - ホットリロード対応の開発環境コンテナ
 
 ### コンポーネント設計
 

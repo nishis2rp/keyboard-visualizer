@@ -1,5 +1,8 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { StyledButton } from '../common/StyledButton'
+import { useAuth } from '../../context/AuthContext'
+import AuthModal from '../Auth/AuthModal'
+import UserMenu from '../Auth/UserMenu'
 import styles from './AppHeader.module.css'
 
 interface AppHeaderProps {
@@ -16,6 +19,9 @@ interface AppHeaderProps {
  * 全画面モードでない場合は、ショートカット競合に関する警告を表示
  */
 const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, isQuizMode, onQuizModeToggle }) => {
+  const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
   return (
     <>
       <div className={styles.headerContainer}>
@@ -45,6 +51,17 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
           >
             {fullscreenMode ? '全画面を終了' : '全画面モード'}
           </StyledButton>
+          {user ? (
+            <UserMenu />
+          ) : (
+            <StyledButton
+              onClick={() => setShowAuthModal(true)}
+              backgroundColor="#667eea"
+              title="ログインしてクイズの進捗を保存"
+            >
+              ログイン
+            </StyledButton>
+          )}
         </div>
       </div>
       <p className="subtitle">
@@ -53,6 +70,7 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
           💡 Ctrl+WやWinキーなどの競合を防ぐには全画面モードを使用してください
         </span>}
       </p>
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </>
   )
 })

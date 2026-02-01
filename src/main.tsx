@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import { AppProvider } from './context/AppContext';
 import { QuizProvider } from './context/QuizContext';
+import { AuthProvider } from './context/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import './styles';
 
@@ -19,11 +20,13 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) { // 開発環境で�
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
-      <AppProvider>
-        <QuizProvider>
-          <App />
-        </QuizProvider>
-      </AppProvider>
+      <AuthProvider>
+        <AppProvider>
+          <QuizProvider>
+            <App />
+          </QuizProvider>
+        </AppProvider>
+      </AuthProvider>
     </ErrorBoundary>
   </StrictMode>,
 );

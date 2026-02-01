@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { SETUP_VERSION } from '../../constants/app'
 import { apps as appConfig } from '../../config/apps'
 import { useAppContext } from '../../context/AppContext'
+import { useAuth } from '../../context/AuthContext'
+import AuthModal from '../Auth/AuthModal'
+import UserMenu from '../Auth/UserMenu'
 import './SetupScreen.css'
 
 interface SetupScreenProps {
@@ -10,12 +13,14 @@ interface SetupScreenProps {
 
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const { isQuizMode } = useAppContext()
+  const { user } = useAuth()
   const [selectedFullscreen, setSelectedFullscreen] = useState(null)
   const [selectedLayout, setSelectedLayout] = useState(null)
   const [selectedMode, setSelectedMode] = useState(null)
   const [selectedApp, setSelectedApp] = useState(null)
   const [selectedQuizApps, setSelectedQuizApps] = useState<any[]>([]) // 複数選択対応
   const [selectedDifficulty, setSelectedDifficulty] = useState(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   // クイズモードが既に有効な場合、モード選択をスキップ
   useEffect(() => {
@@ -213,9 +218,27 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     <div className="setup-overlay">
       <div className="setup-container">
         <div className="setup-header">
-          <h1>⌨️ キーボードビジュアライザー</h1>
-          <h2>ようこそ！</h2>
-          <p>お使いの環境を選択してください</p>
+          <div className="setup-header-top">
+            <div>
+              <h1>⌨️ キーボードビジュアライザー</h1>
+              <h2>ようこそ！</h2>
+              <p>お使いの環境を選択してください</p>
+            </div>
+            <div className="setup-auth-button">
+              {user ? (
+                <UserMenu />
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="auth-login-button"
+                  title="ログインしてクイズの進捗を保存"
+                >
+                  <span>👤</span>
+                  <span>ログイン</span>
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* 全画面モード選択 */}
@@ -412,6 +435,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
           </p>
         </div>
       </div>
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   )
 }

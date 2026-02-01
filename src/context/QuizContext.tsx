@@ -4,6 +4,8 @@ import { isModifierKey, isWindowsKey } from '../utils/keyUtils';
 import { isSequentialShortcut, SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts'; // Updated import
 import { useAppContext } from './AppContext';
 import { useQuizInputHandler } from '../hooks/useQuizInputHandler'; // 追加
+import { useQuizProgress } from '../hooks/useQuizProgress'; // 追加
+import { QuizQuestion } from '../types';
 
 
 interface QuizSettings {
@@ -238,9 +240,12 @@ interface QuizProviderProps {
 
 export function QuizProvider({ children }: QuizProviderProps) {
   // AppContextからショートカットデータを取得
-  const { allShortcuts } = useAppContext();
+  const { allShortcuts, richShortcuts } = useAppContext();
 
   const [quizState, dispatch] = useReducer(quizReducer, initialQuizState);
+
+  // クイズ進捗保存機能
+  const { startQuizSession, recordAnswer, completeQuizSession } = useQuizProgress();
   
 
   // ★ タイマーロジック
@@ -278,7 +283,8 @@ export function QuizProvider({ children }: QuizProviderProps) {
       quizMode, // quizMode を渡す
       quizState.settings.isFullscreen,
       currentUsedShortcuts,
-      quizState.settings.difficulty
+      quizState.settings.difficulty,
+      richShortcuts || [] // richShortcutsを渡す
     );
 
     if (newQuestion) {
@@ -302,14 +308,17 @@ export function QuizProvider({ children }: QuizProviderProps) {
     getAndSetNextQuestion(quizState.usedShortcuts, quizState.settings.quizMode);
   }, [quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts, quizState.settings.quizMode, getAndSetNextQuestion]);
 
-  const startQuiz = useCallback((app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard') => {
+  const startQuiz = useCallback(async (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard') => {
     if (!allShortcuts) {
       console.error('Shortcuts data not loaded yet');
       return;
     }
     dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
     getAndSetNextQuestion(new Set(), 'default'); // クイズ開始時は新しいセットとデフォルトモード
-  }, [allShortcuts, getAndSetNextQuestion]);
+
+    // Start quiz session in database if user is logged in
+    await startQuizSession(app, difficulty);
+  }, [allShortcuts, getAndSetNextQuestion, startQuizSession]);
 
   // ★ クイズ開始時に最初の問題を取得する (useEffect を変更)
   useEffect(() => {
@@ -344,6 +353,20 @@ export function QuizProvider({ children }: QuizProviderProps) {
     window.addEventListener('keydown', handleKeyPressEvent);
     return () => window.removeEventListener('keydown', handleKeyPressEvent);
   }, [quizState.status, quizState.showAnswer, getNextQuestion]);
+
+  // クイズ完了時にセッションを保存
+  useEffect(() => {
+    if (quizState.status === 'finished' && quizState.quizHistory.length > 0) {
+      const totalQuestions = quizState.quizHistory.length;
+      const correctAnswers = quizState.quizHistory.filter(h => h.isCorrect).length;
+      const score = Math.round((correctAnswers / totalQuestions) * 100);
+
+      completeQuizSession(score, totalQuestions, correctAnswers);
+    }
+  }, [quizState.status, quizState.quizHistory, completeQuizSession]);
+
+  // クイズ入力ハンドラーを使用（キーボード入力から正誤判定を行う）
+  useQuizInputHandler({ quizState, dispatch, getNextQuestion });
 
   const value = {
     quizState,

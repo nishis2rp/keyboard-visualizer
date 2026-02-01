@@ -8,7 +8,7 @@ import { matchesDifficulty } from '../constants/shortcutDifficulty';
 import { isSequentialShortcut } from './sequentialShortcuts';
 import { getCodeDisplayName } from './keyMapping'; // Import getCodeDisplayName
 import { APP_DISPLAY_NAMES } from '../constants/app'; // 追加
-import { AllShortcuts, ShortcutDetails } from '../types';
+import { AllShortcuts, ShortcutDetails, RichShortcut } from '../types';
 
 // OSを検出
 const currentOS = detectOS();
@@ -173,6 +173,7 @@ export const getCompatibleApps = (keyboardLayout: string): string[] => {
  * @param {boolean} isFullscreen - Whether fullscreen mode is active.
  * @param {Set<string>} usedShortcuts - Set of already used normalized shortcuts to avoid duplicates.
  * @param {'basic' | 'standard' | 'madmax' | 'allrange'} difficulty - The difficulty level.
+ * @param {RichShortcut[]} richShortcuts - Array of shortcuts with protection level information.
  * @returns {{question: string, correctShortcut: string, normalizedCorrectShortcut: string, appName: string} | null} A question object, or null if no shortcuts are available.
  */
 export const generateQuestion = (
@@ -181,11 +182,19 @@ export const generateQuestion = (
   quizMode = 'default',
   isFullscreen = false,
   usedShortcuts = new Set<string>(),
-  difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard'
+  difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard',
+  richShortcuts: RichShortcut[] = []
 ) => {
   // 全ての許可されたアプリのショートカットを収集
   const allSafeShortcuts: any[] = [];
   if (!allowedApps || !Array.isArray(allowedApps)) return null;
+
+  // richShortcutsからマップを作成（application + keys でルックアップ）
+  const protectionLevelMap = new Map<string, RichShortcut>();
+  richShortcuts.forEach(rs => {
+    const key = `${rs.application}:${rs.keys}`;
+    protectionLevelMap.set(key, rs);
+  });
 
   const allPossibleQuestions: Array<{
     appId: string;
@@ -212,6 +221,21 @@ export const generateQuestion = (
       // 安全なショートカットのみを考慮
       if (!isShortcutSafe(shortcut, quizMode, isFullscreen)) {
         return;
+      }
+
+      // richShortcutsから保護レベルを取得
+      const lookupKey = `${appId}:${shortcut}`;
+      const richShortcut = protectionLevelMap.get(lookupKey);
+
+      // ウィンドウモードの場合、preventable_fullscreenのショートカットを除外
+      if (!isFullscreen && richShortcut) {
+        const protectionLevel = currentOS === 'macos'
+          ? richShortcut.macos_protection_level
+          : richShortcut.windows_protection_level;
+
+        if (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable') {
+          return;
+        }
       }
 
       // 難易度フィルタリング
