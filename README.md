@@ -320,7 +320,6 @@ keyboard-visualizer/
 │   │   │   ├── macJis.ts
 │   │   │   ├── macUs.ts
 │   │   │   └── index.ts
-
 │   ├── lib/                        # ライブラリ、ユーティリティ
 │   │   └── supabase.ts             # Supabaseクライアント初期化
 │   ├── hooks/                      # カスタムフック
