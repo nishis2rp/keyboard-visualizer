@@ -314,12 +314,12 @@ keyboard-visualizer/
 │   │   ├── shortcutDifficulty.ts   # ショートカット難易度分類
 │   │   └── systemProtectedShortcuts.ts  # システム保護ショートカット
 │   ├── data/                       # データファイル
-│   │   ├── layouts/                # キーボードレイアウトデータ
-│   │   │   ├── windowsJis.ts
-│   │   │   ├── windowsUs.ts
-│   │   │   ├── macJis.ts
-│   │   │   ├── macUs.ts
-│   │   │   └── index.ts
+│   │   └── layouts/                # キーボードレイアウトデータ
+│   │       ├── windowsJis.ts
+│   │       ├── windowsUs.ts
+│   │       ├── macJis.ts
+│   │       ├── macUs.ts
+│   │       └── index.ts
 │   ├── lib/                        # ライブラリ、ユーティリティ
 │   │   └── supabase.ts             # Supabaseクライアント初期化
 │   ├── hooks/                      # カスタムフック
