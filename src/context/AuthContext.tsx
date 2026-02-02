@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { parseOAuthCallbackError, clearOAuthErrorFromUrl, mapOAuthErrorToMessage } from '../utils/authErrors';
 
 interface UserProfile {
   id: string;
@@ -19,6 +20,10 @@ interface AuthContextType {
   signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: Error | null }>;
+  sendPasswordResetEmail: (email: string, redirectTo: string) => Promise<{ error: AuthError | null }>;
+  signInWithOAuth: (provider: 'google', redirectTo?: string) => Promise<{ error: AuthError | null }>;
+  updateEmail: (newEmail: string) => Promise<{ error: AuthError | null }>;
+  updatePassword: (newPassword: string) => Promise<{ error: AuthError | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -96,6 +101,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Handle OAuth callback errors from URL fragment
+  useEffect(() => {
+    const oauthError = parseOAuthCallbackError();
+
+    if (oauthError) {
+      console.error('OAuth callback error:', oauthError);
+
+      // Store error for AuthModal to display
+      sessionStorage.setItem('oauth_error', JSON.stringify({
+        provider: oauthError.error_code || 'unknown',
+        message: mapOAuthErrorToMessage(oauthError),
+      }));
+
+      // Clear error from URL
+      clearOAuthErrorFromUrl();
+    }
+  }, []);
 
   // Sign in with email and password
   const signInWithEmail = async (email: string, password: string) => {
@@ -128,11 +150,59 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Sign out
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
+    console.log('🟢 AuthContext: signOut() called');
 
-    if (error) {
-      console.error('Error signing out:', error);
-      throw error;
+    const clearAllAuthData = () => {
+      // Clear local state
+      setUser(null);
+      setProfile(null);
+      setSession(null);
+      console.log('🟢 AuthContext: Local state cleared');
+
+      // Clear all Supabase-related data from localStorage and sessionStorage
+      const clearStorage = (storage: Storage) => {
+        const keys = Object.keys(storage);
+        const supabaseKeys = keys.filter(key => key.includes('supabase') || key.startsWith('sb-'));
+        supabaseKeys.forEach(key => {
+          storage.removeItem(key);
+          console.log('🟢 AuthContext: Removed storage key:', key);
+        });
+      };
+
+      clearStorage(localStorage);
+      clearStorage(sessionStorage);
+    };
+
+    try {
+      // Try to call Supabase signOut with a timeout
+      console.log('🟢 AuthContext: Calling supabase.auth.signOut()...');
+
+      const timeoutPromise = new Promise<any>((resolve) => {
+        setTimeout(() => {
+          console.warn('🟢 AuthContext: Supabase signOut timed out after 2 seconds');
+          resolve({ error: null });
+        }, 2000);
+      });
+
+      const signOutPromise = supabase.auth.signOut();
+
+      const result = await Promise.race([signOutPromise, timeoutPromise]);
+
+      if (result.error) {
+        console.error('🟢 AuthContext: Supabase signOut error:', result.error);
+      } else {
+        console.log('🟢 AuthContext: Supabase signOut completed');
+      }
+
+      // Always clear everything regardless of Supabase response
+      clearAllAuthData();
+
+      console.log('🟢 AuthContext: signOut() completed');
+    } catch (error) {
+      console.error('🟢 AuthContext: Exception in signOut:', error);
+
+      // Force clear everything even on error
+      clearAllAuthData();
     }
   };
 
@@ -164,6 +234,69 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Send password reset email
+  const sendPasswordResetEmail = async (email: string, redirectTo: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    });
+    return { error };
+  };
+
+  // Sign in with OAuth provider
+  const signInWithOAuth = async (
+    provider: 'google',
+    redirectTo?: string
+  ): Promise<{ error: AuthError | null }> => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectTo || `${window.location.origin}/`,
+        },
+      });
+
+      if (error) {
+        console.error('OAuth error:', error);
+
+        // Check if provider not configured
+        if (error.message.includes('Provider not found') ||
+            error.message.includes('not enabled')) {
+          return {
+            error: {
+              ...error,
+              message: 'Googleログインが設定されていません。管理者に連絡してください。',
+            } as AuthError,
+          };
+        }
+
+        return { error };
+      }
+
+      return { error: null };
+    } catch (err) {
+      console.error('Unexpected OAuth error:', err);
+      return {
+        error: {
+          message: 'Googleログイン中にエラーが発生しました。もう一度お試しください。',
+          name: 'OAuthError',
+          status: 500,
+        } as AuthError,
+      };
+    }
+  };
+
+  // Update user email
+  const updateEmail = async (newEmail: string) => {
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    return { error };
+  };
+
+  // Update user password
+  const updatePassword = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    return { error };
+  };
+
   const value = {
     user,
     profile,
@@ -172,7 +305,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signInWithEmail,
     signUpWithEmail,
     signOut,
-    updateProfile
+    updateProfile,
+    sendPasswordResetEmail,
+    signInWithOAuth,
+    updateEmail,
+    updatePassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

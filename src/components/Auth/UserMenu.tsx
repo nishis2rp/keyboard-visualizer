@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom'; // Import Link
 import './UserMenu.css';
 
 const UserMenu: React.FC = () => {
@@ -28,11 +29,21 @@ const UserMenu: React.FC = () => {
   }, [isOpen]);
 
   const handleSignOut = async () => {
+    console.log('🔴 Logout button clicked');
     try {
+      console.log('🔴 Calling signOut()...');
       await signOut();
+      console.log('🔴 signOut() completed successfully');
       setIsOpen(false);
+
+      // Wait a bit for the auth state change to propagate, then reload
+      console.log('🔴 Waiting before reload...');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      console.log('🔴 Reloading page...');
+      window.location.reload();
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('🔴 Error signing out:', error);
+      alert('ログアウトに失敗しました。もう一度お試しください。');
     }
   };
 
@@ -60,6 +71,22 @@ const UserMenu: React.FC = () => {
           </div>
 
           <div className="user-menu-divider"></div>
+
+          <Link to="/mypage" className="user-menu-item" onClick={() => setIsOpen(false)}>
+            <svg
+              className="user-menu-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            マイページ
+          </Link>
 
           <button className="user-menu-item" onClick={handleSignOut}>
             <svg
