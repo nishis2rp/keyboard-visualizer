@@ -2,7 +2,8 @@ import { useEffect, useRef, useCallback } from 'react';
 import { isModifierKey, isWindowsKey } from '../utils/keyUtils';
 import { isSequentialShortcut, SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts';
 import { normalizePressedKeys, checkAnswer, normalizeShortcut } from '../utils/quizEngine';
-import { QuizAction, QuizState, QuizQuestion } from '../types'; // QuizState, QuizQuestion をインポート
+import { QuizAction, QuizState } from '../../context/QuizContext';
+import { QuizQuestion } from '../types';
 
 interface UseQuizInputHandlerProps {
   quizState: QuizState; // 型を明確化
@@ -57,6 +58,12 @@ export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion }: Us
     const answerTimeMs = Date.now() - questionStartTime;
     const userAnswer = normalizePressedKeys(pressedKeys, keyboardLayout);
     const isCorrect = checkAnswer(userAnswer, currentQuestion.normalizedCorrectShortcut);
+
+    // デバッグログ
+    console.log('[Quiz Debug] User answer:', userAnswer);
+    console.log('[Quiz Debug] Correct answer:', currentQuestion.normalizedCorrectShortcut);
+    console.log('[Quiz Debug] Is correct:', isCorrect);
+    console.log('[Quiz Debug] Pressed codes:', Array.from(pressedKeys));
 
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
     previousPressedKeysRef.current = new Set();

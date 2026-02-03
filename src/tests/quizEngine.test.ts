@@ -4,15 +4,13 @@ import {
   normalizePressedKeys,
   generateQuestion,
   checkAnswer,
-  _testExports,
+  isShortcutSafe,
 } from '../utils/quizEngine';
 import {
   ALWAYS_PROTECTED_SHORTCUTS,
   FULLSCREEN_PREVENTABLE_SHORTCUTS,
   detectOS
 } from '../constants/systemProtectedShortcuts';
-
-const { isShortcutSafe, reinitializeProtectedSetsForTesting } = _testExports;
 
 // Mock detectOS
 vi.mock('../constants/systemProtectedShortcuts', async (importOriginal) => {
@@ -58,6 +56,15 @@ describe('quizEngine', () => {
       expect(normalizeShortcut(null)).toBe('');
       expect(normalizeShortcut('')).toBe('');
     });
+
+    it('should normalize PgUp/PgDn to PageUp/PageDown', () => {
+      expect(normalizeShortcut('PgUp')).toBe('PageUp');
+      expect(normalizeShortcut('PgDn')).toBe('PageDown');
+      expect(normalizeShortcut('Ctrl + PgUp')).toBe('Ctrl+PageUp');
+      expect(normalizeShortcut('Ctrl + PgDn')).toBe('Ctrl+PageDown');
+      expect(normalizeShortcut('Shift + PgUp')).toBe('Shift+PageUp');
+      expect(normalizeShortcut('Shift + PgDn')).toBe('Shift+PageDown');
+    });
   });
 
   // --- normalizePressedKeys ---
@@ -101,7 +108,6 @@ describe('quizEngine', () => {
     beforeEach(() => {
       ALWAYS_PROTECTED_SHORTCUTS.clear();
       FULLSCREEN_PREVENTABLE_SHORTCUTS.clear();
-      reinitializeProtectedSetsForTesting();
     });
 
     it('should be safe if not in any protected lists', () => {
@@ -110,26 +116,22 @@ describe('quizEngine', () => {
 
     it('should be unsafe if in ALWAYS_PROTECTED_SHORTCUTS', () => {
       ALWAYS_PROTECTED_SHORTCUTS.add('Ctrl+L');
-      reinitializeProtectedSetsForTesting(); // 再初期化
       expect(isShortcutSafe('Ctrl+L', 'default', false)).toBe(false);
       expect(isShortcutSafe('Ctrl+L', 'hardcore', true)).toBe(false); // Always protected, even in hardcore mode
     });
 
     it('should be unsafe if in FULLSCREEN_PREVENTABLE_SHORTCUTS and not fullscreen in default mode', () => {
       FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-      reinitializeProtectedSetsForTesting(); // 再初期化
       expect(isShortcutSafe('Ctrl+W', 'default', false)).toBe(false);
     });
 
     it('should be safe if in FULLSCREEN_PREVENTABLE_SHORTCUTS but is fullscreen in default mode', () => {
       FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-      reinitializeProtectedSetsForTesting(); // 再初期化
       expect(isShortcutSafe('Ctrl+W', 'default', true)).toBe(true);
     });
 
     it('should be safe if in FULLSCREEN_PREVENTABLE_SHORTCUTS and in hardcore mode', () => {
       FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-      reinitializeProtectedSetsForTesting(); // 再初期化
       expect(isShortcutSafe('Ctrl+W', 'hardcore', false)).toBe(true);
       expect(isShortcutSafe('Ctrl+W', 'hardcore', true)).toBe(true);
     });
@@ -146,11 +148,10 @@ describe('quizEngine', () => {
         'Alt+F4': 'アプリを閉じる'
       }
     };
-    
+
     beforeEach(() => {
       ALWAYS_PROTECTED_SHORTCUTS.clear();
       FULLSCREEN_PREVENTABLE_SHORTCUTS.clear();
-      reinitializeProtectedSetsForTesting();
     });
 
     it('should return null if no shortcuts are provided', () => {
@@ -161,7 +162,6 @@ describe('quizEngine', () => {
     it('should generate a question from safe shortcuts in default mode', () => {
       ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L'); // Win+L is normalized to Meta+L
       FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W'); // Ctrl+W is unsafe by default
-      reinitializeProtectedSetsForTesting();
 
       const question = generateQuestion(mockShortcuts, ['testApp'], 'default', false, new Set(), 'allrange');
       expect(question).not.toBeNull();
@@ -175,7 +175,6 @@ describe('quizEngine', () => {
     it('should generate a question from FULLSCREEN_PREVENTABLE_SHORTCUTS if fullscreen in default mode', () => {
       ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L');
       FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-      reinitializeProtectedSetsForTesting();
 
       const question = generateQuestion(mockShortcuts, ['testApp'], 'default', true, new Set(), 'allrange'); // Fullscreen
       expect(question).not.toBeNull();
@@ -187,7 +186,6 @@ describe('quizEngine', () => {
     it('should generate a question from FULLSCREEN_PREVENTABLE_SHORTCUTS in hardcore mode', () => {
       ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L');
       FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-      reinitializeProtectedSetsForTesting();
 
       const question = generateQuestion(mockShortcuts, ['testApp'], 'hardcore', false, new Set(), 'allrange'); // Hardcore mode
       expect(question).not.toBeNull();
@@ -202,7 +200,6 @@ describe('quizEngine', () => {
       ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L');
       FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W'); // In default mode, this is unsafe
       ALWAYS_PROTECTED_SHORTCUTS.add('Alt+F4');
-      reinitializeProtectedSetsForTesting();
 
       const question = generateQuestion(mockShortcuts, ['testApp'], 'default', false, new Set(), 'allrange');
       expect(question).toBeNull();

@@ -112,12 +112,6 @@ export const useKeyboardShortcuts = (richShortcuts: RichShortcut[], keyboardLayo
         e.preventDefault();
       }
 
-      // Ctrl+矢印キーは完全に無視（ブラウザのデフォルト動作を優先）
-      const isArrowKey = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.code);
-      if (e.ctrlKey && isArrowKey) {
-        return;
-      }
-
       // キーリピート（長押し）の場合
       if (pressedKeysRef.current.has(e.code)) {
         // ショートカットが成立している場合はブラウザのデフォルト動作を防ぐ

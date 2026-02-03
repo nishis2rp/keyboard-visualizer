@@ -31,6 +31,7 @@ const normalizeModifierKeyString = (key: string): string => {
  * - Treats the 'Win' key as the 'Meta' key (for consistency with macOS's Cmd key).
  * - Standardizes modifier keys to uppercase.
  * - Standardizes main alphabet keys to uppercase to match test cases.
+ * - Normalizes PgUp/PgDn to PageUp/PageDown for database consistency.
  * @param {string} shortcutString - A shortcut string like 'Ctrl + Shift + A'.
  * @returns {string} The normalized shortcut string.
  */
@@ -38,9 +39,13 @@ export const normalizeShortcut = (shortcutString: string): string => {
   if (!shortcutString) return '';
 
   const keys = shortcutString
+    .trim() // 先頭と末尾のスペースを削除
     .split(/\s*\+\s*/) // スペースと+で分割
     .map((key: string) => normalizeModifierKeyString(key))
     .map((key: string) => {
+      // PgUp/PgDn を PageUp/PageDown に正規化
+      if (key === 'PgUp') return 'PageUp';
+      if (key === 'PgDn') return 'PageDown';
       // その他のアルファベットキーは大文字に統一（テストケースに合わせる）
       return key.length === 1 && /[a-zA-Z]/.test(key) ? key.toUpperCase() : key;
     });
@@ -107,7 +112,10 @@ export const normalizePressedKeys = (pressedCodes: Set<string>, keyboardLayout: 
   });
 
   // メインキーと修飾キーを結合
-  return [...modifiers, ...mainKeys].join('+');
+  const combined = [...modifiers, ...mainKeys].join('+');
+
+  // さらに正規化してPgDn→PageDown、矢印記号→ArrowXxxなどの変換を行う
+  return normalizeShortcut(combined);
 };
 
 
@@ -122,7 +130,7 @@ const isShortcutSafe = (shortcut: string, quizMode: string, isFullscreen: boolea
   const normalizedShortcut = normalizeShortcut(shortcut);
 
   // 常に保護されているショートカットは、どのモードでも安全ではない
-  if (ALWAYS_PROTECTED_SHORTCUTS.has(shortcut)) { // 直接元のshortcutを参照
+  if (ALWAYS_PROTECTED_SHORTCUTS.has(normalizedShortcut)) {
     return false;
   }
 
@@ -132,7 +140,7 @@ const isShortcutSafe = (shortcut: string, quizMode: string, isFullscreen: boolea
   }
 
   // デフォルトモードで、フルスクリーンでなく、かつ防止可能リストにある場合は安全ではない
-  if (!isFullscreen && FULLSCREEN_PREVENTABLE_SHORTCUTS.has(shortcut)) { // 直接元のshortcutを参照
+  if (!isFullscreen && FULLSCREEN_PREVENTABLE_SHORTCUTS.has(normalizedShortcut)) {
     return false;
   }
 
@@ -304,17 +312,5 @@ export const checkAnswer = (userAnswer: string, normalizedCorrectAnswer: string)
 
 
 
-// --- Test exports (only used during development) ---
-const reinitializeProtectedSetsForTesting = () => {
-  normalizedAlwaysProtected = new Set(
-    Array.from(ALWAYS_PROTECTED_SHORTCUTS).map((s: string) => normalizeShortcut(s))
-  );
-  normalizedFullscreenPreventable = new Set(
-    Array.from(FULLSCREEN_PREVENTABLE_SHORTCUTS).map((s: string) => normalizeShortcut(s))
-  );
-};
-
 // Export isShortcutSafe for use in QuizContext
 export { isShortcutSafe };
-
-export const _testExports = process.env.NODE_ENV === 'test' ? { isShortcutSafe } : {};

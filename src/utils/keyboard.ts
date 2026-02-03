@@ -190,10 +190,9 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
       if (allPressedKeysInShortcut && pressedDisplayNames.size === shortcutKeys.length) {
         shouldInclude = true;
       }
-      // 2. 修飾キーのみが一致（まだメインキーが押されていないショートカット候補）
+      // 2. 押されている修飾キーを含むショートカット候補
       else if (
           pressedModifiers.length > 0 &&
-          pressedModifiers.length === shortcutModifiers.length &&
           pressedModifiers.every((mod: string) => shortcutModifiers.includes(mod)) &&
           pressedDisplayNames.size < shortcutKeys.length
          ) {
