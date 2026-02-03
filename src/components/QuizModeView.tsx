@@ -28,6 +28,11 @@ const QuizModeView = () => {
 
   // 初回マウント時のみクイズを開始
   useEffect(() => {
+    // クイズがすでに開始されている場合はスキップ（Strict Modeでの重複実行を防ぐ）
+    if (quizState.status !== 'idle') {
+      return;
+    }
+
     const os = detectOS();
     if (os === 'macos' && openMacWarningModalRef.current) {
       openMacWarningModalRef.current();

@@ -118,3 +118,25 @@ export interface QuizResult {
 }
 
 export type QuizMode = 'standard' | 'speedrun' | 'practice';
+
+export interface UserQuizStats {
+  user_id: string;
+  application: string;
+  total_sessions: number;
+  total_correct: number;
+  total_questions: number;
+  overall_accuracy: number;
+  last_quiz_date: string;
+}
+
+export interface QuizSession {
+  id: number;
+  user_id: string;
+  application: string;
+  difficulty: ShortcutDifficulty | null;
+  score: number;
+  total_questions: number;
+  correct_answers: number;
+  started_at: string;
+  completed_at: string | null;
+}

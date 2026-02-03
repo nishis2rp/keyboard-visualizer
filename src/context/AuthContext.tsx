@@ -24,6 +24,7 @@ interface AuthContextType {
   signInWithOAuth: (provider: 'google', redirectTo?: string) => Promise<{ error: AuthError | null }>;
   updateEmail: (newEmail: string) => Promise<{ error: AuthError | null }>;
   updatePassword: (newPassword: string) => Promise<{ error: AuthError | null }>;
+  deleteAccount: () => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -297,6 +298,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return { error };
   };
 
+  // Delete user account
+  const deleteAccount = async () => {
+    if (!user) {
+      return { error: new Error('No user logged in') };
+    }
+
+    try {
+      // Delete user profile first
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .delete()
+        .eq('id', user.id);
+
+      if (profileError) {
+        console.error('Error deleting user profile:', profileError);
+        return { error: profileError };
+      }
+
+      // Delete auth user (this will cascade delete related data due to RLS)
+      const { error: authError } = await supabase.rpc('delete_user');
+
+      if (authError) {
+        console.error('Error deleting auth user:', authError);
+        return { error: authError };
+      }
+
+      // Sign out after deletion
+      await signOut();
+
+      return { error: null };
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      return { error: error as Error };
+    }
+  };
+
   const value = {
     user,
     profile,
@@ -310,6 +347,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signInWithOAuth,
     updateEmail,
     updatePassword,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

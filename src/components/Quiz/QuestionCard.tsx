@@ -10,12 +10,10 @@ function QuestionCard() {
   const { quizState, getNextQuestion } = useQuiz();
   const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer, lastWrongAnswer, currentSequentialProgress, pressedKeys, keyboardLayout } = quizState;
 
-  if (status !== 'playing' || !currentQuestion) {
-    return null;
-  }
-
-  // 代替ショートカット表示ロジックをuseMemoで抽出
+  // 代替ショートカット表示ロジックをuseMemoで抽出（Hooksは条件分岐の前に配置する必要がある）
   const alternativeShortcutsDisplay = useMemo(() => {
+    if (!currentQuestion) return null;
+
     const normalized = normalizeShortcut(currentQuestion.correctShortcut);
     const alternatives = getAlternativeShortcuts(normalized);
     const otherAlternatives = alternatives.filter(alt => alt !== normalized);
@@ -33,7 +31,11 @@ function QuestionCard() {
       );
     }
     return null;
-  }, [currentQuestion.correctShortcut]);
+  }, [currentQuestion]);
+
+  if (status !== 'playing' || !currentQuestion) {
+    return null;
+  }
 
   // タイマーの色クラスを時間に応じて変更
   const getTimerClass = () => {

@@ -10,12 +10,17 @@
     "test": "vitest --run",
     "db:migrate": "tsx scripts/migrate-supabase.ts",
     "db:generate-sql": "tsx scripts/generate-sql.ts",
-    "db:run-migration": "tsx scripts/run-migration.ts"
+    "db:run-migration": "tsx scripts/run-migration.ts",
+    "db:list-shortcuts": "tsx scripts/list-shortcuts.ts",
+    "db:update-sort-order": "tsx scripts/update-sort-order.ts",
+    "db:run-single-migration": "tsx scripts/run-single-migration.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",
+    "@types/react-router-dom": "^5.3.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.1",

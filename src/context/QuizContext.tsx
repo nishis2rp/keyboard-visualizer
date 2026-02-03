@@ -59,7 +59,8 @@ type QuizAction =
   | { type: 'FINISH_QUIZ' }
   | { type: 'NEXT_QUESTION' }
   | { type: 'UPDATE_PRESSED_KEYS'; payload: Set<string> } // ★ 追加
-  | { type: 'UPDATE_SEQUENTIAL_PROGRESS'; payload: string[] }; // ★ 追加: 順押し途中経過を更新
+  | { type: 'UPDATE_SEQUENTIAL_PROGRESS'; payload: string[] } // ★ 追加: 順押し途中経過を更新
+  | { type: 'CLEAR_USED_SHORTCUTS' }; // ★ 追加: 出題済みショートカットをクリア
 
 interface QuizContextType {
   quizState: QuizState;
@@ -227,6 +228,11 @@ function quizReducer(state: QuizState, action: QuizAction): QuizState {
         ...state,
         currentSequentialProgress: action.payload,
       };
+    case 'CLEAR_USED_SHORTCUTS': // ★ 追加: 出題済みショートカットをクリア
+      return {
+        ...state,
+        usedShortcuts: new Set(),
+      };
     default:
       return state;
   }
@@ -262,16 +268,25 @@ export function QuizProvider({ children }: QuizProviderProps) {
   }, [quizState.status, quizState.currentQuestion, quizState.showAnswer]);
 
   // getAndSetNextQuestion helper function
-  const getAndSetNextQuestion = useCallback((currentUsedShortcuts: Set<string>, quizMode: 'default' | 'hardcore') => {
-    if (!allShortcuts || !quizState.keyboardLayout) {
+  const getAndSetNextQuestion = useCallback((
+    currentUsedShortcuts: Set<string>,
+    quizMode: 'default' | 'hardcore',
+    keyboardLayout: string,
+    selectedApp: string | null,
+    isFullscreen: boolean,
+    difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange',
+    allowRetry = true
+  ) => {
+    if (!allShortcuts || !keyboardLayout) {
+      console.error('Cannot generate question: missing allShortcuts or keyboardLayout');
       dispatch({ type: 'FINISH_QUIZ' });
       return;
     }
 
-    let compatibleApps = getCompatibleApps(quizState.keyboardLayout);
+    let compatibleApps = getCompatibleApps(keyboardLayout);
 
-    if (quizState.selectedApp) {
-      const selectedApps = quizState.selectedApp.split(',').filter(a => a && a !== 'random');
+    if (selectedApp) {
+      const selectedApps = selectedApp.split(',').filter(a => a && a !== 'random');
       if (selectedApps.length > 0) {
         compatibleApps = compatibleApps.filter(a => selectedApps.includes(a));
       }
@@ -280,19 +295,27 @@ export function QuizProvider({ children }: QuizProviderProps) {
     const newQuestion = generateQuestion(
       allShortcuts,
       compatibleApps,
-      quizMode, // quizMode を渡す
-      quizState.settings.isFullscreen,
+      quizMode,
+      isFullscreen,
       currentUsedShortcuts,
-      quizState.settings.difficulty,
-      richShortcuts || [] // richShortcutsを渡す
+      difficulty,
+      richShortcuts || []
     );
 
     if (newQuestion) {
       dispatch({ type: 'SET_QUESTION', payload: { question: newQuestion } });
+    } else if (allowRetry && currentUsedShortcuts.size > 0) {
+      // 問題が生成できない場合、usedShortcuts をクリアして再試行
+      dispatch({ type: 'CLEAR_USED_SHORTCUTS' });
+      // 次のフレームで再試行（無限ループを避けるため）
+      setTimeout(() => {
+        getAndSetNextQuestion(new Set(), quizMode, keyboardLayout, selectedApp, isFullscreen, difficulty, false);
+      }, 0);
     } else {
+      console.error('Could not generate question even after clearing used shortcuts');
       dispatch({ type: 'FINISH_QUIZ' });
     }
-  }, [allShortcuts, quizState.keyboardLayout, quizState.selectedApp, quizState.settings.quizMode, quizState.settings.isFullscreen, quizState.settings.difficulty]);
+  }, [allShortcuts, richShortcuts]);
 
 
   const handleKeyPress = useCallback((pressedKeys: Set<string>) => {
@@ -305,8 +328,15 @@ export function QuizProvider({ children }: QuizProviderProps) {
       return;
     }
     dispatch({ type: 'NEXT_QUESTION' });
-    getAndSetNextQuestion(quizState.usedShortcuts, quizState.settings.quizMode);
-  }, [quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts, quizState.settings.quizMode, getAndSetNextQuestion]);
+    getAndSetNextQuestion(
+      quizState.usedShortcuts,
+      quizState.settings.quizMode,
+      quizState.keyboardLayout!,
+      quizState.selectedApp,
+      quizState.settings.isFullscreen,
+      quizState.settings.difficulty
+    );
+  }, [quizState.quizHistory.length, quizState.settings.totalQuestions, quizState.usedShortcuts, quizState.settings.quizMode, quizState.keyboardLayout, quizState.selectedApp, quizState.settings.isFullscreen, quizState.settings.difficulty, getAndSetNextQuestion]);
 
   const startQuiz = useCallback(async (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard') => {
     if (!allShortcuts) {
@@ -314,18 +344,23 @@ export function QuizProvider({ children }: QuizProviderProps) {
       return;
     }
     dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
-    getAndSetNextQuestion(new Set(), 'default'); // クイズ開始時は新しいセットとデフォルトモード
 
     // Start quiz session in database if user is logged in
     await startQuizSession(app, difficulty);
+
+    // クイズ開始時は新しいセットとデフォルトモードで1問目を生成
+    // 次のフレームで実行して、START_QUIZ が完了してから実行されるようにする
+    setTimeout(() => {
+      getAndSetNextQuestion(new Set(), 'default', keyboardLayout, app, isFullscreen, difficulty, true);
+    }, 0);
   }, [allShortcuts, getAndSetNextQuestion, startQuizSession]);
 
-  // ★ クイズ開始時に最初の問題を取得する (useEffect を変更)
-  useEffect(() => {
-    if (quizState.status === 'playing' && !quizState.currentQuestion) {
-      getAndSetNextQuestion(new Set(), quizState.settings.quizMode); // quizMode を渡す
-    }
-  }, [quizState.status, quizState.currentQuestion, quizState.settings.quizMode, getAndSetNextQuestion]);
+  // ★ このuseEffectは削除（startQuiz内で問題を生成するため、重複を避ける）
+  // useEffect(() => {
+  //   if (quizState.status === 'playing' && !quizState.currentQuestion) {
+  //     getAndSetNextQuestion(new Set(), quizState.settings.quizMode);
+  //   }
+  // }, [quizState.status, quizState.currentQuestion, quizState.settings.quizMode, getAndSetNextQuestion]);
   const updateFullscreen = useCallback((isFullscreen: boolean) => {
     dispatch({ type: 'UPDATE_FULLSCREEN', payload: { isFullscreen } });
     if (quizState.status === 'playing' && quizState.currentQuestion) {

@@ -227,13 +227,19 @@ export const generateQuestion = (
       const lookupKey = `${appId}:${shortcut}`;
       const richShortcut = protectionLevelMap.get(lookupKey);
 
-      // ウィンドウモードの場合、preventable_fullscreenのショートカットを除外
-      if (!isFullscreen && richShortcut) {
+      // システム保護されたショートカットを除外
+      if (richShortcut) {
         const protectionLevel = currentOS === 'macos'
           ? richShortcut.macos_protection_level
           : richShortcut.windows_protection_level;
 
-        if (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable') {
+        // always-protected は常に除外（フルスクリーンモードでも操作不可のため）
+        if (protectionLevel === 'always-protected') {
+          return;
+        }
+
+        // ウィンドウモードの場合、preventable_fullscreen も除外
+        if (!isFullscreen && (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable')) {
           return;
         }
       }

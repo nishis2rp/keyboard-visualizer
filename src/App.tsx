@@ -1,35 +1,28 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import AppHeader from './components/AppHeader';
 import SetupScreen from './components/SetupScreen';
 import NormalModeView from './components/NormalModeView';
 import QuizModeView from './components/QuizModeView';
+import MyPage from './pages/MyPage';
+import PasswordReset from './pages/PasswordReset'; // Import PasswordReset
 import { useAppContext } from './context/AppContext';
 import { useFullscreen } from './hooks';
 import './styles/global.css';
 
-function App() {
+const HomeView: React.FC = () => {
   const {
     showSetup,
-    setShowSetup,
     handleSetupComplete,
     isQuizMode,
     setIsQuizMode,
     loading,
-    error
+    error,
+    setShowSetup
   } = useAppContext();
 
   const { isFullscreenMode, toggleFullscreenMode } = useFullscreen();
 
-  const handleQuizModeToggle = () => {
-    if (!isQuizMode) {
-      // Visualizerモード → Quizモードへの切り替え時は、セットアップ画面を表示
-      setIsQuizMode(true);
-      setShowSetup(true);
-    } else {
-      // Quizモード → Visualizerモードへの切り替え
-      setIsQuizMode(false);
-    }
-  };
 
   const handleSetupCompleteWithFullscreen = (
     app: string,
@@ -49,6 +42,7 @@ function App() {
     // 元のhandleSetupCompleteを呼び出す
     handleSetupComplete(app, layout, mode, quizApp, difficulty, shouldBeFullscreen);
   };
+
 
   // ローディング中の表示
   if (loading) {
@@ -81,6 +75,25 @@ function App() {
     return <SetupScreen onSetupComplete={handleSetupCompleteWithFullscreen} />;
   }
 
+  return isQuizMode ? <QuizModeView /> : <NormalModeView />;
+}
+
+
+function App() {
+  const { isQuizMode, setIsQuizMode, setShowSetup } = useAppContext();
+  const { isFullscreenMode, toggleFullscreenMode } = useFullscreen();
+
+  const handleQuizModeToggle = () => {
+    if (!isQuizMode) {
+      // Visualizerモード → Quizモードへの切り替え時は、セットアップ画面を表示
+      setIsQuizMode(true);
+      setShowSetup(true);
+    } else {
+      // Quizモード → Visualizerモードへの切り替え
+      setIsQuizMode(false);
+    }
+  };
+
   return (
     <div className="container">
       <AppHeader
@@ -89,7 +102,11 @@ function App() {
         isQuizMode={isQuizMode}
         onQuizModeToggle={handleQuizModeToggle}
       />
-      {isQuizMode ? <QuizModeView /> : <NormalModeView />}
+      <Routes>
+        <Route path="/" element={<HomeView />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/password-reset" element={<PasswordReset />} />
+      </Routes>
     </div>
   );
 }
