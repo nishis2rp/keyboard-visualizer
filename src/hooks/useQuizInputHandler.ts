@@ -59,12 +59,6 @@ export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion }: Us
     const userAnswer = normalizePressedKeys(pressedKeys, keyboardLayout);
     const isCorrect = checkAnswer(userAnswer, currentQuestion.normalizedCorrectShortcut);
 
-    // デバッグログ
-    console.log('[Quiz Debug] User answer:', userAnswer);
-    console.log('[Quiz Debug] Correct answer:', currentQuestion.normalizedCorrectShortcut);
-    console.log('[Quiz Debug] Is correct:', isCorrect);
-    console.log('[Quiz Debug] Pressed codes:', Array.from(pressedKeys));
-
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
     previousPressedKeysRef.current = new Set();
   }, [quizState.currentQuestion, quizState.keyboardLayout, quizState.questionStartTime, dispatch]); // dispatchを依存配列に追加
@@ -93,7 +87,8 @@ export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion }: Us
         const hasWindowsKeyReleased = releasedKeys.some((key: string) => isWindowsKey(key));
 
         // Winキー単独でリリースされた場合の特別処理
-        if (hasWindowsKeyReleased && previousKeys.size === 1 && !hasNonModifierReleased) {
+        // ただし、他のキーがまだ押されている場合は組み合わせショートカットなので判定しない
+        if (hasWindowsKeyReleased && previousKeys.size === 1 && !hasNonModifierReleased && currentKeys.size === 0) {
           handleStandardShortcut(previousKeys);
           return;
         }
