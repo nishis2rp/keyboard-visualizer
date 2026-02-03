@@ -2,7 +2,7 @@
 
 **アプリケーション別のキーボードショートカットをリアルタイムで視覚的に表示し、クイズで学習できるWebアプリケーション**
 
-バックエンドに **Supabase (PostgreSQL)** を使用し、1,146個以上のショートカットデータを動的に管理・提供しています。
+バックエンドに **Supabase (PostgreSQL)** を使用し、1,000個以上のショートカットデータを動的に管理・提供しています。
 
 [![GitHub Pages](https://img.shields.io/badge/demo-live-success)](https://nishis2rp.github.io/keyboard-visualizer/)
 [![React](https://img.shields.io/badge/React-18.3.1-blue)](https://react.dev/)
@@ -44,23 +44,25 @@
 
 ### 🎯 対応アプリケーション (データはバックエンドサービスから動的に取得)
 
-**総ショートカット数: 1,146個**
+**総ショートカット数: 1,000個**
 
 | アプリ | ショートカット数 | 難易度分布 | 特徴 |
 |--------|-----------------|-----------|------|
 | **macOS** | 290 | Basic, Standard, Hard | macOS固有のショートカット（Cmd+Space、Mission Controlなど） |
-| **VS Code** | 279 | Basic~Madmax | 開発エディタ - 全難易度対応、編集、ナビゲーション、デバッグ、Git操作 |
 | **Excel** | 179 | Basic, Standard, Hard | スプレッドシート操作（ピボット、マクロ、VBAなど高度な機能含む） |
-| **Windows 11** | 151 | Basic, Standard, Hard | システムレベルショートカット（Win+X、仮想デスクトップなど） |
-| **Chrome** | 91 | Basic, Standard, Hard | ブラウザショートカット（デベロッパーツール含む） |
-| **Gmail** | 82 | Basic, Standard, Hard | メール操作（フィルタ、高度な検索など） |
-| **Slack** | 74 | Basic, Standard, Hard | チャットアプリ（ワークスペース管理含む） |
+| **Windows 11** | 139 | Basic, Standard, Hard | システムレベルショートカット（Win+X、仮想デスクトップなど） |
+| **Word** | 91 | Basic, Standard, Hard | ドキュメント編集（書式設定、レビュー、マクロなど） |
+| **Chrome** | 87 | Basic, Standard, Hard | ブラウザショートカット（デベロッパーツール含む） |
+| **VS Code** | 80 | Basic~Madmax | 開発エディタ - 全難易度対応、編集、ナビゲーション、デバッグ、Git操作 |
+| **PowerPoint** | 72 | Basic, Standard, Hard | プレゼンテーション編集（スライド操作、アニメーション、発表者モードなど） |
+| **Slack** | 46 | Basic, Standard, Hard | チャットアプリ（ワークスペース管理含む） |
+| **Gmail** | 16 | Basic, Standard, Hard | メール操作（フィルタ、高度な検索など） |
 
 **難易度分布（全体）:**
-- 🌟 Basic: 約200個 (20-25%) - 日常的に使う基本操作
-- ⚡ Standard: 約600個 (50-60%) - 標準的なショートカット
-- 🔥 Hard: 約200個 (20-25%) - 高度な機能・専門的な操作
-- 💀 Madmax: 64個 (5-6%) - VS Code専用、最上級者向け
+- 🌟 Basic: 130個 (13%) - 日常的に使う基本操作
+- ⚡ Standard: 779個 (78%) - 標準的なショートカット
+- 🔥 Hard: 79個 (8%) - 高度な機能・専門的な操作
+- 💀 Madmax: 10個 (1%) - 最上級者向け
 
 ### ⌨️ キーボード配列対応
 
@@ -203,7 +205,7 @@ npm run deploy
    - **表示モード**: 全画面モード or ウィンドウモード を選択
    - **キーボードレイアウト**: Windows JIS / Mac JIS / Mac US から選択
    - **モード**: ビジュアライザーモード を選択
-   - **アプリケーション**: Windows 11 / macOS / Chrome / VS Code / Excel / Slack / Gmail から選択
+   - **アプリケーション**: Windows 11 / macOS / Chrome / VS Code / Excel / Word / PowerPoint / Slack / Gmail から選択
 
 2. **キーを押す**
    - キーを押すと画面にリアルタイムで表示
@@ -232,7 +234,7 @@ npm run deploy
      - 🎲 All Range - 全難易度からランダム
    - **アプリケーション**: 学習したいアプリケーションを選択
      - 🎲 ランダム - すべてのアプリからランダムに出題
-     - 個別アプリ - 特定のアプリのショートカットを集中学習（Windows 11 / macOS / Chrome / VS Code / Excel / Slack / Gmail）
+     - 個別アプリ - 特定のアプリのショートカットを集中学習（Windows 11 / macOS / Chrome / VS Code / Excel / Word / PowerPoint / Slack / Gmail）
 
 3. **クイズに回答**
    - 画面に表示される問題文を読む
@@ -258,7 +260,7 @@ npm run deploy
 - **Supabase (PostgreSQL)** - バックエンドサービス
   - PostgreSQLデータベースによるショートカットデータの一元管理
   - リアルタイムデータ取得とマイグレーション管理
-  - 1,146個以上のショートカット、保護レベル、難易度情報を管理
+  - 1,000個以上のショートカット、保護レベル、難易度情報を管理
   - Supabase Auth - ユーザー認証とセッション管理
   - Row-Level Security (RLS) - データベースレベルのセキュリティ
 - **Docker** - コンテナ化された開発環境
