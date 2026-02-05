@@ -1,22 +1,15 @@
-// scripts/run-protection-fix.ts
-import 'dotenv/config';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { Client } from 'pg';
+import { withDatabase } from './lib/db';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-});
-
 async function main() {
   console.log('Running protection level fixes...');
 
-  try {
-    await client.connect();
+  await withDatabase(async (client) => {
     console.log('✓ Connected to Supabase PostgreSQL\n');
 
     console.log('Running migration: 024_fix_protection_levels.sql');
@@ -54,12 +47,7 @@ async function main() {
     });
 
     console.log('\n✓ Migration completed successfully!');
-  } catch (error) {
-    console.error('Migration failed:', error);
-    throw error;
-  } finally {
-    await client.end();
-  }
+  });
 }
 
 main().catch(err => {

@@ -1,20 +1,7 @@
-import * as dotenv from 'dotenv';
-import pg from 'pg';
+import { withDatabase } from './lib/db';
 
-dotenv.config({ path: '.env' });
-
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-  console.error('❌ DATABASE_URL not found in .env');
-  process.exit(1);
-}
-
-async function checkProtectionLevels() {
-  const client = new pg.Client({ connectionString });
-
-  try {
-    await client.connect();
+async function main() {
+  await withDatabase(async (client) => {
     console.log('✓ Connected to database\n');
 
     // Chromeの主要なショートカットの保護レベルを確認
@@ -54,13 +41,11 @@ async function checkProtectionLevels() {
         console.log(`✗ ${key.padEnd(25)} | NOT FOUND IN DATABASE`);
       }
     }
-
-    await client.end();
-  } catch (err) {
-    console.error('❌ Error:', err);
-    await client.end();
-    process.exit(1);
-  }
+  });
 }
 
-checkProtectionLevels();
+main().catch(err => {
+  console.error('Script failed:', err);
+  process.exit(1);
+});
+

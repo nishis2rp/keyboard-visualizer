@@ -1,14 +1,7 @@
-// scripts/check-pageup-shortcuts.ts
-import 'dotenv/config';
-import { Client } from 'pg';
-
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-});
+import { withDatabase } from './lib/db';
 
 async function main() {
-  try {
-    await client.connect();
+  await withDatabase(async (client) => {
     console.log('✓ Connected to database\n');
 
     // Check all variations of PageUp
@@ -33,12 +26,11 @@ async function main() {
         console.log(`\n"${variation}": Not found`);
       }
     }
-  } catch (error) {
-    console.error('Error:', error);
-    throw error;
-  } finally {
-    await client.end();
-  }
+  });
 }
 
-main();
+main().catch(error => {
+  console.error('Error:', error);
+  process.exit(1);
+});
+

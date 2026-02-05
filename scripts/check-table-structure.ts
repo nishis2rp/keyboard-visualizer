@@ -1,20 +1,7 @@
-import * as dotenv from 'dotenv';
-import pg from 'pg';
+import { withDatabase } from './lib/db';
 
-dotenv.config({ path: '.env' });
-
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-  console.error('❌ DATABASE_URL not found in .env');
-  process.exit(1);
-}
-
-async function checkTableStructure() {
-  const client = new pg.Client({ connectionString });
-
-  try {
-    await client.connect();
+async function main() {
+  await withDatabase(async (client) => {
     console.log('✓ Connected to database\n');
 
     // テーブル構造を確認
@@ -34,13 +21,10 @@ async function checkTableStructure() {
     const sample = await client.query('SELECT * FROM shortcuts LIMIT 3');
     console.log('\nSample data:');
     console.log(sample.rows);
-
-    await client.end();
-  } catch (err) {
-    console.error('❌ Error:', err);
-    await client.end();
-    process.exit(1);
-  }
+  });
 }
 
-checkTableStructure();
+main().catch(err => {
+  console.error('Error:', err);
+  process.exit(1);
+});

@@ -1,23 +1,15 @@
-// scripts/run-auth-migration.ts
-import 'dotenv/config';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { Client } from 'pg';
+import { withDatabase } from './lib/db';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
-
 async function main() {
   console.log('Starting authentication tables migration...');
 
-  try {
-    await client.connect();
+  await withDatabase(async (client) => {
     console.log('✓ Connected to Supabase PostgreSQL\n');
 
     // Run authentication tables migration
@@ -30,12 +22,7 @@ async function main() {
     console.log('✓ User authentication tables created\n');
 
     console.log('✓ Authentication migration completed successfully!');
-  } catch (error) {
-    console.error('Migration failed:', error);
-    throw error;
-  } finally {
-    await client.end();
-  }
+  });
 }
 
 main().catch(err => {

@@ -1,21 +1,7 @@
-import * as dotenv from 'dotenv';
-import pg from 'pg';
-
-dotenv.config({ path: '.env' });
-
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-  console.error('❌ DATABASE_URL not found in .env');
-  process.exit(1);
-}
+import { withDatabase } from './lib/db';
 
 async function findShortcut(searchKey: string) {
-  const client = new pg.Client({ connectionString });
-
-  try {
-    await client.connect();
-
+  await withDatabase(async (client) => {
     const result = await client.query(
       'SELECT application, keys, description, windows_protection_level, macos_protection_level FROM shortcuts WHERE keys = $1',
       [searchKey]
@@ -34,13 +20,7 @@ async function findShortcut(searchKey: string) {
     } else {
       console.log(`❌ No shortcuts found for "${searchKey}"\n`);
     }
-
-    await client.end();
-  } catch (err) {
-    console.error('❌ Error:', err);
-    await client.end();
-    process.exit(1);
-  }
+  });
 }
 
 const searchKey = process.argv[2];
@@ -49,4 +29,7 @@ if (!searchKey) {
   process.exit(1);
 }
 
-findShortcut(searchKey);
+findShortcut(searchKey).catch(err => {
+  console.error('Error:', err);
+  process.exit(1);
+});

@@ -1,20 +1,14 @@
-// scripts/migrate-supabase.ts
-import 'dotenv/config';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { withDatabase } from './lib/db';
 import { Client } from 'pg';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const shortcutsDir = path.join(__dirname, '../src/data/shortcuts');
 
-// Supabase PostgreSQL connection
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-});
-
-async function createTable() {
+async function createTable(client: Client) {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS shortcuts (
       id BIGSERIAL PRIMARY KEY,
@@ -34,7 +28,7 @@ async function createTable() {
   console.log('Table "shortcuts" created or already exists.');
 }
 
-async function insertShortcut(application: string, keys: string, description: string) {
+async function insertShortcut(client: Client, application: string, keys: string, description: string) {
   const insertQuery = `
     INSERT INTO shortcuts (application, keys, description, category)
     VALUES ($1, $2, $3, $4)
@@ -45,14 +39,13 @@ async function insertShortcut(application: string, keys: string, description: st
   await client.query(insertQuery, [application, keys, description, null]);
 }
 
-async function migrate() {
+async function main() {
   console.log('Starting Supabase migration...');
 
-  try {
-    await client.connect();
+  await withDatabase(async (client) => {
     console.log('Connected to Supabase PostgreSQL');
 
-    await createTable();
+    await createTable(client);
 
     const files = await fs.readdir(shortcutsDir);
     const tsFiles = files.filter(file => file.endsWith('.ts') && file !== 'index.ts');
@@ -68,21 +61,16 @@ async function migrate() {
       const shortcuts: Record<string, string> = (new Function(`return ${shortcutsObjectString}`))();
 
       for (const [keys, description] of Object.entries(shortcuts)) {
-        await insertShortcut(application, keys, description);
+        await insertShortcut(client, application, keys, description);
       }
       console.log(`Finished processing ${application}.`);
     }
 
     console.log('Migration completed successfully!');
-  } catch (error) {
-    console.error('Migration failed:', error);
-    throw error;
-  } finally {
-    await client.end();
-  }
+  });
 }
 
-migrate().catch(err => {
+main().catch(err => {
   console.error('Migration failed:', err);
   process.exit(1);
 });
