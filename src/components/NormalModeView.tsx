@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import AppSelector from './AppSelector';
 import KeyboardLayoutSelector from './KeyboardLayoutSelector';
+import DifficultyFilter from './DifficultyFilter';
 import KeyboardLayout from './KeyboardLayout';
 import KeyDisplay from './KeyDisplay';
 import { useKeyboardShortcuts } from '../hooks';
 import { useAppContext } from '../context/AppContext';
 import { specialKeys } from '../constants/keys';
+import { ShortcutDifficulty } from '../types';
 
 const NormalModeView = () => {
   const {
@@ -19,14 +21,43 @@ const NormalModeView = () => {
     richShortcuts, // ★ richShortcutsを取得
   } = useAppContext();
 
+  // 難易度フィルターの状態管理（デフォルトは全て選択）
+  const [selectedDifficulties, setSelectedDifficulties] = useState<Set<ShortcutDifficulty>>(
+    new Set<ShortcutDifficulty>(['basic', 'standard', 'hard', 'madmax'])
+  );
+
+  // 難易度の選択/解除をトグル
+  const handleToggleDifficulty = useCallback((difficulty: ShortcutDifficulty) => {
+    setSelectedDifficulties((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(difficulty)) {
+        newSet.delete(difficulty);
+      } else {
+        newSet.add(difficulty);
+      }
+      return newSet;
+    });
+  }, []);
+
   // richShortcuts が null の場合は空の配列を渡す
   const currentRichShortcuts = richShortcuts || [];
+
+  // 難易度でフィルタリングされたショートカット
+  const filteredShortcuts = useMemo(() => {
+    if (selectedDifficulties.size === 0) {
+      // 何も選択されていない場合は全て表示
+      return currentRichShortcuts;
+    }
+    return currentRichShortcuts.filter((shortcut) =>
+      selectedDifficulties.has(shortcut.difficulty as ShortcutDifficulty)
+    );
+  }, [currentRichShortcuts, selectedDifficulties]);
 
   const {
     pressedKeys,
     currentDescription,
     availableShortcuts,
-  } = useKeyboardShortcuts(currentRichShortcuts, keyboardLayout, selectedApp, shortcutDescriptions, false);
+  } = useKeyboardShortcuts(filteredShortcuts, keyboardLayout, selectedApp, shortcutDescriptions, false);
 
   return (
     <>
@@ -48,13 +79,17 @@ const NormalModeView = () => {
         shortcutDescriptions={shortcutDescriptions}
         keyboardLayout={keyboardLayout}
       />
+      <DifficultyFilter
+        selectedDifficulties={selectedDifficulties}
+        onToggleDifficulty={handleToggleDifficulty}
+      />
       <KeyDisplay
         pressedKeys={pressedKeys}
         specialKeys={specialKeys}
         description={currentDescription}
         availableShortcuts={availableShortcuts}
         selectedApp={selectedApp}
-        richShortcuts={currentRichShortcuts}
+        richShortcuts={filteredShortcuts}
         keyboardLayout={keyboardLayout}
       />
     </>

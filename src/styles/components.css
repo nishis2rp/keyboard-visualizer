@@ -378,7 +378,7 @@
 
 .shortcut-combo {
   font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
+  color: #000000;
   font-size: var(--font-size-base);
   margin-bottom: 6px;
   letter-spacing: -0.2px;
@@ -389,7 +389,7 @@
 
 .shortcut-desc {
   font-size: var(--font-size-xs);
-  color: var(--text-secondary);
+  color: #000000;
   line-height: var(--line-height-snug);
   position: relative;
   z-index: 1;

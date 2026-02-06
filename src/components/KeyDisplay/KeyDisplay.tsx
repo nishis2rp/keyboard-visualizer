@@ -79,15 +79,15 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
               <div style={{ display: 'flex', gap: '12px', fontSize: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '14px' }}>▶</span>
-                  <span style={{ color: '#FF9500' }}>順押し</span>
+                  <span style={{ color: '#000000' }}>順押し</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '14px' }}>🔵</span>
-                  <span style={{ color: '#007AFF' }}>全画面表示で防げる</span>
+                  <span style={{ color: '#000000' }}>全画面表示で防げる</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '14px' }}>🔒</span>
-                  <span style={{ color: '#FF3B30' }}>システム保護</span>
+                  <span style={{ color: '#000000' }}>システム保護</span>
                 </div>
               </div>
             </div>
@@ -169,15 +169,15 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
             <div style={{ display: 'flex', gap: '12px', fontSize: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span style={{ fontSize: '14px' }}>▶</span>
-                <span style={{ color: '#FF9500' }}>順押し</span>
+                <span style={{ color: '#000000' }}>順押し</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span style={{ fontSize: '14px' }}>🔵</span>
-                <span style={{ color: '#007AFF' }}>全画面表示で防げる</span>
+                <span style={{ color: '#000000' }}>全画面表示で防げる</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span style={{ fontSize: '14px' }}>🔒</span>
-                <span style={{ color: '#FF3B30' }}>システム保護</span>
+                <span style={{ color: '#000000' }}>システム保護</span>
               </div>
             </div>
           </div>

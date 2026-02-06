@@ -191,11 +191,11 @@
 }
 
 .shortcut-card.always-protected .shortcut-combo {
-  color: #FF3B30;
+  color: #000000;
 }
 
 .shortcut-card.always-protected .shortcut-desc {
-  color: #E62E24;
+  color: #000000;
 }
 
 .shortcut-card.preventable-fullscreen {
@@ -204,11 +204,11 @@
 }
 
 .shortcut-card.preventable-fullscreen .shortcut-combo {
-  color: #0078D4;
+  color: #000000;
 }
 
 .shortcut-card.preventable-fullscreen .shortcut-desc {
-  color: #0078D4;
+  color: #000000;
 }
 
 .keyboard-key.spacer {

@@ -1,0 +1,133 @@
+/* DifficultyFilter Component Styles - Compact Version */
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 10px auto;
+  max-width: 600px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title {
+  font-size: 0.8em;
+  font-weight: normal;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.selectAllButton {
+  padding: 4px 10px;
+  font-size: 0.7em;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.selectAllButton:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.optionsGrid {
+  display: flex;
+  gap: 6px;
+}
+
+.option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  width: 95px;
+  flex-shrink: 0;
+}
+
+.option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.option.selected {
+  background: rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.5);
+  box-shadow: 0 0 8px rgba(0, 122, 255, 0.2);
+}
+
+.checkbox {
+  display: none;
+}
+
+.icon {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.name {
+  font-size: 0.7em;
+  font-weight: normal;
+  color: #000000;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.warning {
+  padding: 5px 10px;
+  background: rgba(255, 149, 0, 0.15);
+  border: 1px solid rgba(255, 149, 0, 0.4);
+  border-radius: 4px;
+  color: #000000;
+  font-size: 0.7em;
+  text-align: center;
+  white-space: nowrap;
+  font-weight: normal;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .container {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+
+  .optionsGrid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .option {
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .optionsGrid {
+    grid-template-columns: 1fr;
+  }
+}
