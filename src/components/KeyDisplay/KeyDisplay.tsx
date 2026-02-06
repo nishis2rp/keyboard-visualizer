@@ -121,6 +121,19 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
   // 完全なショートカットが押されている場合（説明がある）
   // ただし、修飾キーのみの場合は、利用可能なショートカット一覧も表示
   if (description && (!isOnlyModifierKeys || availableShortcuts.length === 0)) {
+    // 現在押されているショートカットの難易度を取得
+    const currentShortcut = availableShortcuts.find(s => s.description === description);
+    const difficulty = currentShortcut?.difficulty || 'basic';
+
+    // 難易度ラベルと色の設定
+    const difficultyConfig = {
+      basic: { label: '基礎', color: '#4CAF50' },
+      standard: { label: '標準', color: '#2196F3' },
+      hard: { label: '上級', color: '#FF9800' },
+      madmax: { label: '最上級', color: '#F44336' }
+    };
+    const config = difficultyConfig[difficulty as keyof typeof difficultyConfig] || difficultyConfig.basic;
+
     return (
       <div className="display-area active">
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
@@ -136,6 +149,17 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
           </div>
           <div className="shortcut-description-inline">
             <span className="description-icon">💡</span> {description}
+          </div>
+          <div style={{
+            padding: '4px 10px',
+            borderRadius: '12px',
+            backgroundColor: config.color,
+            color: 'white',
+            fontSize: '13px',
+            fontWeight: '600',
+            whiteSpace: 'nowrap'
+          }}>
+            {config.label}
           </div>
         </div>
       </div>
