@@ -25,15 +25,15 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
     }
     switch (difficulty) {
       case 'basic':
-        return 'basic';
+        return '🌟 basic';
       case 'standard':
-        return 'standard';
+        return '⚡ standard';
       case 'hard':
-        return 'hard';
+        return '🔥 hard';
       case 'madmax':
-        return 'madmax';
+        return '💀 madmax';
       case 'allrange':
-        return 'allrange';
+        return '🎯 allrange';
       default:
         return '';
     }
@@ -168,10 +168,10 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
           bottom: '6px',
           right: '8px',
           fontSize: '0.65em',
-          color: '#888',
+          color: '#000000',
           padding: '2px 6px',
           borderRadius: '4px',
-          backgroundColor: 'rgba(136, 136, 136, 0.1)',
+          backgroundColor: '#E0E0E0',
           whiteSpace: 'nowrap',
           fontWeight: '500'
         }}>
