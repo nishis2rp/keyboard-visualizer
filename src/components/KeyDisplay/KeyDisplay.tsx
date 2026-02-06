@@ -52,6 +52,15 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
     // すべてのアプリケーションで単独キーショートカットを表示
     const singleKeyShortcuts = getSingleKeyShortcuts(richShortcuts, selectedApp || '')
 
+    // デバッグログ
+    console.log('[KeyDisplay] pressedKeys.size === 0');
+    console.log('[KeyDisplay] richShortcuts.length:', richShortcuts.length);
+    console.log('[KeyDisplay] selectedApp:', selectedApp);
+    console.log('[KeyDisplay] singleKeyShortcuts.length:', singleKeyShortcuts.length);
+    if (selectedApp === 'gmail') {
+      console.log('[KeyDisplay] Gmail single-key shortcuts (first 5):', singleKeyShortcuts.slice(0, 5).map(s => s.shortcut));
+    }
+
     if (singleKeyShortcuts.length > 0) {
       return (
         <div className="display-area active" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
@@ -92,6 +101,8 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
                   showDebugLog={true} // デバッグ用
                   windows_protection_level={item.windows_protection_level}
                   macos_protection_level={item.macos_protection_level}
+                  difficulty={item.difficulty}
+                  press_type={item.press_type} // ★ 追加
                 />
               ))}
             </div>
@@ -178,10 +189,11 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
                 description={item.description}
                 appContext={selectedApp}
                 showDebugLog={true} // デバッグ用
-                windows_protection_level={item.windows_protection_level}
-                macos_protection_level={item.macos_protection_level}
-              />
-            ))}
+                                  windows_protection_level={item.windows_protection_level}
+                                  macos_protection_level={item.macos_protection_level}
+                                  difficulty={item.difficulty}
+                                  press_type={item.press_type} // ★ 追加
+                                />            ))}
           </div>
         </div>
       )}

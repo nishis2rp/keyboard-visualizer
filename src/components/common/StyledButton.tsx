@@ -2,7 +2,7 @@ import { useState, CSSProperties } from 'react';
 
 interface StyledButtonProps {
   onClick: () => void;
-  backgroundColor: string;
+  backgroundColor?: string;
   hoverBackgroundColor?: string;
   borderColor?: string;
   padding?: string;

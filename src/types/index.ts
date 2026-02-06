@@ -56,7 +56,8 @@ export interface RichShortcut {
   windows_keys?: string | null;
   macos_keys?: string | null;
   windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
-  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';   // ★ 追加
+  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
+  press_type: 'sequential' | 'simultaneous'; // 追加
 }
 
 export interface AvailableShortcut extends RichShortcut {
@@ -98,7 +99,7 @@ export interface QuizQuestion {
   normalizedCorrectShortcut: string;
   appId: string;
   appName: string;
-  isSequential?: boolean; // 順序押しショートカットかどうか
+  press_type: 'sequential' | 'simultaneous'; // 追加
 }
 
 export interface QuizStats {

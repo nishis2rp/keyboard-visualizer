@@ -27,13 +27,25 @@ export function useShortcuts(): UseShortcutsReturn {
       setLoading(true);
       setError(null);
 
+      // Supabaseのデフォルトは1000件制限なので、.limit()を明示的に指定
       const { data, error: supabaseError } = await supabase
         .from('shortcuts')
-        .select('*');
+        .select('*')
+        .limit(15000); // 最大15000件取得
 
       if (supabaseError) {
         throw new Error(`Failed to fetch shortcuts: ${supabaseError.message}`);
       }
+
+      console.log('[useShortcuts] Total shortcuts fetched from DB:', data?.length);
+      console.log('[useShortcuts] Expected: 1307, Got:', data?.length);
+
+      // Count by application
+      const countByApp = data?.reduce((acc: any, item: any) => {
+        acc[item.application] = (acc[item.application] || 0) + 1;
+        return acc;
+      }, {});
+      console.log('[useShortcuts] Shortcuts by app:', countByApp);
 
       // Supabaseレスポンスを AllShortcuts の形式に変換
       const shortcutsMap: AllShortcuts = {};
@@ -60,6 +72,7 @@ export function useShortcuts(): UseShortcutsReturn {
           macos_keys: item.macos_keys,
           windows_protection_level: item.windows_protection_level,
           macos_protection_level: item.macos_protection_level,
+          press_type: item.press_type, // ★ 追加
         };
         richShortcutsArray.push(richShortcut);
 

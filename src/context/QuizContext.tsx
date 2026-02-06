@@ -1,7 +1,7 @@
 import React, { createContext, useReducer, useContext, useCallback, ReactNode, Dispatch, useRef, useEffect } from 'react';
 import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps, normalizeShortcut, isShortcutSafe } from '../utils/quizEngine';
 import { isModifierKey, isWindowsKey } from '../utils/keyUtils';
-import { isSequentialShortcut, SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts'; // Updated import
+import { SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts';
 import { useAppContext } from './AppContext';
 import { useQuizInputHandler } from '../hooks/useQuizInputHandler'; // 追加
 import { useQuizProgress } from '../hooks/useQuizProgress'; // 追加
@@ -25,7 +25,7 @@ interface QuizHistoryEntry {
   speedCategory?: 'fast' | 'normal' | 'slow';
 }
 
-interface QuizState {
+export interface QuizState {
   status: 'idle' | 'playing' | 'paused' | 'finished';
   selectedApp: string | null;
   keyboardLayout: string | null;
@@ -45,7 +45,7 @@ interface QuizState {
   currentSequentialProgress: string[]; // ★ 追加: 順押しショートカットの途中経過
 }
 
-type QuizAction =
+export type QuizAction =
   | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' } }
   | { type: 'SET_QUESTION'; payload: { question: QuizQuestion } }
   | { type: 'ANSWER_QUESTION'; payload: { userAnswer: string; isCorrect: boolean; answerTimeMs: number } }

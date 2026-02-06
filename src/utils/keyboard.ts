@@ -306,14 +306,35 @@ const getKeyboardLayoutIndex = (key: string): number => {
 export const getSingleKeyShortcuts = (richShortcuts: RichShortcut[], selectedApp: string): AvailableShortcut[] => {
   const os = detectOS();
 
-  return richShortcuts
-    .filter(item => item.application === selectedApp) // 選択されたアプリのショートカットのみをフィルタ
-    .filter(item => {
+  const appShortcuts = richShortcuts.filter(item => item.application === selectedApp);
+  console.log(`[getSingleKeyShortcuts] Total shortcuts for ${selectedApp}:`, appShortcuts.length);
+
+  // Gmail特定のデバッグ
+  if (selectedApp === 'gmail') {
+    const allGmailKeys = appShortcuts.map(s => s.keys).sort();
+    console.log('[getSingleKeyShortcuts] All Gmail keys:', allGmailKeys);
+    console.log('[getSingleKeyShortcuts] Has key "a"?', allGmailKeys.includes('a'));
+    console.log('[getSingleKeyShortcuts] Has key "e"?', allGmailKeys.includes('e'));
+    console.log('[getSingleKeyShortcuts] Has key "f"?', allGmailKeys.includes('f'));
+  }
+
+  const filtered = appShortcuts.filter(item => {
       // OSごとのキー、なければkeysにフォールバック
       const targetKeys = (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys;
-      if (!targetKeys) return false;
-      return !targetKeys.includes(' + '); // 修飾キーなしの単独キーのみ
-    })
+      if (!targetKeys) {
+        console.log(`[getSingleKeyShortcuts] Skipping (no targetKeys):`, item.keys);
+        return false;
+      }
+      const isSingleKey = !targetKeys.includes(' + ');
+      if (selectedApp === 'gmail' && ['a', 'e', 'f', 'r', 'n'].includes(item.keys)) {
+        console.log(`[getSingleKeyShortcuts] Key "${item.keys}": targetKeys="${targetKeys}", isSingleKey=${isSingleKey}`);
+      }
+      return isSingleKey; // 修飾キーなしの単独キーのみ
+    });
+
+  console.log(`[getSingleKeyShortcuts] Single-key shortcuts found:`, filtered.length);
+
+  return filtered
     .map(item => ({
       ...item,
       // OSごとのキー、なければkeysにフォールバック

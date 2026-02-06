@@ -31,7 +31,7 @@ function ResultModal() {
   // 苦手なショートカットのリスト
   const difficultShortcuts = useMemo(() => {
     const incorrects = quizHistory.filter(entry => !entry.isCorrect);
-    const shortcutCounts = {};
+    const shortcutCounts: { [key: string]: number } = {};
     incorrects.forEach(entry => {
       shortcutCounts[entry.correctShortcut] = (shortcutCounts[entry.correctShortcut] || 0) + 1;
     });

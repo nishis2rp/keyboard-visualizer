@@ -13,17 +13,27 @@
     "db:run-migration": "tsx scripts/run-migration.ts",
     "db:list-shortcuts": "tsx scripts/list-shortcuts.ts",
     "db:update-sort-order": "tsx scripts/update-sort-order.ts",
-    "db:run-single-migration": "tsx scripts/run-single-migration.ts"
+    "db:run-single-migration": "tsx scripts/run-single-migration.ts",
+    "db:update-ctrl-basic": "tsx scripts/update-ctrl-alphabet-to-basic.ts",
+    "db:update-shift-arrow-basic": "tsx scripts/update-shift-arrow-to-basic.ts",
+    "db:list-shift-arrow": "tsx scripts/list-shift-arrow-shortcuts.ts",
+    "db:find-alt-arrow-patterns": "tsx scripts/find-alt-arrow-patterns.ts",
+    "db:update-alt-arrow-basic": "tsx scripts/update-alt-arrow-to-basic.ts",
+    "db:update-complex-shift-basic": "tsx scripts/update-complex-shift-combinations-to-basic.ts",
+    "db:revert-complex-shift": "tsx scripts/revert-specific-shift-combinations.ts",
+    "db:update-shift-alt-standard": "tsx scripts/update-shift-alt-arrow-to-standard.ts",
+    "db:update-single-keys-basic": "tsx scripts/update-single-keys-to-basic.ts",
+    "db:export-csv": "tsx scripts/export-shortcuts-csv.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",
-    "@types/react-router-dom": "^5.3.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.1",
+    "@types/jsdom": "^27.0.0",
     "@types/pg": "^8.16.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

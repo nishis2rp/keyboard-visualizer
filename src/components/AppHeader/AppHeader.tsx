@@ -1,8 +1,10 @@
-import { memo, useState } from 'react'
+import { memo, useState, useCallback } from 'react'
 import { StyledButton } from '../common/StyledButton'
 import { useAuth } from '../../context/AuthContext'
+import { useAppContext } from '../../context/AppContext'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
+import { downloadShortcutsAsCSV } from '../../utils'
 import styles from './AppHeader.module.css'
 
 interface AppHeaderProps {
@@ -20,7 +22,17 @@ interface AppHeaderProps {
  */
 const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, isQuizMode, onQuizModeToggle }) => {
   const { user } = useAuth();
+  const { richShortcuts } = useAppContext();
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // CSVダウンロードハンドラー
+  const handleDownloadCSV = useCallback(() => {
+    if (!richShortcuts || richShortcuts.length === 0) {
+      alert('ダウンロードするショートカットがありません');
+      return;
+    }
+    downloadShortcutsAsCSV(richShortcuts);
+  }, [richShortcuts]);
 
   return (
     <>
@@ -51,6 +63,16 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
           >
             {fullscreenMode ? '全画面を終了' : '全画面モード'}
           </StyledButton>
+          <button
+            className={styles.csvDownloadButton}
+            onClick={handleDownloadCSV}
+            title="全ショートカットをCSV形式でダウンロード"
+          >
+            <span className={styles.csvText}>
+              <span>CSV</span>
+              <span>DL</span>
+            </span>
+          </button>
           {user ? (
             <UserMenu />
           ) : (

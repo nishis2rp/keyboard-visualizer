@@ -50,7 +50,7 @@ const SessionDetailModal: React.FC<SessionDetailModalProps> = ({ sessionId, onCl
           throw fetchError;
         }
 
-        setAnswers(data as QuizAnswer[]);
+        setAnswers(data as unknown as QuizAnswer[]);
       } catch (err: any) {
         console.error('Error fetching session details:', err);
         setError('セッション詳細の取得に失敗しました: ' + err.message);

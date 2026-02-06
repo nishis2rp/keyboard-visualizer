@@ -1,9 +1,11 @@
+import { App } from '../types';
+
 /**
  * List of supported applications.
  * Each application has its own shortcut definition.
  * @type {Array<{id: string, name: string, icon: string}>}
  */
-export const apps = [
+export const apps: App[] = [
   { id: 'windows11', name: 'Windows 11', icon: '🪟', os: 'windows' },
   { id: 'macos', name: 'macOS', icon: '🍎', os: 'mac' },
   { id: 'chrome', name: 'Chrome', icon: '🌐', os: 'cross-platform' },
@@ -13,7 +15,7 @@ export const apps = [
   { id: 'slack', name: 'Slack', icon: '💬', os: 'cross-platform' },
   { id: 'gmail', name: 'Gmail', icon: '📧', os: 'cross-platform' },
   { id: 'vscode', name: 'VS Code', icon: '💻', os: 'cross-platform' },
-]
+];
 
 /**
  * List of supported keyboard layouts.

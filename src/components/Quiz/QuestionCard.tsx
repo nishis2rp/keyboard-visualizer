@@ -91,7 +91,7 @@ function QuestionCard() {
         </div>
 
         {/* 順序押しバッジ */}
-        {currentQuestion.isSequential && (
+        {currentQuestion.press_type === 'sequential' && (
           <div className={styles.sequentialBadge}>
             <span className={styles.sequentialIcon}>🔢</span>
             <span className={styles.sequentialText}>順序押し</span>
@@ -106,7 +106,7 @@ function QuestionCard() {
           <div className={styles.instructionText}>
             <span className={styles.instructionIcon}>⌨️</span>
             <span className={styles.instructionLabel}>
-              {currentQuestion.isSequential
+              {currentQuestion.press_type === 'sequential'
                 ? 'キーを順番に押してください（Alt を押したまま順番に押す）'
                 : '正しいショートカットキーを押してください'
               }
@@ -114,7 +114,7 @@ function QuestionCard() {
           </div>
 
           {/* 順押しの途中経過表示 */}
-          {currentQuestion.isSequential && currentSequentialProgress.length > 0 && (
+          {currentQuestion.press_type === 'sequential' && currentSequentialProgress.length > 0 && (
             <div className={styles.sequentialProgress}>
               <div className={styles.progressLabel}>入力中...</div>
               <div className={styles.progressSequence}>
@@ -135,7 +135,7 @@ function QuestionCard() {
           )}
 
           {/* 押したキー表示（非順押しの場合のみ） */}
-          {!currentQuestion.isSequential && pressedKeys.size > 0 && (
+          {!currentQuestion.press_type === 'sequential' && pressedKeys.size > 0 && (
             <div className={styles.pressedKeys}>
               <div className={styles.pressedKeysLabel}>入力中...</div>
               <div className={styles.pressedKeysValue}>{getKeyComboText(Array.from(pressedKeys), keyboardLayout)}</div>

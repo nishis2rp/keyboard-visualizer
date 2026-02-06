@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { isModifierKey, isWindowsKey } from '../utils/keyUtils';
-import { isSequentialShortcut, SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts';
+import { SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts';
 import { normalizePressedKeys, checkAnswer, normalizeShortcut } from '../utils/quizEngine';
 import { QuizAction, QuizState } from '../../context/QuizContext';
 import { QuizQuestion } from '../types';
@@ -96,7 +96,7 @@ export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion }: Us
         // 非修飾キーがリリースされた場合
         if (hasNonModifierReleased) {
           const { currentQuestion } = quizState;
-          const isSequential = currentQuestion && isSequentialShortcut(currentQuestion.correctShortcut, currentQuestion.appId);
+          const isSequential = currentQuestion && currentQuestion.press_type === 'sequential';
 
           if (isSequential) {
             handleSequentialShortcut(releasedKeys, previousKeys);

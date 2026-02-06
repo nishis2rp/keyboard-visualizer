@@ -7,7 +7,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('❌ Supabase credentials not found. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  db: {
+    schema: 'public',
+  },
+  global: {
+    headers: {
+      'Prefer': 'count=exact',
+    },
+  },
+});
 
 export interface Shortcut {
   id: number;

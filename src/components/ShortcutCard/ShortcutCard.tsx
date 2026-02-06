@@ -1,28 +1,11 @@
 import { memo, useMemo } from 'react'
-// import { getProtectionLevel } from '../../constants' // 削除
-import { isSequentialShortcut } from '../../utils/shortcutUtils'
 import { isModifierKeyName, isWindowsKeyName } from '../../utils/keyUtils'
-import { detectOS } from '../../utils/os' // detectOSをインポート
-// useAppContext はここで必要ない
-import { EXCEL_APP_SAFE_SHORTCUTS } from '../../constants/systemProtectedShortcuts' // Excelの除外リストをインポート
+import { detectOS } from '../../utils/os'
+import { EXCEL_APP_SAFE_SHORTCUTS } from '../../constants/systemProtectedShortcuts'
+import { ShortcutDifficulty } from '../../types' // ShortcutDifficultyをインポート
 
-// OSは実行時に変わらないため、モジュールレベルで1回だけ検出
 const CURRENT_OS = detectOS();
 
-/**
- * ショートカットカードコンポーネント
- *
- * ショートカットの情報を表示するカードコンポーネント
- * 保護レベルに応じて色分けされる：
- * - 通常: 色なし（干渉しない）
- * - 青色: 全画面表示で防げる（Keyboard Lock API）🔵
- * - 赤色: 全画面表示しても防げない（システムレベル保護）🔒
- *
- * @param {string} shortcut - ショートカットのキー組み合わせ（例: "Win + L"）
- * @param {string} description - ショートカットの説明
- * @param {string} appContext - アプリケーションコンテキスト（例: "excel", "chrome"など）
- * @param {boolean} showDebugLog - デバッグログを表示するか（開発モードのみ）
- */
 interface ShortcutCardProps {
   shortcut: string;
   description: string;
@@ -30,10 +13,31 @@ interface ShortcutCardProps {
   showDebugLog?: boolean;
   windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
   macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
+  difficulty?: ShortcutDifficulty; // difficultyプロップを追加
+  press_type: 'sequential' | 'simultaneous'; // 追加
 }
 
-const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none' }) => {
-  // 保護レベルを計算（メモ化）
+const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none', difficulty, press_type }) => {
+  // 難易度に応じた表示テキストを生成
+  const difficultyDisplay = useMemo(() => {
+    if (showDebugLog && import.meta.env.DEV) {
+      console.log(`[ShortcutCard] shortcut="${shortcut}", difficulty="${difficulty}"`);
+    }
+    switch (difficulty) {
+      case 'basic':
+        return '🔰 基本';
+      case 'standard':
+        return '⭐ 標準';
+      case 'hard':
+        return '🔥 難解';
+      case 'madmax':
+        return '🚀 超難解';
+      case 'allrange':
+        return '🎯 全範囲';
+      default:
+        return '';
+    }
+  }, [difficulty, showDebugLog]);
   const effectiveProtectionLevel = useMemo((): 'none' | 'preventable_fullscreen' | 'always-protected' => {
     // Excelアプリのコンテキストで、Excel固有のショートカットは保護不要
     if (appContext === 'excel' && EXCEL_APP_SAFE_SHORTCUTS.has(shortcut)) {
@@ -58,7 +62,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
 
   // デバッグログ（開発時のみ） - 全てのショートカットでログ出力
   if (showDebugLog && import.meta.env.DEV) {
-    const emoji = effectiveProtectionLevel === 'always-protected' ? '🔒' : effectiveProtectionLevel === 'fullscreen-preventable' ? '🔵' : '⚪'
+    const emoji = effectiveProtectionLevel === 'always-protected' ? '🔒' : effectiveProtectionLevel === 'preventable_fullscreen' ? '🔵' : '⚪'
     // console.log(`${emoji} ${shortcut}: ${description} (${effectiveProtectionLevel})`); // デバッグログ
   }
 
@@ -101,7 +105,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
   const shortcutDisplay = useMemo(() => {
     // ショートカットを " + " で分割
     const parts = shortcut.split(' + ')
-    const isSequential = isSequentialShortcut(shortcut, appContext || undefined)
+    const isSequential = press_type === 'sequential'
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
@@ -141,7 +145,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
         ))}
       </div>
     )
-  }, [shortcut, appContext]);
+  }, [shortcut, appContext, press_type]);
 
   return (
     <div
@@ -153,6 +157,20 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
         <div className="shortcut-combo" style={{ ...style.combo, marginBottom: 0 }}>
           {shortcutDisplay}
         </div>
+        {difficultyDisplay && (
+          <span style={{
+            fontSize: '0.7em',
+            color: '#888',
+            marginLeft: 'auto',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            backgroundColor: 'rgba(136, 136, 136, 0.1)',
+            whiteSpace: 'nowrap',
+            fontWeight: '500'
+          }}>
+            {difficultyDisplay}
+          </span>
+        )}
       </div>
       <div className="shortcut-desc" style={style.description}>
         {description}

@@ -52,7 +52,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     { setupCompleted: false, app: DEFAULTS.APP, layout: DEFAULTS.LAYOUT },
     {
       version: SETUP_VERSION,
-      validator: (data) => data && typeof data.app === 'string' && typeof data.layout === 'string'
+      validator: (data: any): data is SetupData => data && typeof data.app === 'string' && typeof data.layout === 'string'
     }
   );
 

@@ -2,7 +2,7 @@
 
 **アプリケーション別のキーボードショートカットをリアルタイムで視覚的に表示し、クイズで学習できるWebアプリケーション**
 
-バックエンドに **Supabase (PostgreSQL)** を使用し、1,066個以上のショートカットデータを動的に管理・提供しています。
+バックエンドに **Supabase (PostgreSQL)** を使用し、1,336個のショートカットデータを動的に管理・提供しています。
 
 [![GitHub Pages](https://img.shields.io/badge/demo-live-success)](https://nishis2rp.github.io/keyboard-visualizer/)
 [![React](https://img.shields.io/badge/React-18.3.1-blue)](https://react.dev/)
@@ -44,25 +44,25 @@
 
 ### 🎯 対応アプリケーション (データはバックエンドサービスから動的に取得)
 
-**総ショートカット数: 1,000個**
+**総ショートカット数: 1,336個**
 
 | アプリ | ショートカット数 | 難易度分布 | 特徴 |
 |--------|-----------------|-----------|------|
 | **macOS** | 290 | Basic, Standard, Hard | macOS固有のショートカット（Cmd+Space、Mission Controlなど） |
-| **Excel** | 156 | Basic, Standard, Hard, Madmax | スプレッドシート操作（ピボット、マクロ、VBAなど高度な機能含む） |
-| **Windows 11** | 139 | Basic, Standard, Hard | システムレベルショートカット（Win+X、仮想デスクトップなど） |
+| **VS Code** | 285 | Basic~Madmax | 開発エディタ - 全難易度対応、編集、ナビゲーション、デバッグ、Git操作 |
+| **Excel** | 179 | Basic, Standard, Hard, Madmax | スプレッドシート操作（ピボット、マクロ、VBAなど高度な機能含む） |
+| **Windows 11** | 150 | Basic, Standard, Hard | システムレベルショートカット（Win+X、仮想デスクトップなど） |
+| **Gmail** | 135 | Basic, Standard, Madmax | メール操作（ナビゲーション、ラベル、フォーマット、選択など） |
 | **Word** | 91 | Basic, Standard, Hard | ドキュメント編集（書式設定、レビュー、マクロなど） |
 | **Chrome** | 87 | Basic, Standard, Hard | ブラウザショートカット（デベロッパーツール含む） |
-| **VS Code** | 87 | Basic~Madmax | 開発エディタ - 全難易度対応、編集、ナビゲーション、デバッグ、Git操作 |
 | **PowerPoint** | 72 | Basic, Standard, Hard | プレゼンテーション編集（スライド操作、アニメーション、発表者モードなど） |
 | **Slack** | 46 | Basic, Standard, Hard | チャットアプリ（ワークスペース管理含む） |
-| **Gmail** | 32 | Basic, Standard, Madmax | メール操作（ナビゲーション、ラベル、フォーマット、選択など） |
 
 **難易度分布（全体）:**
-- 🌟 Basic: 131個 (13%) - 日常的に使う基本操作
-- ⚡ Standard: 563個 (56%) - 標準的なショートカット
-- 🔥 Hard: 265個 (27%) - 高度な機能・専門的な操作（3キー以上の組み合わせ、順押し系、専門機能など）
-- 💀 Madmax: 39個 (4%) - 超上級者向け（VBA、マクロ、Gmail順押しナビゲーション、フォーマット操作など）
+- 🌟 Basic: 377個 (28%) - 日常的に使う基本操作
+- ⚡ Standard: 488個 (37%) - 標準的なショートカット
+- 🔥 Hard: 323個 (24%) - 高度な機能・専門的な操作（3キー以上の組み合わせ、順押し系、専門機能など）
+- 💀 Madmax: 148個 (11%) - 超上級者向け（VBA、マクロ、Gmail順押しナビゲーション、フォーマット操作など）
 
 ### ⌨️ キーボード配列対応
 
@@ -260,7 +260,7 @@ npm run deploy
 - **Supabase (PostgreSQL)** - バックエンドサービス
   - PostgreSQLデータベースによるショートカットデータの一元管理
   - リアルタイムデータ取得とマイグレーション管理
-  - 1,066個以上のショートカット、保護レベル、難易度情報を管理
+  - 1,336個のショートカット、保護レベル、難易度情報を管理
   - Supabase Auth - ユーザー認証とセッション管理
   - Row-Level Security (RLS) - データベースレベルのセキュリティ
 - **Docker** - コンテナ化された開発環境

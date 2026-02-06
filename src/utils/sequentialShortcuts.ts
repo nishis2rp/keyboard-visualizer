@@ -6,42 +6,41 @@
  */
 
 /**
- * ショートカットが順序押しかどうかを判定
- * @param shortcut - ショートカット文字列（例: "Alt + H + O + I"）
+ * 順序押しショートカットかどうかを判定
+ *
+ * 3つのタイプをサポート:
+ * 1. Excel-style: Alt + H + O + I (修飾キーを押したまま順番に押す)
+ * 2. VS Code-style: Ctrl + K, Ctrl + S (カンマで区切られた複数の組み合わせ)
+ * 3. Gmail-style: g + i (シンプルな文字の連続)
+ *
+ * @param shortcut - ショートカット文字列
  * @param application - アプリケーション名（オプション）
- * @returns 順序押しの場合true
+ * @returns 順序押しショートカットの場合true
  */
 export const isSequentialShortcut = (shortcut: string, application?: string): boolean => {
   if (!shortcut) return false;
 
-  // Windows 11とmacOSは順押しショートカットを持たない（すべて同時押し）
-  if (application === 'windows11' || application === 'macos') {
-    return false;
-  }
-
-  // スペースを削除して分割
-  const keys = shortcut.replace(/ /g, '').split('+');
-
-  // Gmailの単独キーシーケンス（例: "g, i"）
-  if (application === 'gmail' && shortcut.includes(',')) {
+  // VS Code-style: カンマで区切られている (例: Ctrl + K, Ctrl + S)
+  if (shortcut.includes(',')) {
     return true;
   }
 
-  // VS Codeの2段階コマンド（例: "Ctrl + K, Ctrl + S"）
-  if (application === 'vscode' && shortcut.includes(',')) {
-    return true;
+  // Excel-style: 3つ以上のキーが + で繋がれている (例: Alt + H + O + I)
+  const keys = shortcut.split('+').map(k => k.trim());
+  if (keys.length >= 3) {
+    // 修飾キー（Ctrl, Alt, Shift, Meta, Cmd）で始まるかチェック
+    const firstKey = keys[0].toLowerCase();
+    const modifiers = ['ctrl', 'alt', 'shift', 'meta', 'cmd', 'control', 'option', 'command'];
+    if (modifiers.includes(firstKey)) {
+      return true;
+    }
   }
 
-  // Excelのリボン操作（Alt + 文字キー3つ以上）
-  if (application === 'excel') {
-    const firstKeyLower = keys[0].toLowerCase();
-    // Altで始まり、4つ以上のキー、かつ2番目以降が文字キー
-    if (firstKeyLower === 'alt' && keys.length >= 4) {
-      // 2番目以降がすべて1文字の英字かチェック
-      const hasOnlyLetters = keys.slice(1).every(k => /^[a-zA-Z]$/.test(k));
-      if (hasOnlyLetters) {
-        return true;
-      }
+  // Gmail-style: 小文字の単一文字が + で繋がれている (例: g + i)
+  if (keys.length >= 2) {
+    const allSingleLetters = keys.every(k => /^[a-z]$/i.test(k));
+    if (allSingleLetters) {
+      return true;
     }
   }
 

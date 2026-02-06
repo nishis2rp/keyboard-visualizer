@@ -7,7 +7,15 @@ interface ScoreBoardProps {
   settings: { totalQuestions: number };
 }
 
-const StatCard = ({ icon, label, value, colorClass, subtitle }) => (
+interface StatCardProps {
+  icon: React.ReactNode;
+  label: React.ReactNode;
+  value: React.ReactNode;
+  colorClass: string;
+  subtitle?: React.ReactNode;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ icon, label, value, colorClass, subtitle }) => (
   <div className={styles.statCard}>
     <div className={styles.statHeader}>
       <span className={styles.statIcon}>{icon}</span>

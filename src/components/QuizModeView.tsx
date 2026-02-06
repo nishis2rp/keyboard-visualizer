@@ -19,7 +19,7 @@ const QuizModeView = () => {
   const { quizState, startQuiz, getNextQuestion, dispatch, updateFullscreen, handleKeyPress } = useQuiz();
 
   const currentRichShortcuts = richShortcuts || [];
-  const { pressedKeys } = useKeyboardShortcuts(currentRichShortcuts, keyboardLayout, selectedApp, true);
+  const { pressedKeys } = useKeyboardShortcuts(currentRichShortcuts, keyboardLayout, selectedApp, shortcutDescriptions, true);
 
   const openMacWarningModalRef = useRef(null);
   const onMacWarningModalRequest = (openModalFunc) => {
@@ -91,7 +91,7 @@ const QuizModeView = () => {
           quizHistory={quizState.quizHistory}
           settings={quizState.settings}
         />
-        <QuestionCard pressedKeys={quizState.pressedKeys} keyboardLayout={keyboardLayout} />
+        <QuestionCard />
 
         {/* キーボードビジュアライザー */}
         {(quizState.status === 'playing' || quizState.status === 'paused') && (

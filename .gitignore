@@ -35,6 +35,9 @@ _ul-*
 build.txt
 build-output.txt
 
+# CSV exports
+shortcuts-export-*.csv
+
 # Environment variables
 .env
 .env.local

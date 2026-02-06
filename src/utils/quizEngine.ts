@@ -5,7 +5,7 @@ import {
 import { detectOS } from './os';
 import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
 import { matchesDifficulty } from '../constants/shortcutDifficulty';
-import { isSequentialShortcut } from './sequentialShortcuts';
+
 import { getCodeDisplayName } from './keyMapping'; // Import getCodeDisplayName
 import { APP_DISPLAY_NAMES } from '../constants/app'; // 追加
 import { AllShortcuts, ShortcutDetails, RichShortcut } from '../types';
@@ -210,6 +210,7 @@ export const generateQuestion = (
     shortcut: string;
     description: string;
     normalizedShortcut: string; // 正規化されたショートカットを追加
+    press_type: 'sequential' | 'simultaneous'; // 追加
   }> = [];
 
   allowedApps.forEach(appId => {
@@ -260,6 +261,7 @@ export const generateQuestion = (
           shortcut,
           description: details.description,
           normalizedShortcut: normalized,
+          press_type: richShortcut?.press_type || 'simultaneous', // ★ 追加
         });
       }
     });
@@ -273,15 +275,13 @@ export const generateQuestion = (
   const randomIndex = Math.floor(Math.random() * allPossibleQuestions.length);
   const selected = allPossibleQuestions[randomIndex];
 
-  const isSeq = isSequentialShortcut(selected.shortcut, selected.appId);
-
   const question = {
     question: `【${selected.appName}】${selected.description}のショートカットは？`,
     correctShortcut: selected.shortcut,
     normalizedCorrectShortcut: selected.normalizedShortcut, // 既に計算済み
     appName: selected.appName,
     appId: selected.appId,
-    isSequential: isSeq,
+    press_type: selected.press_type, // ★ 追加
   };
 
   return question;

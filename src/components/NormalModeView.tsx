@@ -26,7 +26,7 @@ const NormalModeView = () => {
     pressedKeys,
     currentDescription,
     availableShortcuts,
-  } = useKeyboardShortcuts(currentRichShortcuts, keyboardLayout, selectedApp, false);
+  } = useKeyboardShortcuts(currentRichShortcuts, keyboardLayout, selectedApp, shortcutDescriptions, false);
 
   return (
     <>

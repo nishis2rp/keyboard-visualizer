@@ -19,7 +19,17 @@ export {
 } from './fullscreen'
 
 export {
-  isSequentialShortcut,
-  getShortcutType,
   parseShortcutKeys
 } from './shortcutUtils'
+
+export {
+  isSequentialShortcut,
+  getSequentialKeys,
+  formatSequentialShortcut,
+  checkSequentialShortcut,
+  SequentialKeyRecorder
+} from './sequentialShortcuts'
+
+export {
+  downloadShortcutsAsCSV
+} from './csvExport'
