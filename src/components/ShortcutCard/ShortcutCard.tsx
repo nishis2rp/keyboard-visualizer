@@ -171,7 +171,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
           color: '#000000',
           padding: '2px 6px',
           borderRadius: '4px',
-          backgroundColor: '#E0E0E0',
+          backgroundColor: '#F5F5F5',
           whiteSpace: 'nowrap',
           fontWeight: '500'
         }}>

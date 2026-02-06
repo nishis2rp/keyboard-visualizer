@@ -127,10 +127,10 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
 
     // 難易度ラベルと色の設定
     const difficultyConfig = {
-      basic: { label: '🌟 basic', color: '#E0E0E0' },
-      standard: { label: '⚡ standard', color: '#E0E0E0' },
-      hard: { label: '🔥 hard', color: '#E0E0E0' },
-      madmax: { label: '💀 madmax', color: '#E0E0E0' }
+      basic: { label: '🌟 basic', color: '#F5F5F5' },
+      standard: { label: '⚡ standard', color: '#F5F5F5' },
+      hard: { label: '🔥 hard', color: '#F5F5F5' },
+      madmax: { label: '💀 madmax', color: '#F5F5F5' }
     };
     const config = difficultyConfig[difficulty as keyof typeof difficultyConfig] || difficultyConfig.basic;
 
