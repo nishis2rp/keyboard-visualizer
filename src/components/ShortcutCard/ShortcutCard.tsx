@@ -151,30 +151,33 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
     <div
       className={`shortcut-card ${style.cardClass || ''}`}
       title={style.tooltip}
+      style={{ position: 'relative', paddingBottom: difficultyDisplay ? '24px' : undefined }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
         {style.icon && <span style={{ fontSize: '0.9em' }}>{style.icon}</span>}
         <div className="shortcut-combo" style={{ ...style.combo, marginBottom: 0 }}>
           {shortcutDisplay}
         </div>
-        {difficultyDisplay && (
-          <span style={{
-            fontSize: '0.7em',
-            color: '#888',
-            marginLeft: 'auto',
-            padding: '2px 6px',
-            borderRadius: '4px',
-            backgroundColor: 'rgba(136, 136, 136, 0.1)',
-            whiteSpace: 'nowrap',
-            fontWeight: '500'
-          }}>
-            {difficultyDisplay}
-          </span>
-        )}
       </div>
       <div className="shortcut-desc" style={style.description}>
         {description}
       </div>
+      {difficultyDisplay && (
+        <span style={{
+          position: 'absolute',
+          bottom: '6px',
+          right: '8px',
+          fontSize: '0.65em',
+          color: '#888',
+          padding: '2px 6px',
+          borderRadius: '4px',
+          backgroundColor: 'rgba(136, 136, 136, 0.1)',
+          whiteSpace: 'nowrap',
+          fontWeight: '500'
+        }}>
+          {difficultyDisplay}
+        </span>
+      )}
     </div>
   )
 })
