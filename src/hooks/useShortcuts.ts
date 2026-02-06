@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { AllShortcuts, ShortcutDetails, RichShortcut } from '../types';
-import { getShortcutDifficulty } from '../constants/shortcutDifficulty';
 import { normalizeShortcut } from '../utils/quizEngine';
 import { Shortcut } from '../lib/supabase';
 
 interface UseShortcutsReturn {
   shortcuts: AllShortcuts | null;
   richShortcuts: RichShortcut[] | null;
+  apps: App[] | null; // 追加
   loading: boolean;
   error: Error | null;
   refetch: () => void;
@@ -19,6 +19,7 @@ interface UseShortcutsReturn {
 export function useShortcuts(): UseShortcutsReturn {
   const [shortcuts, setShortcuts] = useState<AllShortcuts | null>(null);
   const [richShortcuts, setRichShortcuts] = useState<RichShortcut[] | null>(null);
+  const [apps, setApps] = useState<App[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -27,15 +28,22 @@ export function useShortcuts(): UseShortcutsReturn {
       setLoading(true);
       setError(null);
 
-      // Supabaseのデフォルトは1000件制限なので、.limit()を明示的に指定
-      const { data, error: supabaseError } = await supabase
-        .from('shortcuts')
-        .select('*')
-        .limit(15000); // 最大15000件取得
+      // 並列で取得
+      const [shortcutsResponse, appsResponse] = await Promise.all([
+        supabase.from('shortcuts').select('*').limit(15000),
+        supabase.from('applications').select('*').order('display_order', { ascending: true })
+      ]);
 
-      if (supabaseError) {
-        throw new Error(`Failed to fetch shortcuts: ${supabaseError.message}`);
+      if (shortcutsResponse.error) {
+        throw new Error(`Failed to fetch shortcuts: ${shortcutsResponse.error.message}`);
       }
+      if (appsResponse.error) {
+        console.error('Failed to fetch applications, using fallback:', appsResponse.error.message);
+      } else {
+        setApps(appsResponse.data as App[]);
+      }
+
+      const { data } = shortcutsResponse;
 
       console.log('[useShortcuts] Total shortcuts fetched from DB:', data?.length);
       console.log('[useShortcuts] Expected: 1307, Got:', data?.length);
@@ -57,7 +65,7 @@ export function useShortcuts(): UseShortcutsReturn {
         }
 
         const normalizedShortcut = normalizeShortcut(item.keys);
-        const difficulty: ShortcutDetails['difficulty'] = item.difficulty ? (item.difficulty as ShortcutDetails['difficulty']) : getShortcutDifficulty(normalizedShortcut); // item.difficultyがnull/undefinedでない場合はそのまま使用し、型アサーションで補完。そうでない場合はgetShortcutDifficultyの結果を使用。
+        const difficulty: ShortcutDetails['difficulty'] = (item.difficulty as ShortcutDetails['difficulty']) || 'standard';
 
         const richShortcut: RichShortcut = {
           id: item.id,
@@ -73,6 +81,7 @@ export function useShortcuts(): UseShortcutsReturn {
           windows_protection_level: item.windows_protection_level,
           macos_protection_level: item.macos_protection_level,
           press_type: item.press_type, // ★ 追加
+          alternative_group_id: item.alternative_group_id, // ★ 追加
         };
         richShortcutsArray.push(richShortcut);
 
@@ -99,6 +108,7 @@ export function useShortcuts(): UseShortcutsReturn {
   return {
     shortcuts,
     richShortcuts,
+    apps,
     loading,
     error,
     refetch: fetchShortcuts,

@@ -1,0 +1,53 @@
+-- Migration 037: Update requested shortcuts
+-- This migration updates or adds specific shortcuts based on the user's latest request.
+
+INSERT INTO shortcuts (application, keys, description, difficulty)
+VALUES
+  ('chrome', 'Ctrl + F4', 'タブを閉じる', 'standard'),
+  ('chrome', 'Ctrl + E', '検索バーにフォーカス', 'standard'),
+  ('chrome', 'Ctrl + K', '検索バーにフォーカス', 'standard'),
+  ('chrome', 'F6', '次のペインにフォーカス', 'standard'),
+  ('chrome', 'Space', '1画面下にスクロール', 'basic'),
+  ('chrome', 'PageUp', '1画面上にスクロール', 'basic'),
+  ('chrome', 'PageDown', '1画面下にスクロール', 'basic'),
+  ('excel', 'F12', '[ファイル] 名前を付けて保存', 'standard'),
+  ('excel', 'F11', '[グラフ] 新しいシートにグラフを作成', 'standard'),
+  ('gmail', 'Ctrl + K', '[書式] リンクを挿入', 'standard'),
+  ('terminal', 'Ctrl + U', 'カーソルから行頭まで削除 (Terminal)', 'standard'),
+  ('terminal', 'Ctrl + L', '画面をクリア (Terminal)', 'standard'),
+  ('terminal', 'Ctrl + R', 'コマンド履歴を検索 (Terminal)', 'standard'),
+  ('terminal', 'Ctrl + F', '右の文字に移動', 'standard'),
+  ('terminal', 'Ctrl + K', 'カーソルから行末まで削除', 'standard'),
+  ('terminal', 'Ctrl + T', '文字を入れ替え', 'standard'),
+  ('terminal', 'Ctrl + N', '下の行に移動', 'standard'),
+  ('terminal', 'Ctrl + P', '上の行に移動', 'standard'),
+  ('terminal', 'Ctrl + O', '次の行に移動', 'standard'),
+  ('system', 'Fn Fn (2回)', '音声入力を開始', 'standard'),
+  ('terminal', 'Ctrl + E', '行末に移動', 'standard'),
+  ('terminal', 'Ctrl + B', '左の文字に移動', 'standard'),
+  ('terminal', 'Ctrl + A', '行頭に移動', 'standard'),
+  ('terminal', 'Ctrl + Y', '削除した文字列を貼り付け', 'standard'),
+  ('terminal', 'Ctrl + H', '前の文字を削除', 'standard'),
+  ('terminal', 'Ctrl + W', '前の単語を削除 (Terminal)', 'standard'),
+  ('terminal', 'Ctrl + C', 'プロセスを中断 (Terminal)', 'standard'),
+  ('terminal', 'Ctrl + Z', 'プロセスを一時停止 (Terminal)', 'standard'),
+  ('xcode', 'Ctrl + I', 'インデントを自動修正 (Xcode)', 'standard'),
+  ('macos', 'Fn + F4', 'Launchpad', 'standard'),
+  ('powerpoint', 'Ctrl + E', '消しゴムツールを使用', 'standard'),
+  ('powerpoint', 'B', '黒い画面にする/解除', 'standard'),
+  ('powerpoint', 'W', '白い画面にする/解除', 'standard'),
+  ('powerpoint', 'S', 'スライドショーを一時停止/再開', 'standard'),
+  ('powerpoint', 'E', 'すべてのインクマークを消去', 'standard'),
+  ('powerpoint', 'Ctrl + K', 'ハイパーリンクを挿入', 'standard'),
+  ('powerpoint', 'Ctrl + T', 'フォントダイアログを開く', 'standard'),
+  ('powerpoint', 'F7', 'スペルチェック', 'standard'),
+  ('vscode', 'F12', '定義へ移動', 'standard'),
+  ('windows11', 'F7', 'スペルチェック（一部アプリ）', 'standard'),
+  ('windows11', 'F10', 'メニューバーをアクティブにする', 'standard'),
+  ('windows11', 'Win + Ctrl + D', '新しい仮想デスクトップを追加', 'standard'),
+  ('windows11', 'Win + Ctrl + ←', '左の仮想デスクトップに切り替え', 'standard'),
+  ('windows11', 'Win + Ctrl + →', '右の仮想デスクトップに切り替え', 'standard')
+ON CONFLICT (application, keys) 
+DO UPDATE SET 
+  description = EXCLUDED.description,
+  difficulty = EXCLUDED.difficulty;

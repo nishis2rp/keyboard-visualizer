@@ -1,14 +1,8 @@
-import {
-  ALWAYS_PROTECTED_SHORTCUTS,
-  FULLSCREEN_PREVENTABLE_SHORTCUTS
-} from '../constants/systemProtectedShortcuts';
 import { detectOS } from './os';
 import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
-import { matchesDifficulty } from '../constants/shortcutDifficulty';
 
 import { getCodeDisplayName } from './keyMapping'; // Import getCodeDisplayName
-import { APP_DISPLAY_NAMES } from '../constants/app'; // 追加
-import { AllShortcuts, ShortcutDetails, RichShortcut } from '../types';
+import { AllShortcuts, ShortcutDetails, RichShortcut, App } from '../types';
 
 // OSを検出
 const currentOS = detectOS();
@@ -124,27 +118,39 @@ export const normalizePressedKeys = (pressedCodes: Set<string>, keyboardLayout: 
  * @param {string} shortcut - The shortcut string (e.g., 'Ctrl + W').
  * @param {string} quizMode - The quiz mode ('default' or 'hardcore').
  * @param {boolean} isFullscreen - Whether fullscreen mode is active.
+ * @param {RichShortcut} richShortcut - (Optional) Rich shortcut object from DB containing protection levels.
  * @returns {boolean} True if it can be safely presented.
  */
-const isShortcutSafe = (shortcut: string, quizMode: string, isFullscreen: boolean): boolean => {
-  const normalizedShortcut = normalizeShortcut(shortcut);
+const isShortcutSafe = (
+  _shortcut: string,
+  quizMode: string,
+  isFullscreen: boolean,
+  richShortcut?: RichShortcut
+): boolean => {
+  // DB情報がない場合は、安全と見なす（DBが唯一の正解ソース）
+  if (!richShortcut) {
+    return true;
+  }
 
-  // 常に保護されているショートカットは、どのモードでも安全ではない
-  if (ALWAYS_PROTECTED_SHORTCUTS.has(normalizedShortcut)) {
+  const protectionLevel = currentOS === 'macos'
+    ? richShortcut.macos_protection_level
+    : richShortcut.windows_protection_level;
+
+  // always-protected は常に除外
+  if (protectionLevel === 'always-protected') {
     return false;
   }
 
-  // ハードコアモードでは、フルスクリーン防止可能ショートカットは常に安全と見なす
+  // ハードコアモードでは、フルスクリーン防止可能ショートカットは安全と見なす
   if (quizMode === 'hardcore') {
     return true;
   }
 
-  // デフォルトモードで、フルスクリーンでなく、かつ防止可能リストにある場合は安全ではない
-  if (!isFullscreen && FULLSCREEN_PREVENTABLE_SHORTCUTS.has(normalizedShortcut)) {
+  // デフォルトモードで、フルスクリーンでなく、かつ防止可能レベルの場合は安全ではない
+  if (!isFullscreen && (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable')) {
     return false;
   }
 
-  // 上記以外は安全
   return true;
 };
 
@@ -153,24 +159,25 @@ const isShortcutSafe = (shortcut: string, quizMode: string, isFullscreen: boolea
 /**
  * キーボードレイアウトに基づいて使用可能なアプリをフィルタリング
  * @param {string} keyboardLayout - キーボードレイアウト (e.g., 'windows-jis', 'mac-jis', 'mac-us')
+ * @param {App[]} apps - アプリケーションメタデータのリスト
  * @returns {string[]} 使用可能なアプリIDの配列
  */
-export const getCompatibleApps = (keyboardLayout: string): string[] => {
+export const getCompatibleApps = (keyboardLayout: string, apps: App[]): string[] => {
   const isMac = keyboardLayout.startsWith('mac-');
 
-  const allApps = ['windows11', 'macos', 'chrome', 'excel', 'slack', 'gmail'];
-
-  return allApps.filter(appId => {
-    // Macレイアウトの場合、Windows 11を除外
-    if (isMac && appId === 'windows11') {
-      return false;
-    }
-    // Windowsレイアウトの場合、macOSを除外
-    if (!isMac && appId === 'macos') {
-      return false;
-    }
-    return true;
-  });
+  return apps
+    .filter(app => {
+      // Macレイアウトの場合、Windows専用アプリを除外
+      if (isMac && app.os === 'windows') {
+        return false;
+      }
+      // Windowsレイアウトの場合、Mac専用アプリを除外
+      if (!isMac && app.os === 'mac') {
+        return false;
+      }
+      return true;
+    })
+    .map(app => app.id);
 };
 
 /**
@@ -182,6 +189,7 @@ export const getCompatibleApps = (keyboardLayout: string): string[] => {
  * @param {Set<string>} usedShortcuts - Set of already used normalized shortcuts to avoid duplicates.
  * @param {'basic' | 'standard' | 'madmax' | 'allrange'} difficulty - The difficulty level.
  * @param {RichShortcut[]} richShortcuts - Array of shortcuts with protection level information.
+ * @param {App[]} apps - Array of application metadata.
  * @returns {{question: string, correctShortcut: string, normalizedCorrectShortcut: string, appName: string} | null} A question object, or null if no shortcuts are available.
  */
 export const generateQuestion = (
@@ -191,11 +199,18 @@ export const generateQuestion = (
   isFullscreen = false,
   usedShortcuts = new Set<string>(),
   difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard',
-  richShortcuts: RichShortcut[] = []
+  richShortcuts: RichShortcut[] = [],
+  apps: App[] = []
 ) => {
   // 全ての許可されたアプリのショートカットを収集
   const allSafeShortcuts: any[] = [];
   if (!allowedApps || !Array.isArray(allowedApps)) return null;
+
+  // アプリ名のマップを作成
+  const appNameMap = new Map<string, string>();
+  apps.forEach(app => {
+    appNameMap.set(app.id, app.name);
+  });
 
   // richShortcutsからマップを作成（application + keys でルックアップ）
   const protectionLevelMap = new Map<string, RichShortcut>();
@@ -227,37 +242,23 @@ export const generateQuestion = (
         return;
       }
 
-      // 安全なショートカットのみを考慮
-      if (!isShortcutSafe(shortcut, quizMode, isFullscreen)) {
-        return;
-      }
-
-      // richShortcutsから保護レベルを取得
+      // richShortcutsから情報を取得
       const lookupKey = `${appId}:${shortcut}`;
       const richShortcut = protectionLevelMap.get(lookupKey);
 
-      // システム保護されたショートカットを除外
-      if (richShortcut) {
-        const protectionLevel = currentOS === 'macos'
-          ? richShortcut.macos_protection_level
-          : richShortcut.windows_protection_level;
-
-        // always-protected は常に除外（フルスクリーンモードでも操作不可のため）
-        if (protectionLevel === 'always-protected') {
-          return;
-        }
-
-        // ウィンドウモードの場合、preventable_fullscreen も除外
-        if (!isFullscreen && (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable')) {
-          return;
-        }
+      // 安全なショートカットのみを考慮
+      if (!isShortcutSafe(shortcut, quizMode, isFullscreen, richShortcut)) {
+        return;
       }
 
       // 難易度フィルタリング
-      if (matchesDifficulty(normalized, difficulty)) {
+      const shortcutDifficulty = richShortcut?.difficulty || 'standard';
+      const isDifficultyMatch = difficulty === 'allrange' || shortcutDifficulty === difficulty;
+
+      if (isDifficultyMatch) {
         allPossibleQuestions.push({
           appId,
-          appName: APP_DISPLAY_NAMES[appId] || appId,
+          appName: appNameMap.get(appId) || appId,
           shortcut,
           description: details.description,
           normalizedShortcut: normalized,
@@ -298,16 +299,17 @@ export const GRACE_PERIOD_MS = 300;
  * Supports alternative shortcuts (e.g., Ctrl+C and Ctrl+Insert for copy).
  * @param {string} userAnswer - The normalized shortcut entered by the user.
  * @param {string} normalizedCorrectAnswer - The normalized correct shortcut.
+ * @param {RichShortcut[]} richShortcuts - (Optional) Rich shortcuts from DB.
  * @returns {boolean} True if correct.
  */
-export const checkAnswer = (userAnswer: string, normalizedCorrectAnswer: string): boolean => {
+export const checkAnswer = (userAnswer: string, normalizedCorrectAnswer: string, richShortcuts?: RichShortcut[]): boolean => {
   // 完全一致チェック
   if (userAnswer === normalizedCorrectAnswer) {
     return true;
   }
 
   // 代替ショートカットチェック
-  return areShortcutsEquivalent(userAnswer, normalizedCorrectAnswer);
+  return areShortcutsEquivalent(userAnswer, normalizedCorrectAnswer, richShortcuts);
 };
 
 

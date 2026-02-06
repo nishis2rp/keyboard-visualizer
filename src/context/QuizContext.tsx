@@ -283,7 +283,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
       return;
     }
 
-    let compatibleApps = getCompatibleApps(keyboardLayout);
+    let compatibleApps = getCompatibleApps(keyboardLayout, apps || []);
 
     if (selectedApp) {
       const selectedApps = selectedApp.split(',').filter(a => a && a !== 'random');
@@ -299,7 +299,8 @@ export function QuizProvider({ children }: QuizProviderProps) {
       isFullscreen,
       currentUsedShortcuts,
       difficulty,
-      richShortcuts || []
+      richShortcuts || [],
+      apps || []
     );
 
     if (newQuestion) {
@@ -401,7 +402,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
   }, [quizState.status, quizState.quizHistory, completeQuizSession]);
 
   // クイズ入力ハンドラーを使用（キーボード入力から正誤判定を行う）
-  useQuizInputHandler({ quizState, dispatch, getNextQuestion });
+  useQuizInputHandler({ quizState, dispatch, getNextQuestion, richShortcuts: richShortcuts || [] });
 
   const value = {
     quizState,

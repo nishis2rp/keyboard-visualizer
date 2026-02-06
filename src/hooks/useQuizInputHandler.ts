@@ -3,15 +3,16 @@ import { isModifierKey, isWindowsKey } from '../utils/keyUtils';
 import { SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts';
 import { normalizePressedKeys, checkAnswer, normalizeShortcut } from '../utils/quizEngine';
 import { QuizAction, QuizState } from '../../context/QuizContext';
-import { QuizQuestion } from '../types';
+import { QuizQuestion, RichShortcut } from '../types';
 
 interface UseQuizInputHandlerProps {
   quizState: QuizState; // 型を明確化
   dispatch: React.Dispatch<QuizAction>;
   getNextQuestion: () => void;
+  richShortcuts: RichShortcut[]; // 追加
 }
 
-export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion }: UseQuizInputHandlerProps) => {
+export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion, richShortcuts }: UseQuizInputHandlerProps) => {
   const previousPressedKeysRef = useRef<Set<string>>(new Set());
   const cooldownRef = useRef<boolean>(false);
   const sequentialKeyRecorderRef = useRef<SequentialKeyRecorder>(new SequentialKeyRecorder());
@@ -57,7 +58,7 @@ export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion }: Us
 
     const answerTimeMs = Date.now() - questionStartTime;
     const userAnswer = normalizePressedKeys(pressedKeys, keyboardLayout);
-    const isCorrect = checkAnswer(userAnswer, currentQuestion.normalizedCorrectShortcut);
+    const isCorrect = checkAnswer(userAnswer, currentQuestion.normalizedCorrectShortcut, richShortcuts);
 
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
     previousPressedKeysRef.current = new Set();

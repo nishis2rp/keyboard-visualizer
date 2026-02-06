@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { SETUP_VERSION } from '../../constants/app'
-import { apps as appConfig } from '../../config/apps'
 import { useAppContext } from '../../context/AppContext'
 import { useAuth } from '../../context/AuthContext'
 import AuthModal from '../Auth/AuthModal'
@@ -12,7 +11,7 @@ interface SetupScreenProps {
 }
 
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
-  const { isQuizMode } = useAppContext()
+  const { isQuizMode, apps } = useAppContext()
   const { user } = useAuth()
   const [selectedFullscreen, setSelectedFullscreen] = useState(null)
   const [selectedLayout, setSelectedLayout] = useState(null)
@@ -66,7 +65,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   ]
 
   // ビジュアライザーモード用のアプリケーション選択肢
-  const visualizerAppOptions = appConfig.map(app => ({
+  const visualizerAppOptions = apps.map(app => ({
     ...app,
     description: `${app.name}のショートカットを表示`
   }))
@@ -128,7 +127,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
       icon: '🎲',
       description: 'すべてのアプリからランダムに出題'
     },
-    ...appConfig.map(app => ({
+    ...apps.map(app => ({
       ...app,
       description: `${app.name}のショートカットのみ出題`
     }))

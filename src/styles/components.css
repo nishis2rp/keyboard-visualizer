@@ -231,17 +231,6 @@
     0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
-@keyframes keyFadeIn {
-  0% {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
 .plus {
   font-size: 1.5em;
   color: var(--sf-gray);
@@ -304,17 +293,6 @@
 .description-icon {
   font-size: 1.3em;
   margin-right: 10px;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Shortcuts List - Modern Card Grid */
@@ -397,8 +375,13 @@
 
 /* Protection Level Styles for Shortcut Cards */
 .shortcut-card.preventable-fullscreen {
-  border: 2px solid #0078D4; /* Blue border for fullscreen-preventable shortcuts */
+  border: 2px solid #0078D4;
   background: linear-gradient(135deg, rgba(0, 120, 212, 0.08) 0%, rgba(0, 120, 212, 0.05) 100%);
+}
+
+.shortcut-card.preventable-fullscreen .shortcut-combo,
+.shortcut-card.preventable-fullscreen .shortcut-desc {
+  color: #000000;
 }
 
 .shortcut-card.preventable-fullscreen:hover {
@@ -407,11 +390,28 @@
 }
 
 .shortcut-card.always-protected {
-  border: 2px solid #FF3B30; /* Red border for always-protected shortcuts */
+  border: 2px solid #FF3B30;
   background: linear-gradient(135deg, rgba(255, 59, 48, 0.08) 0%, rgba(255, 59, 48, 0.05) 100%);
+}
+
+.shortcut-card.always-protected .shortcut-combo,
+.shortcut-card.always-protected .shortcut-desc {
+  color: #000000;
 }
 
 .shortcut-card.always-protected:hover {
   border-color: #FF3B30;
   box-shadow: var(--shadow-md), 0 4px 16px rgba(255, 59, 48, 0.25);
+}
+
+/* Responsive Design for Components */
+@media (max-width: 768px) {
+  .selectors-container {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .shortcuts-grid {
+    grid-template-columns: 1fr;
+  }
 }

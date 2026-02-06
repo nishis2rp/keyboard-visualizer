@@ -58,6 +58,7 @@ export interface RichShortcut {
   windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
   macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
   press_type: 'sequential' | 'simultaneous'; // 追加
+  alternative_group_id?: number | null; // 追加
 }
 
 export interface AvailableShortcut extends RichShortcut {

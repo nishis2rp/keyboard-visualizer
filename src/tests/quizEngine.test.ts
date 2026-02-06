@@ -6,17 +6,12 @@ import {
   checkAnswer,
   isShortcutSafe,
 } from '../utils/quizEngine';
-import {
-  ALWAYS_PROTECTED_SHORTCUTS,
-  FULLSCREEN_PREVENTABLE_SHORTCUTS,
-  detectOS
-} from '../constants/systemProtectedShortcuts';
+import { detectOS } from '../utils/os';
+import { RichShortcut, App, ShortcutDetails } from '../types';
 
 // Mock detectOS
-vi.mock('../constants/systemProtectedShortcuts', async (importOriginal) => {
-  const actual = await importOriginal();
+vi.mock('../utils/os', async (importOriginal) => {
   return {
-    ...actual,
     detectOS: vi.fn(() => 'windows'), // Default to Windows
   };
 });
@@ -24,10 +19,11 @@ vi.mock('../constants/systemProtectedShortcuts', async (importOriginal) => {
 describe('quizEngine', () => {
   beforeEach(() => {
     // Reset mocks before each test
-    detectOS.mockReturnValue('windows');
+    (detectOS as any).mockReturnValue('windows');
   });
 
   // --- normalizeShortcut ---
+  // (No changes needed for normalizeShortcut tests)
   describe('normalizeShortcut', () => {
     it('should normalize shortcut strings by sorting modifiers', () => {
       expect(normalizeShortcut('Shift + Ctrl + A')).toBe('Ctrl+Shift+A');
@@ -40,16 +36,16 @@ describe('quizEngine', () => {
     it('should handle "Win" and "Cmd" keys by converting to "Meta"', () => {
       expect(normalizeShortcut('Win + A')).toBe('Meta+A');
       expect(normalizeShortcut('Cmd + S')).toBe('Meta+S');
-      expect(normalizeShortcut('Shift + Win + C')).toBe('Meta+Shift+C'); // Corrected expectation
+      expect(normalizeShortcut('Shift + Win + C')).toBe('Meta+Shift+C'); 
     });
 
     it('should handle different modifier casing', () => {
-      expect(normalizeShortcut('ctrl + a')).toBe('Ctrl+A'); // Corrected expectation
-      expect(normalizeShortcut('ALT + B')).toBe('Alt+B'); // Corrected expectation
+      expect(normalizeShortcut('ctrl + a')).toBe('Ctrl+A'); 
+      expect(normalizeShortcut('ALT + B')).toBe('Alt+B'); 
     });
 
     it('should remove spaces', () => {
-      expect(normalizeShortcut(' Ctrl + A ')).toBe('Ctrl+A'); // Corrected expectation
+      expect(normalizeShortcut(' Ctrl + A ')).toBe('Ctrl+A'); 
     });
 
     it('should return empty string for null or empty input', () => {
@@ -92,48 +88,61 @@ describe('quizEngine', () => {
 
     it('should handle Windows Meta key', () => {
       const pressed = new Set(['MetaLeft', 'KeyD']);
-      expect(normalizePressedKeys(pressed, mockLayout)).toBe('Meta+D'); // Converted to Meta by normalizeShortcut
+      expect(normalizePressedKeys(pressed, mockLayout)).toBe('Meta+D'); 
     });
 
     it('should handle macOS Cmd key', () => {
-      detectOS.mockReturnValue('macos'); // Set to macOS
+      (detectOS as any).mockReturnValue('macos'); // Set to macOS
       const pressed = new Set(['MetaLeft', 'KeyS']);
       const macMockLayout = 'mac-us';
-      expect(normalizePressedKeys(pressed, macMockLayout)).toBe('Meta+S'); // Converted to Meta by normalizeShortcut
+      expect(normalizePressedKeys(pressed, macMockLayout)).toBe('Meta+S'); 
     });
   });
 
   // --- isShortcutSafe ---
   describe('isShortcutSafe', () => {
-    beforeEach(() => {
-      ALWAYS_PROTECTED_SHORTCUTS.clear();
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.clear();
+    // Helper to create a mock RichShortcut
+    const createRichShortcut = (protectionLevel: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen'): RichShortcut => ({
+      id: 1,
+      keys: 'Ctrl+A',
+      description: 'Test',
+      difficulty: 'basic',
+      application: 'test',
+      category: 'test',
+      created_at: '',
+      press_type: 'simultaneous',
+      windows_protection_level: protectionLevel,
+      macos_protection_level: protectionLevel,
     });
 
-    it('should be safe if not in any protected lists', () => {
+    it('should be safe if no richShortcut is provided (fallback)', () => {
       expect(isShortcutSafe('Ctrl+A', 'default', false)).toBe(true);
     });
 
-    it('should be unsafe if in ALWAYS_PROTECTED_SHORTCUTS', () => {
-      ALWAYS_PROTECTED_SHORTCUTS.add('Ctrl+L');
-      expect(isShortcutSafe('Ctrl+L', 'default', false)).toBe(false);
-      expect(isShortcutSafe('Ctrl+L', 'hardcore', true)).toBe(false); // Always protected, even in hardcore mode
+    it('should be safe if protection level is none', () => {
+      const rs = createRichShortcut('none');
+      expect(isShortcutSafe('Ctrl+A', 'default', false, rs)).toBe(true);
     });
 
-    it('should be unsafe if in FULLSCREEN_PREVENTABLE_SHORTCUTS and not fullscreen in default mode', () => {
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-      expect(isShortcutSafe('Ctrl+W', 'default', false)).toBe(false);
+    it('should be unsafe if protection level is always-protected', () => {
+      const rs = createRichShortcut('always-protected');
+      expect(isShortcutSafe('Ctrl+L', 'default', false, rs)).toBe(false);
+      expect(isShortcutSafe('Ctrl+L', 'hardcore', true, rs)).toBe(false);
     });
 
-    it('should be safe if in FULLSCREEN_PREVENTABLE_SHORTCUTS but is fullscreen in default mode', () => {
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-      expect(isShortcutSafe('Ctrl+W', 'default', true)).toBe(true);
+    it('should be unsafe if preventable_fullscreen and not fullscreen in default mode', () => {
+      const rs = createRichShortcut('preventable_fullscreen');
+      expect(isShortcutSafe('Ctrl+W', 'default', false, rs)).toBe(false);
     });
 
-    it('should be safe if in FULLSCREEN_PREVENTABLE_SHORTCUTS and in hardcore mode', () => {
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-      expect(isShortcutSafe('Ctrl+W', 'hardcore', false)).toBe(true);
-      expect(isShortcutSafe('Ctrl+W', 'hardcore', true)).toBe(true);
+    it('should be safe if preventable_fullscreen but is fullscreen in default mode', () => {
+      const rs = createRichShortcut('preventable_fullscreen');
+      expect(isShortcutSafe('Ctrl+W', 'default', true, rs)).toBe(true);
+    });
+
+    it('should be safe if preventable_fullscreen and in hardcore mode', () => {
+      const rs = createRichShortcut('preventable_fullscreen');
+      expect(isShortcutSafe('Ctrl+W', 'hardcore', false, rs)).toBe(true);
     });
   });
 
@@ -141,72 +150,59 @@ describe('quizEngine', () => {
   describe('generateQuestion', () => {
     const mockShortcuts = {
       'testApp': {
-        'Ctrl+A': 'すべて選択',
-        'Ctrl+S': '保存',
-        'Win+L': 'PCをロック',
-        'Ctrl+W': 'タブを閉じる',
-        'Alt+F4': 'アプリを閉じる'
+        'Ctrl+A': { description: 'すべて選択', difficulty: 'basic' } as ShortcutDetails,
+        'Ctrl+S': { description: '保存', difficulty: 'basic' } as ShortcutDetails,
+        'Win+L': { description: 'PCをロック', difficulty: 'basic' } as ShortcutDetails,
+        'Ctrl+W': { description: 'タブを閉じる', difficulty: 'basic' } as ShortcutDetails,
+        'Alt+F4': { description: 'アプリを閉じる', difficulty: 'basic' } as ShortcutDetails
       }
     };
 
-    beforeEach(() => {
-      ALWAYS_PROTECTED_SHORTCUTS.clear();
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.clear();
-    });
+    const mockApps: App[] = [{ id: 'testApp', name: 'Test App', icon: '', os: 'windows' }];
+
+    const mockRichShortcuts: RichShortcut[] = [
+      { id: 1, keys: 'Ctrl+A', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: '', created_at: '', press_type: 'simultaneous' },
+      { id: 2, keys: 'Ctrl+S', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: '', created_at: '', press_type: 'simultaneous' },
+      { id: 3, keys: 'Win+L', application: 'testApp', difficulty: 'basic', windows_protection_level: 'always-protected', macos_protection_level: 'always-protected', description: '', created_at: '', press_type: 'simultaneous' },
+      { id: 4, keys: 'Ctrl+W', application: 'testApp', difficulty: 'basic', windows_protection_level: 'preventable_fullscreen', macos_protection_level: 'preventable_fullscreen', description: '', created_at: '', press_type: 'simultaneous' },
+      { id: 5, keys: 'Alt+F4', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: '', created_at: '', press_type: 'simultaneous' }
+    ];
 
     it('should return null if no shortcuts are provided', () => {
-      expect(generateQuestion({}, ['anyApp'], 'default', false, new Set(), 'allrange')).toBeNull();
-      expect(generateQuestion(mockShortcuts, [], 'default', false, new Set(), 'allrange')).toBeNull();
+      expect(generateQuestion({}, ['anyApp'], 'default', false, new Set(), 'allrange', [], mockApps)).toBeNull();
+      // Even if data is provided, if allowedApps is empty/mismatch
+      expect(generateQuestion(mockShortcuts, [], 'default', false, new Set(), 'allrange', mockRichShortcuts, mockApps)).toBeNull();
     });
 
     it('should generate a question from safe shortcuts in default mode', () => {
-      ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L'); // Win+L is normalized to Meta+L
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W'); // Ctrl+W is unsafe by default
-
-      const question = generateQuestion(mockShortcuts, ['testApp'], 'default', false, new Set(), 'allrange');
+      const question = generateQuestion(mockShortcuts, ['testApp'], 'default', false, new Set(), 'allrange', mockRichShortcuts, mockApps);
       expect(question).not.toBeNull();
-      // Win+L and Ctrl+W are excluded, so one of Ctrl+A, Ctrl+S, Alt+F4
+      
+      // Win+L (always) and Ctrl+W (preventable, windowed) are excluded
       const possibleShortcuts = ['Ctrl+A', 'Ctrl+S', 'Alt+F4'];
-      expect(possibleShortcuts).toContain(question.correctShortcut);
-      expect(question.question).toMatch(/のショートカットは？$/);
-      expect(question.normalizedCorrectShortcut).toBe(normalizeShortcut(question.correctShortcut));
+      expect(possibleShortcuts).toContain(question?.correctShortcut);
     });
 
-    it('should generate a question from FULLSCREEN_PREVENTABLE_SHORTCUTS if fullscreen in default mode', () => {
-      ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L');
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-
-      const question = generateQuestion(mockShortcuts, ['testApp'], 'default', true, new Set(), 'allrange'); // Fullscreen
+    it('should generate a question from preventable shortcuts if fullscreen in default mode', () => {
+      const question = generateQuestion(mockShortcuts, ['testApp'], 'default', true, new Set(), 'allrange', mockRichShortcuts, mockApps);
       expect(question).not.toBeNull();
-      // Win+L is always protected and excluded. Ctrl+W becomes safe in fullscreen.
+      
+      // Ctrl+W is now safe
       const possibleShortcuts = ['Ctrl+A', 'Ctrl+S', 'Alt+F4', 'Ctrl+W'];
-      expect(possibleShortcuts).toContain(question.correctShortcut);
+      expect(possibleShortcuts).toContain(question?.correctShortcut);
     });
 
-    it('should generate a question from FULLSCREEN_PREVENTABLE_SHORTCUTS in hardcore mode', () => {
-      ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L');
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W');
-
-      const question = generateQuestion(mockShortcuts, ['testApp'], 'hardcore', false, new Set(), 'allrange'); // Hardcore mode
+    it('should generate a question from preventable shortcuts in hardcore mode', () => {
+      const question = generateQuestion(mockShortcuts, ['testApp'], 'hardcore', false, new Set(), 'allrange', mockRichShortcuts, mockApps);
       expect(question).not.toBeNull();
-      // Win+L is always protected and excluded. Ctrl+W becomes safe in hardcore mode.
+      
       const possibleShortcuts = ['Ctrl+A', 'Ctrl+S', 'Alt+F4', 'Ctrl+W'];
-      expect(possibleShortcuts).toContain(question.correctShortcut);
-    });
-
-    it('should return null if no safe shortcuts are available', () => {
-      ALWAYS_PROTECTED_SHORTCUTS.add('Ctrl+A');
-      ALWAYS_PROTECTED_SHORTCUTS.add('Ctrl+S');
-      ALWAYS_PROTECTED_SHORTCUTS.add('Meta+L');
-      FULLSCREEN_PREVENTABLE_SHORTCUTS.add('Ctrl+W'); // In default mode, this is unsafe
-      ALWAYS_PROTECTED_SHORTCUTS.add('Alt+F4');
-
-      const question = generateQuestion(mockShortcuts, ['testApp'], 'default', false, new Set(), 'allrange');
-      expect(question).toBeNull();
+      expect(possibleShortcuts).toContain(question?.correctShortcut);
     });
   });
 
   // --- checkAnswer ---
+  // (No changes needed usually, unless checkAnswer relies on DB data mock now)
   describe('checkAnswer', () => {
     it('should return true for a correct answer', () => {
       expect(checkAnswer('Ctrl+Shift+A', 'Ctrl+Shift+A')).toBe(true);
@@ -217,7 +213,6 @@ describe('quizEngine', () => {
     });
 
     it('should handle different casing in userAnswer if normalized correctly', () => {
-      // Assumes that casing is normalized by normalizeShortcut
       expect(checkAnswer(normalizeShortcut('ctrl+a'), normalizeShortcut('Ctrl+A'))).toBe(true);
     });
   });

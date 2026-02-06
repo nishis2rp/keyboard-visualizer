@@ -184,33 +184,6 @@
   background-color: rgba(0, 120, 212, 0.4);
 }
 
-/* ShortcutCard 保護レベル別スタイル */
-.shortcut-card.always-protected {
-  border-color: #FF3B30;
-  background-color: rgba(255, 59, 48, 0.08);
-}
-
-.shortcut-card.always-protected .shortcut-combo {
-  color: #000000;
-}
-
-.shortcut-card.always-protected .shortcut-desc {
-  color: #000000;
-}
-
-.shortcut-card.preventable-fullscreen {
-  border-color: #0078D4;
-  background-color: rgba(0, 120, 212, 0.08); /* 既存の青色に合わせる */
-}
-
-.shortcut-card.preventable-fullscreen .shortcut-combo {
-  color: #000000;
-}
-
-.shortcut-card.preventable-fullscreen .shortcut-desc {
-  color: #000000;
-}
-
 .keyboard-key.spacer {
   background: linear-gradient(145deg, #D0D2D4 0%, #C0C2C4 50%, #B0B2B4 100%);
   border: none;
@@ -251,18 +224,6 @@
   color: var(--white) !important;
   font-weight: 700 !important;
   animation: keyPress var(--transition-base);
-}
-
-@keyframes keyPress {
-  0% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(3px) scale(1.08);
-  }
-  100% {
-    transform: translateY(3px) scale(1.05);
-  }
 }
 
 .keyboard-key:active {
@@ -368,4 +329,31 @@
 .legend-key.pressed {
   background: linear-gradient(180deg, #FF3B30 0%, #E62E24 100%);
   border-color: rgba(255, 59, 48, 0.3);
+}
+
+/* Responsive Design for Keyboard */
+@media (max-width: 1280px) {
+  .keyboard {
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 1024px) {
+  .keyboard {
+    transform: scale(0.75);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 768px) {
+  .keyboard {
+    transform: scale(0.7);
+    transform-origin: top center;
+  }
+
+  .key-shortcuts-popup {
+    min-width: 200px;
+    font-size: 0.9em;
+  }
 }

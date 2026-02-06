@@ -1,14 +1,8 @@
-/**
- * 代替ショートカットのマッピング
- *
- * 同じ処理を行う異なるショートカットキーをグループ化します。
- * クイズモードでは、グループ内のいずれかのショートカットで回答すれば正解となります。
- */
+import { RichShortcut } from '../types';
 
 /**
- * 代替ショートカットのグループ
- * キー: 正規化された代表的なショートカット
- * 値: 同じ処理を行う代替ショートカットの配列（正規化済み）
+ * 代替ショートカットのマッピング
+ * ... (existing mappings) ...
  */
 export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
   // === 基本操作 ===
@@ -206,9 +200,25 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
 /**
  * 指定されたショートカットの代替ショートカットをすべて取得
  * @param normalizedShortcut - 正規化されたショートカット
+ * @param richShortcuts - (Optional) DBから取得したリッチショートカットのリスト
  * @returns 代替ショートカットの配列（元のショートカットも含む）
  */
-export const getAlternativeShortcuts = (normalizedShortcut: string): string[] => {
+export const getAlternativeShortcuts = (normalizedShortcut: string, richShortcuts?: RichShortcut[] | null): string[] => {
+  // DB情報がある場合は、同じalternative_group_idを持つショートカットを探す
+  if (richShortcuts) {
+    // まず、入力されたショートカットに紐付くグループIDを探す
+    // ※複数のアプリで同じキーが定義されている可能性があるため、最初に見つかったグループIDを採用
+    const groupShortcut = richShortcuts.find(rs => rs.keys === normalizedShortcut && rs.alternative_group_id);
+    if (groupShortcut) {
+      const groupId = groupShortcut.alternative_group_id;
+      // 同じグループIDを持つすべてのキーを取得
+      const alts = richShortcuts
+        .filter(rs => rs.alternative_group_id === groupId)
+        .map(rs => rs.keys);
+      return Array.from(new Set([normalizedShortcut, ...alts]));
+    }
+  }
+
   // 直接マッピングがある場合
   if (ALTERNATIVE_SHORTCUTS[normalizedShortcut]) {
     return [normalizedShortcut, ...ALTERNATIVE_SHORTCUTS[normalizedShortcut]];
@@ -229,15 +239,16 @@ export const getAlternativeShortcuts = (normalizedShortcut: string): string[] =>
  * 2つのショートカットが同じ処理を行うかチェック
  * @param shortcut1 - 正規化されたショートカット1
  * @param shortcut2 - 正規化されたショートカット2
+ * @param richShortcuts - (Optional) DBから取得したリッチショートカットのリスト
  * @returns 同じ処理を行う場合true
  */
-export const areShortcutsEquivalent = (shortcut1: string, shortcut2: string): boolean => {
+export const areShortcutsEquivalent = (shortcut1: string, shortcut2: string, richShortcuts?: RichShortcut[] | null): boolean => {
   if (shortcut1 === shortcut2) {
     return true;
   }
 
-  const alternatives1 = getAlternativeShortcuts(shortcut1);
-  const alternatives2 = getAlternativeShortcuts(shortcut2);
+  const alternatives1 = getAlternativeShortcuts(shortcut1, richShortcuts);
+  const alternatives2 = getAlternativeShortcuts(shortcut2, richShortcuts);
 
   // いずれかのグループに両方が含まれていればtrue
   return alternatives1.some(alt => alternatives2.includes(alt));

@@ -3,7 +3,6 @@ import { useLocalStorage } from '../hooks';
 import { useShortcuts } from '../hooks/useShortcuts';
 import { SETUP_VERSION, STORAGE_KEYS, DEFAULTS } from '../constants';
 import { getLayoutDisplayName, keyboardLayoutOptions, KeyboardLayoutOption } from '../data/layouts';
-import { apps as appConfig } from '../config/apps';
 import { App, AppShortcuts, AllShortcuts, RichShortcut } from '../types';
 
 interface SetupData {
@@ -45,7 +44,7 @@ interface AppProviderProps {
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // APIからショートカットデータを取得
-  const { shortcuts: allShortcuts, richShortcuts, loading, error } = useShortcuts();
+  const { shortcuts: allShortcuts, richShortcuts, apps: dbApps, loading, error } = useShortcuts();
 
   const [setup, setSetup] = useLocalStorage(
     STORAGE_KEYS.SETUP,
@@ -63,7 +62,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizApp, setQuizApp] = useState<string | null>(null);
   const [quizDifficulty, setQuizDifficulty] = useState<'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null>(null);
-  const [apps] = useState<App[]>(appConfig); // stateとして保持
+
+  // DBから取得したアプリリストを使用（なければ空配列）
+  const apps = useMemo(() => dbApps || [], [dbApps]);
 
   const handleSetupComplete = useCallback((app, layout, mode = 'visualizer', quizAppParam = null, difficulty = null, isFullscreen = false) => {
     setSelectedApp(app);
