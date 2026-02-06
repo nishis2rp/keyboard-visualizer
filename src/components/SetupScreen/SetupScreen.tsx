@@ -90,33 +90,33 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const difficultyOptions = [
     {
       id: 'basic',
-      name: 'Basic',
+      name: 'basic',
       icon: '🌟',
-      description: '初心者向け：よく使われる基本的なショートカット'
+      description: 'For beginners: Commonly used basic shortcuts'
     },
     {
       id: 'standard',
-      name: 'Standard',
+      name: 'standard',
       icon: '⚡',
-      description: '中級者向け：適度な難易度のショートカット'
+      description: 'For intermediate users: Standard difficulty shortcuts'
     },
     {
       id: 'hard',
-      name: 'Hard',
+      name: 'hard',
       icon: '💪',
-      description: '上級者向け：より高度で実践的なショートカット'
+      description: 'For advanced users: More advanced and practical shortcuts'
     },
     {
       id: 'madmax',
-      name: 'MadMax',
+      name: 'madmax',
       icon: '🔥',
-      description: '最難関：非常に特殊で習得が難しいプロフェッショナル向けショートカット'
+      description: 'Expert level: Very specialized and difficult professional shortcuts'
     },
     {
       id: 'allrange',
-      name: 'All Range',
+      name: 'allrange',
       icon: '🎲',
-      description: '全難易度：あらゆるショートカットからランダム'
+      description: 'All difficulties: Random shortcuts from all levels'
     }
   ]
 

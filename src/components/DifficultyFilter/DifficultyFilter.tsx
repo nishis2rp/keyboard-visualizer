@@ -10,10 +10,10 @@ interface DifficultyOption {
 }
 
 const difficultyOptions: DifficultyOption[] = [
-  { id: 'basic', name: '基本', icon: '🌟', description: '日常的に使う基本操作' },
-  { id: 'standard', name: '標準', icon: '⚡', description: '標準的なショートカット' },
-  { id: 'hard', name: '難解', icon: '🔥', description: '高度な機能・専門的な操作' },
-  { id: 'madmax', name: '超難解', icon: '💀', description: '超上級者向け' },
+  { id: 'basic', name: 'basic', icon: '🌟', description: 'Daily basic operations' },
+  { id: 'standard', name: 'standard', icon: '⚡', description: 'Standard shortcuts' },
+  { id: 'hard', name: 'hard', icon: '🔥', description: 'Advanced features and operations' },
+  { id: 'madmax', name: 'madmax', icon: '💀', description: 'Expert level shortcuts' },
 ];
 
 interface DifficultyFilterProps {

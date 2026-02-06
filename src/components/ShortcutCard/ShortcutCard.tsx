@@ -25,15 +25,15 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
     }
     switch (difficulty) {
       case 'basic':
-        return '🌟 基本';
+        return 'basic';
       case 'standard':
-        return '⚡ 標準';
+        return 'standard';
       case 'hard':
-        return '🔥 難解';
+        return 'hard';
       case 'madmax':
-        return '💀 超難解';
+        return 'madmax';
       case 'allrange':
-        return '🎯 全範囲';
+        return 'allrange';
       default:
         return '';
     }
