@@ -5,66 +5,92 @@ import { normalizeShortcut } from '../utils/quizEngine';
 import { Shortcut } from '../lib/supabase';
 
 interface UseShortcutsReturn {
-  shortcuts: AllShortcuts | null;
-  richShortcuts: RichShortcut[] | null;
-  apps: App[] | null; // 追加
+  shortcuts: AllShortcuts;
+  richShortcuts: RichShortcut[];
+  apps: App[] | null;
   loading: boolean;
   error: Error | null;
-  refetch: () => void;
+  fetchApps: () => Promise<void>;
+  fetchShortcutsForApp: (appId: string) => Promise<void>;
+  isAppLoaded: (appId: string) => boolean;
 }
 
 /**
- * Supabaseからすべてのショートカットデータを取得し、難易度情報を含む形式に加工するカスタムフック
+ * Supabaseからアプリケーション一覧と、必要に応じてショートカットデータを取得するカスタムフック
  */
 export function useShortcuts(): UseShortcutsReturn {
-  const [shortcuts, setShortcuts] = useState<AllShortcuts | null>(null);
-  const [richShortcuts, setRichShortcuts] = useState<RichShortcut[] | null>(null);
+  const [shortcuts, setShortcuts] = useState<AllShortcuts>({});
+  const [richShortcuts, setRichShortcuts] = useState<RichShortcut[]>([]);
   const [apps, setApps] = useState<App[] | null>(null);
+  const [loadedApps, setLoadedApps] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchShortcuts = useCallback(async () => {
+  const fetchApps = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('applications')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+      setApps(data as App[]);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to fetch applications'));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchShortcutsForApp = useCallback(async (appId: string) => {
+    if (loadedApps.has(appId)) return;
+
     try {
       setLoading(true);
       setError(null);
 
-      // 並列で取得
-      const [shortcutsResponse, appsResponse] = await Promise.all([
-        supabase.from('shortcuts').select('*').limit(15000),
-        supabase.from('applications').select('*').order('display_order', { ascending: true })
-      ]);
+      let query = supabase.from('shortcuts').select('*');
 
-      if (shortcutsResponse.error) {
-        throw new Error(`Failed to fetch shortcuts: ${shortcutsResponse.error.message}`);
-      }
-      if (appsResponse.error) {
-        console.error('Failed to fetch applications, using fallback:', appsResponse.error.message);
-      } else {
-        setApps(appsResponse.data as App[]);
-      }
-
-      const { data } = shortcutsResponse;
-
-      console.log('[useShortcuts] Total shortcuts fetched from DB:', data?.length);
-      console.log('[useShortcuts] Expected: 1307, Got:', data?.length);
-
-      // Count by application
-      const countByApp = data?.reduce((acc: any, item: any) => {
-        acc[item.application] = (acc[item.application] || 0) + 1;
-        return acc;
-      }, {});
-      console.log('[useShortcuts] Shortcuts by app:', countByApp);
-
-      // Supabaseレスポンスを AllShortcuts の形式に変換
-      const shortcutsMap: AllShortcuts = {};
-      const richShortcutsArray: RichShortcut[] = [];
-
-      (data as Shortcut[]).forEach((item) => {
-        if (!shortcutsMap[item.application]) {
-          shortcutsMap[item.application] = {};
+      if (appId !== 'random') {
+        // 複数アプリ（カンマ区切り）に対応
+        const appIds = appId.split(',').filter(id => id && id !== 'random');
+        
+        if (appIds.length === 0) {
+          setLoading(false);
+          return;
         }
 
-        const normalizedShortcut = normalizeShortcut(item.keys);
+        // 未ロードのアプリのみ取得
+        const appsToFetch = appIds.filter(id => !loadedApps.has(id));
+        if (appsToFetch.length === 0) {
+          setLoading(false);
+          return;
+        }
+        query = query.in('application', appsToFetch);
+      } else {
+        // random の場合は全アプリロード済みとするか、全データを取得
+        // 既に全ロード済みのフラグがあればスキップ
+        if (loadedApps.has('all')) {
+          setLoading(false);
+          return;
+        }
+      }
+
+      const { data, error } = await query.limit(15000);
+
+      if (error) throw error;
+
+      const newShortcutsMap = { ...shortcuts };
+      const newRichShortcuts = [...richShortcuts];
+      const newlyLoadedApps = new Set<string>();
+
+      (data as Shortcut[]).forEach((item) => {
+        newlyLoadedApps.add(item.application);
+        if (!newShortcutsMap[item.application]) {
+          newShortcutsMap[item.application] = {};
+        }
+
         const difficulty: ShortcutDetails['difficulty'] = (item.difficulty as ShortcutDetails['difficulty']) || 'standard';
 
         const richShortcut: RichShortcut = {
@@ -78,32 +104,50 @@ export function useShortcuts(): UseShortcutsReturn {
           platform: item.platform,
           windows_keys: item.windows_keys,
           macos_keys: item.macos_keys,
-          windows_protection_level: item.windows_protection_level as 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen',
-          macos_protection_level: item.macos_protection_level as 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen',
-          press_type: item.press_type as 'sequential' | 'simultaneous', // ★ 追加
-          alternative_group_id: item.alternative_group_id as number, // ★ 追加
+          windows_protection_level: item.windows_protection_level as any,
+          macos_protection_level: item.macos_protection_level as any,
+          press_type: item.press_type as any,
+          alternative_group_id: item.alternative_group_id as any,
         };
-        richShortcutsArray.push(richShortcut);
+        
+        // 重複チェック（全取得時に既にロード済みのものがある可能性があるため）
+        if (!richShortcuts.some(rs => rs.id === richShortcut.id)) {
+           newRichShortcuts.push(richShortcut);
+        }
 
-        shortcutsMap[richShortcut.application][richShortcut.keys] = {
+        newShortcutsMap[richShortcut.application][richShortcut.keys] = {
           description: richShortcut.description,
           difficulty: richShortcut.difficulty,
         };
       });
 
-      setShortcuts(shortcutsMap);
-      setRichShortcuts(richShortcutsArray);
+      setShortcuts(newShortcutsMap);
+      setRichShortcuts(newRichShortcuts);
+      setLoadedApps(prev => {
+        const next = new Set(prev);
+        if (appId === 'random') {
+          next.add('all');
+          next.add('random');
+        }
+        newlyLoadedApps.forEach(id => next.add(id));
+        return next;
+      });
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
-      console.error('Error fetching shortcuts:', err);
+      setError(err instanceof Error ? err : new Error(`Failed to fetch shortcuts for ${appId}`));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loadedApps, shortcuts, richShortcuts]);
+
+  const isAppLoaded = useCallback((appId: string) => {
+    if (appId === 'random') return loadedApps.has('all') || loadedApps.has('random');
+    const appIds = appId.split(',').filter(id => id && id !== 'random');
+    return appIds.every(id => loadedApps.has(id));
+  }, [loadedApps]);
 
   useEffect(() => {
-    fetchShortcuts();
-  }, [fetchShortcuts]);
+    fetchApps();
+  }, [fetchApps]);
 
   return {
     shortcuts,
@@ -111,6 +155,8 @@ export function useShortcuts(): UseShortcutsReturn {
     apps,
     loading,
     error,
-    refetch: fetchShortcuts,
+    fetchApps,
+    fetchShortcutsForApp,
+    isAppLoaded,
   };
 }

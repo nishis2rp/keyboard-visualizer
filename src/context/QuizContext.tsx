@@ -2,7 +2,7 @@ import React, { createContext, useReducer, useContext, useCallback, ReactNode, D
 import { generateQuestion, checkAnswer, normalizePressedKeys, getCompatibleApps, normalizeShortcut, isShortcutSafe } from '../utils/quizEngine';
 import { isModifierKey, isWindowsKey } from '../utils/keyUtils';
 import { SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts';
-import { useAppContext } from './AppContext';
+import { useShortcutData } from './ShortcutContext';
 import { useQuizInputHandler } from '../hooks/useQuizInputHandler'; // 追加
 import { useQuizProgress } from '../hooks/useQuizProgress'; // 追加
 import { QuizQuestion } from '../types';
@@ -246,7 +246,7 @@ interface QuizProviderProps {
 
 export function QuizProvider({ children }: QuizProviderProps) {
   // AppContextからショートカットデータを取得
-  const { allShortcuts, richShortcuts, apps } = useAppContext();
+  const { allShortcuts, richShortcuts, apps } = useShortcutData();
 
   const [quizState, dispatch] = useReducer(quizReducer, initialQuizState);
 

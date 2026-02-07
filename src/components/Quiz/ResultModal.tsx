@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { useQuiz } from '../../context/QuizContext';
-import { useAppContext } from '../../context/AppContext';
+import { useUI } from '../../context';
 import { StyledButton } from '../common/StyledButton';
 import styles from './ResultModal.module.css';
 
 function ResultModal() {
   const { quizState, dispatch, startQuiz } = useQuiz();
-  const { setShowSetup, setIsQuizMode } = useAppContext();
+  const { setShowSetup, setIsQuizMode } = useUI();
   const { status, score, quizHistory, selectedApp, keyboardLayout, startTime, endTime, settings } = quizState;
   const [isCopied, setIsCopied] = useState(false);
 

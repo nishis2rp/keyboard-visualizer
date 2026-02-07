@@ -5,7 +5,7 @@ import DifficultyFilter from './DifficultyFilter';
 import KeyboardLayout from './KeyboardLayout';
 import KeyDisplay from './KeyDisplay';
 import { useKeyboardShortcuts } from '../hooks';
-import { useAppContext } from '../context/AppContext';
+import { useSettings, useShortcutData } from '../context';
 import { specialKeys } from '../constants/keys';
 import { ShortcutDifficulty } from '../types';
 
@@ -15,11 +15,19 @@ const NormalModeView = () => {
     setSelectedApp,
     keyboardLayout,
     setKeyboardLayout,
-    shortcutDescriptions,
     keyboardLayouts,
+  } = useSettings();
+
+  const {
+    allShortcuts,
     apps,
-    richShortcuts, // ★ richShortcutsを取得
-  } = useAppContext();
+    richShortcuts,
+  } = useShortcutData();
+
+  const shortcutDescriptions = useMemo(
+    () => allShortcuts?.[selectedApp] || {},
+    [allShortcuts, selectedApp]
+  );
 
   // 難易度フィルターの状態管理（デフォルトは全て選択）
   const [selectedDifficulties, setSelectedDifficulties] = useState<Set<ShortcutDifficulty>>(

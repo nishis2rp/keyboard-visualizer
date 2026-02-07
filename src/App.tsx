@@ -6,20 +6,21 @@ import NormalModeView from './components/NormalModeView';
 import QuizModeView from './components/QuizModeView';
 import MyPage from './pages/MyPage';
 import PasswordReset from './pages/PasswordReset'; // Import PasswordReset
-import { useAppContext } from './context/AppContext';
+import { useSettings, useUI, useShortcutData } from './context';
 import { useFullscreen } from './hooks';
 import './styles/global.css';
 
 const HomeView: React.FC = () => {
+  const { setSelectedApp, setKeyboardLayout, setSetup } = useSettings();
   const {
     showSetup,
-    handleSetupComplete,
+    setShowSetup,
     isQuizMode,
     setIsQuizMode,
-    loading,
-    error,
-    setShowSetup
-  } = useAppContext();
+    setQuizApp,
+    setQuizDifficulty
+  } = useUI();
+  const { loading, error } = useShortcutData();
 
   const { isFullscreenMode, toggleFullscreenMode } = useFullscreen();
 
@@ -39,8 +40,20 @@ const HomeView: React.FC = () => {
       toggleFullscreenMode();
     }
 
-    // 元のhandleSetupCompleteを呼び出す
-    handleSetupComplete(app, layout, mode, quizApp, difficulty, shouldBeFullscreen);
+    // Settings Update
+    setSelectedApp(app);
+    setKeyboardLayout(layout);
+    setSetup({
+      setupCompleted: true,
+      app,
+      layout
+    });
+
+    // UI Update
+    setIsQuizMode(mode === 'quiz');
+    setQuizApp(quizApp);
+    setQuizDifficulty(difficulty);
+    setShowSetup(false);
   };
 
 
@@ -80,7 +93,7 @@ const HomeView: React.FC = () => {
 
 
 function App() {
-  const { isQuizMode, setIsQuizMode, setShowSetup } = useAppContext();
+  const { isQuizMode, setIsQuizMode, setShowSetup } = useUI();
   const { isFullscreenMode, toggleFullscreenMode } = useFullscreen();
 
   const handleQuizModeToggle = () => {

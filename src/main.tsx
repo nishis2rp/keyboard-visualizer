@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import { AppProvider } from './context/AppContext';
+import { SettingsProvider, UIProvider, ShortcutProvider } from './context';
 import { QuizProvider } from './context/QuizContext';
 import { AuthProvider } from './context/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -22,13 +22,17 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
       <AuthProvider>
-        <AppProvider>
-          <QuizProvider>
-            <BrowserRouter basename={import.meta.env.BASE_URL}>
-              <App />
-            </BrowserRouter>
-          </QuizProvider>
-        </AppProvider>
+        <SettingsProvider>
+          <UIProvider>
+            <ShortcutProvider>
+              <QuizProvider>
+                <BrowserRouter basename={import.meta.env.BASE_URL}>
+                  <App />
+                </BrowserRouter>
+              </QuizProvider>
+            </ShortcutProvider>
+          </UIProvider>
+        </SettingsProvider>
       </AuthProvider>
     </ErrorBoundary>
   </StrictMode>,

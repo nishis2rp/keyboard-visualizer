@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import QuestionCard from './Quiz/QuestionCard';
 import ScoreBoard from './Quiz/ScoreBoard';
 import QuizProgressBar from './Quiz/QuizProgressBar'; // Import the new component
@@ -6,7 +6,7 @@ import ResultModal from './Quiz/ResultModal';
 import SystemShortcutWarning from './SystemShortcutWarning';
 import KeyboardLayout from './KeyboardLayout/KeyboardLayout';
 import { useQuiz } from '../context/QuizContext';
-import { useAppContext } from '../context/AppContext';
+import { useSettings, useUI, useShortcutData } from '../context';
 import { useKeyboardShortcuts } from '../hooks';
 import { useFullscreen } from '../hooks';
 import { detectOS } from '../constants';
@@ -15,8 +15,15 @@ import '../styles/quiz.css';
 
 const QuizModeView = () => {
   const { isFullscreenMode } = useFullscreen();
-  const { selectedApp, keyboardLayout, richShortcuts, shortcutDescriptions, quizApp, quizDifficulty } = useAppContext();
+  const { selectedApp, keyboardLayout } = useSettings();
+  const { quizApp, quizDifficulty } = useUI();
+  const { allShortcuts, richShortcuts } = useShortcutData();
   const { quizState, startQuiz, getNextQuestion, dispatch, updateFullscreen, handleKeyPress } = useQuiz();
+
+  const shortcutDescriptions = useMemo(
+    () => allShortcuts?.[selectedApp] || {},
+    [allShortcuts, selectedApp]
+  );
 
   const currentRichShortcuts = richShortcuts || [];
   const { pressedKeys } = useKeyboardShortcuts(currentRichShortcuts, keyboardLayout, selectedApp, shortcutDescriptions, true);

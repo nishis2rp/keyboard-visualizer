@@ -1,74 +1,47 @@
-import { createClient } from '@supabase/supabase-js';
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { withDatabase } from './lib/db';
+import { Client } from 'pg';
 
-// Try .env.local first, then fall back to .env
-dotenv.config({ path: '.env.local' });
-dotenv.config({ path: '.env' });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('❌ Missing Supabase credentials in .env.local');
-  process.exit(1);
-}
-
-async function runSingleMigration(migrationFile: string) {
-  console.log(`\nStarting migration: ${migrationFile}...`);
-
-  const supabase = createClient(supabaseUrl!, supabaseServiceKey!);
-
+async function runMigration(client: Client, migrationFile: string) {
+  const migrationPath = path.join(__dirname, '../supabase/migrations', migrationFile);
   try {
-    const migrationPath = path.join(process.cwd(), 'supabase', 'migrations', migrationFile);
-    const sql = fs.readFileSync(migrationPath, 'utf-8');
-
-    console.log(`✓ Loaded migration: ${migrationFile}`);
-    console.log('\nExecuting SQL...\n');
-
-    const { data, error } = await supabase.rpc('exec_sql', { sql_string: sql });
-
-    if (error) {
-      // Try direct query instead
-      const pg = await import('pg');
-      const connectionString = process.env.DATABASE_URL;
-
-      if (!connectionString) {
-        throw new Error('DATABASE_URL not found in .env');
-      }
-
-      const client = new pg.Client({ connectionString });
-      await client.connect();
-
-      await client.query(sql);
-      await client.end();
-
-      console.log(`✅ Migration ${migrationFile} completed successfully!`);
+    const sql = await fs.readFile(migrationPath, 'utf-8');
+    console.log(`Running migration: ${migrationFile}`);
+    await client.query(sql);
+    console.log(`✓ Completed: ${migrationFile}`);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.error(`Migration file not found: ${migrationPath}`);
     } else {
-      console.log(`✅ Migration ${migrationFile} completed successfully!`);
+      throw error;
     }
-  } catch (err) {
-    console.error(`❌ Migration ${migrationFile} failed:`, err);
-    throw err;
   }
 }
 
 async function main() {
   const migrationFile = process.argv[2];
-
   if (!migrationFile) {
-    console.error('Usage: tsx scripts/run-single-migration.ts <migration-file>');
+    console.error('Usage: tsx scripts/run-single-migration.ts <migration_file_name>');
     process.exit(1);
   }
 
-  try {
-    await runSingleMigration(migrationFile);
-    console.log('\n✅ Migration completed successfully!');
-  } catch (error) {
-    console.error('\n❌ Migration failed:', error);
-    process.exit(1);
-  }
+  console.log(`Starting migration for ${migrationFile}...`);
+
+  await withDatabase(async (client) => {
+    console.log('✓ Connected to Supabase PostgreSQL\n');
+
+    await runMigration(client, migrationFile);
+
+    console.log('\n✓ Migration completed successfully!');
+  });
 }
 
-main();
+main().catch(err => {
+  console.error('Migration failed:', err);
+  process.exit(1);
+});

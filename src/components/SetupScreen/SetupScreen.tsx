@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { SETUP_VERSION } from '../../constants/app'
-import { useAppContext } from '../../context/AppContext'
+import { useUI, useShortcutData } from '../../context'
 import { useAuth } from '../../context/AuthContext'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
@@ -11,7 +11,8 @@ interface SetupScreenProps {
 }
 
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
-  const { isQuizMode, apps } = useAppContext()
+  const { isQuizMode } = useUI()
+  const { apps } = useShortcutData()
   const { user } = useAuth()
   const [selectedFullscreen, setSelectedFullscreen] = useState(null)
   const [selectedLayout, setSelectedLayout] = useState(null)

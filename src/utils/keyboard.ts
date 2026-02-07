@@ -1,5 +1,5 @@
 import { getCodeDisplayName, getShiftedSymbolForKey, getPossibleKeyNamesFromDisplay } from './keyMapping'
-import { MODIFIER_ORDER } from './keyUtils'
+import { MODIFIER_ORDER, MODIFIER_KEY_NAMES } from './keyUtils'
 import { AppShortcuts, ShortcutDetails, RichShortcut, AvailableShortcut } from '../types' // ★ RichShortcut, AvailableShortcutを追加
 import { detectOS } from './os' // ★ detectOSを追加
 import { getSequentialKeys } from './sequentialShortcuts' // ★ 追加
@@ -157,13 +157,6 @@ const getLastKey = (shortcut: string): string => {
   const parts = shortcut.split(' + ')
   return parts[parts.length - 1]
 }
-
-/**
- * 修飾キーのリスト (表示名ベース)
- */
-const MODIFIER_KEY_NAMES = new Set([
-  'Ctrl', 'Shift', 'Alt', 'Win', 'Cmd', 'Option', '⌃', '⇧', '⌥' // OSごとの表示名も含む
-])
 
 /**
  * ショートカットに含まれる修飾キーの数をカウント

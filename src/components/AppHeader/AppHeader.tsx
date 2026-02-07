@@ -1,7 +1,7 @@
 import { memo, useState, useCallback } from 'react'
 import { StyledButton } from '../common/StyledButton'
 import { useAuth } from '../../context/AuthContext'
-import { useAppContext } from '../../context/AppContext'
+import { useShortcutData } from '../../context'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
 import { downloadShortcutsAsCSV } from '../../utils'
@@ -22,7 +22,7 @@ interface AppHeaderProps {
  */
 const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, isQuizMode, onQuizModeToggle }) => {
   const { user } = useAuth();
-  const { richShortcuts } = useAppContext();
+  const { richShortcuts } = useShortcutData();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // CSVダウンロードハンドラー
