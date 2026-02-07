@@ -81,7 +81,7 @@
   height: 22px;
   padding: 0 7px;
   font-family: "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #333;
   background: linear-gradient(180deg, #ffffff 0%, #f9fafb 50%, #f0f0f2 100%);
@@ -135,7 +135,7 @@
 }
 
 .description {
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.4;
   color: #4b5563;
   font-weight: 500;

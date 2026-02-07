@@ -134,6 +134,17 @@
   background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
 }
 
+.key-cap.special.active {
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-color: #1d4ed8;
+  border-bottom-width: 1px;
+  transform: translateY(1px);
+  box-shadow:
+    0 0 15px rgba(59, 130, 246, 0.5),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* Windows Key - Unified with Modifier Keys */
 .key-cap.windows {
   font-size: 10px;
