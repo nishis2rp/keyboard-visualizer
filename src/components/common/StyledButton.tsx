@@ -5,6 +5,7 @@ interface StyledButtonProps {
   backgroundColor?: string;
   hoverBackgroundColor?: string;
   borderColor?: string;
+  textColor?: string;
   padding?: string;
   fontSize?: string;
   fontWeight?: string | number;
@@ -18,8 +19,9 @@ export const StyledButton = ({
   backgroundColor,
   hoverBackgroundColor,
   borderColor,
-  padding = '12px 24px',
-  fontSize = '15px',
+  textColor,
+  padding = '10px 20px',
+  fontSize = '14px',
   fontWeight = '600',
   children,
   title,
@@ -45,16 +47,22 @@ export const StyledButton = ({
     padding,
     fontSize,
     fontWeight,
-    borderRadius: variant === 'color' ? '8px' : '12px',
-    border: variant === 'color' ? 'none' : `1px solid ${borderColor || effectiveBackgroundColor}`,
-    background: isHovered ? effectiveHoverBackgroundColor : effectiveBackgroundColor,
-    color: '#FFFFFF',
+    borderRadius: '12px',
+    border: borderColor ? `1px solid ${borderColor}` : '1px solid rgba(255, 255, 255, 0.4)',
+    background: isHovered
+      ? 'linear-gradient(135deg, rgba(167, 139, 250, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%)'
+      : backgroundColor || 'linear-gradient(135deg, rgba(167, 139, 250, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    color: textColor || '#FFFFFF',
     cursor: 'pointer',
-    boxShadow: variant === 'shadow'
-      ? (isHovered ? '0 4px 12px rgba(0, 0, 0, 0.16)' : '0 2px 8px rgba(0, 0, 0, 0.12)')
-      : undefined,
-    transform: variant === 'shadow' && isHovered ? 'translateY(-1px)' : 'translateY(0)',
-    transition: variant === 'color' ? 'all 0.3s ease' : 'all 0.2s ease',
+    boxShadow: isHovered
+      ? '0 8px 16px rgba(167, 139, 250, 0.3), 0 4px 8px rgba(167, 139, 250, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+      : '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    transform: isHovered ? 'translateY(-3px) scale(1.02)' : 'translateY(0)',
+    transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+    position: 'relative',
+    overflow: 'hidden',
   };
 
   return (

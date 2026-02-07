@@ -1,16 +1,19 @@
-/* DifficultyFilter Component Styles - Compact Version */
+/* DifficultyFilter Component Styles - Badge Style */
 
 .container {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 12px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  margin: 10px auto;
-  max-width: 600px;
+  width: 100%;
+  margin: 0 0 4px 0;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
 }
 
 .header {
@@ -20,61 +23,105 @@
 }
 
 .title {
-  font-size: 0.8em;
-  font-weight: normal;
-  color: #000000;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
   white-space: nowrap;
+  margin: 0;
 }
 
 .selectAllButton {
-  padding: 4px 10px;
-  font-size: 0.7em;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
-  color: #000000;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  color: #6b7280;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .selectAllButton:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .optionsGrid {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-wrap: wrap;
+  }
 }
 
 .option {
-  display: flex;
-  flex-direction: row;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 12px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
-  width: 95px;
-  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  opacity: 0.5;
 }
 
 .option:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.2);
+  opacity: 0.75;
   transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
+/* Difficulty-specific colors when selected */
 .option.selected {
-  background: rgba(0, 122, 255, 0.15);
-  border-color: rgba(0, 122, 255, 0.5);
-  box-shadow: 0 0 8px rgba(0, 122, 255, 0.2);
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Apply difficulty colors dynamically via data attribute or class */
+.option[data-difficulty="basic"].selected,
+.option.basic.selected {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.option[data-difficulty="standard"].selected,
+.option.standard.selected {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.option[data-difficulty="hard"].selected,
+.option.hard.selected {
+  background: #fff7ed;
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.option[data-difficulty="madmax"].selected,
+.option.madmax.selected {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .checkbox {
@@ -82,52 +129,35 @@
 }
 
 .icon {
-  font-size: 1.1em;
+  font-size: 12px;
   line-height: 1;
 }
 
 .name {
-  font-size: 0.7em;
-  font-weight: normal;
-  color: #000000;
+  font-size: 10px;
+  font-weight: 700;
   text-align: center;
   white-space: nowrap;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .warning {
-  padding: 5px 10px;
-  background: rgba(255, 149, 0, 0.15);
-  border: 1px solid rgba(255, 149, 0, 0.4);
-  border-radius: 4px;
-  color: #000000;
-  font-size: 0.7em;
+  padding: 4px 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 20px;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 600;
   text-align: center;
   white-space: nowrap;
-  font-weight: normal;
 }
 
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
   .container {
     flex-wrap: wrap;
-    max-width: 100%;
-  }
-
-  .optionsGrid {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .option {
-    flex-direction: column;
-    gap: 3px;
-    padding: 6px;
-  }
-}
-
-@media (max-width: 480px) {
-  .optionsGrid {
-    grid-template-columns: 1fr;
   }
 }

@@ -406,12 +406,26 @@ interface RichShortcut {
 
 ## Database Schema
 
+### applications table
+
+```sql
+CREATE TABLE applications (
+  id VARCHAR(50) PRIMARY KEY,        -- 'windows11', 'chrome', 'excel', etc.
+  name VARCHAR(100) NOT NULL,        -- 'Windows 11', 'Chrome', 'Excel', etc.
+  icon VARCHAR(50),                  -- '🪟', '🌐', '📊', etc.
+  os VARCHAR(20) NOT NULL,           -- 'windows', 'mac', 'cross-platform'
+  display_order INTEGER DEFAULT 0    -- Order for display in UI
+);
+```
+
+**Row-level security:** Public read-only access enabled
+
 ### shortcuts table
 
 ```sql
 CREATE TABLE shortcuts (
   id BIGSERIAL PRIMARY KEY,
-  application VARCHAR(50),           -- 'windows11', 'chrome', 'excel', etc.
+  application VARCHAR(50),           -- 'windows11', 'chrome', 'excel', etc. (references applications.id)
   keys VARCHAR(100),                 -- "Ctrl+C", "Alt+H+O+I"
   description TEXT,                  -- "Copy to clipboard"
   category VARCHAR(100),             -- "Edit", "Navigation", etc.
@@ -445,6 +459,9 @@ Migrations are in `supabase/migrations/` with sequential numbering:
 - `022_set_word_powerpoint_protection_levels.sql`: Set protection levels for Word/PowerPoint
 - `023_normalize_pageup_pagedown.sql`: Normalize PageUp/PageDown key names
 - `024_fix_protection_levels.sql`: Fix protection level inconsistencies
+- `037-042_*.sql`: Update requested shortcuts and difficulty levels
+- `044_add_alternative_group_id.sql`: Add alternative shortcut grouping
+- `045_create_applications_table.sql`: Create applications table for database-driven app config
 
 **Running migrations:**
 1. Set `.env` with `DATABASE_URL=postgresql://postgres:...`
@@ -475,9 +492,10 @@ Migrations are in `supabase/migrations/` with sequential numbering:
 ### Key Components
 
 **AppContext** (`src/context/AppContext.tsx`):
-- Provides: `richShortcuts`, `allShortcuts`, `selectedApp`, `keyboardLayout`, `isQuizMode`
-- Uses `useShortcuts()` hook to fetch from Supabase
+- Provides: `richShortcuts`, `allShortcuts`, `apps`, `selectedApp`, `keyboardLayout`, `isQuizMode`
+- Uses `useShortcuts()` hook to fetch shortcuts and apps from Supabase
 - Single source of truth for app state
+- Apps list is now dynamically fetched from `applications` table instead of hardcoded
 
 **QuizContext** (`src/context/QuizContext.tsx`):
 - State machine with reducer pattern
@@ -505,10 +523,8 @@ Migrations are in `supabase/migrations/` with sequential numbering:
 - `src/utils/sequentialShortcuts.ts`: Sequential shortcut detection
 
 ### Constants
-- `src/constants/systemProtectedShortcuts.ts`: Protection level definitions
+- `src/constants/systemProtectedShortcuts.ts`: Protection level definitions (legacy, being phased out)
 - `src/constants/alternativeShortcuts.ts`: Equivalent shortcut mappings
-- `src/constants/shortcutDifficulty.ts`: Difficulty classification logic
-- `src/config/apps.ts`: Application definitions (id, name, icon, OS)
 
 ### Data
 - `src/data/layouts/`: Keyboard layout definitions (Windows JIS/US, Mac JIS/US)
@@ -568,25 +584,22 @@ When creating scripts to update the database:
 
 ### Adding a New Application
 
-1. **Add shortcuts to database:**
+1. **Add application to database:**
+   ```sql
+   -- Add to applications table
+   INSERT INTO applications (id, name, icon, os, display_order)
+   VALUES ('my_app', 'My App', '🚀', 'cross-platform', 100);
+   ```
+
+2. **Add shortcuts to database:**
    ```sql
    INSERT INTO shortcuts (application, keys, description, difficulty, platform)
    VALUES ('my_app', 'Ctrl + N', 'New File', 'basic', 'Cross-Platform');
    ```
 
-2. **Add app definition to frontend:**
-   Edit `src/config/apps.ts`:
-   ```typescript
-   export const apps: App[] = [
-     // ... existing apps
-     {
-       id: 'my_app',  // Must match database 'application' column
-       name: 'My App',
-       icon: '🚀',
-       os: 'cross-platform'  // or 'windows' | 'mac'
-     },
-   ]
-   ```
+3. **Frontend automatically updates:**
+   - `useShortcuts()` hook fetches apps from database via `applications` table
+   - No frontend code changes needed - apps are now fully database-driven
 
 ### Updating Protection Levels
 
@@ -882,6 +895,7 @@ npm run preview  # Preview locally
 7. **RichShortcut type refactoring** (2026-01): Introduced `RichShortcut` type for detailed shortcut data from database
 8. **Script organization** (2026-01): Separated read-only scripts (Supabase client) from write scripts (PostgreSQL client with `-pg` suffix)
 9. **User Authentication & Quiz Progress Tracking** (2026-02): Added optional authentication with Google, GitHub, and Email/Password. Users can now save quiz history and track progress across sessions. Implemented AuthContext, AuthModal, UserMenu, and useQuizProgress hook with database tables for user_profiles, quiz_sessions, and quiz_history
+10. **Database-driven app configuration** (2026-02): Migrated from hardcoded `apps.ts` and `shortcutDifficulty.ts` to database tables. Created `applications` table for app metadata. Frontend now dynamically fetches app list from database via `useShortcuts()` hook
 
 ## Git Workflow
 

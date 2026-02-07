@@ -114,54 +114,48 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
   }, [keyboardRows])
 
   return (
-    <div className="keyboard-layout">
-      <h3 className="keyboard-title">{layoutName}</h3>
-      <div className="keyboard">
-        {keysWithPositions.map((keyObj, index) => {
-          const isSpacer = !keyObj.code || keyObj.code === ''
-          const isPressed = isKeyPressed(keyObj)
-          const isModifier = isModifierKey(keyObj.code)
-          const isWinKey = isWindowsKey(keyObj.code)
-          const isSpecial = !isModifier && specialKeys.has(keyObj.key)
-          const shortcuts = getKeyShortcuts(keyObj)
+    <div className="keyboard-container">
+      <div className="keyboard-base">
+        <div className="keyboard-grid">
+          {keysWithPositions.map((keyObj, index) => {
+            const isSpacer = !keyObj.code || keyObj.code === ''
+            const isPressed = isKeyPressed(keyObj)
+            const isModifier = isModifierKey(keyObj.code)
+            const isWinKey = isWindowsKey(keyObj.code)
+            const isSpecial = !isModifier && specialKeys.has(keyObj.key)
+            const shortcuts = getKeyShortcuts(keyObj)
 
-          return (
-            <div
-              key={`${index}-${keyObj.code}`}
-              className={`keyboard-key ${isSpacer ? 'spacer' : ''} ${isPressed ? 'pressed' : ''} ${isWinKey ? 'windows-key' : (isModifier ? 'modifier' : (isSpecial ? 'special' : ''))}`}
-              style={{
-                gridColumn: keyObj.gridColumn,
-                gridRow: keyObj.gridRow,
-                minWidth: `${keyObj.width * KEY_WIDTH_MULTIPLIER}px`
-              }}
-              title={shortcuts.length > 0 ? shortcuts.map(s => `${s.combo}: ${s.desc}`).join('\n') : ''}
-            >
-              <div className="key-display">{keyObj.display}</div>
-              {shortcuts.length > 0 && (
-                <div className="key-shortcuts-popup">
-                  {shortcuts.map((shortcut, idx) => (
-                    <div key={idx} className="key-shortcut-item">
-                      <strong>{shortcut.combo}</strong>: {shortcut.desc}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-      <div className="keyboard-legend">
-        <div className="legend-item">
-          <div className="legend-key normal"></div>
-          <span>通常キー</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-key special"></div>
-          <span>修飾キー</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-key pressed"></div>
-          <span>押下中</span>
+            // Build className for key-cap
+            const keyClasses = ['key-cap']
+            if (isSpacer) return null // Don't render spacer keys
+            if (isPressed) keyClasses.push('active')
+            if (isWinKey) keyClasses.push('windows')
+            else if (isModifier) keyClasses.push('modifier')
+            else if (isSpecial) keyClasses.push('special')
+
+            return (
+              <div
+                key={`${index}-${keyObj.code}`}
+                className={keyClasses.join(' ')}
+                style={{
+                  gridColumn: keyObj.gridColumn,
+                  gridRow: keyObj.gridRow
+                }}
+                title={shortcuts.length > 0 ? shortcuts.map(s => `${s.combo}: ${s.desc}`).join('\n') : ''}
+              >
+                <div className="key-label">{keyObj.display}</div>
+                {shortcuts.length > 0 && (
+                  <div className="key-shortcuts-popup">
+                    {shortcuts.map((shortcut, idx) => (
+                      <div key={idx} className="key-shortcut-item">
+                        <strong>{shortcut.combo}</strong>: {shortcut.desc}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>

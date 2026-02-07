@@ -1,243 +1,217 @@
-/* ===================================
-   Keyboard Layout Styles
-   ================================== */
+/* 
+ * Keyboard Styles
+ * Modernized with Glassmorphism and refined shadows
+ */
 
-/* Keyboard Layout - Enhanced Apple Magic Keyboard */
-.keyboard-layout {
-  margin: var(--spacing-lg) 0;
-  padding: var(--spacing-md) var(--spacing-sm);
-  background: linear-gradient(145deg, #ECEEF0 0%, #D8DADC 50%, #CACED0 100%);
-  border-radius: var(--radius-xl);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
-    0 16px 48px rgba(0, 0, 0, 0.18),
-    0 8px 24px rgba(0, 0, 0, 0.12);
-  position: relative;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.keyboard-layout::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  pointer-events: none;
-}
-
-.keyboard-title {
-  color: var(--text-primary);
-  font-size: 1.125em;
-  margin-bottom: 12px;
-  text-align: center;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-}
-
-.keyboard {
-  display: grid;
-  grid-auto-flow: dense;
-  grid-template-columns: repeat(76, 1fr);
-  grid-auto-rows: 40px;
-  gap: 4px;
-  padding: var(--spacing-md);
-  background:
-    linear-gradient(145deg, #F5F5F7 0%, #ECEEF0 25%, #E5E7E9 50%, #E0E2E4 100%);
-  border-radius: var(--radius-lg);
-  border: 1.5px solid rgba(0, 0, 0, 0.12);
-  box-shadow:
-    inset 0 4px 12px rgba(0, 0, 0, 0.15),
-    inset 0 -2px 4px rgba(255, 255, 255, 0.4),
-    0 3px 6px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: none;
-  margin: 0 auto;
-  position: relative;
-}
-
-.keyboard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 40%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  pointer-events: none;
-}
-
-.keyboard-key {
-  min-height: 40px;
-  min-width: 40px;
-  max-width: 140px;
-  background: linear-gradient(145deg, #FFFFFF 0%, #FAFBFC 25%, #F5F6F7 50%, #EBECED 100%);
-  border: 1.5px solid rgba(0, 0, 0, 0.18);
-  border-bottom: 3px solid rgba(0, 0, 0, 0.25);
-  border-radius: 7px;
+.keyboard-container {
   display: flex;
-  align-items: center;
   justify-content: center;
-  color: var(--text-primary);
-  font-size: 0.8rem;
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  transition: all var(--transition-fast);
+  align-items: center;
+  margin: 4px 0;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  overflow-x: auto;
+  transition: all 0.3s ease;
   position: relative;
-  box-shadow:
-    0 3px 0 rgba(0, 0, 0, 0.12),
-    0 5px 10px rgba(0, 0, 0, 0.18),
-    0 8px 24px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 4px rgba(0, 0, 0, 0.12);
-  user-select: none;
-  padding: 5px 8px;
-  line-height: 1;
 }
 
-.keyboard-key::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 45%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, transparent 100%);
-  border-radius: 6px 6px 0 0;
-  pointer-events: none;
+.keyboard-base {
+  background: linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 0 -2px 0 rgba(255, 255, 255, 0.9),
+    0 15px 35px rgba(0, 0, 0, 0.15),
+    0 5px 15px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.05);
+  position: relative;
+  display: inline-block;
+  border: 2px solid rgba(200, 200, 200, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 1400px;
 }
 
-.keyboard-key:hover {
-  background: linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 25%, #F0F2F4 50%, #E8EAEC 100%);
-  border-color: var(--border-color);
-  border-bottom-color: rgba(0, 0, 0, 0.3);
-  transform: translateY(-3px) scale(1.02);
+.keyboard-grid {
+  display: grid;
+  /*
+   * Grid system:
+   * Main section: 62 cols (15.5u * 4 subdivisions)
+   * Gap: 2 cols (0.5u * 4)
+   * Navigation section: 12 cols (3u * 4)
+   * Total columns: 76 (matches KeyboardLayout.tsx calculation)
+   */
+  grid-template-columns: repeat(76, 1fr);
+  grid-template-rows: repeat(6, minmax(35px, 38px));
+  gap: 3px;
+  min-height: 210px;
+}
+
+/* Base Key Style */
+.key-cap {
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 50%, #f3f4f6 100%);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 3px solid rgba(0, 0, 0, 0.2);
   box-shadow:
-    0 4px 0 rgba(0, 0, 0, 0.15),
-    0 8px 16px rgba(0, 0, 0, 0.12),
-    0 12px 32px rgba(0, 0, 0, 0.1),
+    0 3px 6px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 4px rgba(0, 0, 0, 0.1);
-}
-
-.keyboard-key.special {
-  background: var(--sf-blue);
-  border: 1.5px solid var(--sf-blue-dark);
-  border-bottom: 3px solid var(--sf-blue-dark);
-  color: var(--white);
+    inset 0 -1px 2px rgba(0, 0, 0, 0.03);
+  color: #1f2937;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
   font-weight: 600;
-  box-shadow:
-    0 3px 0 rgba(0, 0, 0, 0.15),
-    0 5px 10px rgba(0, 0, 0, 0.2),
-    0 8px 24px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 4px rgba(0, 0, 0, 0.15);
+  user-select: none;
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
 }
 
-.keyboard-key.modifier {
-  background: var(--sf-blue);
-  border: 1.5px solid var(--sf-blue-dark);
-  border-bottom: 3px solid var(--sf-blue-dark);
-  color: var(--white);
-  font-weight: 600;
-  box-shadow:
-    0 3px 0 rgba(0, 0, 0, 0.15),
-    0 5px 10px rgba(0, 0, 0, 0.2),
-    0 8px 24px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 4px rgba(0, 0, 0, 0.15);
+/* Key Labels */
+.key-label {
+  font-size: 13px;
+  line-height: 1.2;
+  z-index: 2;
 }
 
-.keyboard-key.windows-key {
-  background: var(--sf-blue);
-  border: 1.5px solid var(--sf-blue-dark);
-  border-bottom: 3px solid var(--sf-blue-dark);
-  color: var(--white);
-  font-weight: 700;
-  box-shadow:
-    0 3px 0 rgba(0, 0, 0, 0.2),
-    0 5px 12px rgba(0, 0, 0, 0.25),
-    0 8px 24px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    inset 0 -1px 3px rgba(0, 0, 0, 0.2);
+.key-sublabel {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 1px;
+  z-index: 2;
 }
 
-.keyboard-key.windows-key:hover {
-  background: var(--sf-blue-hover);
-  box-shadow:
-    0 3px 0 rgba(0, 0, 0, 0.15),
-    0 6px 16px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-
-.keyboard-key.preventable-fullscreen {
-  border: 2px solid #0078D4; /* Windows 11 Blue */
-  background-color: rgba(0, 120, 212, 0.2); /* 半透明の青 */
-  color: #0078D4; /* 青文字 */
-}
-
-.keyboard-key.preventable-fullscreen:hover {
-  background-color: rgba(0, 120, 212, 0.4);
-}
-
-.keyboard-key.spacer {
-  background: linear-gradient(145deg, #D0D2D4 0%, #C0C2C4 50%, #B0B2B4 100%);
-  border: none;
-  border-bottom: none;
-  box-shadow: none;
-  cursor: default;
-  pointer-events: none;
-}
-
-.keyboard-key.spacer::before {
-  display: none;
-}
-
-.keyboard-key.spacer:hover {
-  background: linear-gradient(145deg, #D0D2D4 0%, #C0C2C4 50%, #B0B2B4 100%);
-  transform: none;
-  box-shadow: none;
-}
-
-.keyboard-key.special:hover {
-  background: var(--sf-blue-hover);
-  box-shadow:
-    0 2px 0 rgba(0, 0, 0, 0.1),
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-
-.keyboard-key.pressed {
-  background: var(--sf-red) !important;
-  border: 2px solid var(--sf-red-dark) !important;
-  border-bottom: 2px solid var(--sf-red-dark) !important;
-  transform: translateY(3px) scale(1.05);
-  box-shadow:
-    0 0 20px rgba(255, 59, 48, 0.4),
-    0 2px 8px rgba(255, 59, 48, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 3px rgba(0, 0, 0, 0.2) !important;
-  color: var(--white) !important;
-  font-weight: 700 !important;
-  animation: keyPress var(--transition-base);
-}
-
-.keyboard-key:active {
+/* Active State (Pressed) */
+.key-cap.active {
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-color: #1d4ed8;
+  border-bottom-width: 1px;
   transform: translateY(1px);
-  box-shadow:
-    0 0 0 rgba(0, 0, 0, 0.05),
-    0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    0 0 15px rgba(59, 130, 246, 0.5),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
-.key-display {
-  pointer-events: none;
+.key-cap.active .key-sublabel {
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* Keyboard Shortcuts Popup - Refined */
+/* Modifier Keys */
+.key-cap.modifier {
+  font-size: 10px;
+  font-weight: 700;
+  background: linear-gradient(180deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #3730a3;
+}
+
+.key-cap.modifier.active {
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+  border-color: #4338ca;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+  color: white;
+}
+
+/* Special Keys (Enter, Backspace, etc.) */
+.key-cap.special {
+  font-size: 10px;
+  background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
+}
+
+/* Windows Key - Unified with Modifier Keys */
+.key-cap.windows {
+  font-size: 10px;
+  font-weight: 700;
+  background: linear-gradient(180deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #3730a3;
+}
+
+.key-cap.windows.active {
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+  border-color: #4338ca;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+  color: white;
+}
+
+/* Specific Key Alignments */
+.key-cap.shift-left,
+.key-cap.ctrl-left,
+.key-cap.alt-left,
+.key-cap.meta-left {
+  align-items: flex-start;
+  padding-left: 6px;
+}
+
+.key-cap.shift-right,
+.key-cap.ctrl-right,
+.key-cap.alt-right,
+.key-cap.meta-right {
+  align-items: flex-end;
+  padding-right: 6px;
+}
+
+.key-cap.enter {
+  align-items: flex-end;
+  padding-right: 6px;
+}
+
+/* System Protected / Preventable Indications */
+.key-cap.preventable-fullscreen {
+  border: 2px solid #0078D4;
+}
+
+.key-cap.always-protected {
+  border: 2px solid #ef4444;
+}
+
+.key-cap.preventable-fullscreen.active {
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #0078D4;
+}
+
+.key-cap.always-protected.active {
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  border-color: #b91c1c;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+}
+
+/* ISO Enter Key styling helpers */
+.iso-enter-top {
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  z-index: 1;
+}
+
+.iso-enter-bottom {
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  margin-top: -6px;
+  height: calc(100% + 6px);
+  z-index: 1;
+}
+
+.iso-enter-top.active,
+.iso-enter-bottom.active {
+  z-index: 3;
+}
+
+/* Keyboard Shortcuts Popup */
 .key-shortcuts-popup {
   position: absolute;
   bottom: 100%;
@@ -246,114 +220,50 @@
   background: rgba(30, 30, 30, 0.95);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
-  min-width: 250px;
-  max-width: 350px;
+  min-width: 200px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--transition-base);
+  transition: opacity 0.2s ease;
   z-index: 1000;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 12px;
 }
 
-.keyboard-key:hover .key-shortcuts-popup {
+.key-cap:hover .key-shortcuts-popup {
   opacity: 1;
 }
 
-.key-shortcut-item {
-  color: #FFFFFF;
-  font-size: 0.8125em;
-  margin-bottom: 8px;
-  padding: 6px;
-  border-left: 2px solid var(--sf-blue);
-  padding-left: 10px;
-  line-height: 1.4;
-}
-
-.key-shortcut-item:last-child {
-  margin-bottom: 0;
-}
-
-.key-shortcut-item strong {
-  color: var(--sf-blue);
-  font-weight: 600;
-}
-
-/* Keyboard Legend - Minimalist */
-.keyboard-legend {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  box-shadow: var(--shadow-sm);
-  z-index: 10;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-primary);
-  font-size: 0.75em;
-  font-weight: 500;
-}
-
-.legend-key {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--radius-xs);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-.legend-key.normal {
-  background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%);
-}
-
-.legend-key.special {
-  background: linear-gradient(180deg, var(--sf-blue) 0%, #005FCC 100%);
-  border-color: rgba(0, 122, 255, 0.3);
-}
-
-.legend-key.pressed {
-  background: linear-gradient(180deg, #FF3B30 0%, #E62E24 100%);
-  border-color: rgba(255, 59, 48, 0.3);
-}
-
-/* Responsive Design for Keyboard */
+/* Responsive Design */
 @media (max-width: 1280px) {
-  .keyboard {
-    transform: scale(0.9);
+  .keyboard-container {
+    transform: scale(0.95);
     transform-origin: top center;
   }
 }
 
-@media (max-width: 1024px) {
-  .keyboard {
+@media (max-width: 1100px) {
+  .keyboard-container {
+    transform: scale(0.92);
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 900px) {
+  .keyboard-container {
     transform: scale(0.75);
     transform-origin: top center;
   }
 }
 
 @media (max-width: 768px) {
-  .keyboard {
-    transform: scale(0.7);
+  .keyboard-container {
+    transform: scale(0.6);
     transform-origin: top center;
-  }
-
-  .key-shortcuts-popup {
-    min-width: 200px;
-    font-size: 0.9em;
+    padding: 10px;
+    margin: 10px 0;
   }
 }

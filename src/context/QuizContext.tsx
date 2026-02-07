@@ -246,7 +246,7 @@ interface QuizProviderProps {
 
 export function QuizProvider({ children }: QuizProviderProps) {
   // AppContextからショートカットデータを取得
-  const { allShortcuts, richShortcuts } = useAppContext();
+  const { allShortcuts, richShortcuts, apps } = useAppContext();
 
   const [quizState, dispatch] = useReducer(quizReducer, initialQuizState);
 

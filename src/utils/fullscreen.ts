@@ -13,10 +13,11 @@
 const lockKeyboard = async () => {
   try {
     // Keyboard Lock APIがサポートされているかチェック
-    if (navigator.keyboard && navigator.keyboard.lock) {
+    const nav = navigator as any;
+    if (nav.keyboard && nav.keyboard.lock) {
       // 引数なしで呼び出すことで、できるだけ多くのキーをロック
       // （Escキーを除く。Escキーは全画面モードを終了するために常に利用可能）
-      await navigator.keyboard.lock()
+      await nav.keyboard.lock()
     }
   } catch (error) {
     // キーボードロックは一部のブラウザでサポートされていない
@@ -29,8 +30,9 @@ const lockKeyboard = async () => {
  */
 const unlockKeyboard = () => {
   try {
-    if (navigator.keyboard && navigator.keyboard.unlock) {
-      navigator.keyboard.unlock()
+    const nav = navigator as any;
+    if (nav.keyboard && nav.keyboard.unlock) {
+      nav.keyboard.unlock()
     }
   } catch (error) {
     // キーボードロックは一部のブラウザでサポートされていない
@@ -43,7 +45,7 @@ const unlockKeyboard = () => {
  */
 export const enterFullscreen = async () => {
   try {
-    const element = document.documentElement
+    const element = document.documentElement as any
 
     if (element.requestFullscreen) {
       await element.requestFullscreen()
@@ -69,12 +71,14 @@ export const exitFullscreen = async () => {
     // キーボードロックを解除
     unlockKeyboard()
 
-    if (document.exitFullscreen) {
-      await document.exitFullscreen()
-    } else if (document.webkitExitFullscreen) { // Safari
-      await document.webkitExitFullscreen()
-    } else if (document.msExitFullscreen) { // IE11
-      await document.msExitFullscreen()
+    const doc = document as any
+
+    if (doc.exitFullscreen) {
+      await doc.exitFullscreen()
+    } else if (doc.webkitExitFullscreen) { // Safari
+      await doc.webkitExitFullscreen()
+    } else if (doc.msExitFullscreen) { // IE11
+      await doc.msExitFullscreen()
     }
   } catch (error) {
     console.error('フルスクリーンモードからの退出に失敗:', error)
@@ -98,10 +102,11 @@ export const toggleFullscreen = async () => {
  * @returns {boolean}
  */
 export const isFullscreen = () => {
+  const doc = document as any
   return !!(
-    document.fullscreenElement ||
-    document.webkitFullscreenElement ||
-    document.msFullscreenElement
+    doc.fullscreenElement ||
+    doc.webkitFullscreenElement ||
+    doc.msFullscreenElement
   )
 }
 

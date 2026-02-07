@@ -2,6 +2,7 @@ import { getCodeDisplayName, getShiftedSymbolForKey, getPossibleKeyNamesFromDisp
 import { MODIFIER_ORDER } from './keyUtils'
 import { AppShortcuts, ShortcutDetails, RichShortcut, AvailableShortcut } from '../types' // ★ RichShortcut, AvailableShortcutを追加
 import { detectOS } from './os' // ★ detectOSを追加
+import { getSequentialKeys } from './sequentialShortcuts' // ★ 追加
 
 /**
  * キーの正規化
@@ -77,9 +78,24 @@ const getKeyComboAlternatives = (displayComboText, layout) => {
 }
 
 /**
+ * OSに応じた適切なショートカットキー文字列を取得する
+ * (windows_keys または macos_keys があればそれを使用し、なければ keys にフォールバックする)
+ */
+export const getOSSpecificKeys = (item: RichShortcut, os?: string): string => {
+  const currentOS = os || detectOS();
+  if (currentOS === 'windows') {
+    return item.windows_keys || item.keys;
+  } else if (currentOS === 'macos') {
+    return item.macos_keys || item.keys;
+  }
+  return item.keys;
+};
+
+/**
  * ショートカットの説明を取得（代替表現にも対応）
  * @param {string} currentDisplayComboText - 現在押されているキーの表示名形式の組み合わせ文字列
- * @param {AppShortcuts} shortcutDescriptions - ショートカット定義オブジェクト (keyベース、例: {'Ctrl + A': '選択'})
+ * @param {RichShortcut[]} richShortcuts - 全てのRichShortcutデータ
+ * @param {string} selectedApp - 現在選択されているアプリケーション
  * @param {string} layout - キーボードレイアウト
  * @returns {string|null} ショートカットの説明、見つからない場合はnull
  */
@@ -90,8 +106,7 @@ export const getShortcutDescription = (currentDisplayComboText: string, richShor
 
   const findDescription = (targetCombo: string) => {
     for (const item of appRichShortcuts) {
-      // OSごとのキー、なければkeysにフォールバック
-      const shortcutKeys = (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys;
+      const shortcutKeys = getOSSpecificKeys(item, os);
       if (shortcutKeys === targetCombo) {
         return item.description;
       }
@@ -134,6 +149,11 @@ export const getShortcutDescription = (currentDisplayComboText: string, richShor
  * @returns {string} 最後のキー（例: "A"）
  */
 const getLastKey = (shortcut: string): string => {
+  // Sequential かどうかで分割ルールを変える
+  if (shortcut.includes(' → ')) {
+    const parts = shortcut.split(' → ')
+    return parts[parts.length - 1]
+  }
   const parts = shortcut.split(' + ')
   return parts[parts.length - 1]
 }
@@ -151,7 +171,18 @@ const MODIFIER_KEY_NAMES = new Set([
  * @returns {number} 修飾キーの数
  */
 const countModifierKeys = (shortcut: string): number => {
-  const parts = shortcut.split(' + ')
+  const separators = [' + ', ' → '];
+  let parts: string[] = [];
+  
+  for (const sep of separators) {
+    if (shortcut.includes(sep)) {
+      parts = shortcut.split(sep);
+      break;
+    }
+  }
+  
+  if (parts.length === 0) parts = [shortcut];
+  
   const modifierCount = parts.filter((key: string) => MODIFIER_KEY_NAMES.has(key)).length
   return modifierCount
 }
@@ -173,19 +204,23 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
   const filteredRichShortcuts = richShortcuts
     .filter(item => item.application === selectedApp)
     .filter(item => {
-      // OSごとのキー、なければkeysにフォールバック
-      const targetShortcut = (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys;
-      if (!targetShortcut) {
-        // console.log(`    Skipping item (no target shortcut for OS ${os}):`, item);
+      // OSごとのキーを取得
+      const targetShortcutString = getOSSpecificKeys(item, os);
+      if (!targetShortcutString) {
         return false;
       }
 
-      const shortcutKeys = targetShortcut.split(' + ');
+      // press_type に基づいてキーを取得
+      const shortcutKeys = item.press_type === 'sequential' 
+        ? getSequentialKeys(targetShortcutString)
+        : targetShortcutString.split(' + ');
+
       const allPressedKeysInShortcut = Array.from(pressedDisplayNames).every((pressedKey: string) => shortcutKeys.includes(pressedKey));
       const pressedModifiers = Array.from(pressedDisplayNames).filter((key: string) => MODIFIER_KEY_NAMES.has(key));
       const shortcutModifiers = shortcutKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
 
       let shouldInclude = false;
+      
       // 1. 完全一致
       if (allPressedKeysInShortcut && pressedDisplayNames.size === shortcutKeys.length) {
         shouldInclude = true;
@@ -196,25 +231,15 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
           pressedModifiers.every((mod: string) => shortcutModifiers.includes(mod)) &&
           pressedDisplayNames.size < shortcutKeys.length
          ) {
+           // 順押しの場合、最初のキー（修飾キー）が一致していれば候補として表示
            shouldInclude = true;
       }
 
-      // if (!shouldInclude) {
-      //   console.log(`    Skipping item (filter out):`, {
-      //     itemShortcut: targetShortcut,
-      //     pressedDisplayNames: Array.from(pressedDisplayNames),
-      //     shortcutKeys,
-      //     allPressedKeysInShortcut,
-      //     pressedModifiers,
-      //     shortcutModifiers,
-      //     shouldInclude,
-      //   });
-      // }
       return shouldInclude;
     })
     .map(item => ({
       ...item, // RichShortcutのプロパティをすべてコピー
-      shortcut: (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys || '', // 表示用のショートカット文字列
+      shortcut: getOSSpecificKeys(item, os), // 表示用のショートカット文字列
       windows_protection_level: item.windows_protection_level || 'none', // non-nullableにする
       macos_protection_level: item.macos_protection_level || 'none',     // non-nullableにする
     }))
@@ -307,38 +332,30 @@ export const getSingleKeyShortcuts = (richShortcuts: RichShortcut[], selectedApp
   const os = detectOS();
 
   const appShortcuts = richShortcuts.filter(item => item.application === selectedApp);
-  console.log(`[getSingleKeyShortcuts] Total shortcuts for ${selectedApp}:`, appShortcuts.length);
-
-  // Gmail特定のデバッグ
-  if (selectedApp === 'gmail') {
-    const allGmailKeys = appShortcuts.map(s => s.keys).sort();
-    console.log('[getSingleKeyShortcuts] All Gmail keys:', allGmailKeys);
-    console.log('[getSingleKeyShortcuts] Has key "a"?', allGmailKeys.includes('a'));
-    console.log('[getSingleKeyShortcuts] Has key "e"?', allGmailKeys.includes('e'));
-    console.log('[getSingleKeyShortcuts] Has key "f"?', allGmailKeys.includes('f'));
-  }
-
+  
   const filtered = appShortcuts.filter(item => {
-      // OSごとのキー、なければkeysにフォールバック
-      const targetKeys = (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys;
-      if (!targetKeys) {
-        console.log(`[getSingleKeyShortcuts] Skipping (no targetKeys):`, item.keys);
+      // 1. まず press_type をチェック。sequential のものは除外（単独キーではない）
+      if (item.press_type === 'sequential') {
         return false;
       }
-      const isSingleKey = !targetKeys.includes(' + ');
-      if (selectedApp === 'gmail' && ['a', 'e', 'f', 'r', 'n'].includes(item.keys)) {
-        console.log(`[getSingleKeyShortcuts] Key "${item.keys}": targetKeys="${targetKeys}", isSingleKey=${isSingleKey}`);
-      }
-      return isSingleKey; // 修飾キーなしの単独キーのみ
-    });
 
-  console.log(`[getSingleKeyShortcuts] Single-key shortcuts found:`, filtered.length);
+      // OSごとのキーを取得
+      const targetKeys = getOSSpecificKeys(item, os);
+      if (!targetKeys) {
+        return false;
+      }
+
+      // 2. press_type が simultaneous の場合、修飾キーを含まないかチェック
+      // " + " を含まない = 単独キー
+      const isSingleKey = !targetKeys.includes(' + ');
+      
+      return isSingleKey;
+    });
 
   return filtered
     .map(item => ({
       ...item,
-      // OSごとのキー、なければkeysにフォールバック
-      shortcut: (os === 'windows' ? item.windows_keys : item.macos_keys) || item.keys || '',
+      shortcut: getOSSpecificKeys(item, os),
       windows_protection_level: item.windows_protection_level || 'none',
       macos_protection_level: item.macos_protection_level || 'none',
     }))

@@ -68,7 +68,7 @@ const DifficultyFilter = memo<DifficultyFilterProps>(({
           return (
             <label
               key={option.id}
-              className={`${styles.option} ${isSelected ? styles.selected : ''}`}
+              className={`${styles.option} ${styles[option.id]} ${isSelected ? styles.selected : ''}`}
               title={option.description}
             >
               <input

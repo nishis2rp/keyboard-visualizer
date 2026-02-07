@@ -51,14 +51,20 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
         <div className={styles.buttonGroup}>
           <StyledButton
             onClick={onQuizModeToggle}
-            backgroundColor={isQuizMode ? '#6C757D' : '#007AFF'}
+            backgroundColor="rgba(196, 181, 253, 0.85)"
+            hoverBackgroundColor="rgba(196, 181, 253, 0.95)"
+            textColor="#1e3a8a"
+            borderColor="rgba(167, 139, 250, 0.5)"
             title={isQuizMode ? 'クイズモードを終了してビジュアライザーに戻ります' : 'ショートカットを学習するクイズモードを開始します'}
           >
             {isQuizMode ? 'Visualizer Mode' : 'Quiz Mode'}
           </StyledButton>
           <StyledButton
             onClick={onToggleFullscreen}
-            backgroundColor={fullscreenMode ? '#FF3B30' : '#007AFF'}
+            backgroundColor="rgba(196, 181, 253, 0.85)"
+            hoverBackgroundColor="rgba(196, 181, 253, 0.95)"
+            textColor="#1e3a8a"
+            borderColor="rgba(167, 139, 250, 0.5)"
             title="フルスクリーンモードでショートカット競合を軽減。Keyboard Lock APIによりほとんどのWinキーショートカットをキャプチャできますが、Win+L（ロック）などのセキュリティ関連はOSレベルで保護されています"
           >
             {fullscreenMode ? '全画面を終了' : '全画面モード'}
@@ -68,10 +74,7 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
             onClick={handleDownloadCSV}
             title="全ショートカットをCSV形式でダウンロード"
           >
-            <span className={styles.csvText}>
-              <span>CSV</span>
-              <span>DL</span>
-            </span>
+            <span className={styles.csvText}>CSV DL</span>
           </button>
           {user ? (
             <UserMenu />

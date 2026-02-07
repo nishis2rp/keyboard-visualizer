@@ -96,7 +96,7 @@ function QuestionCard() {
             <span className={styles.sequentialIcon}>🔢</span>
             <span className={styles.sequentialText}>順序押し</span>
             <span className={styles.sequentialExample}>
-              {formatSequentialShortcut(currentQuestion.correctShortcut)}
+              {formatSequentialShortcut(currentQuestion.correctShortcut, currentQuestion.appId, currentQuestion.press_type)}
             </span>
           </div>
         )}
@@ -135,7 +135,7 @@ function QuestionCard() {
           )}
 
           {/* 押したキー表示（非順押しの場合のみ） */}
-          {!currentQuestion.press_type === 'sequential' && pressedKeys.size > 0 && (
+          {currentQuestion.press_type !== 'sequential' && pressedKeys.size > 0 && (
             <div className={styles.pressedKeys}>
               <div className={styles.pressedKeysLabel}>入力中...</div>
               <div className={styles.pressedKeysValue}>{getKeyComboText(Array.from(pressedKeys), keyboardLayout)}</div>

@@ -161,11 +161,11 @@ describe('quizEngine', () => {
     const mockApps: App[] = [{ id: 'testApp', name: 'Test App', icon: '', os: 'windows' }];
 
     const mockRichShortcuts: RichShortcut[] = [
-      { id: 1, keys: 'Ctrl+A', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: '', created_at: '', press_type: 'simultaneous' },
-      { id: 2, keys: 'Ctrl+S', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: '', created_at: '', press_type: 'simultaneous' },
-      { id: 3, keys: 'Win+L', application: 'testApp', difficulty: 'basic', windows_protection_level: 'always-protected', macos_protection_level: 'always-protected', description: '', created_at: '', press_type: 'simultaneous' },
-      { id: 4, keys: 'Ctrl+W', application: 'testApp', difficulty: 'basic', windows_protection_level: 'preventable_fullscreen', macos_protection_level: 'preventable_fullscreen', description: '', created_at: '', press_type: 'simultaneous' },
-      { id: 5, keys: 'Alt+F4', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: '', created_at: '', press_type: 'simultaneous' }
+      { id: 1, keys: 'Ctrl+A', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: '', created_at: '', press_type: 'simultaneous', category: null },
+      { id: 2, keys: 'Ctrl+S', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: '', created_at: '', press_type: 'simultaneous', category: null },
+      { id: 3, keys: 'Win+L', application: 'testApp', difficulty: 'basic', windows_protection_level: 'always-protected', macos_protection_level: 'always-protected', description: '', created_at: '', press_type: 'simultaneous', category: null },
+      { id: 4, keys: 'Ctrl+W', application: 'testApp', difficulty: 'basic', windows_protection_level: 'preventable_fullscreen', macos_protection_level: 'preventable_fullscreen', description: '', created_at: '', press_type: 'simultaneous', category: null },
+      { id: 5, keys: 'Alt+F4', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: '', created_at: '', press_type: 'simultaneous', category: null }
     ];
 
     it('should return null if no shortcuts are provided', () => {
@@ -198,6 +198,20 @@ describe('quizEngine', () => {
       
       const possibleShortcuts = ['Ctrl+A', 'Ctrl+S', 'Alt+F4', 'Ctrl+W'];
       expect(possibleShortcuts).toContain(question?.correctShortcut);
+    });
+
+    it('should correctly capture press_type for sequential shortcuts', () => {
+      const seqShortcuts = {
+        'testApp': {
+          'Alt + H + O + I': { description: 'Auto fit', difficulty: 'basic' } as ShortcutDetails,
+        }
+      };
+      const seqRichShortcuts: RichShortcut[] = [
+        { id: 10, keys: 'Alt + H + O + I', application: 'testApp', difficulty: 'basic', windows_protection_level: 'none', macos_protection_level: 'none', description: 'Auto fit', created_at: '', press_type: 'sequential', category: null },
+      ];
+      
+      const question = generateQuestion(seqShortcuts, ['testApp'], 'default', false, new Set(), 'allrange', seqRichShortcuts, mockApps);
+      expect(question?.press_type).toBe('sequential');
     });
   });
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { AllShortcuts, ShortcutDetails, RichShortcut } from '../types';
+import { AllShortcuts, ShortcutDetails, RichShortcut, App } from '../types';
 import { normalizeShortcut } from '../utils/quizEngine';
 import { Shortcut } from '../lib/supabase';
 
@@ -78,10 +78,10 @@ export function useShortcuts(): UseShortcutsReturn {
           platform: item.platform,
           windows_keys: item.windows_keys,
           macos_keys: item.macos_keys,
-          windows_protection_level: item.windows_protection_level,
-          macos_protection_level: item.macos_protection_level,
-          press_type: item.press_type, // ★ 追加
-          alternative_group_id: item.alternative_group_id, // ★ 追加
+          windows_protection_level: item.windows_protection_level as 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen',
+          macos_protection_level: item.macos_protection_level as 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen',
+          press_type: item.press_type as 'sequential' | 'simultaneous', // ★ 追加
+          alternative_group_id: item.alternative_group_id as number, // ★ 追加
         };
         richShortcutsArray.push(richShortcut);
 

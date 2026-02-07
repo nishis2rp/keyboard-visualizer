@@ -149,6 +149,7 @@ describe('authErrors', () => {
         message: 'Invalid login credentials',
         name: 'AuthApiError',
         status: 400,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -160,6 +161,7 @@ describe('authErrors', () => {
         message: 'Email not confirmed',
         name: 'AuthApiError',
         status: 400,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -171,6 +173,7 @@ describe('authErrors', () => {
         message: 'User already registered',
         name: 'AuthApiError',
         status: 400,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -182,6 +185,7 @@ describe('authErrors', () => {
         message: 'Password should be at least 6 characters',
         name: 'AuthApiError',
         status: 400,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -193,6 +197,7 @@ describe('authErrors', () => {
         message: 'Invalid email',
         name: 'AuthApiError',
         status: 400,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -204,6 +209,7 @@ describe('authErrors', () => {
         message: 'Fetch failed',
         name: 'NetworkError',
         status: 0,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -215,6 +221,7 @@ describe('authErrors', () => {
         message: 'Too many requests',
         name: 'AuthApiError',
         status: 429,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -226,6 +233,7 @@ describe('authErrors', () => {
         message: 'Session not found',
         name: 'AuthSessionMissingError',
         status: 401,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -237,6 +245,7 @@ describe('authErrors', () => {
         message: 'Provider not found',
         name: 'AuthApiError',
         status: 400,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -248,6 +257,7 @@ describe('authErrors', () => {
         message: 'Some unknown error occurred',
         name: 'AuthApiError',
         status: 500,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -259,6 +269,7 @@ describe('authErrors', () => {
         message: '',
         name: 'AuthApiError',
         status: 500,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);
@@ -275,6 +286,7 @@ describe('authErrors', () => {
         message: 'INVALID LOGIN CREDENTIALS',
         name: 'AuthApiError',
         status: 400,
+        __isAuthError: true
       };
 
       const result = mapAuthErrorToMessage(error);

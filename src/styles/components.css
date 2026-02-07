@@ -4,75 +4,98 @@
 
 /* Selectors Container */
 .selectors-container {
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
   margin-bottom: 16px;
-  justify-content: center;
-  align-items: flex-start;
+}
+
+.selector-section:first-child {
+  grid-column: span 9;
+}
+
+.selector-section:last-child {
+  grid-column: span 3;
 }
 
 .selector-section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  max-width: 600px;
-}
-
-.selectors-container .selector-section:first-child {
-  flex: 2;
-  max-width: 800px;
-}
-
-.selectors-container .selector-section:last-child {
-  flex: 1;
-  max-width: 400px;
+  gap: 10px;
+  width: 100%;
 }
 
 .selector-title {
-  text-align: center;
-  font-size: 0.875em;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: 0.5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin: 0;
+  padding-left: 4px;
 }
 
-/* App Selector - SF Design Language */
+/* App Selector - Grid Layout */
 .app-selector {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  padding: 4px 8px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+  gap: 6px;
+  width: 100%;
 }
 
-.app-selector::-webkit-scrollbar {
-  display: none;
+@media (max-width: 900px) {
+  .selectors-container {
+    grid-template-columns: 1fr;
+  }
+
+  .selector-section:first-child,
+  .selector-section:last-child {
+    grid-column: span 1;
+  }
+
+  .app-selector {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .app-selector {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .app-selector {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .app-tab {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 3px;
-  padding: 6px 8px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
-  border: 1.5px solid var(--border-color-light);
-  border-radius: var(--radius-md);
+  padding: 6px 4px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(250, 250, 250, 0.85) 50%, rgba(245, 245, 245, 0.8) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(200, 200, 200, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.8);
+  border-bottom: 3px solid rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
   cursor: pointer;
-  transition: all var(--transition-base);
-  font-size: var(--font-size-sm);
-  min-width: 72px;
-  max-width: 88px;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.08),
+    0 3px 6px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.03);
   position: relative;
   overflow: hidden;
+  height: 100%;
+  min-height: 60px;
 }
 
 .app-tab::before {
@@ -82,63 +105,86 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--gradient-blue);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
   opacity: 0;
   transition: opacity var(--transition-base);
-  z-index: -1;
+  z-index: 0;
 }
 
 .app-tab:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: var(--shadow-md), var(--shadow-blue);
-  border-color: var(--sf-blue-light);
+  transform: translateY(-4px) scale(1.01);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(252, 252, 252, 0.95) 50%, rgba(248, 248, 248, 0.9) 100%);
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.08),
+    0 4px 8px rgba(0, 0, 0, 0.06),
+    inset 0 2px 4px rgba(255, 255, 255, 1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.04);
+  border-color: rgba(99, 102, 241, 0.3);
+  border-bottom-width: 4px;
+}
+
+.app-tab:hover::before {
+  opacity: 0.5;
 }
 
 .app-tab:active {
-  transform: translateY(-1px) scale(0.98);
+  transform: translateY(-2px) scale(0.99);
 }
 
 .app-tab.active {
-  background: var(--gradient-blue);
-  color: var(--white);
-  border-color: var(--sf-blue);
-  box-shadow: var(--shadow-md), var(--shadow-blue);
+  background: linear-gradient(180deg, rgba(240, 240, 255, 0.95) 0%, rgba(232, 235, 255, 0.9) 50%, rgba(224, 231, 255, 0.85) 100%);
+  border: 2px solid #6366f1;
+  border-top: 2px solid rgba(200, 200, 255, 0.9);
+  border-bottom: 4px solid #4338ca;
+  box-shadow:
+    0 12px 24px rgba(99, 102, 241, 0.25),
+    0 6px 12px rgba(99, 102, 241, 0.15),
+    0 3px 6px rgba(99, 102, 241, 0.1),
+    inset 0 2px 4px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 4px rgba(99, 102, 241, 0.1);
   transform: translateY(-2px);
 }
 
 .app-tab.active::before {
   opacity: 1;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.15) 100%);
 }
 
 .app-icon {
-  font-size: 1.4em;
-  filter: grayscale(0.2) brightness(1.1);
+  font-size: 21px;
+  filter: grayscale(0.1) brightness(1.05);
   transition: all var(--transition-base);
   transform-origin: center;
+  position: relative;
+  z-index: 1;
 }
 
 .app-tab:hover .app-icon {
-  filter: grayscale(0) brightness(1.2);
-  transform: scale(1.1) rotate(-5deg);
+  filter: grayscale(0) brightness(1.15);
+  transform: scale(1.15);
 }
 
 .app-tab.active .app-icon {
-  filter: grayscale(0) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  transform: scale(1.05);
+  filter: grayscale(0) drop-shadow(0 2px 6px rgba(99, 102, 241, 0.4));
+  transform: scale(1.1);
 }
 
 .app-name {
   font-weight: 600;
-  font-size: 0.78em;
-  color: var(--text-primary);
-  line-height: 1.1;
+  font-size: 11px;
+  color: #374151;
+  line-height: 1.2;
   text-align: center;
   white-space: nowrap;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .app-tab.active .app-name {
-  color: var(--white);
+  color: #4338ca;
+  font-weight: 700;
 }
 
 /* Display Area - Enhanced Glass Effect */
@@ -255,22 +301,22 @@
 
 /* Modifier keys - must come after .special-key for proper specificity */
 .key.modifier-key {
-  background: linear-gradient(180deg, #4A9FFF 0%, var(--sf-blue) 100%) !important;
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%) !important;
   color: var(--white) !important;
-  border-color: var(--sf-blue) !important;
+  border-color: #4338ca !important;
   box-shadow:
-    0 2px 0 rgba(0, 122, 255, 0.3),
-    0 4px 12px rgba(0, 122, 255, 0.2) !important;
+    0 2px 0 rgba(99, 102, 241, 0.3),
+    0 4px 12px rgba(99, 102, 241, 0.2) !important;
 }
 
-/* Windows key in display area */
+/* Windows key in display area - Unified with Modifier Keys */
 .key.windows-key {
-  background: linear-gradient(180deg, #007AFF 0%, #0051D5 100%) !important;
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%) !important;
   color: var(--white) !important;
-  border-color: #0051D5 !important;
+  border-color: #4338ca !important;
   box-shadow:
-    0 3px 0 rgba(0, 81, 213, 0.4),
-    0 5px 16px rgba(0, 122, 255, 0.35) !important;
+    0 3px 0 rgba(99, 102, 241, 0.4),
+    0 5px 16px rgba(99, 102, 241, 0.35) !important;
   font-weight: 700 !important;
 }
 
@@ -307,21 +353,33 @@
 
 .shortcuts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 5px;
   padding: 0;
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 1500px) {
   .shortcuts-grid {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .shortcuts-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .shortcuts-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 .shortcut-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
   backdrop-filter: var(--blur-sm);
-  padding: 12px 14px;
+  padding: 7px 9px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color-light);
   transition: all var(--transition-base);
@@ -357,8 +415,8 @@
 .shortcut-combo {
   font-weight: var(--font-weight-semibold);
   color: #000000;
-  font-size: var(--font-size-base);
-  margin-bottom: 6px;
+  font-size: 11px;
+  margin-bottom: 5px;
   letter-spacing: -0.2px;
   position: relative;
   z-index: 1;
@@ -366,7 +424,7 @@
 }
 
 .shortcut-desc {
-  font-size: var(--font-size-xs);
+  font-size: 5px;
   color: #000000;
   line-height: var(--line-height-snug);
   position: relative;
