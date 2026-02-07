@@ -317,9 +317,12 @@ keyboard-visualizer/
 │   │   ├── NormalModeView.tsx      # 通常モード画面
 │   │   └── QuizModeView.tsx        # クイズモード画面
 │   ├── context/                    # Contextプロバイダー
-│   │   ├── AppContext.tsx          # アプリケーション状態管理
+│   │   ├── SettingsContext.tsx     # 設定状態管理（アプリ、レイアウト、難易度）
+│   │   ├── ShortcutContext.tsx     # ショートカットデータ管理
+│   │   ├── UIContext.tsx           # UI状態管理（モード切り替え、全画面）
 │   │   ├── AuthContext.tsx         # 認証状態管理
-│   │   └── QuizContext.tsx         # クイズ状態管理（reducer使用）
+│   │   ├── QuizContext.tsx         # クイズ状態管理（reducer使用）
+│   │   └── index.ts                # Context一元エクスポート
 │   ├── config/                     # 設定ファイル
 │   │   ├── apps.ts                 # アプリケーション定義
 │   │   └── keyboards.ts            # キーボード配列定義
@@ -436,6 +439,19 @@ keyboard-visualizer/
    - 本番環境用のNginx設定とGzip圧縮
    - ホットリロード対応の開発環境コンテナ
 
+11. **Context分割とモジュール化**（2026年2月）
+   - `AppContext.tsx` を3つの専門化されたContextに分割
+   - `SettingsContext`: アプリケーション選択、レイアウト、難易度設定
+   - `ShortcutContext`: ショートカットデータの取得と管理
+   - `UIContext`: モード切り替え、全画面モードなどUI状態
+   - `src/context/index.ts` による一元的なエクスポート
+   - 関心の分離による保守性とテスタビリティの向上
+
+12. **スクリプト整理とアーカイブ化**（2026年2月）
+   - 50以上のレガシースクリプトを `scripts/archive/` に移動
+   - アクティブに使用されるスクリプトのみをルートに配置
+   - プロジェクト構造の整理と可読性の向上
+
 ### コンポーネント設計
 
 - **関心の分離**: 各コンポーネントが単一の責務を持つ設計
@@ -446,6 +462,11 @@ keyboard-visualizer/
 ### 状態管理
 
 - **Context API**: グローバル状態の一元管理
+  - `SettingsContext`: アプリ設定、レイアウト、難易度の管理
+  - `ShortcutContext`: Supabaseからのショートカットデータ管理
+  - `UIContext`: モード、全画面状態などのUI管理
+  - `AuthContext`: ユーザー認証とセッション管理
+  - `QuizContext`: クイズ状態管理（reducer使用）
 - **useReducer**: 複雑な状態遷移（クイズモード）
 - **Local Storage**: 設定の永続化
 
