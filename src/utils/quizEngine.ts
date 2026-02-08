@@ -8,6 +8,16 @@ import { AllShortcuts, ShortcutDetails, RichShortcut, App } from '../types';
 const currentOS = detectOS();
 
 /**
+ * 修飾キーの表示順序定義
+ */
+const MODIFIER_ORDER: { [key: string]: number } = { 
+  'Ctrl': 1, 
+  'Alt': 2, 
+  'Meta': 3, 
+  'Shift': 4 
+};
+
+/**
  * 修飾キーの文字列を正規化するヘルパー関数
  */
 const normalizeModifierKeyString = (key: string): string => {
@@ -20,36 +30,14 @@ const normalizeModifierKeyString = (key: string): string => {
 };
 
 /**
- * Normalizes the shortcut key string.
- * - Allows for comparison independent of modifier key order by sorting the keys.
- * - Treats the 'Win' key as the 'Meta' key (for consistency with macOS's Cmd key).
- * - Standardizes modifier keys to uppercase.
- * - Standardizes main alphabet keys to uppercase to match test cases.
- * - Normalizes PgUp/PgDn to PageUp/PageDown for database consistency.
- * @param {string} shortcutString - A shortcut string like 'Ctrl + Shift + A'.
- * @returns {string} The normalized shortcut string.
+ * 修飾キーとメインキーを分類してソートするヘルパー
  */
-export const normalizeShortcut = (shortcutString: string): string => {
-  if (!shortcutString) return '';
-
-  const keys = shortcutString
-    .trim() // 先頭と末尾のスペースを削除
-    .split(/\s*\+\s*/) // スペースと+で分割
-    .map((key: string) => normalizeModifierKeyString(key))
-    .map((key: string) => {
-      // PgUp/PgDn を PageUp/PageDown に正規化
-      if (key === 'PgUp') return 'PageUp';
-      if (key === 'PgDn') return 'PageDown';
-      // その他のアルファベットキーは大文字に統一（テストケースに合わせる）
-      return key.length === 1 && /[a-zA-Z]/.test(key) ? key.toUpperCase() : key;
-    });
-
+const sortShortcutKeys = (keys: string[]): string[] => {
   const modifiers: string[] = [];
   const mainKeys: string[] = [];
 
   keys.forEach((key: string) => {
-    // 既に正規化された後なので、'Ctrl', 'Alt', 'Shift', 'Meta' のいずれかかをチェック
-    if (key === 'Ctrl' || key === 'Alt' || key === 'Shift' || key === 'Meta') {
+    if (MODIFIER_ORDER[key]) {
       modifiers.push(key);
     } else {
       mainKeys.push(key);
@@ -57,96 +45,74 @@ export const normalizeShortcut = (shortcutString: string): string => {
   });
 
   // 修飾キーをソート (Ctrl, Alt, Meta, Shiftの順)
-  modifiers.sort((a, b) => {
-    const order: { [key: string]: number } = { 'Ctrl': 1, 'Alt': 2, 'Meta': 3, 'Shift': 4 }; // MetaをShiftの前に
-    return order[a] - order[b];
-  });
+  modifiers.sort((a, b) => MODIFIER_ORDER[a] - MODIFIER_ORDER[b]);
 
-  // メインキーと修飾キーを結合
-  return [...modifiers, ...mainKeys].join('+');
+  return [...modifiers, ...mainKeys];
+};
+
+/**
+ * Normalizes the shortcut key string.
+ */
+export const normalizeShortcut = (shortcutString: string): string => {
+  if (!shortcutString) return '';
+
+  const keys = shortcutString
+    .trim()
+    .split(/\s*\+\s*/)
+    .map((key: string) => normalizeModifierKeyString(key))
+    .map((key: string) => {
+      // PgUp/PgDn を PageUp/PageDown に正規化
+      if (key === 'PgUp') return 'PageUp';
+      if (key === 'PgDn') return 'PageDown';
+      // その他のアルファベットキーは大文字に統一
+      return key.length === 1 && /[a-zA-Z]/.test(key) ? key.toUpperCase() : key;
+    });
+
+  return sortShortcutKeys(keys).join('+');
 };
 
 /**
  * Converts and normalizes an array of user-pressed keys into a shortcut string.
- * @param {Set<string>} pressedCodes - A set of codes for currently pressed keys (e.g., new Set(['ControlLeft', 'KeyA'])).
- * @returns {string} The normalized shortcut string.
  */
 export const normalizePressedKeys = (pressedCodes: Set<string>, keyboardLayout: string): string => {
   const shiftPressed = pressedCodes.has('ShiftLeft') || pressedCodes.has('ShiftRight');
 
   const normalizedKeys = Array.from(pressedCodes)
     .map((code: string) => {
-      // 修飾キーのコードを正規化された名前に変換 (normalizeModifierKeyStringを使用)
-      if (code.startsWith('Control')) return normalizeModifierKeyString('Control');
-      if (code.startsWith('Shift')) return normalizeModifierKeyString('Shift');
-      if (code.startsWith('Alt')) return normalizeModifierKeyString('Alt');
-      if (code.startsWith('Meta')) return normalizeModifierKeyString('Meta');
+      if (code.startsWith('Control')) return 'Ctrl';
+      if (code.startsWith('Shift')) return 'Shift';
+      if (code.startsWith('Alt')) return 'Alt';
+      if (code.startsWith('Meta')) return 'Meta';
 
-      // 非修飾キーの場合、getCodeDisplayNameを使用してシンボルを決定
-      const displayName = getCodeDisplayName(code, null, keyboardLayout, shiftPressed);
-      return displayName;
+      return getCodeDisplayName(code, null, keyboardLayout, shiftPressed);
     })
-    .filter(Boolean); // 空のキーを除外
+    .filter(Boolean);
 
-  const modifiers: string[] = [];
-  const mainKeys: string[] = [];
+  // 重複を除外してソート
+  const uniqueKeys = Array.from(new Set(normalizedKeys));
+  const combined = sortShortcutKeys(uniqueKeys).join('+');
 
-  Array.from(new Set(normalizedKeys)).forEach((key: string) => { // 重複を除外
-    if (key === 'Ctrl' || key === 'Alt' || key === 'Shift' || key === 'Meta') {
-      modifiers.push(key);
-    } else {
-      mainKeys.push(key);
-    }
-  });
-
-  // 修飾キーをソート (Ctrl, Alt, Meta, Shiftの順)
-  modifiers.sort((a, b) => {
-    const order: { [key: string]: number } = { 'Ctrl': 1, 'Alt': 2, 'Meta': 3, 'Shift': 4 };
-    return order[a] - order[b];
-  });
-
-  // メインキーと修飾キーを結合
-  const combined = [...modifiers, ...mainKeys].join('+');
-
-  // さらに正規化してPgDn→PageDown、矢印記号→ArrowXxxなどの変換を行う
   return normalizeShortcut(combined);
 };
 
-
 /**
  * Checks if a shortcut can be safely presented as a question.
- * @param {string} shortcut - The shortcut string (e.g., 'Ctrl + W').
- * @param {string} quizMode - The quiz mode ('default' or 'hardcore').
- * @param {boolean} isFullscreen - Whether fullscreen mode is active.
- * @param {RichShortcut} richShortcut - (Optional) Rich shortcut object from DB containing protection levels.
- * @returns {boolean} True if it can be safely presented.
  */
 const isShortcutSafe = (
-  _shortcut: string,
+  _shortcut: string, // Keep for backward compatibility if needed, but we prefer richShortcut
   quizMode: string,
   isFullscreen: boolean,
   richShortcut?: RichShortcut
 ): boolean => {
-  // DB情報がない場合は、安全と見なす（DBが唯一の正解ソース）
-  if (!richShortcut) {
-    return true;
-  }
+  if (!richShortcut) return true;
 
   const protectionLevel = currentOS === 'macos'
     ? richShortcut.macos_protection_level
     : richShortcut.windows_protection_level;
 
-  // always-protected は常に除外
-  if (protectionLevel === 'always-protected') {
-    return false;
-  }
+  if (protectionLevel === 'always-protected') return false;
+  if (quizMode === 'hardcore') return true;
 
-  // ハードコアモードでは、フルスクリーン防止可能ショートカットは安全と見なす
-  if (quizMode === 'hardcore') {
-    return true;
-  }
-
-  // デフォルトモードで、フルスクリーンでなく、かつ防止可能レベルの場合は安全ではない
   if (!isFullscreen && (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable')) {
     return false;
   }

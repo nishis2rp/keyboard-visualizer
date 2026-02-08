@@ -1,3 +1,11 @@
+export interface SetupOption {
+  id: string;
+  title?: string;
+  name?: string;
+  icon: string;
+  description?: string;
+}
+
 // 共通型定義
 
 export interface App {

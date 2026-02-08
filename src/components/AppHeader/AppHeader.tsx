@@ -89,12 +89,6 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
           )}
         </div>
       </div>
-      <p className="subtitle">
-        アプリケーション別のショートカットを視覚的に表示します
-        {!fullscreenMode && <span className={styles.warningText}>
-          💡 Ctrl+WやWinキーなどの競合を防ぐには全画面モードを使用してください
-        </span>}
-      </p>
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </>
   )

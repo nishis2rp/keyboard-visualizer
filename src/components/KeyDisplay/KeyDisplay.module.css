@@ -2,14 +2,20 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 12px 20px;
+  padding: 6px 12px;
   background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  min-height: 150px;
+  min-height: auto;
+  margin: 0 0 4px 0;
+}
+
+.containerPressedKeys {
+  border: 2px solid rgba(167, 139, 250, 0.5);
 }
 
 .active {
@@ -98,9 +104,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  min-height: 32px;
   color: #9ca3af;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -117,20 +123,17 @@
 /* Pressed Keys Display */
 .pressedKeysContainer {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  margin: 0;
+  padding: 0;
 }
 
 .keysWrapper {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
@@ -138,18 +141,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  height: 32px;
-  padding: 0 10px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
   font-family: "SF Pro Display", sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: #1f2937;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-bottom: 3px solid #d1d5db;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-bottom: 2px solid #d1d5db;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .modifierKey {
@@ -173,20 +176,22 @@
 .descriptionInline {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
   color: #374151;
 }
 
 .descriptionIcon {
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .difficultyBadge {
   padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
+  border-radius: 16px;
+  font-size: 10px;
   font-weight: 700;
   white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }

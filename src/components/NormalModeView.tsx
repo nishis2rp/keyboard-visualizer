@@ -3,7 +3,7 @@ import AppSelector from './AppSelector';
 import KeyboardLayoutSelector from './KeyboardLayoutSelector';
 import DifficultyFilter from './DifficultyFilter';
 import KeyboardLayout from './KeyboardLayout';
-import KeyDisplay from './KeyDisplay';
+import { PressedKeysIndicator, ShortcutsList } from './KeyDisplay';
 import { useKeyboardShortcuts } from '../hooks';
 import { useSettings, useShortcutData } from '../context';
 import { specialKeys } from '../constants/keys';
@@ -87,18 +87,28 @@ const NormalModeView = () => {
         shortcutDescriptions={shortcutDescriptions}
         keyboardLayout={keyboardLayout}
       />
-      <DifficultyFilter
-        selectedDifficulties={selectedDifficulties}
-        onToggleDifficulty={handleToggleDifficulty}
-      />
-      <KeyDisplay
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1 }}>
+          <PressedKeysIndicator
+            pressedKeys={pressedKeys}
+            description={currentDescription}
+            availableShortcuts={availableShortcuts}
+            keyboardLayout={keyboardLayout}
+          />
+        </div>
+        <div style={{ flexShrink: 0 }}>
+          <DifficultyFilter
+            selectedDifficulties={selectedDifficulties}
+            onToggleDifficulty={handleToggleDifficulty}
+          />
+        </div>
+      </div>
+      <ShortcutsList
         pressedKeys={pressedKeys}
-        specialKeys={specialKeys}
-        description={currentDescription}
         availableShortcuts={availableShortcuts}
         selectedApp={selectedApp}
         richShortcuts={filteredShortcuts}
-        keyboardLayout={keyboardLayout}
+        description={currentDescription}
       />
     </>
   );

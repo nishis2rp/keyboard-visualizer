@@ -1,9 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { SETUP_VERSION } from '../../constants/app'
+import { 
+  FULLSCREEN_OPTIONS, 
+  LAYOUT_OPTIONS, 
+  MODES, 
+  DIFFICULTY_OPTIONS 
+} from '../../constants/setup'
 import { useUI, useShortcutData } from '../../context'
 import { useAuth } from '../../context/AuthContext'
+import { SetupOption as SetupOptionType } from '../../types'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
+import SetupOption from './SetupOption'
+import SetupSection from './SetupSection'
 import './SetupScreen.css'
 
 interface SetupScreenProps {
@@ -14,179 +23,70 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const { isQuizMode } = useUI()
   const { apps } = useShortcutData()
   const { user } = useAuth()
-  const [selectedFullscreen, setSelectedFullscreen] = useState(null)
-  const [selectedLayout, setSelectedLayout] = useState(null)
-  const [selectedMode, setSelectedMode] = useState(null)
-  const [selectedApp, setSelectedApp] = useState(null)
+  const [selectedFullscreen, setSelectedFullscreen] = useState<SetupOptionType | null>(null)
+  const [selectedLayout, setSelectedLayout] = useState<SetupOptionType | null>(null)
+  const [selectedMode, setSelectedMode] = useState<SetupOptionType | null>(null)
+  const [selectedApp, setSelectedApp] = useState<any>(null)
   const [selectedQuizApps, setSelectedQuizApps] = useState<any[]>([]) // 複数選択対応
-  const [selectedDifficulty, setSelectedDifficulty] = useState(null)
+  const [selectedDifficulty, setSelectedDifficulty] = useState<SetupOptionType | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
 
   // クイズモードが既に有効な場合、モード選択をスキップ
   useEffect(() => {
     if (isQuizMode) {
-      setSelectedMode({ id: 'quiz', title: 'クイズモード', icon: '🎯' })
+      const quizMode = MODES.find(m => m.id === 'quiz') as SetupOptionType;
+      setSelectedMode(quizMode)
     }
   }, [isQuizMode])
 
-  const fullscreenOptions = [
-    {
-      id: 'fullscreen',
-      title: '全画面モード',
-      icon: '🖥️',
-      description: 'フルスクリーン表示で集中して学習'
-    },
-    {
-      id: 'windowed',
-      title: 'ウィンドウモード',
-      icon: '🪟',
-      description: '他のウィンドウと並べて使用'
-    }
-  ]
-
-  const layoutOptions = [
-    {
-      id: 'windows-jis',
-      title: 'Windows JIS',
-      icon: '🪟',
-      description: '日本語キーボード（Windows）'
-    },
-    {
-      id: 'mac-jis',
-      title: 'Mac JIS',
-      icon: '🍎',
-      description: '日本語キーボード（Mac）'
-    },
-    {
-      id: 'mac-us',
-      title: 'Mac US',
-      icon: '🇺🇸',
-      description: 'US（英語）キーボード（Mac）'
-    }
-  ]
-
   // ビジュアライザーモード用のアプリケーション選択肢
-  const visualizerAppOptions = apps.map(app => ({
+  const visualizerAppOptions = useMemo(() => apps.map(app => ({
     ...app,
-    description: `${app.name}のショートカットを表示`
-  }))
-
-  const modes = [
-    {
-      id: 'visualizer',
-      title: 'ビジュアライザーモード',
-      icon: '⌨️',
-      description: 'キーボードショートカットを可視化'
-    },
-    {
-      id: 'quiz',
-      title: 'クイズモード',
-      icon: '🎯',
-      description: 'ショートカットを学習してスコアを競う'
-    }
-  ]
-
-  // 難易度選択肢
-  const difficultyOptions = [
-    {
-      id: 'basic',
-      name: 'basic',
-      icon: '🌟',
-      description: 'For beginners: Commonly used basic shortcuts'
-    },
-    {
-      id: 'standard',
-      name: 'standard',
-      icon: '⚡',
-      description: 'For intermediate users: Standard difficulty shortcuts'
-    },
-    {
-      id: 'hard',
-      name: 'hard',
-      icon: '💪',
-      description: 'For advanced users: More advanced and practical shortcuts'
-    },
-    {
-      id: 'madmax',
-      name: 'madmax',
-      icon: '🔥',
-      description: 'Expert level: Very specialized and difficult professional shortcuts'
-    },
-    {
-      id: 'allrange',
-      name: 'allrange',
-      icon: '🎲',
-      description: 'All difficulties: Random shortcuts from all levels'
-    }
-  ]
+    title: app.name
+  })), [apps])
 
   // クイズ用のアプリ選択肢（ランダムを含む）
-  const quizAppOptions = [
+  const quizAppOptions = useMemo(() => [
     {
       id: 'random',
       name: 'ランダム',
-      icon: '🎲',
-      description: 'すべてのアプリからランダムに出題'
+      title: 'ランダム',
+      icon: '🎲'
     },
     ...apps.map(app => ({
       ...app,
-      description: `${app.name}のショートカットのみ出題`
+      title: app.name
     }))
-  ]
+  ], [apps])
 
-  const handleSelectFullscreen = (option) => {
-    setSelectedFullscreen(option)
-  }
-
-  const handleSelectLayout = (layout) => {
-    setSelectedLayout(layout)
-  }
-
-  const handleSelectMode = (mode) => {
+  const handleSelectMode = (mode: SetupOptionType) => {
     setSelectedMode(mode)
-    // モード変更時にアプリ選択をリセット
     setSelectedApp(null)
-    // クイズモード以外を選択した場合、クイズアプリと難易度をリセット
     if (mode.id !== 'quiz') {
       setSelectedQuizApps([])
       setSelectedDifficulty(null)
     }
   }
 
-  const handleSelectApp = (app) => {
-    setSelectedApp(app)
-  }
-
-  const handleSelectQuizApp = (app) => {
-    // 複数選択対応
+  const handleSelectQuizApp = (app: any) => {
     setSelectedQuizApps(prev => {
-      // 既に選択されている場合は削除
       if (prev.some(a => a.id === app.id)) {
         return prev.filter(a => a.id !== app.id)
       }
-      // 選択されていない場合は追加
       return [...prev, app]
     })
   }
 
-  const handleSelectDifficulty = (difficulty) => {
-    setSelectedDifficulty(difficulty)
-  }
-
   const handleConfirm = () => {
-    // すべての必須項目が選択されているかチェック
     let canProceed = false
 
     if (selectedMode?.id === 'quiz') {
-      // クイズモードの場合
-      canProceed = selectedFullscreen && selectedLayout && selectedMode && selectedQuizApps.length > 0 && selectedDifficulty
+      canProceed = !!(selectedFullscreen && selectedLayout && selectedMode && selectedQuizApps.length > 0 && selectedDifficulty)
     } else if (selectedMode?.id === 'visualizer') {
-      // ビジュアライザーモードの場合
-      canProceed = selectedFullscreen && selectedLayout && selectedMode && selectedApp
+      canProceed = !!(selectedFullscreen && selectedLayout && selectedMode && selectedApp)
     }
 
-    if (canProceed) {
-      // 使用するアプリIDを決定（クイズモードの場合はquizAppを使わず、デフォルトのアプリを使う）
+    if (canProceed && selectedMode && selectedLayout && selectedFullscreen) {
       const appId = selectedMode.id === 'quiz'
         ? (selectedLayout.id === 'windows-jis' ? 'windows11' : 'macos')
         : selectedApp.id
@@ -198,7 +98,6 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         version: SETUP_VERSION
       }))
 
-      // クイズモードの場合は選択されたアプリ(複数)と難易度も渡す
       const quizAppsIds = selectedMode.id === 'quiz'
         ? selectedQuizApps.map(app => app.id).join(',')
         : null
@@ -208,7 +107,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         selectedLayout.id,
         selectedMode.id,
         quizAppsIds,
-        selectedMode.id === 'quiz' ? selectedDifficulty.id : undefined,
+        selectedMode.id === 'quiz' ? selectedDifficulty?.id : undefined,
         selectedFullscreen.id === 'fullscreen'
       )
     }
@@ -242,165 +141,94 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         </div>
 
         {/* 全画面モード選択 */}
-        <div className="setup-divider">
-          <h3>表示モードを選択してください</h3>
-        </div>
-
-        <div className="setup-options setup-modes">
-          {fullscreenOptions.map((option) => (
-            <div
-              key={option.id}
-              className={`setup-option ${selectedFullscreen?.id === option.id ? 'selected' : ''}`}
-              onClick={() => handleSelectFullscreen(option)}
-            >
-              <div className="option-icon">{option.icon}</div>
-              <div className="option-content">
-                <h3>{option.title}</h3>
-                <p>{option.description}</p>
-                {option.id === 'fullscreen' && (
-                  <p className="setup-recommendation">💡 推奨：より没入感のある学習体験</p>
-                )}
-              </div>
-              <div className="option-check">
-                {selectedFullscreen?.id === option.id && '✓'}
-              </div>
-            </div>
-          ))}
-        </div>
+        <SetupSection title="表示モードを選択してください">
+          <div className="setup-options setup-modes">
+            {FULLSCREEN_OPTIONS.map((option) => (
+              <SetupOption
+                key={option.id}
+                option={option}
+                isSelected={selectedFullscreen?.id === option.id}
+                onSelect={setSelectedFullscreen}
+                showRecommendation
+              />
+            ))}
+          </div>
+        </SetupSection>
 
         {/* キーボードレイアウト選択 */}
-        <div className="setup-divider">
-          <h3>キーボードレイアウトを選択してください</h3>
-        </div>
-
-        <div className="setup-options setup-layouts">
-          {layoutOptions.map((layout) => (
-            <div
-              key={layout.id}
-              className={`setup-option ${selectedLayout?.id === layout.id ? 'selected' : ''}`}
-              onClick={() => handleSelectLayout(layout)}
-            >
-              <div className="option-icon">{layout.icon}</div>
-              <div className="option-content">
-                <h3>{layout.title}</h3>
-                <p>{layout.description}</p>
-              </div>
-              <div className="option-check">
-                {selectedLayout?.id === layout.id && '✓'}
-              </div>
-            </div>
-          ))}
-        </div>
+        <SetupSection title="キーボードレイアウトを選択してください">
+          <div className="setup-options setup-layouts">
+            {LAYOUT_OPTIONS.map((layout) => (
+              <SetupOption
+                key={layout.id}
+                option={layout}
+                isSelected={selectedLayout?.id === layout.id}
+                onSelect={setSelectedLayout}
+              />
+            ))}
+          </div>
+        </SetupSection>
 
         {/* クイズモードが既に有効でない場合のみ、モード選択を表示 */}
         {!isQuizMode && (
-          <>
-            <div className="setup-divider">
-              <h3>モードを選択してください</h3>
-            </div>
-
+          <SetupSection title="モードを選択してください">
             <div className="setup-options setup-modes">
-              {modes.map((mode) => (
-                <div
+              {MODES.map((mode) => (
+                <SetupOption
                   key={mode.id}
-                  className={`setup-option ${selectedMode?.id === mode.id ? 'selected' : ''}`}
-                  onClick={() => handleSelectMode(mode)}
-                >
-                  <div className="option-icon">{mode.icon}</div>
-                  <div className="option-content">
-                    <h3>{mode.title}</h3>
-                    <p>{mode.description}</p>
-                  </div>
-                  <div className="option-check">
-                    {selectedMode?.id === mode.id && '✓'}
-                  </div>
-                </div>
+                  option={mode}
+                  isSelected={selectedMode?.id === mode.id}
+                  onSelect={handleSelectMode}
+                />
               ))}
             </div>
-          </>
+          </SetupSection>
         )}
 
         {/* ビジュアライザーモードが選択された場合、アプリケーション選択を表示 */}
         {selectedMode?.id === 'visualizer' && (
-          <>
-            <div className="setup-divider">
-              <h3>アプリケーションを選択してください</h3>
-            </div>
-
+          <SetupSection title="アプリケーションを選択してください">
             <div className="setup-options setup-quiz-apps">
               {visualizerAppOptions.map((app) => (
-                <div
+                <SetupOption
                   key={app.id}
-                  className={`setup-option ${selectedApp?.id === app.id ? 'selected' : ''}`}
-                  onClick={() => handleSelectApp(app)}
-                >
-                  <div className="option-icon">{app.icon}</div>
-                  <div className="option-content">
-                    <h3>{app.name}</h3>
-                    <p>{app.description}</p>
-                  </div>
-                  <div className="option-check">
-                    {selectedApp?.id === app.id && '✓'}
-                  </div>
-                </div>
+                  option={app}
+                  isSelected={selectedApp?.id === app.id}
+                  onSelect={setSelectedApp}
+                />
               ))}
             </div>
-          </>
+          </SetupSection>
         )}
 
         {/* クイズモードが選択された場合、難易度選択を表示 */}
         {selectedMode?.id === 'quiz' && (
           <>
-            <div className="setup-divider">
-              <h3>難易度を選択してください</h3>
-            </div>
+            <SetupSection title="難易度を選択してください">
+              <div className="setup-options setup-modes">
+                {DIFFICULTY_OPTIONS.map((difficulty) => (
+                  <SetupOption
+                    key={difficulty.id}
+                    option={{ ...difficulty, title: difficulty.name }}
+                    isSelected={selectedDifficulty?.id === difficulty.id}
+                    onSelect={setSelectedDifficulty}
+                  />
+                ))}
+              </div>
+            </SetupSection>
 
-            <div className="setup-options setup-modes">
-              {difficultyOptions.map((difficulty) => (
-                <div
-                  key={difficulty.id}
-                  className={`setup-option ${selectedDifficulty?.id === difficulty.id ? 'selected' : ''}`}
-                  onClick={() => handleSelectDifficulty(difficulty)}
-                >
-                  <div className="option-icon">{difficulty.icon}</div>
-                  <div className="option-content">
-                    <h3>{difficulty.name}</h3>
-                    <p>{difficulty.description}</p>
-                  </div>
-                  <div className="option-check">
-                    {selectedDifficulty?.id === difficulty.id && '✓'}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* クイズモードが選択された場合、アプリケーション選択を表示 */}
-        {selectedMode?.id === 'quiz' && (
-          <>
-            <div className="setup-divider">
-              <h3>出題するアプリケーションを選択してください（複数選択可）</h3>
-            </div>
-
-            <div className="setup-options setup-quiz-apps">
-              {quizAppOptions.map((app) => (
-                <div
-                  key={app.id}
-                  className={`setup-option ${selectedQuizApps.some(a => a.id === app.id) ? 'selected' : ''}`}
-                  onClick={() => handleSelectQuizApp(app)}
-                >
-                  <div className="option-icon">{app.icon}</div>
-                  <div className="option-content">
-                    <h3>{app.name}</h3>
-                    <p>{app.description}</p>
-                  </div>
-                  <div className="option-check">
-                    {selectedQuizApps.some(a => a.id === app.id) && '✓'}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <SetupSection title="出題するアプリケーションを選択してください（複数選択可）">
+              <div className="setup-options setup-quiz-apps">
+                {quizAppOptions.map((app) => (
+                  <SetupOption
+                    key={app.id}
+                    option={app}
+                    isSelected={selectedQuizApps.some(a => a.id === app.id)}
+                    onSelect={handleSelectQuizApp}
+                  />
+                ))}
+              </div>
+            </SetupSection>
           </>
         )}
 
