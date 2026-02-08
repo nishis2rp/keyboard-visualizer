@@ -16,6 +16,22 @@ export const normalizeKey = (key: string): string => {
   return key
 }
 
+/**
+ * ショートカット文字列内のアルファベットキーを小文字に正規化する
+ * (例: "Ctrl + Shift + A" -> "Ctrl + Shift + a")
+ * 修飾キーやシンボルキーは変更しない
+ */
+export const normalizeShortcutCombo = (combo: string): string => {
+  return combo.split(' + ').map(part => {
+    // アルファベット1文字で、かつ修飾キーや特殊シンボルでない場合のみ小文字にする
+    // MODIFIER_KEY_NAMESに"Win"を追加したので、ここでも対応
+    if (part.length === 1 && /[a-zA-Z]/.test(part) && !MODIFIER_KEY_NAMES.has(part) && !/^[!@#$%^&*()_+{}|:"<>?~]$/.test(part)) {
+      return part.toLowerCase();
+    }
+    return part;
+  }).join(' + ');
+};
+
 /** 利用可能なショートカットの最大表示数 */
 const MAX_SHORTCUTS_DISPLAY = Infinity
 
@@ -38,7 +54,7 @@ export const sortKeys = (codes) => {
  * @param {string} layout - キーボードレイアウト ('macUs', 'macJis', 'windowsJis')
  * @returns {string} "Ctrl + Shift + A" のような表示名形式の文字列
  */
-export const getKeyComboText = (codesArray, layout) => {
+export const getKeyComboText = (codesArray: string[], layout: string) => {
   const sortedCodes = sortKeys([...codesArray])
   const shiftPressed = codesArray.includes('ShiftLeft') || codesArray.includes('ShiftRight');
   
@@ -54,7 +70,7 @@ export const getKeyComboText = (codesArray, layout) => {
  * @param {string} layout - キーボードレイアウト
  * @returns {Array<string>} 代替表現の配列
  */
-const getKeyComboAlternatives = (displayComboText, layout) => {
+const getKeyComboAlternatives = (displayComboText: string, layout: string) => {
   const alternatives = [displayComboText];
 
   const parts = displayComboText.split(' + ');
@@ -101,13 +117,16 @@ export const getOSSpecificKeys = (item: RichShortcut, os?: string): string => {
  */
 export const getShortcutDescription = (currentDisplayComboText: string, richShortcuts: RichShortcut[], selectedApp: string, layout: string): string | null => {
   const os = detectOS();
+  const normalizedCurrentCombo = normalizeShortcutCombo(currentDisplayComboText); // 正規化
+
   // 選択されたアプリのショートカットのみをフィルタ
   const appRichShortcuts = richShortcuts.filter(item => item.application === selectedApp);
 
   const findDescription = (targetCombo: string) => {
+    const normalizedTargetCombo = normalizeShortcutCombo(targetCombo); // 正規化
     for (const item of appRichShortcuts) {
       const shortcutKeys = getOSSpecificKeys(item, os);
-      if (shortcutKeys === targetCombo) {
+      if (normalizeShortcutCombo(shortcutKeys) === normalizedTargetCombo) { // 正規化して比較
         return item.description;
       }
     }
@@ -115,7 +134,7 @@ export const getShortcutDescription = (currentDisplayComboText: string, richShor
   };
 
   // まず、現在の表示名で直接検索
-  let description = findDescription(currentDisplayComboText);
+  let description = findDescription(normalizedCurrentCombo);
   if (description) return description;
 
   // 代替表現で検索
@@ -126,7 +145,7 @@ export const getShortcutDescription = (currentDisplayComboText: string, richShor
   }
 
   // キー名の別名を考慮した検索（PgUp <-> PageUp など）
-  const parts = currentDisplayComboText.split(' + ');
+  const parts = normalizedCurrentCombo.split(' + '); // 正規化されたコンボを使用
   const lastKey = parts[parts.length - 1];
   const possibleLastKeys = getPossibleKeyNamesFromDisplay(lastKey);
 
@@ -191,38 +210,43 @@ const countModifierKeys = (shortcut: string): number => {
  */
 export const getAvailableShortcuts = (pressedCodes: string[], layout: string, richShortcuts: RichShortcut[], selectedApp: string): AvailableShortcut[] => {
   const shiftPressed = pressedCodes.includes('ShiftLeft') || pressedCodes.includes('ShiftRight');
-  const pressedDisplayNames = new Set(pressedCodes.map(code => getCodeDisplayName(code, null, layout, shiftPressed)));
+  const pressedDisplayNames = Array.from(pressedCodes).map(code => getCodeDisplayName(code, null, layout, shiftPressed));
+  const normalizedPressedDisplayCombo = normalizeShortcutCombo(pressedDisplayNames.join(' + ')); // ここで正規化
   const os = detectOS();
 
   const filteredRichShortcuts = richShortcuts
     .filter(item => item.application === selectedApp)
     .filter(item => {
-      // OSごとのキーを取得
       const targetShortcutString = getOSSpecificKeys(item, os);
       if (!targetShortcutString) {
         return false;
       }
+      const normalizedTargetShortcut = normalizeShortcutCombo(targetShortcutString); // ここで正規化
 
-      // press_type に基づいてキーを取得
       const shortcutKeys = item.press_type === 'sequential' 
-        ? getSequentialKeys(targetShortcutString)
-        : targetShortcutString.split(' + ');
+        ? getSequentialKeys(normalizedTargetShortcut)
+        : normalizedTargetShortcut.split(' + ');
+      
+      // pressedDisplayNamesはSet<string>なので、Array.from()で配列に変換してから処理
+      const allPressedKeysInShortcut = Array.from(pressedDisplayNames).every((pressedKey: string) => {
+        // shortcutKeysの各要素も正規化して比較
+        return shortcutKeys.map(k => normalizeKey(k)).includes(normalizeKey(pressedKey));
+      });
 
-      const allPressedKeysInShortcut = Array.from(pressedDisplayNames).every((pressedKey: string) => shortcutKeys.includes(pressedKey));
       const pressedModifiers = Array.from(pressedDisplayNames).filter((key: string) => MODIFIER_KEY_NAMES.has(key));
       const shortcutModifiers = shortcutKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
 
       let shouldInclude = false;
-      
+
       // 1. 完全一致
-      if (allPressedKeysInShortcut && pressedDisplayNames.size === shortcutKeys.length) {
+      if (allPressedKeysInShortcut && pressedDisplayNames.length === shortcutKeys.length) { // sizeとlengthで比較
         shouldInclude = true;
       }
       // 2. 押されている修飾キーを含むショートカット候補
       else if (
           pressedModifiers.length > 0 &&
           pressedModifiers.every((mod: string) => shortcutModifiers.includes(mod)) &&
-          pressedDisplayNames.size < shortcutKeys.length
+          pressedDisplayNames.length < shortcutKeys.length
          ) {
            // 順押しの場合、最初のキー（修飾キー）が一致していれば候補として表示
            shouldInclude = true;
@@ -237,7 +261,7 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
       macos_protection_level: item.macos_protection_level || 'none',     // non-nullableにする
     }))
     .filter((item, index, self) =>
-      index === self.findIndex(t => t.shortcut === item.shortcut)
+      index === self.findIndex(t => normalizeShortcutCombo(t.shortcut) === normalizeShortcutCombo(item.shortcut))
     );
 
 

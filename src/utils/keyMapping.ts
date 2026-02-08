@@ -139,7 +139,7 @@ export const getShiftedSymbolForKey = (code, layout) => {
  * @param {boolean} shiftPressed - Whether the Shift key is pressed
  * @returns {string} The display name for the key
  */
-export const getCodeDisplayName = (code, key, layout, shiftPressed) => {
+export const getCodeDisplayName = (code: string, key: string | null, layout: string = 'us', shiftPressed: boolean): string => {
   let displayKey = '';
 
   // 1. OS-specific modifier key mapping

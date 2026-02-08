@@ -16,7 +16,7 @@ import SetupSection from './SetupSection'
 import './SetupScreen.css'
 
 interface SetupScreenProps {
-  onSetupComplete: (app: string, layout: string, mode: string, quizApp: string | null, difficulty?: string, isFullscreen?: boolean) => void;
+  onSetupComplete: (app: string, layout: string, mode: string, quizApp: string | null, difficulty?: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null, isFullscreen?: boolean) => void;
 }
 
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {

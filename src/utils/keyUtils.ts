@@ -19,7 +19,7 @@ export const WINDOWS_KEY_CODES = new Set(['MetaLeft', 'MetaRight']);
 /**
  * 修飾キーの名前リスト（表示名ベース）
  */
-export const MODIFIER_KEY_NAMES = new Set(['Ctrl', 'Shift', 'Alt', 'Cmd', 'Option', 'Meta']);
+export const MODIFIER_KEY_NAMES = new Set(['Ctrl', 'Shift', 'Alt', 'Cmd', 'Option', 'Meta', 'Win']);
 
 /**
  * Windowsキーの名前リスト（表示名ベース）

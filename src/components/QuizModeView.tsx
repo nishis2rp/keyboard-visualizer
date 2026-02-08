@@ -72,32 +72,31 @@ const QuizModeView = () => {
       <SystemShortcutWarning onOpenRequest={onMacWarningModalRequest} />
 
       <div className="quiz-container">
-        {/* コントロールパネル */}
-        {quizState.status === 'playing' && (
+          {/* コントロールパネル */}
           <div className="quiz-controls">
-            <button onClick={pauseQuiz} className="quiz-button quiz-button-pause">
-              ⏸️ 一時停止
-            </button>
+            {quizState.status === 'playing' && (
+              <button onClick={pauseQuiz} className="quiz-button quiz-button-pause">
+                ⏸️ 一時停止
+              </button>
+            )}
+            {quizState.status === 'paused' && (
+              <button onClick={resumeQuiz} className="quiz-button quiz-button-resume">
+                ▶️ 再開
+              </button>
+            )}
           </div>
-        )}
-        {quizState.status === 'paused' && (
-          <div className="quiz-controls">
-            <button onClick={resumeQuiz} className="quiz-button quiz-button-resume">
-              ▶️ 再開
-            </button>
-          </div>
-        )}
 
-        <ScoreBoard
-          status={quizState.status}
-          quizHistory={quizState.quizHistory}
-          settings={quizState.settings}
-        />
-        <QuizProgressBar
-          status={quizState.status}
-          quizHistory={quizState.quizHistory}
-          settings={quizState.settings}
-        />
+          <ScoreBoard
+            status={quizState.status}
+            quizHistory={quizState.quizHistory}
+            settings={quizState.settings}
+          />
+          <QuizProgressBar
+            status={quizState.status}
+            quizHistory={quizState.quizHistory}
+            settings={quizState.settings}
+          />
+
         <QuestionCard />
 
         {/* キーボードビジュアライザー */}

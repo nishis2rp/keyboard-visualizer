@@ -77,7 +77,15 @@ function ResultModal() {
             <ul className={styles.difficultShortcutsList}>
               {difficultShortcuts.map((item, index) => (
                 <li key={index} className={styles.difficultShortcutItem}>
-                  <span className={styles.difficultShortcutKey}>{item.shortcut}</span>: {quizHistory.find(q => q.correctShortcut === item.shortcut)?.question.replace(' のショートカットは？', '')} ({item.count}回間違え)
+                  <div>
+                    <span className={styles.difficultShortcutKey}>{item.shortcut}</span>
+                    <span style={{ marginLeft: '10px' }}>
+                      {quizHistory.find(q => q.correctShortcut === item.shortcut)?.question.replace(' のショートカットは？', '').replace(/^【.*?】/, '')}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--sf-red)' }}>
+                    {item.count}回ミス
+                  </div>
                 </li>
               ))}
             </ul>
