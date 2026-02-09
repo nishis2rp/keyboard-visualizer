@@ -8,7 +8,7 @@ import {
 } from '../../constants/setup'
 import { useUI, useShortcutData } from '../../context'
 import { useAuth } from '../../context/AuthContext'
-import { SetupOption as SetupOptionType } from '../../types'
+import { SetupOption as SetupOptionType, SetupCompleteOptions, ShortcutDifficulty } from '../../types'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
 import SetupOption from './SetupOption'
@@ -16,7 +16,7 @@ import SetupSection from './SetupSection'
 import './SetupScreen.css'
 
 interface SetupScreenProps {
-  onSetupComplete: (app: string, layout: string, mode: string, quizApp: string | null, difficulty?: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null, isFullscreen?: boolean) => void;
+  onSetupComplete: (options: SetupCompleteOptions) => void;
 }
 
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
@@ -102,14 +102,14 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         ? selectedQuizApps.map(app => app.id).join(',')
         : null
 
-      onSetupComplete(
-        appId,
-        selectedLayout.id,
-        selectedMode.id,
-        quizAppsIds,
-        selectedMode.id === 'quiz' ? selectedDifficulty?.id : undefined,
-        selectedFullscreen.id === 'fullscreen'
-      )
+      onSetupComplete({
+        app: appId,
+        layout: selectedLayout.id,
+        mode: selectedMode.id,
+        quizApp: quizAppsIds,
+        difficulty: selectedMode.id === 'quiz' ? (selectedDifficulty?.id as ShortcutDifficulty) : undefined,
+        shouldBeFullscreen: selectedFullscreen.id === 'fullscreen'
+      })
     }
   }
 

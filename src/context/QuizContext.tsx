@@ -11,6 +11,8 @@ import {
   initialQuizState 
 } from './QuizReducer';
 
+export type { QuizState, QuizAction };
+
 interface QuizContextType {
   quizState: QuizState;
   dispatch: Dispatch<QuizAction>;

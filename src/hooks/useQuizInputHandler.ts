@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { isModifierKey, isWindowsKey } from '../utils/keyUtils';
 import { SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts';
 import { normalizePressedKeys, checkAnswer, normalizeShortcut } from '../utils/quizEngine';
-import { QuizAction, QuizState } from '../../context/QuizContext';
+import { QuizAction, QuizState } from '../context/QuizContext';
 import { QuizQuestion, RichShortcut } from '../types';
 
 interface UseQuizInputHandlerProps {

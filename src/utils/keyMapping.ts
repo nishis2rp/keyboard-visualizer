@@ -185,7 +185,7 @@ export const getCodeDisplayName = (code: string, key: string | null, layout: str
  * @param {string} layout - The selected keyboard layout ('macUs', 'macJis', 'windowsJis')
  * @returns {string[]} Array of display names
  */
-export const getDisplayNamesFromCodes = (pressedCodes, layout) => {
+export const getDisplayNamesFromCodes = (pressedCodes: Set<string>, layout: string): string[] => {
   const shiftPressed = pressedCodes.has('ShiftLeft') || pressedCodes.has('ShiftRight');
 
   const displayNames = Array.from(pressedCodes).map(code => {
@@ -205,7 +205,7 @@ export const getDisplayNamesFromCodes = (pressedCodes, layout) => {
  * @param {string} displayName - The display name (e.g., 'PgUp', 'Del', 'Esc')
  * @returns {string[]} Array of possible key codes/names that could produce this display
  */
-export const getPossibleKeyNamesFromDisplay = (displayName) => {
+export const getPossibleKeyNamesFromDisplay = (displayName: string): string[] => {
   const possibleNames = [displayName]; // Always include the display name itself
 
   // Create a reverse mapping from display names to key codes

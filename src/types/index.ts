@@ -6,6 +6,15 @@ export interface SetupOption {
   description?: string;
 }
 
+export interface SetupCompleteOptions {
+  app: string;
+  layout: string;
+  mode: string;
+  quizApp: string | null;
+  difficulty?: ShortcutDifficulty | null;
+  shouldBeFullscreen?: boolean;
+}
+
 // 共通型定義
 
 export interface App {

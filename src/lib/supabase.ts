@@ -31,4 +31,6 @@ export interface Shortcut {
   macos_keys?: string | null;
   windows_protection_level?: string | null;
   macos_protection_level?: string | null;
+  press_type?: 'sequential' | 'simultaneous' | null;
+  alternative_group_id?: number | null;
 }
