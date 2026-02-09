@@ -1,10 +1,20 @@
 import { withDatabase } from './lib/db';
 
 async function main() {
+  const appFilter = process.argv.find(arg => arg.startsWith('--app='))?.split('=')[1] || 
+                   (process.argv.indexOf('--app') !== -1 ? process.argv[process.argv.indexOf('--app') + 1] : null);
+
   await withDatabase(async (client) => {
-    const result = await client.query(
-      'SELECT id, application, keys, description, category, created_at, windows_protection_level, macos_protection_level, difficulty, sort_order FROM shortcuts ORDER BY sort_order'
-    );
+    let query = 'SELECT id, application, keys, description, category, created_at, windows_protection_level, macos_protection_level, difficulty, sort_order FROM shortcuts';
+    const params: any[] = [];
+
+    if (appFilter) {
+      query += ' WHERE application = $1';
+      params.push(appFilter);
+    }
+
+    query += ' ORDER BY sort_order';
+    const result = await client.query(query, params);
 
     console.log(`\nFound ${result.rows.length} shortcut(s):\n`);
 
@@ -13,6 +23,7 @@ async function main() {
         console.log(`ID: ${row.id}`);
         console.log(`Application: ${row.application}`);
         console.log(`Keys: ${row.keys}`);
+        console.log(`Difficulty: ${row.difficulty || 'N/A'}`);
         console.log(`Description: ${row.description}`);
         console.log(`Category: ${row.category || 'N/A'}`);
         console.log(`Created At: ${row.created_at}`);
