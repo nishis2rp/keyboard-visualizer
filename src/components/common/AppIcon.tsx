@@ -38,7 +38,9 @@ export const AppIcon: React.FC<AppIconProps> = ({ appId, size = 24, className = 
       case 'chrome':
         return (
           <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
-            <path d="M12 0C8.21 0 4.83 1.7 2.5 4.33L5.55 9.54C6.45 6.46 9.32 4.2 12.68 4.2H21.06C19.14 1.66 16.07 0 12 0ZM12 8.22c2.1 0 3.78 1.68 3.78 3.78s-1.68 3.78-3.78 3.78-3.78-1.68-3.78-3.78 1.68-3.78 3.78-3.78ZM11.3 17.76H20.36C18.44 20.3 15.37 21.96 11.3 21.96H12V17.76ZM21.06 4.2C22.86 6.57 24 9.41 24 12.42V12h-4.22c-.9 3.1-3.78 5.38-7.14 5.38H5.18L1 15.54C2.1 20.92 6.57 24 12 24c6.63 0 12-5.37 12-12 0-3.32-1.35-6.32-3.53-8.48L21.06 4.2Z" />
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="4" fill="white" />
+            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 17.5c-4.142 0-7.5-3.358-7.5-7.5S7.858 4.5 12 4.5s7.5 3.358 7.5 7.5-3.358 7.5-7.5 7.5z" opacity="0" />
           </svg>
         );
       case 'excel':
@@ -167,14 +169,14 @@ export const AppIcon: React.FC<AppIconProps> = ({ appId, size = 24, className = 
         );
       case 'hard':
         return (
-          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
-            <path d="M12 2c-1.5 0-2.7 1.2-2.7 2.7 0 .8.3 1.5.8 2L6.5 10c-.5-.2-1.1-.3-1.7-.3C3.2 9.7 2 10.9 2 12.5S3.2 15.3 4.8 15.3c.6 0 1.2-.1 1.7-.4l3.6 3.3c-.5.5-.8 1.2-.8 2 0 1.5 1.2 2.7 2.7 2.7s2.7-1.2 2.7-2.7c0-.8-.3-1.5-.8-2l3.6-3.3c.5.2 1.1.4 1.7.4 1.6 0 2.8-1.2 2.8-2.8S20.8 9.7 19.2 9.7c-.6 0-1.2.1-1.7.3l-3.6-3.3c.5-.5.8-1.2.8-2C14.7 3.2 13.5 2 12 2z" />
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
           </svg>
         );
       case 'madmax':
         return (
-          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-4.5-5.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm6 0c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm-3 2.5c-1.66 0-3 1.34-3 3h6c0-1.66-1.34-3-3-3z" />
           </svg>
         );
       default:
