@@ -69,7 +69,8 @@ export const AppIcon: React.FC<AppIconProps> = ({ appId, size = 24, className = 
     return <span>{fallbackIcon || '❓'}</span>;
   }
 
-  const iconPath = `/icons/${filename}`;
+  // Viteのベースパスを考慮したパスを生成
+  const iconPath = `${import.meta.env.BASE_URL}icons/${filename}`;
 
   // mask-imageを使用してcurrentColorを適用するためのスタイル
   // これにより外部SVGでもCSSのcolorプロパティで色を変えることができます
