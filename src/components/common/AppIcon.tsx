@@ -89,6 +89,7 @@ export const AppIcon: React.FC<AppIconProps> = ({ appId, size = 24, className = 
           </svg>
         );
       case 'random':
+      case 'allrange':
         return (
           <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
             <rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="currentColor" strokeWidth="2" />
@@ -97,6 +98,81 @@ export const AppIcon: React.FC<AppIconProps> = ({ appId, size = 24, className = 
             <circle cx="12" cy="12" r="1.5" />
             <circle cx="17" cy="7" r="1.5" />
             <circle cx="7" cy="17" r="1.5" />
+          </svg>
+        );
+      case 'fullscreen':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="2" />
+            <rect x="6" y="6" width="12" height="12" rx="1" fill="currentColor" opacity="0.2" />
+          </svg>
+        );
+      case 'windowed':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.549h-13.051zM0 12.75h9.75v9.451L0 20.851m10.949-8.101H24V24l-13.051-1.849z" />
+          </svg>
+        );
+      case 'windows-jis':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.549h-13.051zM0 12.75h9.75v9.451L0 20.851m10.949-8.101H24V24l-13.051-1.849z" />
+          </svg>
+        );
+      case 'mac-jis':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <path d="M17.057 12.763c.067 2.104 1.812 2.865 1.857 2.887-.028.093-.299.99-.927 2.041-.538.885-1.095 1.765-2.015 1.783-.903.015-1.196-.58-2.228-.58-1.03 0-1.353.564-2.21.581-.856.017-1.49-.945-2.033-1.827-1.106-1.794-1.953-5.072-.814-6.703.566-.81 1.391-1.324 2.29-1.34.856-.015 1.657.63 2.18.63.522 0 1.54-.787 2.598-.675.44.019 1.677.19 2.474 1.442-.066.04-.1.06-.1.06zM12.022 1.66c-.456.556-.763 1.33-.675 2.102.77.06 1.544-.42 2.001-.976.456-.556.763-1.33.675-2.102-.77-.06-1.544.42-2.001.976z" />
+          </svg>
+        );
+      case 'mac-us':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <path d="M17.057 12.763c.067 2.104 1.812 2.865 1.857 2.887-.028.093-.299.99-.927 2.041-.538.885-1.095 1.765-2.015 1.783-.903.015-1.196-.58-2.228-.58-1.03 0-1.353.564-2.21.581-.856.017-1.49-.945-2.033-1.827-1.106-1.794-1.953-5.072-.814-6.703.566-.81 1.391-1.324 2.29-1.34.856-.015 1.657.63 2.18.63.522 0 1.54-.787 2.598-.675.44.019 1.677.19 2.474 1.442-.066.04-.1.06-.1.06zM12.022 1.66c-.456.556-.763 1.33-.675 2.102.77.06 1.544-.42 2.001-.976.456-.556.763-1.33.675-2.102-.77-.06-1.544.42-2.001.976z" />
+          </svg>
+        );
+      case 'visualizer':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path d="M6 8h.01M10 8h.01M14 8h.01" strokeWidth="3" />
+            <path d="M6 12h12" />
+            <path d="M8 16h8" />
+          </svg>
+        );
+      case 'quiz':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 2 L14 8 L12 12 L10 8 Z" />
+            <path d="M22 12 L16 14 L12 12 L16 10 Z" />
+            <path d="M12 22 L10 16 L12 12 L14 16 Z" />
+            <path d="M2 12 L8 10 L12 12 L8 14 Z" />
+          </svg>
+        );
+      case 'basic':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6z" />
+          </svg>
+        );
+      case 'standard':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" />
+          </svg>
+        );
+      case 'hard':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <path d="M12 2c-1.5 0-2.7 1.2-2.7 2.7 0 .8.3 1.5.8 2L6.5 10c-.5-.2-1.1-.3-1.7-.3C3.2 9.7 2 10.9 2 12.5S3.2 15.3 4.8 15.3c.6 0 1.2-.1 1.7-.4l3.6 3.3c-.5.5-.8 1.2-.8 2 0 1.5 1.2 2.7 2.7 2.7s2.7-1.2 2.7-2.7c0-.8-.3-1.5-.8-2l3.6-3.3c.5.2 1.1.4 1.7.4 1.6 0 2.8-1.2 2.8-2.8S20.8 9.7 19.2 9.7c-.6 0-1.2.1-1.7.3l-3.6-3.3c.5-.5.8-1.2.8-2C14.7 3.2 13.5 2 12 2z" />
+          </svg>
+        );
+      case 'madmax':
+        return (
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
+            <path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm8 7c-.8 0-1.6.3-2.2.9l-1.9-1.9c.1-.3.1-.7.1-1 0-1.7-1.3-3-3-3s-3 1.3-3 3c0 .3 0 .7.1 1L8.2 9.9C7.6 9.3 6.8 9 6 9c-2.2 0-4 1.8-4 4s1.8 4 4 4c.8 0 1.6-.3 2.2-.9l1.9 1.9c-.1.3-.1.7-.1 1 0 1.7 1.3 3 3 3s3-1.3 3-3c0-.3 0-.7-.1-1l1.9-1.9c.6.6 1.4.9 2.2.9 2.2 0 4-1.8 4-4s-1.8-4-4-4zm0 6c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zM6 15c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z" />
           </svg>
         );
       default:
