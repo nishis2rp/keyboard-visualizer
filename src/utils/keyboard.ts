@@ -252,17 +252,34 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
       let shouldInclude = false;
 
       // 1. 完全一致
-      if (allPressedKeysInShortcut && pressedDisplayNames.length === shortcutKeys.length) { // sizeとlengthで比較
+      if (allPressedKeysInShortcut && pressedDisplayNames.length === shortcutKeys.length) {
         shouldInclude = true;
       }
-      // 2. 押されている修飾キーを含むショートカット候補
-      else if (
-          pressedModifiers.length > 0 &&
-          pressedModifiers.every((mod: string) => shortcutModifiers.includes(mod)) &&
-          pressedDisplayNames.length < shortcutKeys.length
-         ) {
-           // 順押しの場合、最初のキー（修飾キー）が一致していれば候補として表示
-           shouldInclude = true;
+      // 2. 候補の表示条件を厳格化
+      // - 少なくとも1つは非修飾キー（文字や矢印など）が含まれている場合、
+      //   その組み合わせが完全に一致していなければ候補として出さない
+      // - 修飾キーのみが押されている場合は、その修飾キーを含むショートカットを候補として出す
+      else {
+        const hasNonModifierPressed = Array.from(pressedDisplayNames).some(key => !MODIFIER_KEY_NAMES.has(key));
+        
+        if (hasNonModifierPressed) {
+          // 非修飾キー（例：→）が含まれている場合、修飾キーの構成が完全に一致している必要がある
+          // かつ、ショートカットの方がキー数が多い（未完成のショートカット）
+          const pressedModifiersSet = new Set(pressedModifiers.map(m => normalizeKey(m)));
+          const shortcutModifiersSet = new Set(shortcutModifiers.map(m => normalizeKey(m)));
+          
+          const modifiersMatch = pressedModifiersSet.size === shortcutModifiersSet.size && 
+                               [...pressedModifiersSet].every(m => shortcutModifiersSet.has(m));
+          
+          if (modifiersMatch && allPressedKeysInShortcut && pressedDisplayNames.length < shortcutKeys.length) {
+            shouldInclude = true;
+          }
+        } else if (pressedModifiers.length > 0) {
+          // 修飾キーのみが押されている場合、その修飾キーをすべて含むショートカットを候補に出す
+          if (pressedModifiers.every((mod: string) => shortcutModifiers.includes(mod))) {
+            shouldInclude = true;
+          }
+        }
       }
 
       return shouldInclude;
