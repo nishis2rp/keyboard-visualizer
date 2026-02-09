@@ -64,6 +64,7 @@ const NormalModeView = () => {
   const {
     pressedKeys,
     currentDescription,
+    currentShortcut,
     availableShortcuts,
   } = useKeyboardShortcuts(filteredShortcuts, keyboardLayout, selectedApp, shortcutDescriptions, false);
 
@@ -92,6 +93,7 @@ const NormalModeView = () => {
           <PressedKeysIndicator
             pressedKeys={pressedKeys}
             description={currentDescription}
+            currentShortcut={currentShortcut}
             availableShortcuts={availableShortcuts}
             keyboardLayout={keyboardLayout}
           />

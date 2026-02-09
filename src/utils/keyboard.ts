@@ -20,15 +20,25 @@ export const normalizeKey = (key: string): string => {
  * ショートカット文字列内のアルファベットキーを小文字に正規化する
  * (例: "Ctrl + Shift + A" -> "Ctrl + Shift + a")
  * 修飾キーやシンボルキーは変更しない
+ * macOSの記号 (⌘, ⌥, ⇧, ⌃) を標準的な名称 (Cmd, Alt, Shift, Ctrl) に変換して比較しやすくする
  */
 export const normalizeShortcutCombo = (combo: string): string => {
+  const symbolMap: Record<string, string> = {
+    '⌘': 'Cmd',
+    '⌥': 'Alt',
+    '⇧': 'Shift',
+    '⌃': 'Ctrl'
+  };
+
   return combo.split(' + ').map(part => {
+    // macOS記号の置換
+    const normalizedPart = symbolMap[part] || part;
+
     // アルファベット1文字で、かつ修飾キーや特殊シンボルでない場合のみ小文字にする
-    // MODIFIER_KEY_NAMESに"Win"を追加したので、ここでも対応
-    if (part.length === 1 && /[a-zA-Z]/.test(part) && !MODIFIER_KEY_NAMES.has(part) && !/^[!@#$%^&*()_+{}|:"<>?~]$/.test(part)) {
-      return part.toLowerCase();
+    if (normalizedPart.length === 1 && /[a-zA-Z]/.test(normalizedPart) && !MODIFIER_KEY_NAMES.has(normalizedPart) && !/^[!@#$%^&*()_+{}|:"<>?~]$/.test(normalizedPart)) {
+      return normalizedPart.toLowerCase();
     }
-    return part;
+    return normalizedPart;
   }).join(' + ');
 };
 

@@ -12,6 +12,7 @@ import styles from './KeyDisplay.module.css';
 interface PressedKeysIndicatorProps {
   pressedKeys?: Set<string>;
   description?: string | null;
+  currentShortcut?: AvailableShortcut | null;
   availableShortcuts?: AvailableShortcut[];
   keyboardLayout?: string;
 }
@@ -19,6 +20,7 @@ interface PressedKeysIndicatorProps {
 const PressedKeysIndicator = memo<PressedKeysIndicatorProps>(({
   pressedKeys = new Set(),
   description,
+  currentShortcut,
   availableShortcuts = [],
   keyboardLayout
 }) => {
@@ -61,7 +63,6 @@ const PressedKeysIndicator = memo<PressedKeysIndicatorProps>(({
 
   // 完全なショートカットが押されている場合（説明がある）
   if (description && (!isOnlyModifierKeys || availableShortcuts.length === 0)) {
-    const currentShortcut = availableShortcuts.find(s => s.description === description);
     const difficulty = currentShortcut?.difficulty || 'basic';
 
     const difficultyConfig = {

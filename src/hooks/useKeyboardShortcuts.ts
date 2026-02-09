@@ -58,6 +58,7 @@ export const useKeyboardShortcuts = (richShortcuts: RichShortcut[], keyboardLayo
   const [pressedKeys, setPressedKeys] = useState(new Set<string>());
   const [history, setHistory] = useState<{ combo: string; description: string | null }[]>([]);
   const [currentDescription, setCurrentDescription] = useState<string | null>(null);
+  const [currentShortcut, setCurrentShortcut] = useState<AvailableShortcut | null>(null); // ★ 追加
   const [availableShortcuts, setAvailableShortcuts] = useState<AvailableShortcut[]>([]); // ★ AvailableShortcut[]型に
   const pressedKeysRef = useRef(pressedKeys);
 
@@ -69,6 +70,7 @@ export const useKeyboardShortcuts = (richShortcuts: RichShortcut[], keyboardLayo
     setPressedKeys(new Set());
     if (!isQuizMode) {
       setCurrentDescription(null);
+      setCurrentShortcut(null); // ★ 追加
       setAvailableShortcuts([]);
     }
   }, [isQuizMode]);
@@ -78,6 +80,7 @@ export const useKeyboardShortcuts = (richShortcuts: RichShortcut[], keyboardLayo
 
     if (keys.length === 0) {
       setCurrentDescription(null);
+      setCurrentShortcut(null); // ★ 追加
       setAvailableShortcuts([]);
       return;
     }
@@ -87,6 +90,14 @@ export const useKeyboardShortcuts = (richShortcuts: RichShortcut[], keyboardLayo
 
     const shortcuts = getAvailableShortcuts(keys, keyboardLayout, richShortcuts, selectedApp);
     setAvailableShortcuts(shortcuts);
+
+    // descriptionが一致するショートカットを探してセット
+    if (description) {
+      const match = shortcuts.find(s => s.description === description);
+      setCurrentShortcut(match || null);
+    } else {
+      setCurrentShortcut(null);
+    }
   }, [isQuizMode, keyboardLayout, richShortcuts, selectedApp]);
 
 
