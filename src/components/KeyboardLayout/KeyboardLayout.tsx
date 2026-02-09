@@ -65,15 +65,15 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
   }, [keyboardLayout, shortcutDescriptions, shiftPressed])
 
   // Calculate grid positions for all keys（メモ化）
-  // Grid columns: 72 (allows 0.25 increments: 1.0 = 4 cols, 1.25 = 5 cols, etc.)
-  // Main keyboard: 62 cols (15.5 * 4), Gap: 2 cols, Navigation: 12 cols (3 * 4)
   const keysWithPositions = useMemo((): (KeyDefinition & { gridColumn: string, gridRow: string, width: number })[] => {
     const GRID_MULTIPLIER = 4
-    const MAIN_KEYBOARD_END = 62
-    const NAV_BLOCK_START = 64
+    const MAIN_BLOCK_WIDTH = 15.5
+    const GAP_WIDTH = 0.5
+    const NAV_BLOCK_START = Math.round((MAIN_BLOCK_WIDTH + GAP_WIDTH) * GRID_MULTIPLIER) + 1
 
-    // Navigation keys that should be positioned on the right
-    const navKeys = new Set(['Fn', 'Home', 'PageUp', 'Delete', 'End', 'PageDown', 'Insert', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight', 'PrintScreen', 'ScrollLock', 'Pause', 'F13', 'F14', 'F15'])
+    // Block categorization based on code
+    const navBlockCodes = new Set(['Home', 'PageUp', 'Delete', 'End', 'PageDown', 'Insert', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight'])
+    const fBlockExtras = new Set(['PrintScreen', 'ScrollLock', 'Pause', 'F13', 'F14', 'F15'])
 
     return keyboardRows.keys.flatMap((row, rowIndex) => {
       let mainColStart = 1
@@ -81,20 +81,33 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
 
       return row.map((keyObj: KeyDefinition) => {
         const widthInCols = Math.round((keyObj.width || 1) * GRID_MULTIPLIER)
-        const isNavKey = navKeys.has(keyObj.code)
+        const isNavBlock = navBlockCodes.has(keyObj.code)
+        const isFBlockExtra = fBlockExtras.has(keyObj.code)
 
         let colStart, colEnd
-        if (isNavKey) {
-          // Special handling for ArrowUp - center it in the nav block
+        if (isNavBlock || isFBlockExtra) {
+          // Navigation block or F-key row extensions (PrtSc etc.)
           if (keyObj.code === 'ArrowUp') {
-            colStart = NAV_BLOCK_START + 4 // Center position (skip 1 column)
+            // ArrowUp is special - always centered in its 3-key block
+            colStart = NAV_BLOCK_START + (1 * GRID_MULTIPLIER)
+            colEnd = colStart + widthInCols
+          } else if (keyObj.code === 'ArrowLeft') {
+            colStart = NAV_BLOCK_START
+            colEnd = colStart + widthInCols
+          } else if (keyObj.code === 'ArrowDown') {
+            colStart = NAV_BLOCK_START + (1 * GRID_MULTIPLIER)
+            colEnd = colStart + widthInCols
+          } else if (keyObj.code === 'ArrowRight') {
+            colStart = NAV_BLOCK_START + (2 * GRID_MULTIPLIER)
             colEnd = colStart + widthInCols
           } else {
+            // Sequential positioning for other nav keys (Home, End, etc.)
             colStart = navColStart
             colEnd = navColStart + widthInCols
             navColStart = colEnd
           }
         } else {
+          // Main keyboard block
           colStart = mainColStart
           colEnd = mainColStart + widthInCols
           mainColStart = colEnd

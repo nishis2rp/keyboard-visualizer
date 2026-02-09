@@ -22,30 +22,28 @@ describe('quizEngine', () => {
     (detectOS as any).mockReturnValue('windows');
   });
 
-  // --- normalizeShortcut ---
-  // (No changes needed for normalizeShortcut tests)
   describe('normalizeShortcut', () => {
     it('should normalize shortcut strings by sorting modifiers', () => {
-      expect(normalizeShortcut('Shift + Ctrl + A')).toBe('Ctrl+Shift+A');
-      expect(normalizeShortcut('Alt + B + Ctrl')).toBe('Ctrl+Alt+B');
+      expect(normalizeShortcut('Shift + Ctrl + A')).toBe('Ctrl + Shift + A');
+      expect(normalizeShortcut('Alt + B + Ctrl')).toBe('Ctrl + Alt + B');
       expect(normalizeShortcut('A')).toBe('A');
       expect(normalizeShortcut('Ctrl')).toBe('Ctrl');
-      expect(normalizeShortcut('Ctrl + Alt + Shift + A')).toBe('Ctrl+Alt+Shift+A');
+      expect(normalizeShortcut('Ctrl + Alt + Shift + A')).toBe('Ctrl + Alt + Shift + A');
     });
 
     it('should handle "Win" and "Cmd" keys by converting to "Meta"', () => {
-      expect(normalizeShortcut('Win + A')).toBe('Meta+A');
-      expect(normalizeShortcut('Cmd + S')).toBe('Meta+S');
-      expect(normalizeShortcut('Shift + Win + C')).toBe('Meta+Shift+C'); 
+      expect(normalizeShortcut('Win + A')).toBe('Meta + A');
+      expect(normalizeShortcut('Cmd + S')).toBe('Meta + S');
+      expect(normalizeShortcut('Shift + Win + C')).toBe('Meta + Shift + C'); 
     });
 
     it('should handle different modifier casing', () => {
-      expect(normalizeShortcut('ctrl + a')).toBe('Ctrl+A'); 
-      expect(normalizeShortcut('ALT + B')).toBe('Alt+B'); 
+      expect(normalizeShortcut('ctrl + a')).toBe('Ctrl + A'); 
+      expect(normalizeShortcut('ALT + B')).toBe('Alt + B'); 
     });
 
-    it('should remove spaces', () => {
-      expect(normalizeShortcut(' Ctrl + A ')).toBe('Ctrl+A'); 
+    it('should maintain standard spaces', () => {
+      expect(normalizeShortcut(' Ctrl + A ')).toBe('Ctrl + A'); 
     });
 
     it('should return empty string for null or empty input', () => {
@@ -56,10 +54,10 @@ describe('quizEngine', () => {
     it('should normalize PgUp/PgDn to PageUp/PageDown', () => {
       expect(normalizeShortcut('PgUp')).toBe('PageUp');
       expect(normalizeShortcut('PgDn')).toBe('PageDown');
-      expect(normalizeShortcut('Ctrl + PgUp')).toBe('Ctrl+PageUp');
-      expect(normalizeShortcut('Ctrl + PgDn')).toBe('Ctrl+PageDown');
-      expect(normalizeShortcut('Shift + PgUp')).toBe('Shift+PageUp');
-      expect(normalizeShortcut('Shift + PgDn')).toBe('Shift+PageDown');
+      expect(normalizeShortcut('Ctrl + PgUp')).toBe('Ctrl + PageUp');
+      expect(normalizeShortcut('Ctrl + PgDn')).toBe('Ctrl + PageDown');
+      expect(normalizeShortcut('Shift + PgUp')).toBe('Shift + PageUp');
+      expect(normalizeShortcut('Shift + PgDn')).toBe('Shift + PageDown');
     });
   });
 
@@ -78,7 +76,7 @@ describe('quizEngine', () => {
 
     it('should combine and sort modifiers with main keys (Windows)', () => {
       const pressed = new Set(['ControlLeft', 'ShiftLeft', 'KeyA']);
-      expect(normalizePressedKeys(pressed, mockLayout)).toBe('Ctrl+Shift+A');
+      expect(normalizePressedKeys(pressed, mockLayout)).toBe('Ctrl + Shift + A');
     });
 
     it('should map arrow keys correctly', () => {
@@ -88,14 +86,14 @@ describe('quizEngine', () => {
 
     it('should handle Windows Meta key', () => {
       const pressed = new Set(['MetaLeft', 'KeyD']);
-      expect(normalizePressedKeys(pressed, mockLayout)).toBe('Meta+D'); 
+      expect(normalizePressedKeys(pressed, mockLayout)).toBe('Meta + D'); 
     });
 
     it('should handle macOS Cmd key', () => {
       (detectOS as any).mockReturnValue('macos'); // Set to macOS
       const pressed = new Set(['MetaLeft', 'KeyS']);
       const macMockLayout = 'mac-us';
-      expect(normalizePressedKeys(pressed, macMockLayout)).toBe('Meta+S'); 
+      expect(normalizePressedKeys(pressed, macMockLayout)).toBe('Meta + S'); 
     });
   });
 
@@ -219,15 +217,15 @@ describe('quizEngine', () => {
   // (No changes needed usually, unless checkAnswer relies on DB data mock now)
   describe('checkAnswer', () => {
     it('should return true for a correct answer', () => {
-      expect(checkAnswer('Ctrl+Shift+A', 'Ctrl+Shift+A')).toBe(true);
+      expect(checkAnswer('Ctrl + Shift + A', 'Ctrl + Shift + A')).toBe(true);
     });
 
     it('should return false for an incorrect answer', () => {
-      expect(checkAnswer('Ctrl+Shift+A', 'Ctrl+Shift+B')).toBe(false);
+      expect(checkAnswer('Ctrl + Shift + A', 'Ctrl + Shift + B')).toBe(false);
     });
 
     it('should handle different casing in userAnswer if normalized correctly', () => {
-      expect(checkAnswer(normalizeShortcut('ctrl+a'), normalizeShortcut('Ctrl+A'))).toBe(true);
+      expect(checkAnswer(normalizeShortcut('ctrl + a'), normalizeShortcut('Ctrl + A'))).toBe(true);
     });
   });
 });

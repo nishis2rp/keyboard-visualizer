@@ -7,189 +7,189 @@ import { RichShortcut } from '../types';
 export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
   // === 基本操作 ===
   // コピー
-  'Ctrl+C': ['Ctrl+Insert'],
-  'Ctrl+Insert': ['Ctrl+C'],
+  'Ctrl + C': ['Ctrl + Insert'],
+  'Ctrl + Insert': ['Ctrl + C'],
 
   // 切り取り
-  'Ctrl+X': ['Shift+Delete'],
-  'Shift+Delete': ['Ctrl+X'],
+  'Ctrl + X': ['Shift + Delete'],
+  'Shift + Delete': ['Ctrl + X'],
 
   // 貼り付け
-  'Ctrl+V': ['Shift+Insert'],
-  'Shift+Insert': ['Ctrl+V'],
+  'Ctrl + V': ['Shift + Insert'],
+  'Shift + Insert': ['Ctrl + V'],
 
   // 元に戻す
-  'Ctrl+Z': ['Alt+Backspace'],
-  'Alt+Backspace': ['Ctrl+Z'],
+  'Ctrl + Z': ['Alt + Backspace'],
+  'Alt + Backspace': ['Ctrl + Z'],
 
   // やり直し
-  'Ctrl+Y': ['Ctrl+Shift+Z'],
-  'Ctrl+Shift+Z': ['Ctrl+Y'],
+  'Ctrl + Y': ['Ctrl + Shift + Z'],
+  'Ctrl + Shift + Z': ['Ctrl + Y'],
 
   // すべて選択
-  'Ctrl+A': [],
+  'Ctrl + A': [],
 
   // 検索
-  'Ctrl+F': [],
+  'Ctrl + F': [],
 
   // 上書き保存
-  'Ctrl+S': [],
+  'Ctrl + S': [],
 
   // 開く
-  'Ctrl+O': [],
+  'Ctrl + O': [],
 
   // 印刷
-  'Ctrl+P': [],
+  'Ctrl + P': [],
 
   // === ウィンドウ・タブ操作 ===
   // ウィンドウを閉じる
-  'Alt+F4': [],
+  'Alt + F4': [],
 
   // タブを閉じる（ブラウザ）
-  'Ctrl+W': ['Ctrl+F4'],
-  'Ctrl+F4': ['Ctrl+W'],
+  'Ctrl + W': ['Ctrl + F4'],
+  'Ctrl + F4': ['Ctrl + W'],
 
   // 新しいタブ（ブラウザ）
-  'Ctrl+T': [],
+  'Ctrl + T': [],
 
   // タブ切り替え（ブラウザ）
-  'Ctrl+Tab': ['Ctrl+PageDown'],
-  'Ctrl+PageDown': ['Ctrl+Tab'],
-  'Ctrl+Shift+Tab': ['Ctrl+PageUp'],
-  'Ctrl+PageUp': ['Ctrl+Shift+Tab'],
+  'Ctrl + Tab': ['Ctrl + PageDown'],
+  'Ctrl + PageDown': ['Ctrl + Tab'],
+  'Ctrl + Shift + Tab': ['Ctrl + PageUp'],
+  'Ctrl + PageUp': ['Ctrl + Shift + Tab'],
 
   // アプリケーション切り替え
-  'Alt+Tab': [],
+  'Alt + Tab': [],
 
   // === Windows 11 操作 ===
   // スタートメニューを開く
-  'Win': ['Ctrl+Esc'],
-  'Ctrl+Esc': ['Win'],
+  'Win': ['Ctrl + Esc'],
+  'Ctrl + Esc': ['Win'],
 
   // === ブラウザ操作 ===
   // ページ更新
-  'Ctrl+R': ['F5'],
-  'F5': ['Ctrl+R'],
+  'Ctrl + R': ['F5'],
+  'F5': ['Ctrl + R'],
 
   // 強制更新
-  'Ctrl+Shift+R': ['Ctrl+F5'],
-  'Ctrl+F5': ['Ctrl+Shift+R'],
+  'Ctrl + Shift + R': ['Ctrl + F5'],
+  'Ctrl + F5': ['Ctrl + Shift + R'],
 
   // アドレスバーにフォーカス
-  'Ctrl+L': ['Alt+D', 'F6'],
-  'Alt+D': ['Ctrl+L', 'F6'],
-  'F6': ['Ctrl+L', 'Alt+D'],
+  'Ctrl + L': ['Alt + D', 'F6'],
+  'Alt + D': ['Ctrl + L', 'F6'],
+  'F6': ['Ctrl + L', 'Alt + D'],
 
   // ブックマーク
-  'Ctrl+D': [],
+  'Ctrl + D': [],
 
   // 履歴
-  'Ctrl+H': [],
+  'Ctrl + H': [],
 
   // デベロッパーツール
-  'Ctrl+Shift+I': ['F12'],
-  'F12': ['Ctrl+Shift+I'],
+  'Ctrl + Shift + I': ['F12'],
+  'F12': ['Ctrl + Shift + I'],
 
   // 全画面
   'F11': [],
 
   // ズームイン
-  'Ctrl++': ['Ctrl+='],
-  'Ctrl+=': ['Ctrl++'],
+  'Ctrl + +': ['Ctrl + ='],
+  'Ctrl + =': ['Ctrl + +'],
 
   // ズームアウト
-  'Ctrl+-': [],
+  'Ctrl + -': [],
 
   // ズームリセット
-  'Ctrl+0': [],
+  'Ctrl + 0': [],
 
   // === Excel操作 ===
   // セルの編集
   'F2': [],
 
   // 太字
-  'Ctrl+B': ['Ctrl+2'],
-  'Ctrl+2': ['Ctrl+B'],
+  'Ctrl + B': ['Ctrl + 2'],
+  'Ctrl + 2': ['Ctrl + B'],
 
   // 斜体
-  'Ctrl+I': ['Ctrl+3'],
-  'Ctrl+3': ['Ctrl+I'],
+  'Ctrl + I': ['Ctrl + 3'],
+  'Ctrl + 3': ['Ctrl + I'],
 
   // 下線
-  'Ctrl+U': ['Ctrl+4'],
-  'Ctrl+4': ['Ctrl+U'],
+  'Ctrl + U': ['Ctrl + 4'],
+  'Ctrl + 4': ['Ctrl + U'],
 
   // セルの書式設定
-  'Ctrl+1': [],
+  'Ctrl + 1': [],
 
   // 名前を付けて保存
-  'Ctrl+Shift+S': [],
+  'Ctrl + Shift + S': [],
 
   // 行全体を選択
-  'Shift+Space': [],
+  'Shift + Space': [],
 
   // 列全体を選択
-  'Ctrl+Space': [],
+  'Ctrl + Space': [],
 
   // すべてのセルを選択（Excel）
-  'Ctrl+Shift+Space': [],
+  'Ctrl + Shift + Space': [],
 
   // === macOS固有の代替 ===
   // コピー（Mac）
-  'Cmd+C': [],
+  'Cmd + C': [],
 
   // 切り取り（Mac）
-  'Cmd+X': [],
+  'Cmd + X': [],
 
   // 貼り付け（Mac）
-  'Cmd+V': [],
+  'Cmd + V': [],
 
   // 元に戻す（Mac）
-  'Cmd+Z': [],
+  'Cmd + Z': [],
 
   // やり直し（Mac）
-  'Cmd+Shift+Z': ['Cmd+Y'],
+  'Cmd + Shift + Z': ['Cmd + Y'],
 
   // 全画面（Mac）
-  'Cmd+Ctrl+F': [],
+  'Cmd + Ctrl + F': [],
 
   // アプリケーション切り替え（Mac）
-  'Cmd+Tab': [],
+  'Cmd + Tab': [],
 
   // ブラウザ更新（Mac）
-  'Cmd+R': [],
+  'Cmd + R': [],
 
   // ブラウザ強制更新（Mac）
-  'Cmd+Shift+R': [],
+  'Cmd + Shift + R': [],
 
   // アドレスバー（Mac）
-  'Cmd+L': [],
+  'Cmd + L': [],
 
   // ズームイン（Mac）
-  'Cmd++': ['Cmd+='],
+  'Cmd + +': ['Cmd + ='],
 
   // ズームアウト（Mac）
-  'Cmd+-': [],
+  'Cmd + -': [],
 
   // ズームリセット（Mac）
-  'Cmd+0': [],
+  'Cmd + 0': [],
 
   // === Slack固有の代替 ===
   // 新規メッセージ
-  'Ctrl+N': ['Shift+Ctrl+K'],
-  'Shift+Ctrl+K': ['Ctrl+N'],
+  'Ctrl + N': ['Shift + Ctrl + K'],
+  'Shift + Ctrl + K': ['Ctrl + N'],
 
   // 次に移動
-  'Ctrl+K': ['T'],
-  'T': ['Ctrl+K'],
+  'Ctrl + K': ['T'],
+  'T': ['Ctrl + K'],
 
   // 直近のメッセージを編集
-  'ArrowUp': ['Ctrl+ArrowUp'],
-  'Ctrl+ArrowUp': ['ArrowUp'],
+  'ArrowUp': ['Ctrl + ArrowUp'],
+  'Ctrl + ArrowUp': ['ArrowUp'],
 
   // アクティビティ
-  'Ctrl+Shift+3': ['Shift+Ctrl+M'],
-  'Shift+Ctrl+M': ['Ctrl+Shift+3'],
+  'Ctrl + Shift + 3': ['Shift + Ctrl + M'],
+  'Shift + Ctrl + M': ['Ctrl + Shift + 3'],
 
   // === その他の代替 ===
   // 削除キー

@@ -68,7 +68,7 @@ export const normalizeShortcut = (shortcutString: string): string => {
       return key.length === 1 && /[a-zA-Z]/.test(key) ? key.toUpperCase() : key;
     });
 
-  return sortShortcutKeys(keys).join('+');
+  return sortShortcutKeys(keys).join(' + ');
 };
 
 /**
@@ -90,7 +90,7 @@ export const normalizePressedKeys = (pressedCodes: Set<string>, keyboardLayout: 
 
   // 重複を除外してソート
   const uniqueKeys = Array.from(new Set(normalizedKeys));
-  const combined = sortShortcutKeys(uniqueKeys).join('+');
+  const combined = sortShortcutKeys(uniqueKeys).join(' + ');
 
   return normalizeShortcut(combined);
 };

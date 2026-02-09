@@ -180,9 +180,8 @@ export class SequentialKeyRecorder {
       return false;
     }
 
-    // 大文字小文字を無視して比較
     return this.sequence.every((key, index) =>
-      key.toLowerCase().replace(/\s+/g, '') === expectedKeys[index].toLowerCase().replace(/\s+/g, '')
+      key.toLowerCase().trim() === expectedKeys[index].toLowerCase().trim()
     );
   }
 
@@ -197,7 +196,7 @@ export class SequentialKeyRecorder {
     }
 
     return this.sequence.every((key, index) =>
-      key.toLowerCase().replace(/\s+/g, '') === expectedKeys[index].toLowerCase().replace(/\s+/g, '')
+      key.toLowerCase().trim() === expectedKeys[index].toLowerCase().trim()
     );
   }
 }
@@ -230,6 +229,6 @@ export const checkSequentialShortcut = (
   }
 
   return userSequence.every((key, index) =>
-    key.toLowerCase().replace(/\s+/g, '') === expectedKeys[index].toLowerCase().replace(/\s+/g, '')
+    key.toLowerCase().trim() === expectedKeys[index].toLowerCase().trim()
   );
 };

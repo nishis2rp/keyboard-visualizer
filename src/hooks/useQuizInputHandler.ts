@@ -36,14 +36,14 @@ export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion, rich
       // 完全一致チェック
       if (sequentialKeyRecorderRef.current.matches(correctSequentialKeys)) {
         const answerTimeMs = Date.now() - questionStartTime;
-        const userAnswer = currentSequence.join('+');
+        const userAnswer = currentSequence.join(' + ');
         dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect: true, answerTimeMs } });
         sequentialKeyRecorderRef.current.reset();
         previousPressedKeysRef.current = new Set();
       } else if (!sequentialKeyRecorderRef.current.isPartialMatch(correctSequentialKeys)) {
         // 部分一致でない場合は不正解
         const answerTimeMs = Date.now() - questionStartTime;
-        const userAnswer = currentSequence.join('+');
+        const userAnswer = currentSequence.join(' + ');
         dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect: false, answerTimeMs } });
         sequentialKeyRecorderRef.current.reset();
         previousPressedKeysRef.current = new Set();

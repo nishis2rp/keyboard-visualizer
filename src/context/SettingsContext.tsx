@@ -34,11 +34,17 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   );
 
   const [selectedApp, setSelectedAppInternal] = useState(setup.app || DEFAULTS.APP);
-  const [keyboardLayout, setKeyboardLayout] = useState(setup.layout || DEFAULTS.LAYOUT);
+  const [keyboardLayout, setKeyboardLayoutInternal] = useState(setup.layout || DEFAULTS.LAYOUT);
 
   const setSelectedApp = (app: string) => {
     setSelectedAppInternal(app);
+    setSetup(prev => ({ ...prev, app }));
     analytics.appSelected(app);
+  };
+
+  const setKeyboardLayout = (layout: string) => {
+    setKeyboardLayoutInternal(layout);
+    setSetup(prev => ({ ...prev, layout }));
   };
 
   const value = {
