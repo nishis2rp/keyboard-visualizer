@@ -9,6 +9,8 @@ These scripts are actively used for database management:
 - **`migrate-supabase.ts`** - Run all database migrations sequentially
 - **`generate-sql.ts`** - Generate SQL INSERT statements from data files
 - **`run-migration.ts`** - Run database migrations
+- **`run-single-migration.ts`** - Run a single database migration file
+- **`update-sort-order.ts`** - Update sort_order for all shortcuts
 - **`check-protection-levels.ts`** - Check protection levels for specific shortcuts
 - **`find-shortcut.ts`** - Find a specific shortcut in the database
 - **`check-table-structure.ts`** - Check database table structure
