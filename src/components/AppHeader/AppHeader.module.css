@@ -1,134 +1,81 @@
-/* AppHeader Component Styles - Modern Unified Design */
+/* AppHeader Component Styles - Modern Visual Upgrade */
 
 .headerContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 14px;
+  margin-bottom: 12px;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 18px;
   box-shadow:
-    0 4px 6px rgba(0, 0, 0, 0.02),
-    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 10px 25px rgba(0, 0, 0, 0.03),
+    0 4px 10px rgba(0, 0, 0, 0.02),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   position: relative;
   overflow: hidden;
+  animation: headerAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.headerContainer::before {
+@keyframes headerAppear {
+  0% { transform: translateY(-20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.headerContainer::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(79, 70, 229, 0.03) 100%);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(167, 139, 250, 0.05) 100%);
   pointer-events: none;
-  z-index: 0;
 }
 
 .titleContainer {
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 16px;
-  font-size: 1.75em;
+  gap: 12px;
   position: relative;
   z-index: 1;
 }
 
-.logoGroup {
+.logoIconContainer {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.logoBox {
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  font-size: 1.2em;
-  font-weight: 800;
-  color: #FFFFFF;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  transition: all 0.3s ease;
-  box-shadow:
-    0 4px 8px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.logoBox:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow:
-    0 6px 12px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-.logoBoxK {
-  background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
-  box-shadow:
-    0 4px 8px rgba(99, 102, 241, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-.logoBoxS {
-  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
-  box-shadow:
-    0 4px 8px rgba(139, 92, 246, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-.logoBoxV {
-  background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%);
-  box-shadow:
-    0 4px 8px rgba(167, 139, 250, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+.logoIconContainer:hover {
+  transform: rotate(-5deg) scale(1.1);
 }
 
 .titleTextContainer {
   display: flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: 10px;
-  line-height: 1.1;
+  align-items: center;
+  line-height: 1;
 }
 
-.titleLine1 {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 700;
-  font-size: 0.85em;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
-}
-
-.titleLine2 {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.titleText {
+  font-size: 22px;
   font-weight: 800;
-  font-size: 0.9em;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
 }
 
 .buttonGroup {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
   position: relative;
   z-index: 1;
 }
@@ -148,43 +95,32 @@
   box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);
 }
 
-/* CSV Download Button - Unified with other buttons */
+/* CSV Download Button - Modern Redesign */
 .csvDownloadButton {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 600;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  background: linear-gradient(135deg, rgba(167, 139, 250, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: #FFFFFF;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: white;
+  color: #64748b;
   cursor: pointer;
-  box-shadow:
-    0 4px 6px rgba(0, 0, 0, 0.05),
-    0 1px 3px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transform: translateY(0);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  position: relative;
-  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .csvDownloadButton:hover {
-  background: linear-gradient(135deg, rgba(167, 139, 250, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
-  box-shadow:
-    0 8px 16px rgba(167, 139, 250, 0.3),
-    0 4px 8px rgba(167, 139, 250, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  transform: translateY(-3px) scale(1.02);
+  background: #f8fafc;
+  color: #6366f1;
+  border-color: #6366f1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.1);
 }
 
 .csvDownloadButton:active {
-  transform: translateY(-1px) scale(1);
+  transform: translateY(0);
 }
 
 .csvIcon {
@@ -193,10 +129,7 @@
 }
 
 .csvText {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  line-height: 1;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
 }

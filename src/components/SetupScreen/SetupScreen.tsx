@@ -119,9 +119,9 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         <div className="setup-header">
           <div className="setup-header-top">
             <div>
-              <h1>⌨️ キーボードビジュアライザー</h1>
+              <h1 className="setup-title">キーボードビジュアライザー <small>ショートカット学習ツール</small></h1>
               <h2>ようこそ！</h2>
-              <p>お使いの環境を選択してください</p>
+              <p>1,300種類以上のショートカットを可視化・練習しましょう</p>
             </div>
             <div className="setup-auth-button">
               {user ? (

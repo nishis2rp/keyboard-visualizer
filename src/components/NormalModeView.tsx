@@ -87,8 +87,8 @@ const NormalModeView = () => {
         shortcutDescriptions={shortcutDescriptions}
         keyboardLayout={keyboardLayout}
       />
-      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-        <div style={{ flex: 1 }}>
+      <div className="indicator-filter-container">
+        <div className="indicator-wrapper">
           <PressedKeysIndicator
             pressedKeys={pressedKeys}
             description={currentDescription}
@@ -96,7 +96,7 @@ const NormalModeView = () => {
             keyboardLayout={keyboardLayout}
           />
         </div>
-        <div style={{ flexShrink: 0 }}>
+        <div className="filter-wrapper">
           <DifficultyFilter
             selectedDifficulties={selectedDifficulties}
             onToggleDifficulty={handleToggleDifficulty}

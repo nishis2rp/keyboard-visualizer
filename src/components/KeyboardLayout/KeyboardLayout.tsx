@@ -114,9 +114,9 @@ const KeyboardLayout = memo<KeyboardLayoutProps>(({ pressedKeys = new Set(), spe
   }, [keyboardRows])
 
   return (
-    <div className="keyboard-container">
+    <div className="keyboard-container" role="application" aria-label={`キーボードレイアウト: ${layoutName}`}>
       <div className="keyboard-base">
-        <div className="keyboard-grid">
+        <div className="keyboard-grid" role="grid">
           {keysWithPositions.map((keyObj, index) => {
             const isSpacer = !keyObj.code || keyObj.code === ''
             const isPressed = isKeyPressed(keyObj)

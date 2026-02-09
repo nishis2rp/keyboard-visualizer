@@ -56,27 +56,28 @@ const Home: React.FC = () => {
   // ローディング中の表示
   if (loading) {
     return (
-      <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div style={{ textAlign: 'center' }}>
-          <h2>Loading shortcuts...</h2>
-          <p>Fetching data from API server...</p>
-        </div>
-      </div>
+      <main className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <article style={{ textAlign: 'center' }}>
+          <h2>キーボードショートカットを読み込み中...</h2>
+          <p>データを準備しています。少々お待ちください。</p>
+          <div className="loading-spinner"></div>
+        </article>
+      </main>
     );
   }
 
   // エラーの表示
   if (error) {
     return (
-      <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div style={{ textAlign: 'center', color: 'red' }}>
-          <h2>Error loading shortcuts</h2>
+      <main className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <article style={{ textAlign: 'center', color: 'red' }}>
+          <h2>データの取得に失敗しました</h2>
           <p>{error.message}</p>
           <p style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
-            Make sure the API server is running on http://localhost:3001
+            インターネット接続を確認するか、しばらく経ってから再度お試しください。
           </p>
-        </div>
-      </div>
+        </article>
+      </main>
     );
   }
 

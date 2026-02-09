@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { UserQuizStats, QuizSession, ShortcutDifficulty } from '../types';
+import { UserQuizStats, QuizSession, ShortcutDifficulty, WeakShortcut, RichShortcut } from '../types';
 import SessionDetailModal from '../components/SessionDetailModal';
+import StatCards from '../components/MyPage/StatCards';
+import AppStatsTable from '../components/MyPage/AppStatsTable';
+import RecentSessions from '../components/MyPage/RecentSessions';
+import WeakShortcuts from '../components/MyPage/WeakShortcuts';
 import './MyPage.css';
 
 const MyPage: React.FC = () => {
@@ -16,7 +20,9 @@ const MyPage: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [quizStats, setQuizStats] = useState<UserQuizStats[]>([]);
   const [quizSessions, setQuizSessions] = useState<QuizSession[]>([]);
+  const [weakShortcuts, setWeakShortcuts] = useState<WeakShortcut[]>([]);
   const [quizDataLoading, setQuizDataLoading] = useState(true);
+  const [weakShortcutsLoading, setWeakShortcutsLoading] = useState(false);
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -66,6 +72,9 @@ const MyPage: React.FC = () => {
         }
         setQuizSessions(sessionsData || []);
 
+        // Fetch and aggregate weak shortcuts
+        fetchWeakShortcuts(user.id);
+
       } catch (err: any) {
         console.error('Error fetching quiz data:', err);
         setError('クイズデータの取得に失敗しました: ' + err.message);
@@ -78,6 +87,80 @@ const MyPage: React.FC = () => {
       fetchQuizData();
     }
   }, [user]);
+
+  const fetchWeakShortcuts = async (userId: string) => {
+    setWeakShortcutsLoading(true);
+    try {
+      // Fetch recent history (detailed answers)
+      const { data: historyData, error: historyError } = await supabase
+        .from('quiz_history')
+        .select(`
+          shortcut_id,
+          was_correct,
+          shortcuts (*)
+        `)
+        .eq('user_id', userId)
+        .order('answered_at', { ascending: false })
+        .limit(500);
+
+      if (historyError) throw historyError;
+
+      if (!historyData || historyData.length === 0) {
+        setWeakShortcuts([]);
+        return;
+      }
+
+      // Aggregate by shortcut_id
+      const aggregation: Record<number, { 
+        wrong: number, 
+        correct: number, 
+        shortcut: any 
+      }> = {};
+
+      historyData.forEach((item: any) => {
+        if (!item.shortcut_id || !item.shortcuts) return;
+        
+        if (!aggregation[item.shortcut_id]) {
+          aggregation[item.shortcut_id] = { 
+            wrong: 0, 
+            correct: 0, 
+            shortcut: item.shortcuts 
+          };
+        }
+        
+        if (item.was_correct) {
+          aggregation[item.shortcut_id].correct++;
+        } else {
+          aggregation[item.shortcut_id].wrong++;
+        }
+      });
+
+      // Convert to WeakShortcut and filter/sort
+      const weakList: WeakShortcut[] = Object.values(aggregation)
+        .filter(a => a.wrong > 0) // Only those with at least one mistake
+        .map(a => {
+          const total = a.wrong + a.correct;
+          return {
+            ...a.shortcut,
+            wrong_count: a.wrong,
+            correct_count: a.correct,
+            accuracy: a.correct / total
+          };
+        })
+        .sort((a, b) => {
+          // Sort by accuracy (ascending) then by wrong_count (descending)
+          if (a.accuracy !== b.accuracy) return a.accuracy - b.accuracy;
+          return b.wrong_count - a.wrong_count;
+        })
+        .slice(0, 5); // Top 5 weak shortcuts
+
+      setWeakShortcuts(weakList);
+    } catch (err) {
+      console.error('Error fetching weak shortcuts:', err);
+    } finally {
+      setWeakShortcutsLoading(false);
+    }
+  };
 
   if (loading || quizDataLoading) {
     return (
@@ -214,11 +297,6 @@ const MyPage: React.FC = () => {
     }
   };
 
-  const getDifficultyBadgeClass = (difficulty: ShortcutDifficulty | null) => {
-    if (!difficulty) return 'difficulty-badge';
-    return `difficulty-badge difficulty-${difficulty}`;
-  };
-
   // Overall Stats
   const overallCorrect = quizStats.reduce((sum, stat) => sum + stat.total_correct, 0);
   const overallQuestions = quizStats.reduce((sum, stat) => sum + stat.total_questions, 0);
@@ -227,248 +305,172 @@ const MyPage: React.FC = () => {
 
   return (
     <div className="mypage-container">
-      <h1 className="mypage-title">マイページ</h1>
+      <div className="mypage-header">
+        <h1 className="mypage-title">ダッシュボード</h1>
+        <div className="mypage-header-actions">
+          <Link to="/" className="home-link">🏠 ホームへ戻る</Link>
+        </div>
+      </div>
 
       {error && <div className="alert alert-error">⚠️ {error}</div>}
       {message && <div className="alert alert-success">✓ {message}</div>}
 
-      {/* Profile Section */}
-      <section className="mypage-section">
-        <h2 className="section-title">👤 プロフィール情報</h2>
-
-        <div className="profile-header">
-          <img
-            src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=667eea&color=fff&size=100`}
-            alt="アバター"
-            className="profile-avatar"
-          />
-          <div className="profile-info">
-            <p className="profile-email"><strong>メールアドレス:</strong> {user.email}</p>
-            <form onSubmit={handleDisplayNameUpdate} className="form-group">
-              <label htmlFor="displayNameInput" className="form-label">表示名:</label>
-              <input
-                id="displayNameInput"
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="form-input"
-                placeholder="表示名を入力"
-              />
-              <button
-                type="submit"
-                disabled={profileUpdateLoading || displayName === profile?.display_name || displayName.trim() === ''}
-                className="form-button"
-              >
-                {profileUpdateLoading ? '更新中...' : '更新'}
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <div className="avatar-upload-section">
-          <h3 className="section-subtitle">アバターの変更</h3>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleAvatarChange}
-            className="file-input"
-          />
-          <button
-            onClick={handleAvatarUpload}
-            disabled={uploading || !avatarFile}
-            className="form-button"
-          >
-            {uploading ? 'アップロード中...' : 'アバターをアップロード'}
-          </button>
-        </div>
-      </section>
-
-      {/* Account Settings */}
-      <section className="mypage-section">
-        <h2 className="section-title">⚙️ アカウント設定</h2>
-
-        <div style={{ marginBottom: '24px' }}>
-          <h3 className="section-subtitle">メールアドレスの変更</h3>
-          <form onSubmit={handleEmailUpdate} className="form-group">
-            <label htmlFor="newEmailInput" className="form-label">新しいメール:</label>
-            <input
-              id="newEmailInput"
-              type="email"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              className="form-input"
-              placeholder="新しいメールアドレス"
-              required
+      <div className="dashboard-grid">
+        {/* Main Stats Area */}
+        <div className="dashboard-main">
+          {/* Stats Cards Section */}
+          <section className="dashboard-card stats-overview-section">
+            <h2 className="section-title">📊 統計サマリー</h2>
+            <StatCards
+              overallAccuracy={overallAccuracy}
+              overallCorrect={overallCorrect}
+              overallQuestions={overallQuestions}
+              totalSessions={totalSessions}
             />
-            <button
-              type="submit"
-              disabled={emailUpdateLoading || newEmail.trim() === '' || newEmail === user.email}
-              className="form-button"
-            >
-              {emailUpdateLoading ? '更新中...' : '更新'}
-            </button>
-          </form>
+          </section>
+
+          {/* Weak Shortcuts Section */}
+          <section className="dashboard-card weak-shortcuts-section">
+            <h2 className="section-title">⚠️ 重点復習ショートカット</h2>
+            <WeakShortcuts 
+              weakShortcuts={weakShortcuts} 
+              loading={weakShortcutsLoading} 
+            />
+          </section>
+
+          {/* App Stats Section */}
+          <section className="dashboard-card app-stats-section">
+            <h2 className="section-title">📱 アプリケーション別統計</h2>
+            <AppStatsTable stats={quizStats} />
+          </section>
+
+          {/* Recent Sessions Section */}
+          <section className="dashboard-card recent-sessions-section">
+            <h2 className="section-title">🎯 最近のプレイ履歴</h2>
+            <RecentSessions 
+              sessions={quizSessions} 
+              onSelectSession={(id) => setSelectedSessionId(id)} 
+            />
+          </section>
         </div>
 
-        <div className="divider"></div>
-
-        <div style={{ marginBottom: '24px' }}>
-          <h3 className="section-subtitle">パスワードの変更</h3>
-          <p style={{ marginBottom: '12px', color: '#666' }}>
-            パスワードを変更する場合は、パスワードリセットページをご利用ください。
-          </p>
-          <Link to="/password-reset" className="text-link">
-            パスワードリセットページへ →
-          </Link>
-        </div>
-
-        <div className="divider"></div>
-
-        <div>
-          <h3 className="section-subtitle" style={{ color: '#dc3545' }}>アカウントの削除</h3>
-          <p style={{ marginBottom: '12px', color: '#666' }}>
-            アカウントを削除すると、全てのデータが完全に削除されます。この操作は取り消せません。
-          </p>
-          {!showDeleteConfirm ? (
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="form-button form-button-danger"
-            >
-              アカウントを削除
-            </button>
-          ) : (
-            <div style={{ padding: '16px', background: '#fff3cd', borderRadius: '8px', border: '2px solid #ffc107' }}>
-              <p style={{ margin: '0 0 12px 0', fontWeight: 'bold', color: '#856404' }}>
-                本当にアカウントを削除しますか？
-              </p>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button
-                  onClick={handleDeleteAccount}
-                  disabled={deleting}
-                  className="form-button form-button-danger"
-                >
-                  {deleting ? '削除中...' : 'はい、削除します'}
-                </button>
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  disabled={deleting}
-                  className="form-button"
-                >
-                  キャンセル
-                </button>
+        {/* Sidebar / Settings Area */}
+        <div className="dashboard-sidebar">
+          {/* Profile Section */}
+          <section className="dashboard-card profile-section">
+            <h2 className="section-title">👤 プロフィール</h2>
+            <div className="profile-compact">
+              <div className="profile-avatar-container">
+                <img
+                  src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=667eea&color=fff&size=80`}
+                  alt="アバター"
+                  className="profile-avatar"
+                />
+                <div className="avatar-edit-overlay">
+                  <label htmlFor="avatarInput" className="avatar-label">編集</label>
+                  <input
+                    id="avatarInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    style={{ display: 'none' }}
+                  />
+                </div>
+              </div>
+              <div className="profile-details">
+                <form onSubmit={handleDisplayNameUpdate} className="profile-form">
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="compact-input"
+                    placeholder="表示名"
+                  />
+                  {displayName !== profile?.display_name && (
+                    <button type="submit" disabled={profileUpdateLoading} className="icon-button">
+                      {profileUpdateLoading ? '...' : '✓'}
+                    </button>
+                  )}
+                </form>
+                <p className="profile-email-text">{user.email}</p>
               </div>
             </div>
-          )}
-        </div>
-      </section>
+            
+            {avatarFile && (
+              <div className="avatar-upload-confirm">
+                <p className="upload-file-name">{avatarFile.name}</p>
+                <button
+                  onClick={handleAvatarUpload}
+                  disabled={uploading}
+                  className="form-button form-button-small"
+                >
+                  {uploading ? '...' : 'アップロード'}
+                </button>
+              </div>
+            )}
+          </section>
 
-      {/* Quiz Statistics */}
-      <section className="mypage-section">
-        <h2 className="section-title">📊 クイズ統計</h2>
+          {/* Account Settings Section */}
+          <section className="dashboard-card settings-section">
+            <h2 className="section-title">⚙️ 設定</h2>
+            
+            <div className="settings-item">
+              <h3>メールアドレス変更</h3>
+              <form onSubmit={handleEmailUpdate} className="settings-form">
+                <input
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  className="compact-input"
+                  placeholder="新しいメール"
+                />
+                <button
+                  type="submit"
+                  disabled={emailUpdateLoading || newEmail === user.email}
+                  className="form-button form-button-small"
+                >
+                  変更
+                </button>
+              </form>
+            </div>
 
-        <div className="stats-grid">
-          <div className="stat-card">
-            <h4>総合正解率</h4>
-            <p className="stat-value">{overallAccuracy}%</p>
-            <p className="stat-detail">({overallCorrect} / {overallQuestions})</p>
-          </div>
-          <div className="stat-card">
-            <h4>総セッション数</h4>
-            <p className="stat-value">{totalSessions}</p>
-          </div>
-        </div>
+            <div className="settings-divider"></div>
 
-        <h3 className="section-subtitle">アプリケーション別統計</h3>
-        {quizStats.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon">📝</div>
-            <p className="empty-state-text">まだクイズをプレイしていません。</p>
-          </div>
-        ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>アプリケーション</th>
-                <th>セッション数</th>
-                <th>正解数</th>
-                <th>総問題数</th>
-                <th>正解率</th>
-                <th>最終プレイ日時</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quizStats.map((stat, index) => (
-                <tr key={index}>
-                  <td>{stat.application}</td>
-                  <td>{stat.total_sessions}</td>
-                  <td>{stat.total_correct}</td>
-                  <td>{stat.total_questions}</td>
-                  <td>{stat.overall_accuracy.toFixed(1)}%</td>
-                  <td>{new Date(stat.last_quiz_date).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+            <div className="settings-item">
+              <h3>パスワード</h3>
+              <Link to="/password-reset" className="text-link-small">
+                パスワードリセットはこちら →
+              </Link>
+            </div>
 
-      {/* Quiz Sessions */}
-      <section className="mypage-section">
-        <h2 className="section-title">🎯 最近のクイズセッション</h2>
-        {quizSessions.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon">🎮</div>
-            <p className="empty-state-text">最近のクイズセッションはありません。</p>
-          </div>
-        ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>アプリケーション</th>
-                <th>難易度</th>
-                <th>スコア</th>
-                <th>正解数</th>
-                <th>総問題数</th>
-                <th>完了日時</th>
-                <th>詳細</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quizSessions.map((session) => (
-                <tr key={session.id}>
-                  <td>{session.application}</td>
-                  <td>
-                    {session.difficulty ? (
-                      <span className={getDifficultyBadgeClass(session.difficulty)}>
-                        {session.difficulty}
-                      </span>
-                    ) : (
-                      'N/A'
-                    )}
-                  </td>
-                  <td><strong>{session.score}</strong></td>
-                  <td>{session.correct_answers}</td>
-                  <td>{session.total_questions}</td>
-                  <td>
-                    {session.completed_at
-                      ? new Date(session.completed_at).toLocaleString()
-                      : '進行中'}
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => setSelectedSessionId(session.id)}
-                      className="form-button"
-                      style={{ padding: '6px 12px', fontSize: '12px' }}
-                    >
-                      詳細
+            <div className="settings-divider"></div>
+
+            <div className="settings-item danger-zone">
+              <h3>アカウント削除</h3>
+              {!showDeleteConfirm ? (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-link-danger"
+                >
+                  アカウントを削除する
+                </button>
+              ) : (
+                <div className="delete-confirm">
+                  <p>本当に削除しますか？</p>
+                  <div className="delete-actions">
+                    <button onClick={handleDeleteAccount} disabled={deleting} className="btn-danger-small">
+                      削除
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+                    <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting} className="btn-secondary-small">
+                      戻る
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
 
       {/* Session Detail Modal */}
       {selectedSessionId && (

@@ -5,26 +5,25 @@ import Home from './pages/Home';
 import MyPage from './pages/MyPage';
 import PasswordReset from './pages/PasswordReset';
 import { useUI } from './context';
-import { useFullscreen } from './hooks';
+import { useFullscreen, useAdaptivePerformance } from './hooks';
 import './styles/global.css';
 
 function App() {
   const { isQuizMode, setIsQuizMode, setShowSetup } = useUI();
   const { isFullscreenMode, toggleFullscreenMode } = useFullscreen();
+  const { performanceStyles } = useAdaptivePerformance();
 
   const handleQuizModeToggle = () => {
     if (!isQuizMode) {
-      // Visualizerモード → Quizモードへの切り替え時は、セットアップ画面を表示
       setIsQuizMode(true);
       setShowSetup(true);
     } else {
-      // Quizモード → Visualizerモードへの切り替え
       setIsQuizMode(false);
     }
   };
 
   return (
-    <div className="container">
+    <div className="container" style={performanceStyles}>
       <AppHeader
         fullscreenMode={isFullscreenMode}
         onToggleFullscreen={toggleFullscreenMode}

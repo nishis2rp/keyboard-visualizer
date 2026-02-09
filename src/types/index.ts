@@ -159,3 +159,9 @@ export interface QuizSession {
   started_at: string;
   completed_at: string | null;
 }
+
+export interface WeakShortcut extends RichShortcut {
+  wrong_count: number;
+  correct_count: number;
+  accuracy: number;
+}

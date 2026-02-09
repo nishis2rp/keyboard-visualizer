@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nishis2rp.github.io/keyboard-visualizer/sitemap.xml

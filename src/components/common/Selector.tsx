@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { AppIcon } from './AppIcon'
 
 /**
  * セレクターアイテムの基底インターフェース
@@ -38,7 +39,9 @@ function SelectorComponent<T extends SelectorItem>({
             className={`app-tab ${selectedId === item.id ? 'active' : ''}`}
             onClick={() => onSelect(item.id)}
           >
-            <span className="app-icon">{item.icon}</span>
+            <span className="app-icon">
+              <AppIcon appId={item.id} fallbackIcon={item.icon} size={19} />
+            </span>
             <span className="app-name">{item.name}</span>
           </button>
         ))}

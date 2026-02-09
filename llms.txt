@@ -1,0 +1,30 @@
+# Keyboard Visualizer
+
+A modern, high-performance web application for visualizing keyboard shortcuts and learning them through interactive quizzes.
+
+## Tech Stack
+- Frontend: React 18, TypeScript, Vite
+- Backend: Supabase (Postgres, Auth, RLS)
+- Performance: requestAnimationFrame-based adaptive rendering
+- Styles: CSS Modules with Glassmorphism
+
+## Core Directories
+- `/src/components`: UI Components
+  - `/AppHeader`: Global navigation and logo
+  - `/AppSelector`: Application-specific shortcut context switching
+  - `/Quiz`: AI-optimized learning engine
+  - `/common`: Reusable atomic components (HeaderLogo, AppIcon, etc.)
+- `/src/context`: State management (Settings, Auth, Quiz, Shortcuts)
+- `/src/hooks`: Logic-only functions
+  - `useKeyboardShortcuts.ts`: The "brain" of key detection
+  - `useAdaptivePerformance.ts`: Real-time FPS monitoring and quality scaling
+- `/src/utils`: Pure functional logic (Deduction engine, Quiz scoring)
+- `/supabase/migrations`: Database schema and RLS policies
+
+## Key Concepts
+- Protection Levels: `fullscreen-preventable` vs `always-protected` (OS level).
+- Adaptive Quality: High/Medium/Low rendering based on device performance.
+- AI Hints: Deductive logic to identify confusing shortcuts.
+
+## Developer Note
+When modifying shortcut logic, always check `useKeyboardShortcuts.ts` for simultaneous key press detection logic.

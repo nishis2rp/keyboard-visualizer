@@ -5,6 +5,7 @@ import { useShortcutData } from '../../context'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
 import { downloadShortcutsAsCSV } from '../../utils'
+import { HeaderLogo } from '../common/HeaderLogo'
 import styles from './AppHeader.module.css'
 
 interface AppHeaderProps {
@@ -36,59 +37,54 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
 
   return (
     <>
-      <div className={styles.headerContainer}>
-        <h1 className={styles.titleContainer}>
-          <div className={styles.logoGroup}>
-            <span className={`${styles.logoBox} ${styles.logoBoxK}`}>K</span>
-            <span className={`${styles.logoBox} ${styles.logoBoxS}`}>S</span>
-            <span className={`${styles.logoBox} ${styles.logoBoxV}`}>V</span>
+      <header className={styles.headerContainer}>
+        <div className={styles.titleContainer}>
+          <div className={styles.logoIconContainer}>
+            <HeaderLogo size={48} />
           </div>
           <div className={styles.titleTextContainer}>
-            <span className={styles.titleLine1}>Keyboard Shortcut</span>
-            <span className={styles.titleLine2}>Visualizer</span>
+            <span className={styles.titleText}>KEYBOARD Visualizer</span>
           </div>
-        </h1>
+        </div>
         <div className={styles.buttonGroup}>
           <StyledButton
             onClick={onQuizModeToggle}
-            backgroundColor="rgba(196, 181, 253, 0.85)"
-            hoverBackgroundColor="rgba(196, 181, 253, 0.95)"
-            textColor="#1e3a8a"
-            borderColor="rgba(167, 139, 250, 0.5)"
-            title={isQuizMode ? 'クイズモードを終了してビジュアライザーに戻ります' : 'ショートカットを学習するクイズモードを開始します'}
+            backgroundColor="#6366f1"
+            textColor="white"
+            title={isQuizMode ? 'ビジュアライザーに戻ります' : 'クイズモードを開始します'}
           >
-            {isQuizMode ? 'Visualizer Mode' : 'Quiz Mode'}
+            {isQuizMode ? 'Visualizer' : 'Quiz Mode'}
           </StyledButton>
           <StyledButton
             onClick={onToggleFullscreen}
-            backgroundColor="rgba(196, 181, 253, 0.85)"
-            hoverBackgroundColor="rgba(196, 181, 253, 0.95)"
-            textColor="#1e3a8a"
-            borderColor="rgba(167, 139, 250, 0.5)"
-            title="フルスクリーンモードでショートカット競合を軽減。Keyboard Lock APIによりほとんどのWinキーショートカットをキャプチャできますが、Win+L（ロック）などのセキュリティ関連はOSレベルで保護されています"
+            backgroundColor="#f1f5f9"
+            textColor="#475569"
+            borderColor="#e2e8f0"
+            title="フルスクリーンモード"
           >
-            {fullscreenMode ? '全画面を終了' : '全画面モード'}
+            {fullscreenMode ? '全画面終了' : '全画面'}
           </StyledButton>
           <button
             className={styles.csvDownloadButton}
             onClick={handleDownloadCSV}
-            title="全ショートカットをCSV形式でダウンロード"
+            title="CSVダウンロード"
           >
-            <span className={styles.csvText}>CSV DL</span>
+            <span className={styles.csvText}>CSV</span>
           </button>
           {user ? (
             <UserMenu />
           ) : (
             <StyledButton
               onClick={() => setShowAuthModal(true)}
-              backgroundColor="#667eea"
-              title="ログインしてクイズの進捗を保存"
+              backgroundColor="#1e293b"
+              textColor="white"
+              title="ログイン"
             >
               ログイン
             </StyledButton>
           )}
         </div>
-      </div>
+      </header>
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </>
   )

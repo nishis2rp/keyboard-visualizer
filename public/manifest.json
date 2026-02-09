@@ -1,11 +1,20 @@
 {
-  "name": "Keyboard Visualizer",
-  "short_name": "KeyboardVis",
-  "description": "キーボードショートカットを視覚化し、クイズで学習するアプリ",
+  "name": "キーボードビジュアライザー | ショートカット学習・可視化ツール",
+  "short_name": "キーボードビジュ",
+  "description": "1,300種類以上のキーボードショートカットをリアルタイムで可視化。クイズモードでタイピングスキルとショートカット習得をサポートします。",
   "start_url": ".",
   "display": "standalone",
-  "orientation": "landscape",
-  "background_color": "#1a1a1a",
-  "theme_color": "#007AFF",
-  "icons": []
+  "orientation": "any",
+  "background_color": "#f8f9fa",
+  "theme_color": "#667eea",
+  "lang": "ja",
+  "categories": ["education", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "keyboard.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }

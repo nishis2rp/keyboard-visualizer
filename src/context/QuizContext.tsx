@@ -4,6 +4,7 @@ import { useShortcutData } from './ShortcutContext';
 import { useQuizInputHandler } from '../hooks/useQuizInputHandler';
 import { useQuizProgress } from '../hooks/useQuizProgress';
 import { QuizQuestion } from '../types';
+import { analytics } from '../utils/analytics';
 import { 
   QuizState, 
   QuizAction, 
@@ -121,6 +122,9 @@ export function QuizProvider({ children }: QuizProviderProps) {
     }
     dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
     await startQuizSession(app, difficulty);
+    
+    // Analytics
+    analytics.quizStarted(app, difficulty);
 
     setTimeout(() => {
       getAndSetNextQuestion(new Set(), 'default', keyboardLayout, app, isFullscreen, difficulty, true);
@@ -162,8 +166,15 @@ export function QuizProvider({ children }: QuizProviderProps) {
       const score = Math.round((correctAnswers / totalQuestions) * 100);
 
       completeQuizSession(score, totalQuestions, correctAnswers);
+      
+      // Analytics
+      analytics.quizCompleted(
+        quizState.selectedApp || 'unknown',
+        score,
+        correctAnswers / totalQuestions
+      );
     }
-  }, [quizState.status, quizState.quizHistory, completeQuizSession]);
+  }, [quizState.status, quizState.quizHistory, completeQuizSession, quizState.selectedApp]);
 
   useQuizInputHandler({ quizState, dispatch, getNextQuestion, richShortcuts: richShortcuts || [] });
 
