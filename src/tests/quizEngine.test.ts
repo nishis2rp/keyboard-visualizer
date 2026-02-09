@@ -227,5 +227,13 @@ describe('quizEngine', () => {
     it('should handle different casing in userAnswer if normalized correctly', () => {
       expect(checkAnswer(normalizeShortcut('ctrl + a'), normalizeShortcut('Ctrl + A'))).toBe(true);
     });
+
+    it('should handle Shift-symbol-digit equivalents (e.g., ! vs 1)', () => {
+      const mockLayout = 'windows-jis';
+      // User presses Shift + 1 which produces '!' in some layouts
+      // The correct answer is defined as 'Ctrl + Shift + 1'
+      expect(checkAnswer('Ctrl + Shift + !', 'Ctrl + Shift + 1', [], mockLayout)).toBe(true);
+      expect(checkAnswer('Ctrl + Shift + 1', 'Ctrl + Shift + !', [], mockLayout)).toBe(true);
+    });
   });
 });

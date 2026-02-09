@@ -132,6 +132,26 @@ export const getShiftedSymbolForKey = (code, layout) => {
 };
 
 /**
+ * Get the base key (unshifted) for a given shifted symbol.
+ * @param {string} symbol - The shifted symbol (e.g., '!', '@', '#')
+ * @param {string} layout - The selected keyboard layout ('macUs', 'macJis', 'windowsJis')
+ * @returns {string|null} The base key, or null if not found
+ */
+export const getUnshiftedKeyForSymbol = (symbol: string, layout: string): string | null => {
+  const map = layout.includes('us') ? US_SYMBOL_MAP : JIS_SYMBOL_MAP;
+  
+  // Find the entry that has this symbol as its value and starts with 'ShiftLeft+'
+  for (const [key, value] of Object.entries(map)) {
+    if (value === symbol && key.startsWith('ShiftLeft+')) {
+      const code = key.replace('ShiftLeft+', '');
+      // Try to get the base display name for this code
+      return getCodeDisplayName(code, null, layout, false);
+    }
+  }
+  return null;
+};
+
+/**
  * Gets the display name from a key code.
  * @param {string} code - KeyboardEvent.code (e.g., 'KeyA', 'BracketLeft')
  * @param {string} key - KeyboardEvent.key (e.g., 'a', '[', '{')

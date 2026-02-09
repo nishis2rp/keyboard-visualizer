@@ -58,7 +58,7 @@ export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion, rich
 
     const answerTimeMs = Date.now() - questionStartTime;
     const userAnswer = normalizePressedKeys(pressedKeys, keyboardLayout);
-    const isCorrect = checkAnswer(userAnswer, currentQuestion.normalizedCorrectShortcut, richShortcuts);
+    const isCorrect = checkAnswer(userAnswer, currentQuestion.normalizedCorrectShortcut, richShortcuts, keyboardLayout);
 
     dispatch({ type: 'ANSWER_QUESTION', payload: { userAnswer, isCorrect, answerTimeMs } });
     previousPressedKeysRef.current = new Set();

@@ -1,4 +1,4 @@
-import { getCodeDisplayName, getShiftedSymbolForKey, getPossibleKeyNamesFromDisplay } from './keyMapping'
+import { getCodeDisplayName, getShiftedSymbolForKey, getPossibleKeyNamesFromDisplay, getUnshiftedKeyForSymbol } from './keyMapping'
 import { MODIFIER_ORDER, MODIFIER_KEY_NAMES } from './keyUtils'
 import { AppShortcuts, ShortcutDetails, RichShortcut, AvailableShortcut } from '../types' // ★ RichShortcut, AvailableShortcutを追加
 import { detectOS } from './os' // ★ detectOSを追加
@@ -89,16 +89,25 @@ const getKeyComboAlternatives = (displayComboText: string, layout: string) => {
   const parts = displayComboText.split(' + ');
   const hasShift = parts.some(p => p === 'Shift' || p === '⇧'); 
 
-  // 最後のキーが数字の場合、対応するShift記号があるかチェック
+  if (!hasShift) return alternatives;
+
   const lastKey = parts[parts.length - 1];
-  if (hasShift && /^\d$/.test(lastKey)) { // 数字キーの場合
-    // keyMapping.jsのUS/JIS_SYMBOL_MAPを逆引きして代替キーを取得
-    // getShiftedSymbolForKey は code (e.g., 'Digit1') を期待するので、lastKey (e.g., '1') を 'DigitX' 形式に変換する必要がある
+  
+  // 1. 最後のキーが数字の場合、対応するShift記号を候補に追加
+  if (/^\d$/.test(lastKey)) {
     const digitCode = `Digit${lastKey}`;
     const shiftedSymbol = getShiftedSymbolForKey(digitCode, layout);
 
     if (shiftedSymbol) {
       const altParts = [...parts.slice(0, -1), shiftedSymbol];
+      alternatives.push(altParts.join(' + '));
+    }
+  } 
+  // 2. 最後のキーが記号の場合、対応する数字（またはベースキー）を候補に追加
+  else {
+    const unshiftedKey = getUnshiftedKeyForSymbol(lastKey, layout);
+    if (unshiftedKey) {
+      const altParts = [...parts.slice(0, -1), unshiftedKey];
       alternatives.push(altParts.join(' + '));
     }
   }
@@ -243,7 +252,27 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
       // pressedDisplayNamesはSet<string>なので、Array.from()で配列に変換してから処理
       const allPressedKeysInShortcut = Array.from(pressedDisplayNames).every((pressedKey: string) => {
         // shortcutKeysの各要素も正規化して比較
-        return shortcutKeys.map(k => normalizeKey(k)).includes(normalizeKey(pressedKey));
+        const normalizedShortcutKeys = shortcutKeys.map(k => normalizeKey(k));
+        const normalizedPressedKey = normalizeKey(pressedKey);
+        
+        // 直接一致するかチェック
+        if (normalizedShortcutKeys.includes(normalizedPressedKey)) return true;
+        
+        // Shiftが押されている場合、代替キー（記号 <-> 数字）もチェック
+        if (shiftPressed) {
+          const unshifted = getUnshiftedKeyForSymbol(pressedKey, layout);
+          if (unshifted && normalizedShortcutKeys.includes(normalizeKey(unshifted))) return true;
+          
+          // 逆のパターン（1 -> !）はShortcut定義側が記号で、入力が数字の場合だが、
+          // 通常Shiftを押していれば入力は記号になる。
+          // ただし、定義が記号で入力が数字として扱われる可能性も考慮して逆もチェック
+          if (/^\d$/.test(pressedKey)) {
+             const shifted = getShiftedSymbolForKey(`Digit${pressedKey}`, layout);
+             if (shifted && normalizedShortcutKeys.includes(normalizeKey(shifted))) return true;
+          }
+        }
+        
+        return false;
       });
 
       const pressedModifiers = Array.from(pressedDisplayNames).filter((key: string) => MODIFIER_KEY_NAMES.has(key));

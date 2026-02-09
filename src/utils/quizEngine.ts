@@ -1,7 +1,7 @@
 import { detectOS } from './os';
 import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
 
-import { getCodeDisplayName } from './keyMapping'; // Import getCodeDisplayName
+import { getCodeDisplayName, getUnshiftedKeyForSymbol } from './keyMapping'; // Import getCodeDisplayName and getUnshiftedKeyForSymbol
 import { AllShortcuts, ShortcutDetails, RichShortcut, App } from '../types';
 
 // OSを検出
@@ -266,16 +266,49 @@ export const GRACE_PERIOD_MS = 300;
  * @param {string} userAnswer - The normalized shortcut entered by the user.
  * @param {string} normalizedCorrectAnswer - The normalized correct shortcut.
  * @param {RichShortcut[]} richShortcuts - (Optional) Rich shortcuts from DB.
+ * @param {string} keyboardLayout - (Optional) Keyboard layout for symbol mapping.
  * @returns {boolean} True if correct.
  */
-export const checkAnswer = (userAnswer: string, normalizedCorrectAnswer: string, richShortcuts?: RichShortcut[]): boolean => {
+export const checkAnswer = (userAnswer: string, normalizedCorrectAnswer: string, richShortcuts?: RichShortcut[], keyboardLayout?: string): boolean => {
   // 完全一致チェック
   if (userAnswer === normalizedCorrectAnswer) {
     return true;
   }
 
-  // 代替ショートカットチェック
-  return areShortcutsEquivalent(userAnswer, normalizedCorrectAnswer, richShortcuts);
+  // 代替ショートカットチェック (既存のロジック)
+  if (areShortcutsEquivalent(userAnswer, normalizedCorrectAnswer, richShortcuts)) {
+    return true;
+  }
+
+  // Shift関連の記号/数字の読み替えチェック
+  // 例: userAnswer="Ctrl + Shift + !" vs correctAnswer="Ctrl + Shift + 1"
+  if (keyboardLayout && (userAnswer.includes('Shift') || normalizedCorrectAnswer.includes('Shift'))) {
+    const userParts = userAnswer.split(' + ');
+    const correctParts = normalizedCorrectAnswer.split(' + ');
+
+    if (userParts.length === correctParts.length) {
+      // 最後のキー以外が一致しているか確認
+      const baseMatch = userParts.slice(0, -1).every((part, i) => part === correctParts[i]);
+      if (baseMatch) {
+        const userLastKey = userParts[userParts.length - 1];
+        const correctLastKey = correctParts[correctParts.length - 1];
+
+        // userAnswerの記号を数字に変換して比較
+        const unshiftedUser = getUnshiftedKeyForSymbol(userLastKey, keyboardLayout);
+        if (unshiftedUser === correctLastKey) {
+          return true;
+        }
+
+        // correctAnswerの記号を数字に変換して比較
+        const unshiftedCorrect = getUnshiftedKeyForSymbol(correctLastKey, keyboardLayout);
+        if (unshiftedCorrect === userLastKey) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 };
 
 
