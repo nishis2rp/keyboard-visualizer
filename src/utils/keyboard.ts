@@ -27,11 +27,14 @@ export const normalizeShortcutCombo = (combo: string): string => {
     '⌘': 'Cmd',
     '⌥': 'Alt',
     '⇧': 'Shift',
-    '⌃': 'Ctrl'
+    '⌃': 'Ctrl',
+    'Option': 'Alt',
+    'Control': 'Ctrl',
+    'Command': 'Cmd'
   };
 
   return combo.split(' + ').map(part => {
-    // macOS記号の置換
+    // 修飾キーの正規化（記号または別名を標準名称に変換）
     const normalizedPart = symbolMap[part] || part;
 
     // アルファベット1文字で、かつ修飾キーや特殊シンボルでない場合のみ小文字にする

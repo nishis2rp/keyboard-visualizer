@@ -2,8 +2,8 @@
  * 修飾キーのコードベース表示順序
  */
 export const MODIFIER_CODE_DISPLAY_ORDER: readonly string[] = [
-  'ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight',
-  'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'
+  'ControlLeft', 'ControlRight', 'AltLeft', 'AltRight',
+  'ShiftLeft', 'ShiftRight', 'MetaLeft', 'MetaRight'
 ];
 
 /**
@@ -28,11 +28,12 @@ export const WINDOWS_KEY_NAMES = new Set(['Win']);
 
 /**
  * 修飾キーのソート順序（KeyboardEvent.code）
+ * データベースの規約 (Alt + Shift + ...) に合わせるため Alt を Shift より先に並べる
  */
 export const MODIFIER_ORDER: Record<string, number> = {
   ControlLeft: 1, ControlRight: 1,
-  ShiftLeft: 2, ShiftRight: 2,
-  AltLeft: 3, AltRight: 3,
+  AltLeft: 2, AltRight: 2,
+  ShiftLeft: 3, ShiftRight: 3,
   MetaLeft: 4, MetaRight: 4,
 };
 
