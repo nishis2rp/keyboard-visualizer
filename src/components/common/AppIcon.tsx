@@ -173,8 +173,8 @@ export const AppIcon: React.FC<AppIconProps> = ({ appId, size = 24, className = 
         );
       case 'madmax':
         return (
-          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="currentColor">
-            <path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm8 7c-.8 0-1.6.3-2.2.9l-1.9-1.9c.1-.3.1-.7.1-1 0-1.7-1.3-3-3-3s-3 1.3-3 3c0 .3 0 .7.1 1L8.2 9.9C7.6 9.3 6.8 9 6 9c-2.2 0-4 1.8-4 4s1.8 4 4 4c.8 0 1.6-.3 2.2-.9l1.9 1.9c-.1.3-.1.7-.1 1 0 1.7 1.3 3 3 3s3-1.3 3-3c0-.3 0-.7-.1-1l1.9-1.9c.6.6 1.4.9 2.2.9 2.2 0 4-1.8 4-4s-1.8-4-4-4zm0 6c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zM6 15c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z" />
+          <svg viewBox="0 0 24 24" style={iconStyle} className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
           </svg>
         );
       default:
