@@ -7,6 +7,7 @@ import {
   isWindowsKey
 } from '../../utils/keyUtils';
 import { AvailableShortcut } from '../../types';
+import { AppIcon } from '../common/AppIcon';
 import styles from './KeyDisplay.module.css';
 
 interface PressedKeysIndicatorProps {
@@ -98,6 +99,7 @@ const PressedKeysIndicator = memo<PressedKeysIndicatorProps>(({
             className={styles.difficultyBadge}
             style={{ backgroundColor: config.color, color: config.text }}
           >
+            <AppIcon appId={difficulty} size={12} className={styles.difficultyIcon} />
             {config.label}
           </div>
         </div>

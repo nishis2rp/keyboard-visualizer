@@ -180,6 +180,7 @@ export const useKeyboardShortcuts = (richShortcuts: RichShortcut[], keyboardLayo
     pressedKeys,
     history,
     currentDescription,
+    currentShortcut,
     availableShortcuts,
     handleClear: handleClearHistory,
   };

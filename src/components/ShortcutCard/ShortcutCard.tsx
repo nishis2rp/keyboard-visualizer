@@ -4,6 +4,7 @@ import { detectOS } from '../../utils/os'
 import { EXCEL_APP_SAFE_SHORTCUTS } from '../../constants/systemProtectedShortcuts'
 import { ShortcutDifficulty } from '../../types'
 import { getSequentialKeys } from '../../utils/sequentialShortcuts'
+import { AppIcon } from '../common/AppIcon'
 import styles from './ShortcutCard.module.css'
 
 const CURRENT_OS = detectOS();
@@ -24,11 +25,11 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
   // 難易度表示のテキストとクラスを取得
   const difficultyInfo = useMemo(() => {
     switch (difficulty) {
-      case 'basic': return { label: '🌟 BASIC', class: styles.basic };
-      case 'standard': return { label: '⚡ STANDARD', class: styles.standard };
-      case 'hard': return { label: '🔥 HARD', class: styles.hard };
-      case 'madmax': return { label: '💀 MADMAX', class: styles.madmax };
-      case 'allrange': return { label: '⭐ ALL', class: styles.allrange };
+      case 'basic': return { label: 'BASIC', class: styles.basic };
+      case 'standard': return { label: 'STANDARD', class: styles.standard };
+      case 'hard': return { label: 'HARD', class: styles.hard };
+      case 'madmax': return { label: 'MADMAX', class: styles.madmax };
+      case 'allrange': return { label: 'ALL', class: styles.allrange };
       default: return { label: '', class: '' };
     }
   }, [difficulty]);
@@ -113,6 +114,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
 
       {difficultyInfo.label && (
         <div className={`${styles.difficultyBadge} ${difficultyInfo.class}`}>
+          {difficulty && <AppIcon appId={difficulty} size={12} className={styles.difficultyIcon} />}
           {difficultyInfo.label}
         </div>
       )}

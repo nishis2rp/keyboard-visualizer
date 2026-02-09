@@ -1,19 +1,19 @@
 import { memo } from 'react';
 import { ShortcutDifficulty } from '../../types';
+import { AppIcon } from '../common/AppIcon';
 import styles from './DifficultyFilter.module.css';
 
 interface DifficultyOption {
   id: ShortcutDifficulty;
   name: string;
-  icon: string;
   description: string;
 }
 
 const difficultyOptions: DifficultyOption[] = [
-  { id: 'basic', name: 'basic', icon: '🌟', description: 'Daily basic operations' },
-  { id: 'standard', name: 'standard', icon: '⚡', description: 'Standard shortcuts' },
-  { id: 'hard', name: 'hard', icon: '🔥', description: 'Advanced features and operations' },
-  { id: 'madmax', name: 'madmax', icon: '💀', description: 'Expert level shortcuts' },
+  { id: 'basic', name: 'basic', description: 'Daily basic operations' },
+  { id: 'standard', name: 'standard', description: 'Standard shortcuts' },
+  { id: 'hard', name: 'hard', description: 'Advanced features and operations' },
+  { id: 'madmax', name: 'madmax', description: 'Expert level shortcuts' },
 ];
 
 interface DifficultyFilterProps {
@@ -77,7 +77,9 @@ const DifficultyFilter = memo<DifficultyFilterProps>(({
                 onChange={() => handleToggle(option.id)}
                 className={styles.checkbox}
               />
-              <span className={styles.icon}>{option.icon}</span>
+              <span className={styles.icon}>
+                <AppIcon appId={option.id} size={18} />
+              </span>
               <span className={styles.name}>{option.name}</span>
             </label>
           );

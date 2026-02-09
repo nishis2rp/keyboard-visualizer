@@ -194,4 +194,11 @@
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.difficultyIcon {
+  flex-shrink: 0;
 }

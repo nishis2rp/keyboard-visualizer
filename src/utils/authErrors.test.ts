@@ -145,132 +145,143 @@ describe('authErrors', () => {
 
   describe('mapAuthErrorToMessage', () => {
     it('should map invalid login credentials error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'Invalid login credentials',
         name: 'AuthApiError',
         status: 400,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
     });
 
     it('should map email not confirmed error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'Email not confirmed',
         name: 'AuthApiError',
         status: 400,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.EMAIL_NOT_CONFIRMED);
     });
 
     it('should map user already registered error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'User already registered',
         name: 'AuthApiError',
         status: 400,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.USER_EXISTS);
     });
 
     it('should map password too short error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'Password should be at least 6 characters',
         name: 'AuthApiError',
         status: 400,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.PASSWORD_TOO_SHORT);
     });
 
     it('should map invalid email error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'Invalid email',
         name: 'AuthApiError',
         status: 400,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.INVALID_EMAIL);
     });
 
     it('should map network error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'Fetch failed',
         name: 'NetworkError',
         status: 0,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.NETWORK_ERROR);
     });
 
     it('should map rate limit error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'Too many requests',
         name: 'AuthApiError',
         status: 429,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.RATE_LIMIT);
     });
 
     it('should map session not found error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'Session not found',
         name: 'AuthSessionMissingError',
         status: 401,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.SESSION_INVALID);
     });
 
     it('should map OAuth provider error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'Provider not found',
         name: 'AuthApiError',
         status: 400,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.OAUTH_PROVIDER_ERROR);
     });
 
     it('should return original message for unmapped error', () => {
-      const error: AuthError = {
+      const error = {
         message: 'Some unknown error occurred',
         name: 'AuthApiError',
         status: 500,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe('Some unknown error occurred');
     });
 
     it('should return generic error for empty message', () => {
-      const error: AuthError = {
+      const error = {
         message: '',
         name: 'AuthApiError',
         status: 500,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.GENERIC_ERROR);
@@ -282,12 +293,13 @@ describe('authErrors', () => {
     });
 
     it('should handle case-insensitive matching', () => {
-      const error: AuthError = {
+      const error = {
         message: 'INVALID LOGIN CREDENTIALS',
         name: 'AuthApiError',
         status: 400,
-        __isAuthError: true
-      };
+        __isAuthError: true,
+        code: undefined
+      } as any as AuthError;
 
       const result = mapAuthErrorToMessage(error);
       expect(result).toBe(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
