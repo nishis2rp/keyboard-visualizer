@@ -172,7 +172,7 @@ const MyPage: React.FC = () => {
   }
 
   if (!user) {
-    return <Navigate to="/" />;
+    return <Navigate to="/app" />;
   }
 
   const handleDisplayNameUpdate = async (e: React.FormEvent) => {
@@ -308,7 +308,7 @@ const MyPage: React.FC = () => {
       <div className="mypage-header">
         <h1 className="mypage-title">ダッシュボード</h1>
         <div className="mypage-header-actions">
-          <Link to="/" className="home-link">🏠 ホームへ戻る</Link>
+          <Link to="/app" className="home-link">🏠 アプリへ戻る</Link>
         </div>
       </div>
 

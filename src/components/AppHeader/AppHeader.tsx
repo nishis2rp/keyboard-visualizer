@@ -1,4 +1,5 @@
 import { memo, useState, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { StyledButton } from '../common/StyledButton'
 import { useAuth } from '../../context/AuthContext'
 import { useShortcutData } from '../../context'
@@ -38,14 +39,16 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
   return (
     <>
       <header className={styles.headerContainer}>
-        <div className={styles.titleContainer}>
-          <div className={styles.logoIconContainer}>
-            <HeaderLogo size={48} />
+        <Link to="/app" className={styles.titleLink}>
+          <div className={styles.titleContainer}>
+            <div className={styles.logoIconContainer}>
+              <HeaderLogo size={48} />
+            </div>
+            <div className={styles.titleTextContainer}>
+              <span className={styles.titleText}>KEYBOARD Visualizer</span>
+            </div>
           </div>
-          <div className={styles.titleTextContainer}>
-            <span className={styles.titleText}>KEYBOARD Visualizer</span>
-          </div>
-        </div>
+        </Link>
         <div className={styles.buttonGroup}>
           <StyledButton
             onClick={onQuizModeToggle}

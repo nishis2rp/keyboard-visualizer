@@ -36,6 +36,11 @@
   pointer-events: none;
 }
 
+.titleLink {
+  text-decoration: none;
+  color: inherit;
+}
+
 .titleContainer {
   margin: 0;
   display: flex;
