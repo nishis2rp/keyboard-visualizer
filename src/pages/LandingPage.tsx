@@ -20,10 +20,19 @@ const LandingPage: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Canvas size setup
+    // Canvas size setup with device pixel ratio for crisp rendering
     const setCanvasSize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      ctx.scale(dpr, dpr);
+
+      // Update CSS size
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
     };
     setCanvasSize();
     window.addEventListener('resize', setCanvasSize);
@@ -33,29 +42,35 @@ const LandingPage: React.FC = () => {
     const particleCount = 80;
     const connectionDistance = 150;
 
-    // Create particles
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1,
-      });
-    }
+    // Create particles (use CSS size, not canvas internal size)
+    const initParticles = () => {
+      particles.length = 0;
+      const rect = canvas.getBoundingClientRect();
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * rect.width,
+          y: Math.random() * rect.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: Math.random() * 2 + 1,
+        });
+      }
+    };
+    initParticles();
 
     // Animation loop
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
 
       // Update and draw particles
       particles.forEach((particle) => {
         particle.x += particle.vx;
         particle.y += particle.vy;
 
-        // Bounce off edges
-        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
-        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+        // Bounce off edges (use CSS size)
+        if (particle.x < 0 || particle.x > rect.width) particle.vx *= -1;
+        if (particle.y < 0 || particle.y > rect.height) particle.vy *= -1;
 
         // Draw particle
         ctx.beginPath();
