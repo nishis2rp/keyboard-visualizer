@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Tech Stack:**
 - React 18.3.1 + TypeScript 5.9
 - Vite 5.4 (build tool)
+- Tailwind CSS 4.1 (styling with @theme and CSS variables)
 - Supabase PostgreSQL (backend database)
 - Vitest (testing)
 
@@ -896,6 +897,7 @@ npm run preview  # Preview locally
 8. **Script organization** (2026-01): Separated read-only scripts (Supabase client) from write scripts (PostgreSQL client with `-pg` suffix)
 9. **User Authentication & Quiz Progress Tracking** (2026-02): Added optional authentication with Google, GitHub, and Email/Password. Users can now save quiz history and track progress across sessions. Implemented AuthContext, AuthModal, UserMenu, and useQuizProgress hook with database tables for user_profiles, quiz_sessions, and quiz_history
 10. **Database-driven app configuration** (2026-02): Migrated from hardcoded `apps.ts` and `shortcutDifficulty.ts` to database tables. Created `applications` table for app metadata. Frontend now dynamically fetches app list from database via `useShortcuts()` hook
+11. **Tailwind CSS v4 migration** (2026-02): Migrated from Tailwind CSS v3 to v4. Replaced `@tailwind` directives with `@import "tailwindcss"`, migrated to `@theme` for CSS variables, removed `@apply` directives in favor of vanilla CSS, and installed `@tailwindcss/postcss` plugin for PostCSS integration
 
 ## Git Workflow
 

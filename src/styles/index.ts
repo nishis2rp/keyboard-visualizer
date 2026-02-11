@@ -2,6 +2,7 @@
  * グローバルスタイルのエントリーポイント
  * すべてのCSSをここでインポート
  */
+import './tailwind.css'
 import './variables.css'
 import './global.css'
 import './animations.css'

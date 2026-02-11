@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom'; // Import Link
-import './UserMenu.css';
 
 const UserMenu: React.FC = () => {
   const { user, profile, signOut } = useAuth();
@@ -48,37 +47,35 @@ const UserMenu: React.FC = () => {
   };
 
   return (
-    <div className="user-menu" ref={menuRef}>
+    <div className="relative" ref={menuRef}>
       <button
-        className="user-menu-trigger"
+        className="flex items-center justify-center p-0.5 border-2 border-transparent hover:border-sf-blue rounded-full transition-all bg-white shadow-sm overflow-hidden"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="User menu"
       >
         {avatarUrl ? (
-          <img src={avatarUrl} alt={displayName} className="user-avatar" />
+          <img src={avatarUrl} alt={displayName} className="w-8 h-8 object-cover rounded-full" />
         ) : (
-          <div className="user-avatar-placeholder">
+          <div className="w-8 h-8 bg-sf-blue text-white flex items-center justify-center text-sm font-black rounded-full">
             {displayName.charAt(0).toUpperCase()}
           </div>
         )}
       </button>
 
       {isOpen && (
-        <div className="user-menu-dropdown">
-          <div className="user-menu-header">
-            <div className="user-menu-name">{displayName}</div>
-            <div className="user-menu-email">{user?.email}</div>
+        <div className="apple-dropdown">
+          <div className="px-4 py-2 border-b border-gray-50 mb-1">
+            <div className="text-sm font-black text-sf-primary truncate">{displayName}</div>
+            <div className="text-[10px] text-sf-gray font-bold truncate">{user?.email}</div>
           </div>
 
-          <div className="user-menu-divider"></div>
-
-          <Link to="/mypage" className="user-menu-item" onClick={() => setIsOpen(false)}>
+          <Link to="/mypage" className="apple-dropdown-item" onClick={() => setIsOpen(false)}>
             <svg
-              className="user-menu-icon"
+              className="w-4 h-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
@@ -88,13 +85,13 @@ const UserMenu: React.FC = () => {
             マイページ
           </Link>
 
-          <button className="user-menu-item" onClick={handleSignOut}>
+          <button className="apple-dropdown-item w-full" onClick={handleSignOut}>
             <svg
-              className="user-menu-icon"
+              className="w-4 h-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.5"
             >
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />

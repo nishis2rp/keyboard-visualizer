@@ -8,7 +8,6 @@ import StatCards from '../components/MyPage/StatCards';
 import AppStatsTable from '../components/MyPage/AppStatsTable';
 import RecentSessions from '../components/MyPage/RecentSessions';
 import WeakShortcuts from '../components/MyPage/WeakShortcuts';
-import './MyPage.css';
 
 const MyPage: React.FC = () => {
   const { user, profile, loading, updateProfile, updateEmail, deleteAccount } = useAuth();
@@ -304,23 +303,23 @@ const MyPage: React.FC = () => {
   const totalSessions = quizStats.reduce((sum, stat) => sum + stat.total_sessions, 0);
 
   return (
-    <div className="mypage-container">
-      <div className="mypage-header">
-        <h1 className="mypage-title">ダッシュボード</h1>
+    <div className="max-w-[1200px] mx-auto my-12 p-4 animate-in fade-in duration-700">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-black tracking-tighter text-sf-primary m-0">ダッシュボード</h1>
         <div className="mypage-header-actions">
-          <Link to="/app" className="home-link">🏠 アプリへ戻る</Link>
+          <Link to="/app" className="no-underline text-sf-gray text-sm font-medium px-3 py-1.5 rounded-apple-md transition-all hover:bg-sf-gray-light hover:text-sf-primary">🏠 アプリへ戻る</Link>
         </div>
       </div>
 
-      {error && <div className="alert alert-error">⚠️ {error}</div>}
-      {message && <div className="alert alert-success">✓ {message}</div>}
+      {error && <div className="apple-alert-error">⚠️ {error}</div>}
+      {message && <div className="apple-alert-success">✓ {message}</div>}
 
-      <div className="dashboard-grid">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
         {/* Main Stats Area */}
-        <div className="dashboard-main">
+        <div className="flex flex-col gap-8">
           {/* Stats Cards Section */}
-          <section className="dashboard-card stats-overview-section">
-            <h2 className="section-title">📊 統計サマリー</h2>
+          <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">📊 統計サマリー</h2>
             <StatCards
               overallAccuracy={overallAccuracy}
               overallCorrect={overallCorrect}
@@ -330,8 +329,8 @@ const MyPage: React.FC = () => {
           </section>
 
           {/* Weak Shortcuts Section */}
-          <section className="dashboard-card weak-shortcuts-section">
-            <h2 className="section-title">⚠️ 重点復習ショートカット</h2>
+          <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">⚠️ 重点復習ショートカット</h2>
             <WeakShortcuts 
               weakShortcuts={weakShortcuts} 
               loading={weakShortcutsLoading} 
@@ -339,14 +338,14 @@ const MyPage: React.FC = () => {
           </section>
 
           {/* App Stats Section */}
-          <section className="dashboard-card app-stats-section">
-            <h2 className="section-title">📱 アプリケーション別統計</h2>
+          <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">📱 アプリケーション別統計</h2>
             <AppStatsTable stats={quizStats} />
           </section>
 
           {/* Recent Sessions Section */}
-          <section className="dashboard-card recent-sessions-section">
-            <h2 className="section-title">🎯 最近のプレイ履歴</h2>
+          <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">🎯 最近のプレイ履歴</h2>
             <RecentSessions 
               sessions={quizSessions} 
               onSelectSession={(id) => setSelectedSessionId(id)} 
@@ -355,113 +354,113 @@ const MyPage: React.FC = () => {
         </div>
 
         {/* Sidebar / Settings Area */}
-        <div className="dashboard-sidebar">
+        <div className="flex flex-col gap-8">
           {/* Profile Section */}
-          <section className="dashboard-card profile-section">
-            <h2 className="section-title">👤 プロフィール</h2>
-            <div className="profile-compact">
-              <div className="profile-avatar-container">
+          <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">👤 プロフィール</h2>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="relative w-20 h-20 shrink-0">
                 <img
                   src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=667eea&color=fff&size=80`}
                   alt="アバター"
-                  className="profile-avatar"
+                  className="w-20 h-20 rounded-full object-cover border-2 border-sf-blue-ultralight"
                 />
-                <div className="avatar-edit-overlay">
-                  <label htmlFor="avatarInput" className="avatar-label">編集</label>
+                <div className="absolute bottom-0 right-0 bg-sf-blue text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] cursor-pointer border-2 border-white shadow-sm">
+                  <label htmlFor="avatarInput" className="cursor-pointer">編集</label>
                   <input
                     id="avatarInput"
                     type="file"
                     accept="image/*"
                     onChange={handleAvatarChange}
-                    style={{ display: 'none' }}
+                    className="hidden"
                   />
                 </div>
               </div>
-              <div className="profile-details">
-                <form onSubmit={handleDisplayNameUpdate} className="profile-form">
+              <div className="flex-1 min-w-0">
+                <form onSubmit={handleDisplayNameUpdate} className="flex items-center gap-1">
                   <input
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    className="compact-input"
+                    className="apple-input py-1.5"
                     placeholder="表示名"
                   />
                   {displayName !== profile?.display_name && (
-                    <button type="submit" disabled={profileUpdateLoading} className="icon-button">
+                    <button type="submit" disabled={profileUpdateLoading} className="w-6 h-6 bg-sf-green text-white rounded flex items-center justify-center shrink-0 disabled:opacity-50">
                       {profileUpdateLoading ? '...' : '✓'}
                     </button>
                   )}
                 </form>
-                <p className="profile-email-text">{user.email}</p>
+                <p className="text-[11px] text-sf-gray m-0 mt-1 truncate font-medium">{user.email}</p>
               </div>
             </div>
             
             {avatarFile && (
-              <div className="avatar-upload-confirm">
-                <p className="upload-file-name">{avatarFile.name}</p>
+              <div className="bg-sf-blue-ultralight p-3 rounded-apple-md text-center">
+                <p className="text-[10px] text-sf-blue font-bold truncate mb-2">{avatarFile.name}</p>
                 <button
                   onClick={handleAvatarUpload}
                   disabled={uploading}
-                  className="form-button form-button-small"
+                  className="w-full py-1.5 bg-sf-blue text-white rounded-apple-sm text-xs font-bold disabled:opacity-50"
                 >
-                  {uploading ? '...' : 'アップロード'}
+                  {uploading ? 'アップロード中...' : 'アップロード確定'}
                 </button>
               </div>
             )}
           </section>
 
           {/* Account Settings Section */}
-          <section className="dashboard-card settings-section">
-            <h2 className="section-title">⚙️ 設定</h2>
+          <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">⚙️ 設定</h2>
             
-            <div className="settings-item">
-              <h3>メールアドレス変更</h3>
-              <form onSubmit={handleEmailUpdate} className="settings-form">
+            <div className="mb-6">
+              <h3 className="text-[11px] font-bold text-sf-gray uppercase tracking-wider mb-2">メールアドレス変更</h3>
+              <form onSubmit={handleEmailUpdate} className="flex gap-1.5">
                 <input
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  className="compact-input"
+                  className="apple-input py-1.5"
                   placeholder="新しいメール"
                 />
                 <button
                   type="submit"
                   disabled={emailUpdateLoading || newEmail === user.email}
-                  className="form-button form-button-small"
+                  className="px-3 py-1.5 bg-sf-blue text-white rounded-apple-sm text-xs font-bold disabled:opacity-50 shrink-0"
                 >
                   変更
                 </button>
               </form>
             </div>
 
-            <div className="settings-divider"></div>
+            <div className="h-[1px] bg-gray-100 my-6"></div>
 
-            <div className="settings-item">
-              <h3>パスワード</h3>
-              <Link to="/password-reset" className="text-link-small">
+            <div className="mb-6">
+              <h3 className="text-[11px] font-bold text-sf-gray uppercase tracking-wider mb-2">パスワード</h3>
+              <Link to="/password-reset" className="text-xs text-sf-blue font-bold no-underline">
                 パスワードリセットはこちら →
               </Link>
             </div>
 
-            <div className="settings-divider"></div>
+            <div className="h-[1px] bg-gray-100 my-6"></div>
 
-            <div className="settings-item danger-zone">
-              <h3>アカウント削除</h3>
+            <div>
+              <h3 className="text-[11px] font-bold text-sf-gray uppercase tracking-wider mb-2 text-sf-red">危険な操作</h3>
               {!showDeleteConfirm ? (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="text-link-danger"
+                  className="text-xs text-sf-red font-bold bg-transparent border-none p-0 cursor-pointer"
                 >
                   アカウントを削除する
                 </button>
               ) : (
-                <div className="delete-confirm">
-                  <p>本当に削除しますか？</p>
-                  <div className="delete-actions">
-                    <button onClick={handleDeleteAccount} disabled={deleting} className="btn-danger-small">
+                <div className="bg-red-50 p-3 rounded-apple-md text-center">
+                  <p className="text-[11px] text-sf-red-dark font-bold mb-2">本当に削除しますか？</p>
+                  <div className="flex gap-2 justify-center">
+                    <button onClick={handleDeleteAccount} disabled={deleting} className="px-3 py-1 bg-sf-red text-white text-[10px] font-bold rounded cursor-pointer border-none">
                       削除
                     </button>
-                    <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting} className="btn-secondary-small">
+                    <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting} className="px-3 py-1 bg-gray-200 text-sf-gray text-[10px] font-bold rounded cursor-pointer border-none">
                       戻る
                     </button>
                   </div>

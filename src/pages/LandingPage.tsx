@@ -12,6 +12,23 @@ interface Particle {
 
 const LandingPage: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    // Scroll reveal animation
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add(styles.isVisible);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => observerRef.current?.observe(section));
+
+    return () => observerRef.current?.disconnect();
+  }, []);
 
   useEffect(() => {
     const canvas = document.getElementById('particleCanvas') as HTMLCanvasElement;
@@ -39,8 +56,9 @@ const LandingPage: React.FC = () => {
 
     // Particle system
     const particles: Particle[] = [];
-    const particleCount = 80;
-    const connectionDistance = 150;
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 40 : 80;
+    const connectionDistance = isMobile ? 100 : 150;
 
     // Create particles (use CSS size, not canvas internal size)
     const initParticles = () => {
@@ -111,19 +129,22 @@ const LandingPage: React.FC = () => {
   return (
     <div className={styles.landingWrapper}>
       <main className={styles.landingContainer}>
-        <section className={styles.heroSection}>
+        <section className={`${styles.heroSection} ${styles.isVisible}`}>
+          <div className={styles.badge}>NEW VERSION 2.0</div>
           <h1 className={styles.title}>KEYBOARD VISUALIZER</h1>
           <p className={styles.subtitle}>
             Work at the speed of thought.
           </p>
           <p className={styles.description}>
             1,300以上のショートカットをリアルタイムで可視化する学習プラットフォーム。
-            <br />
             ツールを使いこなし、創造的な時間を最大化しましょう。
           </p>
           <div className={styles.ctaButtonContainer}>
             <Link to="/app" className={styles.ctaButton}>
               無料で今すぐはじめる
+              <svg className={styles.ctaIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </Link>
           </div>
         </section>
@@ -288,6 +309,9 @@ const LandingPage: React.FC = () => {
           </p>
           <Link to="/app" className={styles.finalCtaButton}>
             無料で今すぐはじめる
+            <svg className={styles.ctaIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </Link>
         </section>
 
