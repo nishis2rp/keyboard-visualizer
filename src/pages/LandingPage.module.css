@@ -6,22 +6,27 @@
   align-items: flex-start;
   position: relative;
   overflow-x: hidden;
-  overflow-y: auto;
   scroll-behavior: smooth;
   background: #050505;
   color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* GPU acceleration for the whole container */
+  transform: translateZ(0);
+  margin: 0;
+  padding: 0;
 }
 
 .particleCanvas {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   z-index: 1;
   opacity: 0.6;
+  /* Ensure it's on its own layer */
+  will-change: transform;
 }
 
 .landingWrapper::before {
@@ -32,13 +37,14 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 10% 20%, rgba(0, 122, 255, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(175, 82, 222, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 60%);
-  filter: blur(80px);
+    radial-gradient(circle at 10% 20%, rgba(0, 122, 255, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(175, 82, 222, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 60%);
+  filter: blur(var(--glass-blur, 80px));
   animation: pulseGlow 15s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: 0;
+  will-change: transform, opacity;
 }
 
 /* Subtle grid background */
@@ -50,8 +56,8 @@
   right: 0;
   bottom: 0;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
   z-index: 0;
@@ -59,8 +65,8 @@
 }
 
 @keyframes pulseGlow {
-  0% { transform: scale(1); opacity: 0.5; }
-  100% { transform: scale(1.1); opacity: 0.8; }
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(1.05); opacity: 0.6; }
 }
 
 .landingContainer {
@@ -77,10 +83,13 @@
 /* Scroll Reveal Base */
 section {
   opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), 
-              transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
+  /* Performance optimization: off-screen content rendering */
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 500px;
 }
 
 section.isVisible {
@@ -91,10 +100,11 @@ section.isVisible {
 .heroSection {
   text-align: center;
   margin-bottom: 140px;
-  max-width: 900px;
-  /* Hero is visible by default or has its own animation */
+  max-width: 1200px;
+  width: 100%;
   opacity: 1;
   transform: translateY(0);
+  content-visibility: visible;
 }
 
 .badge {
@@ -109,16 +119,11 @@ section.isVisible {
   color: rgba(255, 255, 255, 0.6);
   margin-bottom: 32px;
   text-transform: uppercase;
-  backdrop-filter: blur(10px);
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(60px); }
-  to { opacity: 1; transform: translateY(0); }
+  backdrop-filter: blur(var(--glass-blur, 10px));
 }
 
 .title {
-  font-size: clamp(2.5rem, 8vw, 5.5rem);
+  font-size: clamp(3rem, 10vw, 6.5rem);
   font-weight: 900;
   line-height: 1.05;
   letter-spacing: -0.04em;
@@ -129,15 +134,9 @@ section.isVisible {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.1));
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.1));
   white-space: nowrap;
-}
-
-@media (max-width: 1024px) {
-  .title {
-    white-space: normal;
-    letter-spacing: -0.02em;
-  }
+  width: 100%;
 }
 
 .subtitle {
@@ -160,12 +159,15 @@ section.isVisible {
 }
 
 .ctaButtonContainer {
-  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .ctaButton {
   display: inline-flex;
   align-items: center;
+  gap: 12px;
   background: #ffffff;
   color: #000000;
   padding: 20px 48px;
@@ -173,27 +175,52 @@ section.isVisible {
   font-size: 1.125rem;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.4s ease,
+              background 0.3s ease;
+  box-shadow: 0 10px 30px rgba(255, 255, 255, var(--shadow-opacity, 0.2));
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .ctaButton:hover {
   transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(255, 255, 255, 0.3), 0 0 20px rgba(0, 122, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(255, 255, 255, 0.3);
   background: #f8f9fa;
 }
 
 .ctaIcon {
   width: 20px;
   height: 20px;
-  margin-left: 12px;
   transition: transform 0.3s ease;
 }
 
 .ctaButton:hover .ctaIcon {
-  transform: translateX(5px);
+  transform: translateX(4px);
+}
+
+/* Common Section Styles */
+.sectionTitle {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 24px;
+  letter-spacing: -0.03em;
+  background: linear-gradient(to bottom, #ffffff 40%, rgba(255, 255, 255, 0.6));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sectionSubtitle {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  margin-bottom: 48px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
 /* Stats Section */
@@ -217,13 +244,12 @@ section.isVisible {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(var(--glass-blur, 20px));
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .statCard:hover {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
   transform: translateY(-10px);
 }
 
@@ -242,26 +268,6 @@ section.isVisible {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-}
-
-/* Section Titles */
-.sectionTitle {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 800;
-  color: #ffffff;
-  text-align: center;
-  margin-bottom: 16px;
-  letter-spacing: -0.03em;
-}
-
-.sectionSubtitle {
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.5);
-  text-align: center;
-  margin-bottom: 64px;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* Features Section */
@@ -285,12 +291,11 @@ section.isVisible {
   border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   text-align: left;
-  backdrop-filter: blur(30px);
+  backdrop-filter: blur(var(--glass-blur, 30px));
 }
 
 .featureCard:hover {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-12px);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
 }
@@ -325,16 +330,16 @@ section.isVisible {
 }
 
 .featureCard h3 {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 16px;
   color: #ffffff;
-  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  line-height: 1.3;
 }
 
 .featureCard p {
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 1.125rem;
   line-height: 1.6;
 }
 
@@ -363,12 +368,11 @@ section.isVisible {
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(var(--glass-blur, 10px));
 }
 
 .appCard:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-5px);
 }
 
@@ -376,13 +380,12 @@ section.isVisible {
   width: 44px;
   height: 44px;
   margin-bottom: 20px;
-  filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+  filter: brightness(0) invert(1);
   opacity: 0.7;
   transition: all 0.3s ease;
 }
 
 .appCard:hover .appIcon {
-  filter: brightness(0) invert(1) drop-shadow(0 4px 12px rgba(255, 255, 255, 0.5));
   opacity: 1;
   transform: scale(1.1);
 }
@@ -417,37 +420,34 @@ section.isVisible {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 32px;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(var(--glass-blur, 10px));
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  position: relative;
-  overflow: hidden;
 }
 
 .benefitCard:hover {
   background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
   transform: scale(1.02);
 }
 
 .benefitNumber {
   font-size: 0.875rem;
-  font-weight: 800;
-  color: #007AFF;
-  letter-spacing: 0.2em;
-  margin-bottom: 24px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
 }
 
 .benefitTitle {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 16px;
-  letter-spacing: -0.02em;
+  line-height: 1.3;
 }
 
 .benefitDescription {
-  font-size: 1.125rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
 }
 
@@ -474,22 +474,22 @@ section.isVisible {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 32px;
   text-align: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(var(--glass-blur, 10px));
   transition: all 0.4s ease;
 }
 
 .stepCard:hover {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-8px);
 }
 
 .stepNumber {
   font-size: 0.875rem;
-  font-weight: 800;
-  color: #AF52DE;
-  letter-spacing: 0.2em;
-  margin-bottom: 24px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+  text-transform: uppercase;
 }
 
 .stepTitle {
@@ -497,18 +497,21 @@ section.isVisible {
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 12px;
+  line-height: 1.3;
 }
 
 .stepDescription {
-  font-size: 1.125rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
 }
 
 .stepArrow {
-  font-size: 2.5rem;
-  color: rgba(255, 255, 255, 0.1);
-  font-weight: 200;
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Release Notes Section */
@@ -525,78 +528,70 @@ section.isVisible {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 48px;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(var(--glass-blur, 10px));
   transition: all 0.3s ease;
-}
-
-.releaseNotesCard:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 .releaseNotesHeader {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 16px;
   margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .releaseVersion {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 16px;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  color: #ffffff;
-  border-radius: 20px;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 16px;
+  border-radius: 100px;
 }
 
 .releaseDate {
+  font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.9rem;
-  font-weight: 500;
 }
 
 .releaseNotesTitle {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #ffffff;
-  margin-bottom: 24px;
-  line-height: 1.4;
+  margin-bottom: 20px;
+  line-height: 1.3;
 }
 
 .releaseNotesList {
   list-style: none;
   padding: 0;
-  margin: 0 0 32px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  margin: 0 0 24px 0;
 }
 
 .releaseNotesList li {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1.05rem;
-  line-height: 1.6;
-  padding-left: 8px;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.8;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.releaseNotesList li:last-child {
+  border-bottom: none;
 }
 
 .releaseNotesLink {
   display: inline-flex;
   align-items: center;
-  color: #007AFF;
+  color: #ffffff;
   text-decoration: none;
   font-weight: 600;
-  font-size: 1.05rem;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .releaseNotesLink:hover {
-  color: #0051D5;
+  color: rgba(255, 255, 255, 0.8);
   transform: translateX(4px);
 }
 
@@ -612,25 +607,25 @@ section.isVisible {
 }
 
 .finalCtaTitle {
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 800;
   color: #ffffff;
   margin-bottom: 24px;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  letter-spacing: -0.04em;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
 }
 
 .finalCtaDescription {
   font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 48px;
+  line-height: 1.6;
 }
 
 .finalCtaButton {
   display: inline-flex;
   align-items: center;
+  gap: 12px;
   background: #ffffff;
   color: #000000;
   padding: 24px 64px;
@@ -639,12 +634,17 @@ section.isVisible {
   font-weight: 600;
   text-decoration: none;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 10px 40px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 40px rgba(255, 255, 255, var(--shadow-opacity, 0.2));
 }
 
 .finalCtaButton:hover {
   transform: translateY(-5px) scale(1.02);
   box-shadow: 0 20px 60px rgba(255, 255, 255, 0.4);
+}
+
+.finalCtaButton .ctaIcon {
+  width: 24px;
+  height: 24px;
 }
 
 .footer {
@@ -667,9 +667,6 @@ section.isVisible {
   .landingContainer {
     padding: 120px 20px 80px;
   }
-  .heroSection {
-    margin-bottom: 100px;
-  }
   .featuresGrid, .statsGrid, .benefitsGrid, .stepsGrid {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -679,8 +676,18 @@ section.isVisible {
   }
   .title {
     font-size: clamp(2.5rem, 10vw, 3.5rem);
+    white-space: normal;
   }
-  .featureCard, .benefitCard, .statCard, .stepCard {
+  .sectionTitle {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+  }
+  .subtitle, .description, .sectionSubtitle {
+    font-size: 1rem;
+  }
+  .featureCard, .benefitCard, .stepCard {
+    padding: 32px 24px;
+  }
+  .releaseNotesCard {
     padding: 32px 24px;
   }
 }

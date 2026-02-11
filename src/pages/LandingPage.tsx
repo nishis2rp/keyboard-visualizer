@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './LandingPage.module.css';
+import { useAdaptivePerformance } from '../hooks';
 
 interface Particle {
   x: number;
@@ -13,8 +14,17 @@ interface Particle {
 const LandingPage: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const animationFrameRef = useRef<number>(0);
+  const isCanvasVisible = useRef<boolean>(true);
+  const { qualityLevel, performanceStyles } = useAdaptivePerformance();
 
   useEffect(() => {
+    // Remove body padding for landing page (add it back on cleanup)
+    const originalPadding = document.body.style.padding;
+    const originalBackground = document.body.style.background;
+    document.body.style.padding = '0';
+    document.body.style.background = '#050505';
+
     // Scroll reveal animation
     observerRef.current = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -27,19 +37,35 @@ const LandingPage: React.FC = () => {
     const sections = document.querySelectorAll('section');
     sections.forEach(section => observerRef.current?.observe(section));
 
-    return () => observerRef.current?.disconnect();
+    // Canvas visibility observer
+    const canvasObserver = new IntersectionObserver((entries) => {
+      isCanvasVisible.current = entries[0].isIntersecting;
+    }, { threshold: 0 });
+
+    const canvas = document.getElementById('particleCanvas');
+    if (canvas) canvasObserver.observe(canvas);
+
+    return () => {
+      // Restore original body styles
+      document.body.style.padding = originalPadding;
+      document.body.style.background = originalBackground;
+      observerRef.current?.disconnect();
+      canvasObserver.disconnect();
+    };
   }, []);
 
   useEffect(() => {
-    const canvas = document.getElementById('particleCanvas') as HTMLCanvasElement;
+    const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
+    let rect = canvas.getBoundingClientRect();
+    
     // Canvas size setup with device pixel ratio for crisp rendering
     const setCanvasSize = () => {
-      const rect = canvas.getBoundingClientRect();
+      rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
 
       canvas.width = rect.width * dpr;
@@ -50,87 +76,109 @@ const LandingPage: React.FC = () => {
       // Update CSS size
       canvas.style.width = rect.width + 'px';
       canvas.style.height = rect.height + 'px';
+      
+      initParticles();
     };
-    setCanvasSize();
-    window.addEventListener('resize', setCanvasSize);
 
     // Particle system
     const particles: Particle[] = [];
-    const isMobile = window.innerWidth < 768;
-    const particleCount = isMobile ? 40 : 80;
-    const connectionDistance = isMobile ? 100 : 150;
 
-    // Create particles (use CSS size, not canvas internal size)
     const initParticles = () => {
+      const isMobile = window.innerWidth < 768;
+      let particleCount = isMobile ? 50 : 100;
+
+      // Adjust count based on performance level
+      if (qualityLevel === 'medium') particleCount = Math.floor(particleCount * 0.7);
+      if (qualityLevel === 'low') particleCount = Math.floor(particleCount * 0.3);
+
       particles.length = 0;
-      const rect = canvas.getBoundingClientRect();
       for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: Math.random() * rect.width,
           y: Math.random() * rect.height,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-          radius: Math.random() * 2 + 1,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6,
+          radius: Math.random() * 2 + 0.8,
         });
       }
     };
-    initParticles();
+
+    setCanvasSize();
+    window.addEventListener('resize', setCanvasSize);
+
+    const connectionDistance = window.innerWidth < 768 ? 100 : 150;
 
     // Animation loop
     const animate = () => {
-      const rect = canvas.getBoundingClientRect();
+      if (!isCanvasVisible.current) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       ctx.clearRect(0, 0, rect.width, rect.height);
 
       // Update and draw particles
-      particles.forEach((particle) => {
-        particle.x += particle.vx;
-        particle.y += particle.vy;
+      const pCount = particles.length;
+      for (let i = 0; i < pCount; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
 
-        // Bounce off edges (use CSS size)
-        if (particle.x < 0 || particle.x > rect.width) particle.vx *= -1;
-        if (particle.y < 0 || particle.y > rect.height) particle.vy *= -1;
+        // Bounce off edges
+        if (p.x < 0 || p.x > rect.width) p.vx *= -1;
+        if (p.y < 0 || p.y > rect.height) p.vy *= -1;
 
         // Draw particle
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
         ctx.fill();
-      });
 
-      // Draw connections
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+        // Add glow effect to particles
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+        ctx.fill();
+        ctx.shadowBlur = 0;
 
-          if (distance < connectionDistance) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            const opacity = (1 - distance / connectionDistance) * 0.5;
-            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
+        // Connections (only for higher quality)
+        if (qualityLevel !== 'low') {
+          for (let j = i + 1; j < pCount; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq < connectionDistance * connectionDistance) {
+              const distance = Math.sqrt(distSq);
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              const opacity = (1 - distance / connectionDistance) * 0.5;
+              ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
           }
         }
       }
 
-      requestAnimationFrame(animate);
+      animationFrameRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    animationFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('resize', setCanvasSize);
+      cancelAnimationFrame(animationFrameRef.current);
     };
-  }, []);
+  }, [qualityLevel]);
 
   return (
-    <div className={styles.landingWrapper}>
+    <div className={styles.landingWrapper} style={performanceStyles}>
+      <canvas className={styles.particleCanvas} id="particleCanvas" ref={canvasRef}></canvas>
       <main className={styles.landingContainer}>
         <section className={`${styles.heroSection} ${styles.isVisible}`}>
-          <div className={styles.badge}>NEW VERSION 2.0</div>
+          <div className={styles.badge}>NEW VERSION 2.1</div>
           <h1 className={styles.title}>KEYBOARD VISUALIZER</h1>
           <p className={styles.subtitle}>
             Work at the speed of thought.
@@ -148,7 +196,6 @@ const LandingPage: React.FC = () => {
             </Link>
           </div>
         </section>
-        <canvas className={styles.particleCanvas} id="particleCanvas"></canvas>
 
         {/* Stats Section */}
         <section className={styles.statsSection}>
@@ -174,21 +221,42 @@ const LandingPage: React.FC = () => {
           <div className={styles.featuresGrid}>
             <div className={styles.featureCard}>
               <div className={styles.iconWrapper}>
-                <img src={`${import.meta.env.BASE_URL}icons/visualizer.svg`} alt="Visualizer" className={styles.featureIcon} />
+                <img 
+                  src={`${import.meta.env.BASE_URL}icons/visualizer.svg`} 
+                  alt="Visualizer" 
+                  className={styles.featureIcon} 
+                  loading="lazy" 
+                  width="32" 
+                  height="32" 
+                />
               </div>
               <h3>Visual Feedback</h3>
               <p>入力したすべてのキーが美しく可視化されます。システムの挙動を直感的に理解しましょう。</p>
             </div>
             <div className={styles.featureCard}>
               <div className={styles.iconWrapper}>
-                <img src={`${import.meta.env.BASE_URL}icons/quiz.svg`} alt="Quiz" className={styles.featureIcon} />
+                <img 
+                  src={`${import.meta.env.BASE_URL}icons/quiz.svg`} 
+                  alt="Quiz" 
+                  className={styles.featureIcon} 
+                  loading="lazy" 
+                  width="32" 
+                  height="32" 
+                />
               </div>
               <h3>Active Learning</h3>
               <p>クイズ形式の反復練習により、記憶に定着。苦手な操作も自然と体が覚えます。</p>
             </div>
             <div className={styles.featureCard}>
               <div className={styles.iconWrapper}>
-                <img src={`${import.meta.env.BASE_URL}icons/allrange.svg`} alt="Apps" className={styles.featureIcon} />
+                <img 
+                  src={`${import.meta.env.BASE_URL}icons/allrange.svg`} 
+                  alt="Apps" 
+                  className={styles.featureIcon} 
+                  loading="lazy" 
+                  width="32" 
+                  height="32" 
+                />
               </div>
               <h3>Master Every App</h3>
               <p>VS CodeからExcel、Slackまで。日常的に使うあらゆるプロツールの達人へ。</p>
@@ -203,42 +271,29 @@ const LandingPage: React.FC = () => {
             日常的に使うプロフェッショナルツールのショートカットを網羅
           </p>
           <div className={styles.appsGrid}>
-            <div className={styles.appCard}>
-              <img src={`${import.meta.env.BASE_URL}icons/windows.svg`} alt="Windows 11" className={styles.appIcon} />
-              <div className={styles.appName}>Windows 11</div>
-            </div>
-            <div className={styles.appCard}>
-              <img src={`${import.meta.env.BASE_URL}icons/macos.svg`} alt="macOS" className={styles.appIcon} />
-              <div className={styles.appName}>macOS</div>
-            </div>
-            <div className={styles.appCard}>
-              <img src={`${import.meta.env.BASE_URL}icons/chrome.svg`} alt="Chrome" className={styles.appIcon} />
-              <div className={styles.appName}>Chrome</div>
-            </div>
-            <div className={styles.appCard}>
-              <img src={`${import.meta.env.BASE_URL}icons/vscode.svg`} alt="VS Code" className={styles.appIcon} />
-              <div className={styles.appName}>VS Code</div>
-            </div>
-            <div className={styles.appCard}>
-              <img src={`${import.meta.env.BASE_URL}icons/excel.svg`} alt="Excel" className={styles.appIcon} />
-              <div className={styles.appName}>Excel</div>
-            </div>
-            <div className={styles.appCard}>
-              <img src={`${import.meta.env.BASE_URL}icons/word.svg`} alt="Word" className={styles.appIcon} />
-              <div className={styles.appName}>Word</div>
-            </div>
-            <div className={styles.appCard}>
-              <img src={`${import.meta.env.BASE_URL}icons/powerpoint.svg`} alt="PowerPoint" className={styles.appIcon} />
-              <div className={styles.appName}>PowerPoint</div>
-            </div>
-            <div className={styles.appCard}>
-              <img src={`${import.meta.env.BASE_URL}icons/slack.svg`} alt="Slack" className={styles.appIcon} />
-              <div className={styles.appName}>Slack</div>
-            </div>
-            <div className={styles.appCard}>
-              <img src={`${import.meta.env.BASE_URL}icons/gmail.svg`} alt="Gmail" className={styles.appIcon} />
-              <div className={styles.appName}>Gmail</div>
-            </div>
+            {[
+              { id: 'windows', name: 'Windows 11', icon: 'windows.svg' },
+              { id: 'macos', name: 'macOS', icon: 'macos.svg' },
+              { id: 'chrome', name: 'Chrome', icon: 'chrome.svg' },
+              { id: 'vscode', name: 'VS Code', icon: 'vscode.svg' },
+              { id: 'excel', name: 'Excel', icon: 'excel.svg' },
+              { id: 'word', name: 'Word', icon: 'word.svg' },
+              { id: 'powerpoint', name: 'PowerPoint', icon: 'powerpoint.svg' },
+              { id: 'slack', name: 'Slack', icon: 'slack.svg' },
+              { id: 'gmail', name: 'Gmail', icon: 'gmail.svg' }
+            ].map(app => (
+              <div key={app.id} className={styles.appCard}>
+                <img 
+                  src={`${import.meta.env.BASE_URL}icons/${app.icon}`} 
+                  alt={app.name} 
+                  className={styles.appIcon} 
+                  loading="lazy" 
+                  width="44" 
+                  height="44" 
+                />
+                <div className={styles.appName}>{app.name}</div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -309,14 +364,14 @@ const LandingPage: React.FC = () => {
           </p>
           <div className={styles.releaseNotesCard}>
             <div className={styles.releaseNotesHeader}>
-              <span className={styles.releaseVersion}>v2.1.0</span>
+              <span className={styles.releaseVersion}>v2.1.1</span>
               <span className={styles.releaseDate}>2026-02-11</span>
             </div>
-            <h3 className={styles.releaseNotesTitle}>Tailwind CSS v4 & Landing Page Improvements</h3>
+            <h3 className={styles.releaseNotesTitle}>Performance Optimization & Smooth Experience</h3>
             <ul className={styles.releaseNotesList}>
-              <li>✨ Tailwind CSS v4への移行で最新のスタイリング技術を採用</li>
-              <li>🚀 アプリケーションロゴの視認性を改善</li>
-              <li>🎯 スムーススクロールでページ操作性を向上</li>
+              <li>🚀 レンダリングパフォーマンスを最適化し、スクロールをスムーズに</li>
+              <li>🔋 低スペックデバイス向けのアダプティブ・パフォーマンス機能をLPに適用</li>
+              <li>🖼️ 画像の遅延読み込みとサイズ指定でレイアウトシフト（CLS）を防止</li>
             </ul>
             <Link to="/release-notes" className={styles.releaseNotesLink}>
               すべてのリリースノートを見る →
