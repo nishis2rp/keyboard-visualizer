@@ -10,8 +10,6 @@
   background: #050505;
   color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  /* GPU acceleration for the whole container */
-  transform: translateZ(0);
   margin: 0;
   padding: 0;
 }
@@ -24,9 +22,7 @@
   height: 100vh;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.6;
-  /* Ensure it's on its own layer */
-  will-change: transform;
+  opacity: 0.5;
 }
 
 .landingWrapper::before {
@@ -36,15 +32,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 10% 20%, rgba(0, 122, 255, 0.1) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(175, 82, 222, 0.1) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 60%);
-  filter: blur(var(--glass-blur, 80px));
-  animation: pulseGlow 15s ease-in-out infinite alternate;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(0, 122, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(175, 82, 222, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.04) 0%, transparent 60%);
   pointer-events: none;
   z-index: 0;
-  will-change: transform, opacity;
+  opacity: 0.5;
 }
 
 /* Subtle grid background */
@@ -55,18 +49,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 50px 50px;
   pointer-events: none;
   z-index: 0;
-  mask-image: radial-gradient(circle at 50% 50%, black, transparent 80%);
-}
-
-@keyframes pulseGlow {
-  0% { transform: scale(1); opacity: 0.4; }
-  100% { transform: scale(1.05); opacity: 0.6; }
+  opacity: 0.5;
 }
 
 .landingContainer {
@@ -84,12 +73,8 @@
 section {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
-              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
-  /* Performance optimization: off-screen content rendering */
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 500px;
+  transition: opacity 0.6s ease-out,
+              transform 0.6s ease-out;
 }
 
 section.isVisible {
@@ -110,16 +95,15 @@ section.isVisible {
 .badge {
   display: inline-block;
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.15em;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   margin-bottom: 32px;
   text-transform: uppercase;
-  backdrop-filter: blur(var(--glass-blur, 10px));
 }
 
 .title {
@@ -241,11 +225,10 @@ section.isVisible {
 .statCard {
   text-align: center;
   padding: 48px 32px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(var(--glass-blur, 20px));
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease-out;
 }
 
 .statCard:hover {
@@ -285,13 +268,12 @@ section.isVisible {
 }
 
 .featureCard {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   padding: 48px;
   border-radius: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease-out;
   text-align: left;
-  backdrop-filter: blur(var(--glass-blur, 30px));
 }
 
 .featureCard:hover {
@@ -364,11 +346,10 @@ section.isVisible {
   align-items: center;
   justify-content: center;
   padding: 40px 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
   transition: all 0.3s ease;
-  backdrop-filter: blur(var(--glass-blur, 10px));
 }
 
 .appCard:hover {
@@ -417,11 +398,10 @@ section.isVisible {
 
 .benefitCard {
   padding: 48px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 32px;
-  backdrop-filter: blur(var(--glass-blur, 10px));
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: all 0.3s ease-out;
 }
 
 .benefitCard:hover {
@@ -470,12 +450,11 @@ section.isVisible {
 
 .stepCard {
   padding: 48px 32px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 32px;
   text-align: center;
-  backdrop-filter: blur(var(--glass-blur, 10px));
-  transition: all 0.4s ease;
+  transition: all 0.3s ease-out;
 }
 
 .stepCard:hover {
@@ -524,11 +503,10 @@ section.isVisible {
 .releaseNotesCard {
   max-width: 800px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   padding: 48px;
-  backdrop-filter: blur(var(--glass-blur, 10px));
   transition: all 0.3s ease;
 }
 

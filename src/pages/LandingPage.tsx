@@ -85,20 +85,20 @@ const LandingPage: React.FC = () => {
 
     const initParticles = () => {
       const isMobile = window.innerWidth < 768;
-      let particleCount = isMobile ? 50 : 100;
+      let particleCount = isMobile ? 30 : 50;
 
       // Adjust count based on performance level
-      if (qualityLevel === 'medium') particleCount = Math.floor(particleCount * 0.7);
-      if (qualityLevel === 'low') particleCount = Math.floor(particleCount * 0.3);
+      if (qualityLevel === 'medium') particleCount = Math.floor(particleCount * 0.6);
+      if (qualityLevel === 'low') particleCount = Math.floor(particleCount * 0.4);
 
       particles.length = 0;
       for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: Math.random() * rect.width,
           y: Math.random() * rect.height,
-          vx: (Math.random() - 0.5) * 0.6,
-          vy: (Math.random() - 0.5) * 0.6,
-          radius: Math.random() * 2 + 0.8,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: Math.random() * 1.5 + 0.5,
         });
       }
     };
@@ -106,14 +106,26 @@ const LandingPage: React.FC = () => {
     setCanvasSize();
     window.addEventListener('resize', setCanvasSize);
 
-    const connectionDistance = window.innerWidth < 768 ? 100 : 150;
+    const connectionDistance = window.innerWidth < 768 ? 80 : 120;
+
+    // Throttle animation to reduce CPU usage
+    let lastFrameTime = 0;
+    const frameInterval = 1000 / 30; // 30 FPS for smooth performance
 
     // Animation loop
-    const animate = () => {
+    const animate = (currentTime: number) => {
+      animationFrameRef.current = requestAnimationFrame(animate);
+
       if (!isCanvasVisible.current) {
-        animationFrameRef.current = requestAnimationFrame(animate);
         return;
       }
+
+      // Throttle to 30 FPS
+      const deltaTime = currentTime - lastFrameTime;
+      if (deltaTime < frameInterval) {
+        return;
+      }
+      lastFrameTime = currentTime - (deltaTime % frameInterval);
 
       ctx.clearRect(0, 0, rect.width, rect.height);
 
@@ -128,17 +140,11 @@ const LandingPage: React.FC = () => {
         if (p.x < 0 || p.x > rect.width) p.vx *= -1;
         if (p.y < 0 || p.y > rect.height) p.vy *= -1;
 
-        // Draw particle
+        // Draw particle (simple, no glow for performance)
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
         ctx.fill();
-
-        // Add glow effect to particles
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
-        ctx.fill();
-        ctx.shadowBlur = 0;
 
         // Connections (only for higher quality)
         if (qualityLevel !== 'low') {
@@ -153,16 +159,14 @@ const LandingPage: React.FC = () => {
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(p2.x, p2.y);
-              const opacity = (1 - distance / connectionDistance) * 0.5;
+              const opacity = (1 - distance / connectionDistance) * 0.4;
               ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-              ctx.lineWidth = 1;
+              ctx.lineWidth = 0.8;
               ctx.stroke();
             }
           }
         }
       }
-
-      animationFrameRef.current = requestAnimationFrame(animate);
     };
 
     animationFrameRef.current = requestAnimationFrame(animate);
