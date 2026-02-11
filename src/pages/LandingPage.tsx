@@ -301,6 +301,29 @@ const LandingPage: React.FC = () => {
           </div>
         </section>
 
+        {/* Release Notes Section */}
+        <section className={styles.releaseNotesSection}>
+          <h2 className={styles.sectionTitle}>最新アップデート</h2>
+          <p className={styles.sectionSubtitle}>
+            Keyboard Visualizerの最新機能と改善履歴
+          </p>
+          <div className={styles.releaseNotesCard}>
+            <div className={styles.releaseNotesHeader}>
+              <span className={styles.releaseVersion}>v2.1.0</span>
+              <span className={styles.releaseDate}>2026-02-11</span>
+            </div>
+            <h3 className={styles.releaseNotesTitle}>Tailwind CSS v4 & Landing Page Improvements</h3>
+            <ul className={styles.releaseNotesList}>
+              <li>✨ Tailwind CSS v4への移行で最新のスタイリング技術を採用</li>
+              <li>🚀 アプリケーションロゴの視認性を改善</li>
+              <li>🎯 スムーススクロールでページ操作性を向上</li>
+            </ul>
+            <Link to="/release-notes" className={styles.releaseNotesLink}>
+              すべてのリリースノートを見る →
+            </Link>
+          </div>
+        </section>
+
         {/* Final CTA Section */}
         <section className={styles.finalCtaSection}>
           <h2 className={styles.finalCtaTitle}>今すぐ始めて、生産性を最大化しましょう</h2>

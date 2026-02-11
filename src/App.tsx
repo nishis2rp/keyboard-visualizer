@@ -4,6 +4,7 @@ import AppHeader from './components/AppHeader';
 import Home from './pages/Home';
 import MyPage from './pages/MyPage';
 import LandingPage from './pages/LandingPage';
+import ReleaseNotes from './pages/ReleaseNotes';
 import PasswordReset from './pages/PasswordReset';
 import { useUI } from './context';
 import { useFullscreen, useAdaptivePerformance } from './hooks';
@@ -17,6 +18,7 @@ function App() {
   const navigate = useNavigate();
 
   const isLandingPage = location.pathname === '/';
+  const isReleaseNotesPage = location.pathname === '/release-notes';
 
   const handleQuizModeToggle = () => {
     if (!isQuizMode) {
@@ -25,16 +27,17 @@ function App() {
     } else {
       setIsQuizMode(false);
     }
-    
+
     if (location.pathname !== '/app') {
       navigate('/app');
     }
   };
 
-  if (isLandingPage) {
+  if (isLandingPage || isReleaseNotesPage) {
     return (
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/release-notes" element={<ReleaseNotes />} />
       </Routes>
     );
   }

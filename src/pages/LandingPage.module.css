@@ -6,6 +6,8 @@
   align-items: flex-start;
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
   background: #050505;
   color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -266,6 +268,7 @@ section.isVisible {
 .featuresSection {
   width: 100%;
   padding: 100px 0;
+  margin-bottom: 100px;
 }
 
 .featuresGrid {
@@ -373,13 +376,13 @@ section.isVisible {
   width: 44px;
   height: 44px;
   margin-bottom: 20px;
-  filter: grayscale(1) brightness(2);
-  opacity: 0.6;
+  filter: brightness(0) invert(1) drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+  opacity: 0.7;
   transition: all 0.3s ease;
 }
 
 .appCard:hover .appIcon {
-  filter: grayscale(0) brightness(1);
+  filter: brightness(0) invert(1) drop-shadow(0 4px 12px rgba(255, 255, 255, 0.5));
   opacity: 1;
   transform: scale(1.1);
 }
@@ -506,6 +509,95 @@ section.isVisible {
   font-size: 2.5rem;
   color: rgba(255, 255, 255, 0.1);
   font-weight: 200;
+}
+
+/* Release Notes Section */
+.releaseNotesSection {
+  width: 100%;
+  padding: 100px 0;
+  margin-bottom: 100px;
+}
+
+.releaseNotesCard {
+  max-width: 800px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 48px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.releaseNotesCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.releaseNotesHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.releaseVersion {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  color: #ffffff;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.releaseDate {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.releaseNotesTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+.releaseNotesList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.releaseNotesList li {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  padding-left: 8px;
+}
+
+.releaseNotesLink {
+  display: inline-flex;
+  align-items: center;
+  color: #007AFF;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: all 0.2s;
+}
+
+.releaseNotesLink:hover {
+  color: #0051D5;
+  transform: translateX(4px);
 }
 
 /* Final CTA Section */
