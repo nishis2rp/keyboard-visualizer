@@ -18,7 +18,7 @@ const LandingPage: React.FC = () => {
   const animationFrameRef = useRef<number>(0);
   const isCanvasVisible = useRef<boolean>(true);
   const { qualityLevel, performanceStyles } = useAdaptivePerformance();
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
 
   useEffect(() => {
     // Remove body padding for landing page (add it back on cleanup)
@@ -182,6 +182,24 @@ const LandingPage: React.FC = () => {
   return (
     <div className={styles.landingWrapper} style={performanceStyles}>
       <canvas className={styles.particleCanvas} id="particleCanvas" ref={canvasRef}></canvas>
+      
+      <header className={styles.landingHeader}>
+        <div className={styles.languageSwitch}>
+          <button 
+            className={`${styles.langButton} ${language === 'ja' ? styles.activeLang : ''}`}
+            onClick={() => setLanguage('ja')}
+          >
+            <span className={styles.langFlag}>🇯🇵</span> 日本語
+          </button>
+          <button 
+            className={`${styles.langButton} ${language === 'en' ? styles.activeLang : ''}`}
+            onClick={() => setLanguage('en')}
+          >
+            <span className={styles.langFlag}>🇺🇸</span> English
+          </button>
+        </div>
+      </header>
+
       <main className={styles.landingContainer}>
         <section className={`${styles.heroSection} ${styles.isVisible}`}>
           <div className={styles.badge}>{t.landing.badge}</div>

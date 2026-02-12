@@ -1,4 +1,5 @@
 import { Selector, SelectorItem } from '../common/Selector'
+import { useLanguage } from '../../context/LanguageContext'
 
 interface KeyboardLayoutOption extends SelectorItem {
   id: string;
@@ -18,9 +19,11 @@ interface KeyboardLayoutSelectorProps {
  * 利用可能なキーボード配列の一覧を表示し、選択できるようにする
  */
 const KeyboardLayoutSelector = ({ layouts, selectedLayout, onSelectLayout }: KeyboardLayoutSelectorProps) => {
+  const { t } = useLanguage()
+
   return (
     <Selector
-      title="キーボード配列"
+      title={t.header.keyboardLayout}
       items={layouts}
       selectedId={selectedLayout}
       onSelect={onSelectLayout}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import styles from './ScoreBoard.module.css';
 
 interface ScoreBoardProps {
@@ -27,6 +28,8 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value, colorClass, sub
 );
 
 const ScoreBoard: React.FC<ScoreBoardProps> = ({ status, quizHistory, settings }) => {
+  const { t } = useLanguage();
+
   if (status !== 'playing' && status !== 'paused') {
     return null;
   }
@@ -40,13 +43,13 @@ const ScoreBoard: React.FC<ScoreBoardProps> = ({ status, quizHistory, settings }
       <div className={styles.statsContainer}>
         <StatCard
           icon="📝"
-          label="問題"
+          label={t.quiz.question}
           value={`${currentQuestionNumber}/${totalQuestions}`}
           colorClass={styles.blue}
         />
         <StatCard
           icon="✅"
-          label="正解数"
+          label={t.quiz.results.correctAnswers}
           value={correctAnswers}
           colorClass={styles.green}
         />

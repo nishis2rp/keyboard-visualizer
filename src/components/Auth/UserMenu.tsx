@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Link } from 'react-router-dom'; // Import Link
 
 const UserMenu: React.FC = () => {
+  const { t } = useLanguage();
   const { user, profile, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const displayName = profile?.display_name || user?.email?.split('@')[0] || 'ユーザー';
+  const displayName = profile?.display_name || user?.email?.split('@')[0] || t.auth.defaultUserName;
   const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url;
 
   // Close menu when clicking outside
@@ -42,7 +44,7 @@ const UserMenu: React.FC = () => {
       window.location.reload();
     } catch (error) {
       console.error('🔴 Error signing out:', error);
-      alert('ログアウトに失敗しました。もう一度お試しください。');
+      alert(t.auth.signOutError);
     }
   };
 
@@ -82,7 +84,7 @@ const UserMenu: React.FC = () => {
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            マイページ
+            {t.auth.myPage}
           </Link>
 
           <button className="apple-dropdown-item w-full" onClick={handleSignOut}>
@@ -97,7 +99,7 @@ const UserMenu: React.FC = () => {
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
             </svg>
-            ログアウト
+            {t.auth.signOut}
           </button>
         </div>
       )}

@@ -1,5 +1,6 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { ShortcutDifficulty } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 import { AppIcon } from '../common/AppIcon';
 import styles from './DifficultyFilter.module.css';
 
@@ -8,13 +9,6 @@ interface DifficultyOption {
   name: string;
   description: string;
 }
-
-const difficultyOptions: DifficultyOption[] = [
-  { id: 'basic', name: 'basic', description: 'Daily basic operations' },
-  { id: 'standard', name: 'standard', description: 'Standard shortcuts' },
-  { id: 'hard', name: 'hard', description: 'Advanced features and operations' },
-  { id: 'madmax', name: 'madmax', description: 'Expert level shortcuts' },
-];
 
 interface DifficultyFilterProps {
   selectedDifficulties: Set<ShortcutDifficulty>;
@@ -25,6 +19,15 @@ const DifficultyFilter = memo<DifficultyFilterProps>(({
   selectedDifficulties,
   onToggleDifficulty,
 }) => {
+  const { t } = useLanguage();
+
+  const difficultyOptions: DifficultyOption[] = useMemo(() => [
+    { id: 'basic', name: 'basic', description: t.normalMode.difficultyDescriptions.basic },
+    { id: 'standard', name: 'standard', description: t.normalMode.difficultyDescriptions.standard },
+    { id: 'hard', name: 'hard', description: t.normalMode.difficultyDescriptions.hard },
+    { id: 'madmax', name: 'madmax', description: t.normalMode.difficultyDescriptions.madmax },
+  ], [t.normalMode.difficultyDescriptions]);
+
   const handleToggle = (difficulty: ShortcutDifficulty) => {
     onToggleDifficulty(difficulty);
   };
@@ -53,13 +56,13 @@ const DifficultyFilter = memo<DifficultyFilterProps>(({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <span className={styles.title}>難易度フィルター</span>
+        <span className={styles.title}>{t.normalMode.difficultyFilter}</span>
         <button
           className={styles.selectAllButton}
           onClick={handleSelectAll}
-          title={allSelected ? '全て解除' : '全て選択'}
+          title={allSelected ? t.normalMode.deselectAll : t.normalMode.selectAll}
         >
-          {allSelected ? '全解除' : '全選択'}
+          {allSelected ? t.normalMode.deselectAll : t.normalMode.selectAll}
         </button>
       </div>
       <div className={styles.optionsGrid}>
@@ -87,7 +90,7 @@ const DifficultyFilter = memo<DifficultyFilterProps>(({
       </div>
       {noneSelected && (
         <div className={styles.warning}>
-          ⚠️ 少なくとも1つの難易度を選択してください
+          {t.normalMode.selectAtLeastOne}
         </div>
       )}
     </div>

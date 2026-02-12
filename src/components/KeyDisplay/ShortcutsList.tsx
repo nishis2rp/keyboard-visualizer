@@ -3,6 +3,8 @@ import { getSingleKeyShortcuts } from '../../utils';
 import { MODIFIER_CODES } from '../../utils/keyUtils';
 import ShortcutCard from '../ShortcutCard';
 import { AvailableShortcut, RichShortcut } from '../../types';
+import { getLocalizedDescription } from '../../utils/i18n';
+import { useLanguage } from '../../context/LanguageContext';
 import styles from './KeyDisplay.module.css';
 
 interface ShortcutsListProps {
@@ -20,6 +22,7 @@ const ShortcutsList = memo<ShortcutsListProps>(({
   richShortcuts = [],
   description
 }) => {
+  const { language, t } = useLanguage();
   // キーが押されていない場合：単独キーショートカットを表示
   if (pressedKeys.size === 0) {
     const singleKeyShortcuts = getSingleKeyShortcuts(richShortcuts, selectedApp || '')
@@ -31,22 +34,22 @@ const ShortcutsList = memo<ShortcutsListProps>(({
             <h3 className={styles.title}>
               <span className={styles.descriptionIcon}>{selectedApp === 'gmail' ? '📧' : '⌨️'}</span>
               {selectedApp === 'gmail'
-                ? 'Gmail 単独キーショートカット'
-                : '単独キーショートカット'
+                ? t.normalMode.gmailSingleKeyShortcuts
+                : t.normalMode.singleKeyShortcuts
               }
             </h3>
             <div className={styles.legend}>
               <div className={styles.legendItem}>
                 <span>▶</span>
-                <span>順押し</span>
+                <span>{t.normalMode.sequential}</span>
               </div>
               <div className={styles.legendItem}>
                 <span className={`${styles.legendIcon} ${styles.blueBorder}`}></span>
-                <span>全画面で防げる</span>
+                <span>{t.normalMode.preventableInFullscreen}</span>
               </div>
               <div className={styles.legendItem}>
                 <span className={`${styles.legendIcon} ${styles.redBorder}`}></span>
-                <span>システム保護</span>
+                <span>{t.normalMode.systemProtected}</span>
               </div>
             </div>
           </div>
@@ -55,7 +58,7 @@ const ShortcutsList = memo<ShortcutsListProps>(({
               <ShortcutCard
                 key={index}
                 shortcut={item.shortcut}
-                description={item.description}
+                description={getLocalizedDescription(item, language)}
                 appContext={selectedApp}
                 windows_protection_level={item.windows_protection_level}
                 macos_protection_level={item.macos_protection_level}
@@ -85,19 +88,19 @@ const ShortcutsList = memo<ShortcutsListProps>(({
     return (
       <div className={`${styles.container} ${styles.active}`}>
         <div className={styles.header}>
-          <h3 className={styles.title}>利用可能なショートカット</h3>
+          <h3 className={styles.title}>{t.normalMode.availableShortcuts}</h3>
           <div className={styles.legend}>
             <div className={styles.legendItem}>
               <span>▶</span>
-              <span>順押し</span>
+              <span>{t.normalMode.sequential}</span>
             </div>
             <div className={styles.legendItem}>
               <span className={`${styles.legendIcon} ${styles.blueBorder}`}></span>
-              <span>全画面で防げる</span>
+              <span>{t.normalMode.preventableInFullscreen}</span>
             </div>
             <div className={styles.legendItem}>
               <span className={`${styles.legendIcon} ${styles.redBorder}`}></span>
-              <span>システム保護</span>
+              <span>{t.normalMode.systemProtected}</span>
             </div>
           </div>
         </div>
@@ -106,7 +109,7 @@ const ShortcutsList = memo<ShortcutsListProps>(({
             <ShortcutCard
               key={index}
               shortcut={item.shortcut}
-              description={item.description}
+              description={getLocalizedDescription(item, language)}
               appContext={selectedApp}
               windows_protection_level={item.windows_protection_level}
               macos_protection_level={item.macos_protection_level}

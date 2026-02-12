@@ -1,4 +1,5 @@
 import { memo, useMemo } from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { getCodeDisplayName } from '../../utils/keyMapping';
 import {
   MODIFIER_CODE_DISPLAY_ORDER,
@@ -25,6 +26,8 @@ const PressedKeysIndicator = memo<PressedKeysIndicatorProps>(({
   availableShortcuts = [],
   keyboardLayout
 }) => {
+  const { t } = useLanguage();
+
   // Shiftキーが押されているか判定
   const shiftPressed = useMemo(
     () => pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight'),
@@ -56,7 +59,7 @@ const PressedKeysIndicator = memo<PressedKeysIndicatorProps>(({
     return (
       <div className={`${styles.container} ${styles.containerPressedKeys}`}>
         <div className={styles.emptyState}>
-          <p className={styles.instruction}>キーを押してください...</p>
+          <p className={styles.instruction}>{t.normalMode.pressAnyKey}</p>
         </div>
       </div>
     )
@@ -127,7 +130,7 @@ const PressedKeysIndicator = memo<PressedKeysIndicatorProps>(({
         </div>
         {availableShortcuts.length === 0 && (
           <div className={styles.descriptionInline} style={{ opacity: 0.6 }}>
-            <span className={styles.descriptionIcon}>ℹ️</span> ショートカットが見つかりません
+            <span className={styles.descriptionIcon}>ℹ️</span> {t.normalMode.noShortcutFound}
           </div>
         )}
       </div>

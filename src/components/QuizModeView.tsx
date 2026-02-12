@@ -7,6 +7,7 @@ import SystemShortcutWarning from './SystemShortcutWarning';
 import KeyboardLayout from './KeyboardLayout/KeyboardLayout';
 import { useQuiz } from '../context/QuizContext';
 import { useSettings, useUI, useShortcutData } from '../context';
+import { useLanguage } from '../context/LanguageContext';
 import { useKeyboardShortcuts } from '../hooks';
 import { useFullscreen } from '../hooks';
 import { detectOS } from '../constants';
@@ -19,6 +20,7 @@ const QuizModeView = () => {
   const { quizApp, quizDifficulty } = useUI();
   const { allShortcuts, richShortcuts } = useShortcutData();
   const { quizState, startQuiz, getNextQuestion, dispatch, updateFullscreen, handleKeyPress } = useQuiz();
+  const { t } = useLanguage();
 
   const shortcutDescriptions = useMemo(
     () => allShortcuts?.[selectedApp] || {},
@@ -76,12 +78,12 @@ const QuizModeView = () => {
           <div className="quiz-controls">
             {quizState.status === 'playing' && (
               <button onClick={pauseQuiz} className="quiz-button quiz-button-pause">
-                ⏸️ 一時停止
+                ⏸️ {t.quiz.pause}
               </button>
             )}
             {quizState.status === 'paused' && (
               <button onClick={resumeQuiz} className="quiz-button quiz-button-resume">
-                ▶️ 再開
+                ▶️ {t.quiz.resume}
               </button>
             )}
           </div>

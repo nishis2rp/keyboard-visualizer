@@ -166,7 +166,8 @@ export const generateQuestion = (
   usedShortcuts = new Set<string>(),
   difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard',
   richShortcuts: RichShortcut[] = [],
-  apps: App[] = []
+  apps: App[] = [],
+  language: 'ja' | 'en' = 'ja'
 ) => {
   // 全ての許可されたアプリのショートカットを収集
   const allSafeShortcuts: any[] = [];
@@ -222,11 +223,16 @@ export const generateQuestion = (
       const isDifficultyMatch = difficulty === 'allrange' || shortcutDifficulty === difficulty;
 
       if (isDifficultyMatch) {
+        // Get localized description
+        const description = language === 'en' && richShortcut?.description_en
+          ? richShortcut.description_en
+          : (richShortcut?.description || details.description);
+
         allPossibleQuestions.push({
           appId,
           appName: appNameMap.get(appId) || appId,
           shortcut,
-          description: details.description,
+          description,
           normalizedShortcut: normalized,
           press_type: richShortcut?.press_type || 'simultaneous', // ★ 追加
         });
@@ -243,7 +249,9 @@ export const generateQuestion = (
   const selected = allPossibleQuestions[randomIndex];
 
   const question = {
-    question: `【${selected.appName}】${selected.description}のショートカットは？`,
+    question: language === 'en'
+      ? `【${selected.appName}】What is the shortcut for "${selected.description}"?`
+      : `【${selected.appName}】${selected.description}のショートカットは？`,
     correctShortcut: selected.shortcut,
     normalizedCorrectShortcut: selected.normalizedShortcut, // 既に計算済み
     appName: selected.appName,

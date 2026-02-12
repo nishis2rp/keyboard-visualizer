@@ -1,14 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { SETUP_VERSION } from '../../constants/app'
-import {
-  FULLSCREEN_OPTIONS,
-  LAYOUT_OPTIONS,
-  MODES,
-  DIFFICULTY_OPTIONS
-} from '../../constants/setup'
+import { LANGUAGE_OPTIONS } from '../../constants/setup'
 import { useUI, useShortcutData } from '../../context'
 import { useAuth } from '../../context/AuthContext'
-import { useLanguage } from '../../context/LanguageContext'
+import { useLanguage, Language } from '../../context/LanguageContext'
 import { SetupOption as SetupOptionType, SetupCompleteOptions, ShortcutDifficulty } from '../../types'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
@@ -24,7 +19,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const { isQuizMode } = useUI()
   const { apps } = useShortcutData()
   const { user } = useAuth()
-  const { t } = useLanguage()
+  const { t, language, setLanguage } = useLanguage()
   const [selectedFullscreen, setSelectedFullscreen] = useState<SetupOptionType | null>(null)
   const [selectedLayout, setSelectedLayout] = useState<SetupOptionType | null>(null)
   const [selectedMode, setSelectedMode] = useState<SetupOptionType | null>(null)
@@ -33,13 +28,105 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<SetupOptionType | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
 
+  // Translated options
+  const fullscreenOptions = useMemo(() => [
+    {
+      id: 'fullscreen',
+      title: t.setup.displayMode.fullscreen.title,
+      icon: '🖥️',
+      description: t.setup.displayMode.fullscreen.description,
+      recommendation: t.setup.displayMode.fullscreen.recommendation
+    },
+    {
+      id: 'windowed',
+      title: t.setup.displayMode.windowed.title,
+      icon: '🪟',
+      description: t.setup.displayMode.windowed.description
+    }
+  ], [t])
+
+  const layoutOptions = useMemo(() => [
+    {
+      id: 'windows-jis',
+      title: t.setup.keyboardLayout.windowsJis.title,
+      icon: '🪟',
+      description: t.setup.keyboardLayout.windowsJis.description
+    },
+    {
+      id: 'windows-us',
+      title: t.setup.keyboardLayout.windowsUs?.title || 'Windows US',
+      icon: '🪟',
+      description: t.setup.keyboardLayout.windowsUs?.description || 'US (English) Keyboard (Windows)'
+    },
+    {
+      id: 'mac-jis',
+      title: t.setup.keyboardLayout.macJis.title,
+      icon: '🍎',
+      description: t.setup.keyboardLayout.macJis.description
+    },
+    {
+      id: 'mac-us',
+      title: t.setup.keyboardLayout.macUs.title,
+      icon: '🇺🇸',
+      description: t.setup.keyboardLayout.macUs.description
+    }
+  ], [t])
+
+  const modeOptions = useMemo(() => [
+    {
+      id: 'visualizer',
+      title: t.setup.modes.visualizer.title,
+      icon: '⌨️',
+      description: t.setup.modes.visualizer.description
+    },
+    {
+      id: 'quiz',
+      title: t.setup.modes.quiz.title,
+      icon: '🎯',
+      description: t.setup.modes.quiz.description
+    }
+  ], [t])
+
+  const difficultyOptionsTranslated = useMemo(() => [
+    {
+      id: 'basic',
+      name: t.setup.difficultyOptions.basic.name,
+      icon: '🌟',
+      description: t.setup.difficultyOptions.basic.description
+    },
+    {
+      id: 'standard',
+      name: t.setup.difficultyOptions.standard.name,
+      icon: '⚡',
+      description: t.setup.difficultyOptions.standard.description
+    },
+    {
+      id: 'hard',
+      name: t.setup.difficultyOptions.hard.name,
+      icon: '💪',
+      description: t.setup.difficultyOptions.hard.description
+    },
+    {
+      id: 'madmax',
+      name: t.setup.difficultyOptions.madmax.name,
+      icon: '🔥',
+      description: t.setup.difficultyOptions.madmax.description
+    },
+    {
+      id: 'allrange',
+      name: t.setup.difficultyOptions.allrange.name,
+      icon: '🎲',
+      description: t.setup.difficultyOptions.allrange.description
+    }
+  ], [t])
+
   // クイズモードが既に有効な場合、モード選択をスキップ
   useEffect(() => {
     if (isQuizMode) {
-      const quizMode = MODES.find(m => m.id === 'quiz') as SetupOptionType;
+      const quizMode = modeOptions.find(m => m.id === 'quiz') as SetupOptionType;
       setSelectedMode(quizMode)
     }
-  }, [isQuizMode])
+  }, [isQuizMode, modeOptions])
 
   // ビジュアライザーモード用のアプリケーション選択肢
   const visualizerAppOptions = useMemo(() => apps.map(app => ({
@@ -142,16 +229,31 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
           </div>
         </div>
 
+        {/* 言語選択 */}
+        <SetupSection title={t.setup.selectLanguage || "Language / 言語"}>
+          <div className="setup-options setup-modes">
+            {LANGUAGE_OPTIONS.map((option) => (
+              <SetupOption
+                key={option.id}
+                option={option}
+                isSelected={language === option.id}
+                onSelect={(opt) => setLanguage(opt.id as Language)}
+              />
+            ))}
+          </div>
+        </SetupSection>
+
         {/* 全画面モード選択 */}
         <SetupSection title={t.setup.selectDisplayMode}>
           <div className="setup-options setup-modes">
-            {FULLSCREEN_OPTIONS.map((option) => (
+            {fullscreenOptions.map((option) => (
               <SetupOption
                 key={option.id}
                 option={option}
                 isSelected={selectedFullscreen?.id === option.id}
                 onSelect={setSelectedFullscreen}
                 showRecommendation
+                recommendationText={(option as any).recommendation}
               />
             ))}
           </div>
@@ -160,7 +262,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         {/* キーボードレイアウト選択 */}
         <SetupSection title={t.setup.selectKeyboardLayout}>
           <div className="setup-options setup-layouts">
-            {LAYOUT_OPTIONS.map((layout) => (
+            {layoutOptions.map((layout) => (
               <SetupOption
                 key={layout.id}
                 option={layout}
@@ -175,7 +277,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         {!isQuizMode && (
           <SetupSection title={t.setup.selectMode}>
             <div className="setup-options setup-modes">
-              {MODES.map((mode) => (
+              {modeOptions.map((mode) => (
                 <SetupOption
                   key={mode.id}
                   option={mode}
@@ -208,7 +310,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
           <>
             <SetupSection title={t.setup.selectDifficulty}>
               <div className="setup-options setup-modes">
-                {DIFFICULTY_OPTIONS.map((difficulty) => (
+                {difficultyOptionsTranslated.map((difficulty) => (
                   <SetupOption
                     key={difficulty.id}
                     option={{ ...difficulty, title: difficulty.name }}

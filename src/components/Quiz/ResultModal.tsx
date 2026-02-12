@@ -1,32 +1,38 @@
 import React, { useMemo, useState } from 'react';
 import { useQuiz } from '../../context/QuizContext';
 import { useUI } from '../../context';
+import { useLanguage } from '../../context/LanguageContext';
 import { StyledButton } from '../common/StyledButton';
 import styles from './ResultModal.module.css';
 
 function ResultModal() {
   const { quizState, dispatch, startQuiz } = useQuiz();
   const { setShowSetup, setIsQuizMode } = useUI();
+  const { t } = useLanguage();
   const { status, score, quizHistory, selectedApp, keyboardLayout, startTime, endTime, settings } = quizState;
   const [isCopied, setIsCopied] = useState(false);
 
   if (status !== 'finished') {
     return null; // クイズが終了していない場合は何も表示しない
   }
-  
+
+  // スコア計算
+  const totalQuestions = quizHistory.length;
+  const correctAnswers = score;
+
   const handleShare = () => {
     const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
-    const shareText = `キーボード早打ちクイズで【${selectedApp}】のスコアは ${totalQuestions}問中${correctAnswers}問正解でした！ 正答率: ${accuracy.toFixed(0)}% #キーボードビジュアライザー`;
+    const shareText = t.quiz.results.shareText
+      .replace('{app}', selectedApp)
+      .replace('{correctAnswers}', correctAnswers.toString())
+      .replace('{totalQuestions}', totalQuestions.toString())
+      .replace('{accuracy}', accuracy.toFixed(0));
 
     navigator.clipboard.writeText(shareText).then(() => {
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     });
   };
-
-  // スコア計算
-  const totalQuestions = quizHistory.length;
-  const correctAnswers = score;
 
   // 苦手なショートカットのリスト
   const difficultShortcuts = useMemo(() => {
@@ -61,19 +67,19 @@ function ResultModal() {
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h2 className={styles.modalTitle}>🎉 クイズ終了！</h2>
+        <h2 className={styles.modalTitle}>{t.quiz.results.quizComplete}</h2>
 
         {/* スコア詳細 */}
         <div className={styles.scoreDetails}>
           <div className={styles.scoreCard}>
-            <div className={styles.scoreLabel}>正解数</div>
+            <div className={styles.scoreLabel}>{t.quiz.results.correctAnswers}</div>
             <div className={styles.scoreValue}>{correctAnswers} / {totalQuestions}</div>
           </div>
         </div>
 
         {difficultShortcuts.length > 0 && (
           <div className={styles.difficultShortcutsSection}>
-            <h3 className={styles.difficultShortcutsTitle}>苦手なショートカット</h3>
+            <h3 className={styles.difficultShortcutsTitle}>{t.quiz.results.difficultShortcuts}</h3>
             <ul className={styles.difficultShortcutsList}>
               {difficultShortcuts.map((item, index) => (
                 <li key={index} className={styles.difficultShortcutItem}>
@@ -84,7 +90,7 @@ function ResultModal() {
                     </span>
                   </div>
                   <div style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--sf-red)' }}>
-                    {item.count}回ミス
+                    {item.count}{t.quiz.results.mistakesCount}
                   </div>
                 </li>
               ))}
@@ -100,7 +106,7 @@ function ResultModal() {
             fontWeight="bold"
             variant="success" // 新しいvariantを使用
           >
-            🔄 もう一度挑戦
+            {t.quiz.results.retryQuiz}
           </StyledButton>
 
           <StyledButton
@@ -110,7 +116,7 @@ function ResultModal() {
             fontWeight="bold"
             variant="info" // 新しいvariantを使用
           >
-            {isCopied ? '✅ コピーしました！' : '🔗 結果をシェア'}
+            {isCopied ? t.quiz.results.copied : t.quiz.results.shareResults}
           </StyledButton>
 
           <StyledButton
@@ -120,7 +126,7 @@ function ResultModal() {
             fontWeight="bold"
             variant="primary" // 新しいvariantを使用
           >
-            📝 他のクイズモードを選ぶ
+            {t.quiz.results.selectOtherQuiz}
           </StyledButton>
 
           <StyledButton
@@ -130,7 +136,7 @@ function ResultModal() {
             fontWeight="bold"
             variant="secondary" // 新しいvariantを使用
           >
-            🏠 スタートに戻る
+            {t.quiz.results.backToStart}
           </StyledButton>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { App } from '../../types'
+import { useLanguage } from '../../context/LanguageContext'
 import { Selector } from '../common/Selector'
 
 interface AppSelectorProps {
@@ -13,9 +14,11 @@ interface AppSelectorProps {
  * 利用可能なアプリケーションの一覧を表示し、選択できるようにする
  */
 const AppSelector = ({ apps, selectedApp, onSelectApp }: AppSelectorProps) => {
+  const { t } = useLanguage();
+
   return (
     <Selector
-      title="アプリケーション"
+      title={t.normalMode.applicationSelector}
       items={apps}
       selectedId={selectedApp}
       onSelect={onSelectApp}

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useQuiz } from '../../context/QuizContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { getKeyComboText } from '../../utils/keyboard'; // 追加
 import { formatSequentialShortcut, getSequentialKeys } from '../../utils/sequentialShortcuts';
 import { getAlternativeShortcuts } from '../../constants/alternativeShortcuts';
@@ -9,6 +10,7 @@ import styles from './QuestionCard.module.css';
 function QuestionCard() {
   const { quizState, getNextQuestion } = useQuiz();
   const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer, lastWrongAnswer, currentSequentialProgress, pressedKeys, keyboardLayout } = quizState;
+  const { t } = useLanguage();
 
   // 代替ショートカット表示ロジックをuseMemoで抽出（Hooksは条件分岐の前に配置する必要がある）
   const alternativeShortcutsDisplay = useMemo(() => {
@@ -21,7 +23,7 @@ function QuestionCard() {
     if (otherAlternatives.length > 0) {
       return (
         <div className={styles.alternativeShortcuts}>
-          <div className={styles.alternativeLabel}>他の正解：</div>
+          <div className={styles.alternativeLabel}>{t.quiz.otherCorrect}</div>
           <div className={styles.alternativeList}>
             {otherAlternatives.map((alt, idx) => (
               <span key={idx} className={styles.alternativeItem}>{alt}</span>
@@ -31,7 +33,7 @@ function QuestionCard() {
       );
     }
     return null;
-  }, [currentQuestion]);
+  }, [currentQuestion, t.quiz.otherCorrect]);
 
   if (status !== 'playing' || !currentQuestion) {
     return null;
@@ -83,7 +85,7 @@ function QuestionCard() {
         </div>
 
         {/* 問題ヘッダー */}
-        <div className={styles.questionHeader}>📝 Question</div>
+        <div className={styles.questionHeader}>📝 {t.quiz.question}</div>
 
         {/* 問題文 */}
         <div className={styles.questionText}>
@@ -94,7 +96,7 @@ function QuestionCard() {
         {currentQuestion.press_type === 'sequential' && (
           <div className={styles.sequentialBadge}>
             <span className={styles.sequentialIcon}>🔢</span>
-            <span className={styles.sequentialText}>順序押し</span>
+            <span className={styles.sequentialText}>{t.quiz.sequential}</span>
             <span className={styles.sequentialExample}>
               {formatSequentialShortcut(currentQuestion.correctShortcut, currentQuestion.appId, currentQuestion.press_type)}
             </span>
@@ -107,8 +109,8 @@ function QuestionCard() {
             <span className={styles.instructionIcon}>⌨️</span>
             <span className={styles.instructionLabel}>
               {currentQuestion.press_type === 'sequential'
-                ? 'キーを順番に押してください（Alt を押したまま順番に押す）'
-                : '正しいショートカットキーを押してください'
+                ? t.quiz.pressKeysInOrder
+                : t.quiz.pressCorrectShortcut
               }
             </span>
           </div>
@@ -116,7 +118,7 @@ function QuestionCard() {
           {/* 順押しの途中経過表示 */}
           {currentQuestion.press_type === 'sequential' && currentSequentialProgress.length > 0 && (
             <div className={styles.sequentialProgress}>
-              <div className={styles.progressLabel}>入力中...</div>
+              <div className={styles.progressLabel}>{t.quiz.typing}</div>
               <div className={styles.progressSequence}>
                 {currentSequentialProgress.map((key, index) => {
                   const expectedKeys = getSequentialKeys(currentQuestion.correctShortcut);
@@ -137,7 +139,7 @@ function QuestionCard() {
           {/* 押したキー表示（非順押しの場合のみ） */}
           {currentQuestion.press_type !== 'sequential' && pressedKeys.size > 0 && (
             <div className={styles.pressedKeys}>
-              <div className={styles.pressedKeysLabel}>入力中...</div>
+              <div className={styles.pressedKeysLabel}>{t.quiz.typing}</div>
               <div className={styles.pressedKeysValue}>{getKeyComboText(Array.from(pressedKeys), keyboardLayout)}</div>
             </div>
           )}
@@ -156,7 +158,7 @@ function QuestionCard() {
             {/* 間違った回答を表示 */}
             {lastAnswerResult === 'incorrect' && lastWrongAnswer && (
               <div className={styles.wrongAnswer}>
-                <div className={styles.wrongAnswerLabel}>あなたの回答：</div>
+                <div className={styles.wrongAnswerLabel}>{t.quiz.yourAnswer}</div>
                 <div className={styles.wrongAnswerValue}>{lastWrongAnswer}</div>
               </div>
             )}
@@ -164,7 +166,7 @@ function QuestionCard() {
             {/* 正解表示 */}
             <div className={styles.correctAnswer}>
               <div className={styles.correctAnswerLabel}>
-                {lastAnswerResult === 'correct' ? '正解！' : '正解は：'}
+                {lastAnswerResult === 'correct' ? t.quiz.correct : t.quiz.correctAnswer}
               </div>
               <div className={styles.correctAnswerValue}>
                 {currentQuestion.correctShortcut}
@@ -178,7 +180,7 @@ function QuestionCard() {
               className={styles.nextButton}
               onClick={getNextQuestion}
             >
-              次の問題へ →
+              {t.quiz.nextQuestion}
             </button>
           </div>
         )}

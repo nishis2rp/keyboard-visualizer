@@ -8,6 +8,7 @@ interface SetupOptionProps {
   onSelect: (option: any) => void;
   className?: string;
   showRecommendation?: boolean;
+  recommendationText?: string;
 }
 
 const SetupOption: React.FC<SetupOptionProps> = ({
@@ -15,7 +16,8 @@ const SetupOption: React.FC<SetupOptionProps> = ({
   isSelected,
   onSelect,
   className = '',
-  showRecommendation = false
+  showRecommendation = false,
+  recommendationText
 }) => {
   return (
     <div
@@ -27,8 +29,8 @@ const SetupOption: React.FC<SetupOptionProps> = ({
       </div>
       <div className="option-content">
         <h3>{option.title || option.name}</h3>
-        {showRecommendation && option.id === 'fullscreen' && (
-          <p className="setup-recommendation">💡 推奨：より没入感のある学習体験</p>
+        {showRecommendation && option.id === 'fullscreen' && recommendationText && (
+          <p className="setup-recommendation">{recommendationText}</p>
         )}
       </div>
       <div className="option-check">

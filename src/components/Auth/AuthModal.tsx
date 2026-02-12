@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { mapAuthErrorToMessage, AUTH_ERROR_MESSAGES } from '../../utils/authErrors';
 
 interface AuthModalProps {
@@ -10,6 +11,7 @@ interface AuthModalProps {
 type AuthMode = 'signin' | 'signup' | 'password_reset';
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useLanguage();
   const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -56,7 +58,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         if (error) {
           setError(mapAuthErrorToMessage(error));
         } else {
-          setMessage('確認メールを送信しました。メールを確認してアカウントを有効化してください。');
+          setMessage(t.auth.confirmationEmailSent);
         }
       }
     } catch (err) {
@@ -78,7 +80,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       if (resetError) {
         setError(mapAuthErrorToMessage(resetError));
       } else {
-        setMessage('パスワードリセットのメールを送信しました。メールを確認してください。');
+        setMessage(t.auth.passwordResetEmailSent);
         setEmail(''); // Clear email after sending
       }
     } catch (err) {
@@ -125,13 +127,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </button>
 
         <h2 className="text-2xl font-black tracking-tight text-sf-primary mb-2">
-          {mode === 'signin' ? 'ログイン' : mode === 'signup' ? 'アカウント作成' : 'パスワードをリセット'}
+          {mode === 'signin' ? t.auth.signIn : mode === 'signup' ? t.auth.signUp : t.auth.passwordReset}
         </h2>
 
         <p className="text-sm text-sf-gray font-medium mb-6">
           {mode === 'signin' || mode === 'signup'
-            ? 'アカウントを作成してクイズの進捗とスコアを保存しましょう'
-            : '登録済みのメールアドレスを入力してください。パスワードリセットのリンクをお送りします。'}
+            ? t.auth.subtitle
+            : t.auth.passwordResetSubtitle}
         </p>
 
         {error && <div className="p-3 bg-red-50 border border-red-100 rounded-apple-md text-red-600 text-xs font-bold mb-4">⚠️ {error}</div>}
@@ -140,7 +142,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         {mode === 'password_reset' ? (
           <form className="flex flex-col gap-4" onSubmit={handlePasswordResetRequest}>
             <div>
-              <label className="apple-label" htmlFor="email">メールアドレス</label>
+              <label className="apple-label" htmlFor="email">{t.auth.email}</label>
               <input
                 className="apple-input"
                 type="email"
@@ -157,11 +159,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               className="apple-button-primary w-full py-2.5"
               disabled={loading}
             >
-              {loading ? '処理中...' : 'リセットリンクを送信'}
+              {loading ? t.auth.processing : t.auth.sendResetLink}
             </button>
             <div className="text-center">
               <button type="button" onClick={() => toggleMode('signin')} className="text-xs font-bold text-sf-blue hover:underline">
-                ログインに戻る
+                {t.auth.backToSignIn}
               </button>
             </div>
           </form>
@@ -170,21 +172,21 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <form className="flex flex-col gap-4" onSubmit={handleEmailAuth}>
               {mode === 'signup' && (
                 <div className="animate-in slide-in-from-top-2 duration-300">
-                  <label className="apple-label" htmlFor="displayName">表示名</label>
+                  <label className="apple-label" htmlFor="displayName">{t.auth.displayName}</label>
                   <input
                     className="apple-input"
                     type="text"
                     id="displayName"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="例: 田中太郎"
+                    placeholder={t.auth.displayNamePlaceholder}
                     autoComplete="name"
                   />
                 </div>
               )}
 
               <div>
-                <label className="apple-label" htmlFor="email">メールアドレス</label>
+                <label className="apple-label" htmlFor="email">{t.auth.email}</label>
                 <input
                   className="apple-input"
                   type="email"
@@ -198,14 +200,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div>
-                <label className="apple-label" htmlFor="password">パスワード</label>
+                <label className="apple-label" htmlFor="password">{t.auth.password}</label>
                 <input
                   className="apple-input"
                   type="password"
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="6文字以上"
+                  placeholder={t.auth.passwordPlaceholder}
                   required
                   autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
                   minLength={6}
@@ -215,7 +217,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               {mode === 'signin' && (
                 <div className="text-right">
                   <button type="button" onClick={() => toggleMode('password_reset')} className="text-[10px] font-bold text-sf-gray hover:text-sf-blue transition-all">
-                    パスワードをお忘れですか？
+                    {t.auth.forgotPassword}
                   </button>
                 </div>
               )}
@@ -225,13 +227,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 className="apple-button-primary w-full py-2.5 mt-2"
                 disabled={loading}
               >
-                {loading ? '処理中...' : mode === 'signin' ? 'ログイン' : 'アカウント作成'}
+                {loading ? t.auth.processing : mode === 'signin' ? t.auth.signIn : t.auth.signUp}
               </button>
             </form>
 
             <div className="my-6 flex items-center gap-4 text-sf-gray/30 text-[10px] font-bold uppercase tracking-widest">
               <div className="h-[1px] bg-gray-100 flex-1"></div>
-              または
+              {t.auth.or}
               <div className="h-[1px] bg-gray-100 flex-1"></div>
             </div>
 
@@ -247,7 +249,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
-              {oauthLoading === 'google' ? 'Googleに接続中...' : 'Googleでログイン'}
+              {oauthLoading === 'google' ? t.auth.connectingToGoogle : t.auth.signInWithGoogle}
             </button>
           </>
         )}
@@ -257,16 +259,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <div className="mt-8 text-center text-xs text-sf-gray font-medium">
             {mode === 'signin' ? (
               <>
-                アカウントをお持ちでないですか？{' '}
+                {t.auth.noAccount}{' '}
                 <button type="button" onClick={() => toggleMode('signup')} className="text-sf-blue font-bold hover:underline">
-                  アカウント作成
+                  {t.auth.signUp}
                 </button>
               </>
             ) : (
               <>
-                すでにアカウントをお持ちですか？{' '}
+                {t.auth.haveAccount}{' '}
                 <button type="button" onClick={() => toggleMode('signin')} className="text-sf-blue font-bold hover:underline">
-                  ログイン
+                  {t.auth.signIn}
                 </button>
               </>
             )}

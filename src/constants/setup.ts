@@ -81,3 +81,18 @@ export const DIFFICULTY_OPTIONS = [
     description: 'All difficulties: Random shortcuts from all levels'
   }
 ];
+
+export const LANGUAGE_OPTIONS = [
+  {
+    id: 'ja',
+    title: '日本語',
+    icon: '🇯🇵',
+    description: 'Japanese'
+  },
+  {
+    id: 'en',
+    title: 'English',
+    icon: '🇺🇸',
+    description: 'English'
+  }
+];

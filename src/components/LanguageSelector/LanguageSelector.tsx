@@ -4,23 +4,26 @@ import styles from './LanguageSelector.module.css';
 export function LanguageSelector() {
   const { language, setLanguage } = useLanguage();
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'ja' ? 'en' : 'ja');
-  };
-
   return (
-    <button
-      className={styles.languageSelector}
-      onClick={toggleLanguage}
-      aria-label="Switch language"
-      title={language === 'ja' ? 'Switch to English' : '日本語に切り替え'}
-    >
-      <span className={styles.flag}>
-        {language === 'ja' ? '🇯🇵' : '🇺🇸'}
-      </span>
-      <span className={styles.label}>
-        {language === 'ja' ? 'JA' : 'EN'}
-      </span>
-    </button>
+    <div className={styles.languageSelectorGroup}>
+      <button
+        className={`${styles.languageButton} ${language === 'ja' ? styles.active : ''}`}
+        onClick={() => setLanguage('ja')}
+        aria-label="Switch to Japanese"
+        title="日本語"
+      >
+        <span className={styles.flag}>🇯🇵</span>
+        <span className={styles.label}>JA</span>
+      </button>
+      <button
+        className={`${styles.languageButton} ${language === 'en' ? styles.active : ''}`}
+        onClick={() => setLanguage('en')}
+        aria-label="Switch to English"
+        title="English"
+      >
+        <span className={styles.flag}>🇺🇸</span>
+        <span className={styles.label}>EN</span>
+      </button>
+    </div>
   );
 }

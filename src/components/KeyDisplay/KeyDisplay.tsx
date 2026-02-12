@@ -10,6 +10,8 @@ import {
 } from '../../utils/keyUtils';
 import { AvailableShortcut, RichShortcut } from '../../types';
 import { AppIcon } from '../common/AppIcon';
+import { getLocalizedDescription } from '../../utils/i18n';
+import { useLanguage } from '../../context/LanguageContext';
 import styles from './KeyDisplay.module.css';
 
 interface KeyDisplayProps {
@@ -23,6 +25,8 @@ interface KeyDisplayProps {
 }
 
 const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys = new Set(), description, availableShortcuts = [], selectedApp, richShortcuts = [], keyboardLayout }) => {
+  const { language } = useLanguage();
+
   // Shiftキーが押されているか判定
   const shiftPressed = useMemo(
     () => pressedKeys.has('ShiftLeft') || pressedKeys.has('ShiftRight'),
@@ -84,7 +88,7 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
               <ShortcutCard
                 key={index}
                 shortcut={item.shortcut}
-                description={item.description}
+                description={getLocalizedDescription(item, language)}
                 appContext={selectedApp}
                 windows_protection_level={item.windows_protection_level}
                 macos_protection_level={item.macos_protection_level}
@@ -201,7 +205,7 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
               <ShortcutCard
                 key={index}
                 shortcut={item.shortcut}
-                description={item.description}
+                description={getLocalizedDescription(item, language)}
                 appContext={selectedApp}
                 windows_protection_level={item.windows_protection_level}
                 macos_protection_level={item.macos_protection_level}

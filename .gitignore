@@ -42,8 +42,8 @@ shortcuts-export-*.csv
 .env
 .env.local
 
-# Database
-data/
+# Database (root level only)
+/data/
 
 # Claude Code settings
 .claude/settings.local.json

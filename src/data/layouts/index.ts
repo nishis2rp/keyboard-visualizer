@@ -2,6 +2,7 @@ import { KeyboardLayout } from '../../types'
 
 // すべてのキーボードレイアウトを統合してエクスポート
 import { windowsJisLayout } from './windowsJis'
+import { windowsUsLayout } from './windowsUs'
 import { macJisLayout } from './macJis'
 import { macUsLayout } from './macUs'
 
@@ -12,6 +13,8 @@ export const getKeyboardLayoutByName = (layoutName: string): KeyboardLayout => {
       return macJisLayout
     case 'mac-us':
       return macUsLayout
+    case 'windows-us':
+      return windowsUsLayout
     case 'windows-jis':
     default:
       return windowsJisLayout
@@ -25,6 +28,8 @@ export const getLayoutDisplayName = (layoutName) => {
       return 'Mac JIS キーボード配列'
     case 'mac-us':
       return 'Mac US キーボード配列'
+    case 'windows-us':
+      return 'Windows US キーボード配列'
     case 'windows-jis':
     default:
       return 'Windows JIS キーボード配列'
@@ -40,9 +45,10 @@ export interface KeyboardLayoutOption {
 
 export const keyboardLayoutOptions: KeyboardLayoutOption[] = [
   { id: 'windows-jis', icon: '⊞', name: 'Windows JIS' },
+  { id: 'windows-us', icon: '⊞', name: 'Windows US' },
   { id: 'mac-jis', icon: '⌘', name: 'Mac JIS' },
   { id: 'mac-us', icon: '⌘', name: 'Mac US' },
 ];
 
 // 個別のレイアウトもエクスポート
-export { windowsJisLayout, macJisLayout, macUsLayout }
+export { windowsJisLayout, windowsUsLayout, macJisLayout, macUsLayout }

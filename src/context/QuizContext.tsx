@@ -3,13 +3,14 @@ import { generateQuestion, getCompatibleApps, isShortcutSafe } from '../utils/qu
 import { useShortcutData } from './ShortcutContext';
 import { useQuizInputHandler } from '../hooks/useQuizInputHandler';
 import { useQuizProgress } from '../hooks/useQuizProgress';
+import { useLanguage } from './LanguageContext';
 import { QuizQuestion } from '../types';
 import { analytics } from '../utils/analytics';
-import { 
-  QuizState, 
-  QuizAction, 
-  quizReducer, 
-  initialQuizState 
+import {
+  QuizState,
+  QuizAction,
+  quizReducer,
+  initialQuizState
 } from './QuizReducer';
 
 export type { QuizState, QuizAction };
@@ -33,6 +34,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
   const { allShortcuts, richShortcuts, apps } = useShortcutData();
   const [quizState, dispatch] = useReducer(quizReducer, initialQuizState);
   const { startQuizSession, completeQuizSession } = useQuizProgress();
+  const { language } = useLanguage();
 
   // ★ タイマーロジック
   useEffect(() => {
@@ -79,7 +81,8 @@ export function QuizProvider({ children }: QuizProviderProps) {
       currentUsedShortcuts,
       difficulty,
       richShortcuts || [],
-      apps || []
+      apps || [],
+      language
     );
 
     if (newQuestion) {
@@ -92,7 +95,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
     } else {
       dispatch({ type: 'FINISH_QUIZ' });
     }
-  }, [allShortcuts, richShortcuts, apps]);
+  }, [allShortcuts, richShortcuts, apps, language]);
 
 
   const handleKeyPress = useCallback((pressedKeys: Set<string>) => {

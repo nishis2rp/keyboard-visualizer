@@ -522,6 +522,20 @@ keyboard-visualizer/
    - グラデーションタイトルとCTAボタンによる視覚的インパクト
    - レスポンシブ対応で全デバイスに最適化
 
+18. **多言語対応とSEO最適化**（2026年2月）
+   - **完全な多言語対応**: 英語/日本語の翻訳キーを拡充し、ビジュアライザーモードのUI要素から日本語を完全に除去
+   - **SEO対策の強化**:
+     - Canonical URLの追加により重複コンテンツ問題を回避
+     - robots metaタグ（`index, follow`）の追加
+     - JSON-LD構造化データを`WebApplication`型に拡張し、`featureList`、`inLanguage`、詳細な機能説明を追加
+   - **Windows USキーボードレイアウトの実装**:
+     - `windowsUs.ts`を新規作成し、Mac USレイアウトから完全に分離
+     - Commandキー（⌘）をWindowsキー（⊞）に修正
+     - Windows固有キー（PrintScreen, ScrollLock, Pause, Insert, Context Menu）を正確に配置
+   - **Mac USキーボードレイアウトの配置修正**:
+     - 各キーの幅を調整し、レイアウトの崩れを解消（Backspace: 2.5→2、Shift左: 2.5→2.25、Space: 5.25→6.25等）
+     - 各行のキー幅合計を統一し、視覚的な一貫性を確保
+
 ### コンポーネント設計
 
 - **関心の分離**: 各コンポーネントが単一の責務を持つ設計

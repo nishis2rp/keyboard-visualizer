@@ -31,7 +31,7 @@
 }
 
 .selector-section:nth-child(2) {
-  grid-column: span 3;
+  grid-column: span 4;
 }
 
 .selector-title {
@@ -345,11 +345,12 @@
   background: linear-gradient(to right, rgba(239, 68, 68, 0.02), white);
 }
 
-/* Selectors Container - Compact Layout with 12-column Grid */
+/* Selectors Container - Compact Layout with 13-column Grid */
 .selectors-container {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: repeat(13, 1fr);
   column-gap: 8px;
+  min-width: 990px;
   max-width: 990px;
   margin: 0 auto 16px auto;
   align-items: start;
