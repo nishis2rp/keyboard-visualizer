@@ -1,0 +1,151 @@
+/**
+ * Common shortcut description translations (Japanese to English)
+ * This is a partial mapping for the most common shortcuts.
+ * Unmapped descriptions will remain in Japanese until translated.
+ */
+export const descriptionTranslations: Record<string, string> = {
+  // Common editing shortcuts
+  'コピー': 'Copy',
+  'カット': 'Cut',
+  '切り取り': 'Cut',
+  '貼り付け': 'Paste',
+  'ペースト': 'Paste',
+  '元に戻す': 'Undo',
+  'やり直し': 'Redo',
+  '保存': 'Save',
+  '名前を付けて保存': 'Save As',
+  '印刷': 'Print',
+  '全て選択': 'Select All',
+  'すべて選択': 'Select All',
+  '検索': 'Find',
+  '置換': 'Replace',
+  '検索と置換': 'Find and Replace',
+  '開く': 'Open',
+  '新規作成': 'New',
+  '新しいウィンドウ': 'New Window',
+  '新しいタブ': 'New Tab',
+  '閉じる': 'Close',
+  'タブを閉じる': 'Close Tab',
+  'ウィンドウを閉じる': 'Close Window',
+  '更新': 'Refresh',
+  '再読み込み': 'Reload',
+
+  // Navigation
+  '次のタブ': 'Next Tab',
+  '前のタブ': 'Previous Tab',
+  '最初のタブ': 'First Tab',
+  '最後のタブ': 'Last Tab',
+  '戻る': 'Go Back',
+  '進む': 'Go Forward',
+  'ホーム': 'Home',
+  '終わり': 'End',
+  '上': 'Up',
+  '下': 'Down',
+  '左': 'Left',
+  '右': 'Right',
+  'ページアップ': 'Page Up',
+  'ページダウン': 'Page Down',
+
+  // Browser specific
+  'アドレスバーにフォーカス': 'Focus Address Bar',
+  'ブックマークに追加': 'Add Bookmark',
+  'ブックマークを開く': 'Open Bookmarks',
+  '履歴を開く': 'Open History',
+  'ダウンロードを開く': 'Open Downloads',
+  'デベロッパーツールを開く': 'Open Developer Tools',
+  'シークレットウィンドウを開く': 'Open Incognito Window',
+  'プライベートウィンドウを開く': 'Open Private Window',
+  'フルスクリーン': 'Full Screen',
+  'フルスクリーン切り替え': 'Toggle Full Screen',
+  '拡大': 'Zoom In',
+  '縮小': 'Zoom Out',
+  'ズームリセット': 'Reset Zoom',
+
+  // Application specific
+  '太字': 'Bold',
+  '斜体': 'Italic',
+  '下線': 'Underline',
+  '左揃え': 'Align Left',
+  '中央揃え': 'Center',
+  '右揃え': 'Align Right',
+  '箇条書き': 'Bullet List',
+  '番号付きリスト': 'Numbered List',
+  'リンクを挿入': 'Insert Link',
+  '画像を挿入': 'Insert Image',
+  'テーブルを挿入': 'Insert Table',
+  'スペルチェック': 'Spell Check',
+  'ヘルプ': 'Help',
+  '設定': 'Settings',
+  '環境設定': 'Preferences',
+
+  // System
+  'スクリーンショット': 'Screenshot',
+  'タスクマネージャー': 'Task Manager',
+  'ロック': 'Lock',
+  'デスクトップを表示': 'Show Desktop',
+  'ウィンドウを最小化': 'Minimize Window',
+  'ウィンドウを最大化': 'Maximize Window',
+  'アプリケーションを切り替え': 'Switch Applications',
+  'ウィンドウを切り替え': 'Switch Windows',
+
+  // VS Code specific
+  'コマンドパレット': 'Command Palette',
+  'クイックオープン': 'Quick Open',
+  'ターミナル': 'Terminal',
+  'サイドバー': 'Sidebar',
+  'エクスプローラー': 'Explorer',
+  'デバッグ': 'Debug',
+  'ソース管理': 'Source Control',
+  'コメント': 'Comment',
+  'コメント解除': 'Uncomment',
+  '行コメント': 'Line Comment',
+  'ブロックコメント': 'Block Comment',
+  'フォーマット': 'Format',
+  'ドキュメントのフォーマット': 'Format Document',
+  '定義へ移動': 'Go to Definition',
+  '参照を検索': 'Find References',
+  '名前の変更': 'Rename',
+  'シンボルの検索': 'Find Symbol',
+
+  // Excel specific
+  'セル編集': 'Edit Cell',
+  '列の選択': 'Select Column',
+  '行の選択': 'Select Row',
+  '数式バー': 'Formula Bar',
+  '合計': 'Sum',
+  'オートフィル': 'Auto Fill',
+  'グラフの挿入': 'Insert Chart',
+  'ピボットテーブル': 'Pivot Table',
+  'フィルター': 'Filter',
+  '並べ替え': 'Sort',
+
+  // Gmail specific
+  '送信': 'Send',
+  '返信': 'Reply',
+  '全員に返信': 'Reply All',
+  '転送': 'Forward',
+  '削除': 'Delete',
+  'アーカイブ': 'Archive',
+  '既読': 'Mark as Read',
+  '未読': 'Mark as Unread',
+  'スター': 'Star',
+  'ラベル': 'Label',
+  '作成': 'Compose',
+
+  // Slack specific
+  'チャンネル検索': 'Search Channels',
+  'ダイレクトメッセージ': 'Direct Message',
+  'メンション': 'Mention',
+  'スレッド': 'Thread',
+  '絵文字': 'Emoji',
+  'リアクション': 'Reaction',
+  'メッセージを検索': 'Search Messages',
+};
+
+/**
+ * Get English description, fallback to original if not found
+ */
+export function getDescriptionInEnglish(japaneseDescription: string | null): string | null {
+  if (!japaneseDescription) return null;
+  return descriptionTranslations[japaneseDescription] || japaneseDescription;
+}

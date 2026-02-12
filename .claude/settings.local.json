@@ -64,7 +64,8 @@
       "Bash(tasklist:*)",
       "Bash(cmd //c taskkill //PID 25072 //F)",
       "Bash(rm:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

@@ -5,6 +5,7 @@ import { EXCEL_APP_SAFE_SHORTCUTS } from '../../constants/systemProtectedShortcu
 import { ShortcutDifficulty } from '../../types'
 import { getSequentialKeys } from '../../utils/sequentialShortcuts'
 import { AppIcon } from '../common/AppIcon'
+import { useLanguage } from '../../context/LanguageContext'
 import styles from './ShortcutCard.module.css'
 
 const CURRENT_OS = detectOS();
@@ -21,18 +22,19 @@ interface ShortcutCardProps {
 }
 
 const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none', difficulty, press_type }) => {
-  
+  const { t } = useLanguage();
+
   // 難易度表示のテキストとクラスを取得
   const difficultyInfo = useMemo(() => {
     switch (difficulty) {
-      case 'basic': return { label: 'BASIC', class: styles.basic };
-      case 'standard': return { label: 'STANDARD', class: styles.standard };
-      case 'hard': return { label: 'HARD', class: styles.hard };
-      case 'madmax': return { label: 'MADMAX', class: styles.madmax };
+      case 'basic': return { label: t.shortcutCard.basic.toUpperCase(), class: styles.basic };
+      case 'standard': return { label: t.shortcutCard.standard.toUpperCase(), class: styles.standard };
+      case 'hard': return { label: t.shortcutCard.hard.toUpperCase(), class: styles.hard };
+      case 'madmax': return { label: t.shortcutCard.madmax.toUpperCase(), class: styles.madmax };
       case 'allrange': return { label: 'ALL', class: styles.allrange };
       default: return { label: '', class: '' };
     }
-  }, [difficulty]);
+  }, [difficulty, t.shortcutCard]);
 
   const effectiveProtectionLevel = useMemo((): 'none' | 'preventable_fullscreen' | 'always-protected' => {
     if (appContext === 'excel' && EXCEL_APP_SAFE_SHORTCUTS.has(shortcut)) {
@@ -64,10 +66,10 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
 
   // ツールチップテキスト
   const tooltipText = useMemo(() => {
-    if (effectiveProtectionLevel === 'always-protected') return '⚠️ OSレベルで保護されています';
-    if (effectiveProtectionLevel === 'preventable_fullscreen') return 'ℹ️ 全画面表示でキャプチャ可能';
+    if (effectiveProtectionLevel === 'always-protected') return `⚠️ ${t.shortcutCard.protected}`;
+    if (effectiveProtectionLevel === 'preventable_fullscreen') return `ℹ️ ${t.shortcutCard.preventableInFullscreen}`;
     return '';
-  }, [effectiveProtectionLevel]);
+  }, [effectiveProtectionLevel, t.shortcutCard]);
 
   // ショートカットキーのパーツ分割
   const keyParts = useMemo(() => {

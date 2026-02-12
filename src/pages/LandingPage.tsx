@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './LandingPage.module.css';
 import { useAdaptivePerformance } from '../hooks';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Particle {
   x: number;
@@ -17,6 +18,7 @@ const LandingPage: React.FC = () => {
   const animationFrameRef = useRef<number>(0);
   const isCanvasVisible = useRef<boolean>(true);
   const { qualityLevel, performanceStyles } = useAdaptivePerformance();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Remove body padding for landing page (add it back on cleanup)
@@ -182,18 +184,17 @@ const LandingPage: React.FC = () => {
       <canvas className={styles.particleCanvas} id="particleCanvas" ref={canvasRef}></canvas>
       <main className={styles.landingContainer}>
         <section className={`${styles.heroSection} ${styles.isVisible}`}>
-          <div className={styles.badge}>NEW VERSION 2.1</div>
-          <h1 className={styles.title}>KEYBOARD VISUALIZER</h1>
+          <div className={styles.badge}>{t.landing.badge}</div>
+          <h1 className={styles.title}>{t.landing.title}</h1>
           <p className={styles.subtitle}>
-            Work at the speed of thought.
+            {t.landing.subtitle}
           </p>
           <p className={styles.description}>
-            1,300以上のショートカットをリアルタイムで可視化する学習プラットフォーム。
-            ツールを使いこなし、創造的な時間を最大化しましょう。
+            {t.landing.description}
           </p>
           <div className={styles.ctaButtonContainer}>
             <Link to="/app" className={styles.ctaButton}>
-              無料で今すぐはじめる
+              {t.landing.ctaButton}
               <svg className={styles.ctaIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
@@ -206,73 +207,73 @@ const LandingPage: React.FC = () => {
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
               <div className={styles.statNumber}>1,300+</div>
-              <div className={styles.statLabel}>ショートカット</div>
+              <div className={styles.statLabel}>{t.landing.stats.shortcuts}</div>
             </div>
             <div className={styles.statCard}>
               <div className={styles.statNumber}>9</div>
-              <div className={styles.statLabel}>対応アプリ</div>
+              <div className={styles.statLabel}>{t.landing.stats.apps}</div>
             </div>
             <div className={styles.statCard}>
               <div className={styles.statNumber}>4</div>
-              <div className={styles.statLabel}>難易度レベル</div>
+              <div className={styles.statLabel}>{t.landing.stats.levels}</div>
             </div>
           </div>
         </section>
 
         {/* Features Section */}
         <section className={styles.featuresSection}>
-          <h2 className={styles.sectionTitle}>なぜKeyboard Visualizerなのか</h2>
+          <h2 className={styles.sectionTitle}>{t.landing.whyTitle}</h2>
           <div className={styles.featuresGrid}>
             <div className={styles.featureCard}>
               <div className={styles.iconWrapper}>
-                <img 
-                  src={`${import.meta.env.BASE_URL}icons/visualizer.svg`} 
-                  alt="Visualizer" 
-                  className={styles.featureIcon} 
-                  loading="lazy" 
-                  width="32" 
-                  height="32" 
+                <img
+                  src={`${import.meta.env.BASE_URL}icons/visualizer.svg`}
+                  alt="Visualizer"
+                  className={styles.featureIcon}
+                  loading="lazy"
+                  width="32"
+                  height="32"
                 />
               </div>
-              <h3>Visual Feedback</h3>
-              <p>入力したすべてのキーが美しく可視化されます。システムの挙動を直感的に理解しましょう。</p>
+              <h3>{t.landing.features.visualFeedback.title}</h3>
+              <p>{t.landing.features.visualFeedback.description}</p>
             </div>
             <div className={styles.featureCard}>
               <div className={styles.iconWrapper}>
-                <img 
-                  src={`${import.meta.env.BASE_URL}icons/quiz.svg`} 
-                  alt="Quiz" 
-                  className={styles.featureIcon} 
-                  loading="lazy" 
-                  width="32" 
-                  height="32" 
+                <img
+                  src={`${import.meta.env.BASE_URL}icons/quiz.svg`}
+                  alt="Quiz"
+                  className={styles.featureIcon}
+                  loading="lazy"
+                  width="32"
+                  height="32"
                 />
               </div>
-              <h3>Active Learning</h3>
-              <p>クイズ形式の反復練習により、記憶に定着。苦手な操作も自然と体が覚えます。</p>
+              <h3>{t.landing.features.quizMode.title}</h3>
+              <p>{t.landing.features.quizMode.description}</p>
             </div>
             <div className={styles.featureCard}>
               <div className={styles.iconWrapper}>
-                <img 
-                  src={`${import.meta.env.BASE_URL}icons/allrange.svg`} 
-                  alt="Apps" 
-                  className={styles.featureIcon} 
-                  loading="lazy" 
-                  width="32" 
-                  height="32" 
+                <img
+                  src={`${import.meta.env.BASE_URL}icons/allrange.svg`}
+                  alt="Apps"
+                  className={styles.featureIcon}
+                  loading="lazy"
+                  width="32"
+                  height="32"
                 />
               </div>
-              <h3>Master Every App</h3>
-              <p>VS CodeからExcel、Slackまで。日常的に使うあらゆるプロツールの達人へ。</p>
+              <h3>{t.landing.features.multiPlatform.title}</h3>
+              <p>{t.landing.features.multiPlatform.description}</p>
             </div>
           </div>
         </section>
 
         {/* Supported Apps Section */}
         <section className={styles.appsSection}>
-          <h2 className={styles.sectionTitle}>対応アプリケーション</h2>
+          <h2 className={styles.sectionTitle}>{t.landing.appsTitle}</h2>
           <p className={styles.sectionSubtitle}>
-            日常的に使うプロフェッショナルツールのショートカットを網羅
+            {t.landing.appsDescription}
           </p>
           <div className={styles.appsGrid}>
             {[
@@ -303,34 +304,34 @@ const LandingPage: React.FC = () => {
 
         {/* Benefits Section */}
         <section className={styles.benefitsSection}>
-          <h2 className={styles.sectionTitle}>得られるメリット</h2>
+          <h2 className={styles.sectionTitle}>{t.landing.benefitsTitle}</h2>
           <div className={styles.benefitsGrid}>
             <div className={styles.benefitCard}>
-              <div className={styles.benefitNumber}>01</div>
-              <h3 className={styles.benefitTitle}>生産性の劇的な向上</h3>
+              <div className={styles.benefitNumber}>{t.landing.benefits.productivity.number}</div>
+              <h3 className={styles.benefitTitle}>{t.landing.benefits.productivity.title}</h3>
               <p className={styles.benefitDescription}>
-                マウス操作からキーボード操作へ移行することで、作業速度が平均30-50%向上します。
+                {t.landing.benefits.productivity.description}
               </p>
             </div>
             <div className={styles.benefitCard}>
-              <div className={styles.benefitNumber}>02</div>
-              <h3 className={styles.benefitTitle}>フロー状態の維持</h3>
+              <div className={styles.benefitNumber}>{t.landing.benefits.flow.number}</div>
+              <h3 className={styles.benefitTitle}>{t.landing.benefits.flow.title}</h3>
               <p className={styles.benefitDescription}>
-                マウスとキーボードの切り替えによる集中力の途切れを防ぎ、深い集中状態を保てます。
+                {t.landing.benefits.flow.description}
               </p>
             </div>
             <div className={styles.benefitCard}>
-              <div className={styles.benefitNumber}>03</div>
-              <h3 className={styles.benefitTitle}>プロフェッショナルなスキル</h3>
+              <div className={styles.benefitNumber}>{t.landing.benefits.skill.number}</div>
+              <h3 className={styles.benefitTitle}>{t.landing.benefits.skill.title}</h3>
               <p className={styles.benefitDescription}>
-                ショートカットを使いこなす姿は、周囲から見ても圧倒的にプロフェッショナルです。
+                {t.landing.benefits.skill.description}
               </p>
             </div>
             <div className={styles.benefitCard}>
-              <div className={styles.benefitNumber}>04</div>
-              <h3 className={styles.benefitTitle}>身体的な負担軽減</h3>
+              <div className={styles.benefitNumber}>{t.landing.benefits.ergonomics.number}</div>
+              <h3 className={styles.benefitTitle}>{t.landing.benefits.ergonomics.title}</h3>
               <p className={styles.benefitDescription}>
-                マウス操作の減少により、肩や手首への負担が軽減され、長時間の作業も快適になります。
+                {t.landing.benefits.ergonomics.description}
               </p>
             </div>
           </div>
@@ -338,59 +339,59 @@ const LandingPage: React.FC = () => {
 
         {/* How It Works Section */}
         <section className={styles.howItWorksSection}>
-          <h2 className={styles.sectionTitle}>使い方はシンプル</h2>
+          <h2 className={styles.sectionTitle}>{t.landing.howItWorksTitle}</h2>
           <div className={styles.stepsGrid}>
             <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>STEP 1</div>
-              <h3 className={styles.stepTitle}>アプリを選択</h3>
-              <p className={styles.stepDescription}>学習したいアプリケーションとレベルを選びます</p>
+              <div className={styles.stepNumber}>{t.landing.steps.step1.number}</div>
+              <h3 className={styles.stepTitle}>{t.landing.steps.step1.title}</h3>
+              <p className={styles.stepDescription}>{t.landing.steps.step1.description}</p>
             </div>
             <div className={styles.stepArrow}>→</div>
             <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>STEP 2</div>
-              <h3 className={styles.stepTitle}>キーを押す</h3>
-              <p className={styles.stepDescription}>実際にキーボードでショートカットを入力します</p>
+              <div className={styles.stepNumber}>{t.landing.steps.step2.number}</div>
+              <h3 className={styles.stepTitle}>{t.landing.steps.step2.title}</h3>
+              <p className={styles.stepDescription}>{t.landing.steps.step2.description}</p>
             </div>
             <div className={styles.stepArrow}>→</div>
             <div className={styles.stepCard}>
-              <div className={styles.stepNumber}>STEP 3</div>
-              <h3 className={styles.stepTitle}>即座にフィードバック</h3>
-              <p className={styles.stepDescription}>正解・不正解が瞬時に表示され、理解が深まります</p>
+              <div className={styles.stepNumber}>{t.landing.steps.step3.number}</div>
+              <h3 className={styles.stepTitle}>{t.landing.steps.step3.title}</h3>
+              <p className={styles.stepDescription}>{t.landing.steps.step3.description}</p>
             </div>
           </div>
         </section>
 
         {/* Release Notes Section */}
         <section className={styles.releaseNotesSection}>
-          <h2 className={styles.sectionTitle}>最新アップデート</h2>
+          <h2 className={styles.sectionTitle}>{t.landing.releaseNotesTitle}</h2>
           <p className={styles.sectionSubtitle}>
-            Keyboard Visualizerの最新機能と改善履歴
+            {t.landing.releaseNotesDescription}
           </p>
           <div className={styles.releaseNotesCard}>
             <div className={styles.releaseNotesHeader}>
-              <span className={styles.releaseVersion}>v2.1.1</span>
-              <span className={styles.releaseDate}>2026-02-11</span>
+              <span className={styles.releaseVersion}>{t.landing.releaseNotesVersion}</span>
+              <span className={styles.releaseDate}>{t.landing.releaseNotesDate}</span>
             </div>
-            <h3 className={styles.releaseNotesTitle}>Performance Optimization & Smooth Experience</h3>
+            <h3 className={styles.releaseNotesTitle}>{t.landing.releaseNotesSubtitle}</h3>
             <ul className={styles.releaseNotesList}>
-              <li>🚀 レンダリングパフォーマンスを最適化し、スクロールをスムーズに</li>
-              <li>🔋 低スペックデバイス向けのアダプティブ・パフォーマンス機能をLPに適用</li>
-              <li>🖼️ 画像の遅延読み込みとサイズ指定でレイアウトシフト（CLS）を防止</li>
+              {t.landing.releaseNotesList.map((note, index) => (
+                <li key={index}>{note}</li>
+              ))}
             </ul>
             <Link to="/release-notes" className={styles.releaseNotesLink}>
-              すべてのリリースノートを見る →
+              {t.landing.viewAllReleases}
             </Link>
           </div>
         </section>
 
         {/* Final CTA Section */}
         <section className={styles.finalCtaSection}>
-          <h2 className={styles.finalCtaTitle}>今すぐ始めて、生産性を最大化しましょう</h2>
+          <h2 className={styles.finalCtaTitle}>{t.landing.finalCtaTitle}</h2>
           <p className={styles.finalCtaDescription}>
-            完全無料・登録不要で、すぐに使い始められます
+            {t.landing.finalCtaDescription}
           </p>
           <Link to="/app" className={styles.finalCtaButton}>
-            無料で今すぐはじめる
+            {t.landing.finalCtaButton}
             <svg className={styles.ctaIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -398,7 +399,7 @@ const LandingPage: React.FC = () => {
         </section>
 
         <footer className={styles.footer}>
-          <p>&copy; {new Date().getFullYear()} Keyboard Visualizer. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {t.landing.footer.copyright}</p>
         </footer>
       </main>
     </div>

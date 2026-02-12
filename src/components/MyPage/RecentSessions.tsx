@@ -10,10 +10,10 @@ interface RecentSessionsProps {
 const RecentSessions: React.FC<RecentSessionsProps> = ({ sessions, onSelectSession }) => {
   const getDifficultyBadgeColor = (difficulty: ShortcutDifficulty | null) => {
     switch (difficulty) {
-      case 'Basic': return 'bg-sf-blue-ultralight text-sf-blue border-sf-blue/20';
-      case 'Standard': return 'bg-sf-green-ultralight text-sf-green border-sf-green/20';
-      case 'Hard': return 'bg-orange-50 text-orange-600 border-orange-200';
-      case 'Madmax': return 'bg-sf-red-light/10 text-sf-red border-sf-red/20';
+      case 'basic': return 'bg-sf-blue-ultralight text-sf-blue border-sf-blue/20';
+      case 'standard': return 'bg-sf-green-ultralight text-sf-green border-sf-green/20';
+      case 'hard': return 'bg-orange-50 text-orange-600 border-orange-200';
+      case 'madmax': return 'bg-sf-red-light/10 text-sf-red border-sf-red/20';
       default: return 'bg-sf-gray-light text-sf-gray border-gray-200';
     }
   };

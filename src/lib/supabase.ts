@@ -23,7 +23,9 @@ export interface Shortcut {
   application: string;
   keys: string;
   description: string;
+  description_en?: string | null;
   category: string | null;
+  category_en?: string | null;
   created_at: string;
   difficulty: string | null;
   platform?: 'Windows' | 'macOS' | 'Cross-Platform';

@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import { StyledButton } from '../common/StyledButton'
 import { useAuth } from '../../context/AuthContext'
 import { useShortcutData } from '../../context'
+import { useLanguage } from '../../context/LanguageContext'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
+import { LanguageSelector } from '../LanguageSelector'
 import { downloadShortcutsAsCSV } from '../../utils'
 import { HeaderLogo } from '../common/HeaderLogo'
 import styles from './AppHeader.module.css'
@@ -25,16 +27,17 @@ interface AppHeaderProps {
 const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, isQuizMode, onQuizModeToggle }) => {
   const { user } = useAuth();
   const { richShortcuts } = useShortcutData();
+  const { t } = useLanguage();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // CSVダウンロードハンドラー
   const handleDownloadCSV = useCallback(() => {
     if (!richShortcuts || richShortcuts.length === 0) {
-      alert('ダウンロードするショートカットがありません');
+      alert(t.header.noShortcutsToDownload);
       return;
     }
     downloadShortcutsAsCSV(richShortcuts);
-  }, [richShortcuts]);
+  }, [richShortcuts, t.header.noShortcutsToDownload]);
 
   return (
     <>
@@ -54,26 +57,27 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
             onClick={onQuizModeToggle}
             backgroundColor="#6366f1"
             textColor="white"
-            title={isQuizMode ? 'ビジュアライザーに戻ります' : 'クイズモードを開始します'}
+            title={isQuizMode ? t.header.returnToVisualizer : t.header.startQuizMode}
           >
-            {isQuizMode ? 'Visualizer' : 'Quiz Mode'}
+            {isQuizMode ? t.header.visualizer : t.header.quizMode}
           </StyledButton>
           <StyledButton
             onClick={onToggleFullscreen}
             backgroundColor="#f1f5f9"
             textColor="#475569"
             borderColor="#e2e8f0"
-            title="フルスクリーンモード"
+            title={fullscreenMode ? t.header.exitFullscreen : t.header.fullscreen}
           >
-            {fullscreenMode ? '全画面終了' : '全画面'}
+            {fullscreenMode ? t.header.exitFullscreen : t.header.fullscreen}
           </StyledButton>
           <button
             className={styles.csvDownloadButton}
             onClick={handleDownloadCSV}
-            title="CSVダウンロード"
+            title={t.header.csvDownload}
           >
             <span className={styles.csvText}>CSV</span>
           </button>
+          <LanguageSelector />
           {user ? (
             <UserMenu />
           ) : (
@@ -81,9 +85,9 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
               onClick={() => setShowAuthModal(true)}
               backgroundColor="#1e293b"
               textColor="white"
-              title="ログイン"
+              title={t.header.login}
             >
-              ログイン
+              {t.header.login}
             </StyledButton>
           )}
         </div>

@@ -5,6 +5,7 @@ import App from './App';
 import { SettingsProvider, UIProvider, ShortcutProvider } from './context';
 import { QuizProvider } from './context/QuizContext';
 import { AuthProvider } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import ErrorBoundary from './components/ErrorBoundary';
 
 
@@ -23,19 +24,21 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) { // 開発環境で�
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
-      <AuthProvider>
-        <SettingsProvider>
-          <UIProvider>
-            <ShortcutProvider>
-              <QuizProvider>
-                <BrowserRouter basename={import.meta.env.BASE_URL}>
-                  <App />
-                </BrowserRouter>
-              </QuizProvider>
-            </ShortcutProvider>
-          </UIProvider>
-        </SettingsProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <SettingsProvider>
+            <UIProvider>
+              <ShortcutProvider>
+                <QuizProvider>
+                  <BrowserRouter basename={import.meta.env.BASE_URL}>
+                    <App />
+                  </BrowserRouter>
+                </QuizProvider>
+              </ShortcutProvider>
+            </UIProvider>
+          </SettingsProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   </StrictMode>,
 );

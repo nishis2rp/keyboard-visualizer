@@ -20,6 +20,7 @@ export interface SetupCompleteOptions {
 export interface App {
   id: string;
   name: string;
+  name_en?: string | null; // English name
   icon: string;
   os: 'windows' | 'mac' | 'cross-platform';
 }
@@ -65,9 +66,11 @@ export interface RichShortcut {
   id: number;
   keys: string;
   description: string;
+  description_en?: string | null; // English description
   difficulty: ShortcutDifficulty;
   application: string;
   category: string | null;
+  category_en?: string | null; // English category
   created_at: string;
   platform?: 'Windows' | 'macOS' | 'Cross-Platform';
   windows_keys?: string | null;
