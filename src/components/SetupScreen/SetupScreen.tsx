@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from 'react'
 import { SETUP_VERSION } from '../../constants/app'
-import { 
-  FULLSCREEN_OPTIONS, 
-  LAYOUT_OPTIONS, 
-  MODES, 
-  DIFFICULTY_OPTIONS 
+import {
+  FULLSCREEN_OPTIONS,
+  LAYOUT_OPTIONS,
+  MODES,
+  DIFFICULTY_OPTIONS
 } from '../../constants/setup'
 import { useUI, useShortcutData } from '../../context'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 import { SetupOption as SetupOptionType, SetupCompleteOptions, ShortcutDifficulty } from '../../types'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
@@ -23,6 +24,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const { isQuizMode } = useUI()
   const { apps } = useShortcutData()
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [selectedFullscreen, setSelectedFullscreen] = useState<SetupOptionType | null>(null)
   const [selectedLayout, setSelectedLayout] = useState<SetupOptionType | null>(null)
   const [selectedMode, setSelectedMode] = useState<SetupOptionType | null>(null)
@@ -49,15 +51,15 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const quizAppOptions = useMemo(() => [
     {
       id: 'random',
-      name: 'ランダム',
-      title: 'ランダム',
+      name: t.setup.randomApp,
+      title: t.setup.randomApp,
       icon: '🎲'
     },
     ...apps.map(app => ({
       ...app,
       title: app.name
     }))
-  ], [apps])
+  ], [apps, t.setup.randomApp])
 
   const handleSelectMode = (mode: SetupOptionType) => {
     setSelectedMode(mode)
@@ -119,9 +121,9 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         <div className="setup-header">
           <div className="setup-header-top">
             <div>
-              <h1 className="setup-title">キーボードビジュアライザー <small>ショートカット学習ツール</small></h1>
-              <h2>ようこそ！</h2>
-              <p>1,300種類以上のショートカットを可視化・練習しましょう</p>
+              <h1 className="setup-title">{t.setup.title} <small>{t.setup.subtitle}</small></h1>
+              <h2>{t.setup.welcome}</h2>
+              <p>{t.setup.welcomeMessage}</p>
             </div>
             <div className="setup-auth-button">
               {user ? (
@@ -130,10 +132,10 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
                 <button
                   onClick={() => setShowAuthModal(true)}
                   className="auth-login-button"
-                  title="ログインしてクイズの進捗を保存"
+                  title={t.setup.loginTooltip}
                 >
                   <span>👤</span>
-                  <span>ログイン</span>
+                  <span>{t.setup.loginButton}</span>
                 </button>
               )}
             </div>
@@ -141,7 +143,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         </div>
 
         {/* 全画面モード選択 */}
-        <SetupSection title="表示モードを選択してください">
+        <SetupSection title={t.setup.selectDisplayMode}>
           <div className="setup-options setup-modes">
             {FULLSCREEN_OPTIONS.map((option) => (
               <SetupOption
@@ -156,7 +158,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         </SetupSection>
 
         {/* キーボードレイアウト選択 */}
-        <SetupSection title="キーボードレイアウトを選択してください">
+        <SetupSection title={t.setup.selectKeyboardLayout}>
           <div className="setup-options setup-layouts">
             {LAYOUT_OPTIONS.map((layout) => (
               <SetupOption
@@ -171,7 +173,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
 
         {/* クイズモードが既に有効でない場合のみ、モード選択を表示 */}
         {!isQuizMode && (
-          <SetupSection title="モードを選択してください">
+          <SetupSection title={t.setup.selectMode}>
             <div className="setup-options setup-modes">
               {MODES.map((mode) => (
                 <SetupOption
@@ -187,7 +189,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
 
         {/* ビジュアライザーモードが選択された場合、アプリケーション選択を表示 */}
         {selectedMode?.id === 'visualizer' && (
-          <SetupSection title="アプリケーションを選択してください">
+          <SetupSection title={t.setup.selectApplication}>
             <div className="setup-options setup-quiz-apps">
               {visualizerAppOptions.map((app) => (
                 <SetupOption
@@ -204,7 +206,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
         {/* クイズモードが選択された場合、難易度選択を表示 */}
         {selectedMode?.id === 'quiz' && (
           <>
-            <SetupSection title="難易度を選択してください">
+            <SetupSection title={t.setup.selectDifficulty}>
               <div className="setup-options setup-modes">
                 {DIFFICULTY_OPTIONS.map((difficulty) => (
                   <SetupOption
@@ -217,7 +219,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
               </div>
             </SetupSection>
 
-            <SetupSection title="出題するアプリケーションを選択してください（複数選択可）">
+            <SetupSection title={t.setup.selectQuizApplication}>
               <div className="setup-options setup-quiz-apps">
                 {quizAppOptions.map((app) => (
                   <SetupOption
@@ -245,21 +247,21 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
             }
           >
             {!selectedFullscreen
-              ? '表示モードを選択してください'
+              ? t.setup.pleaseSelectDisplayMode
               : !selectedLayout
-              ? 'キーボードレイアウトを選択してください'
+              ? t.setup.pleaseSelectLayout
               : !selectedMode
-              ? 'モードを選択してください'
+              ? t.setup.pleaseSelectMode
               : selectedMode.id === 'visualizer' && !selectedApp
-              ? 'アプリケーションを選択してください'
+              ? t.setup.pleaseSelectApp
               : selectedMode.id === 'quiz' && !selectedDifficulty
-              ? '難易度を選択してください'
+              ? t.setup.pleaseSelectDifficulty
               : selectedMode.id === 'quiz' && selectedQuizApps.length === 0
-              ? 'アプリケーションを選択してください'
-              : '開始する'}
+              ? t.setup.pleaseSelectQuizApp
+              : t.setup.confirmButton}
           </button>
           <p className="setup-note">
-            後で設定から変更できます
+            {t.setup.canChangeInSettings}
           </p>
         </div>
       </div>
