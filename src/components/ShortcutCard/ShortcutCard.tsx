@@ -24,45 +24,39 @@ interface ShortcutCardProps {
 const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none', difficulty, press_type }) => {
   const { t } = useLanguage();
 
-  // 難易度表示のテキストとクラスを取得
+  // 難易度表示のテキストとクラスを取得（オブジェクトマッピングで簡略化）
   const difficultyInfo = useMemo(() => {
-    switch (difficulty) {
-      case 'basic': return { label: t.shortcutCard.basic.toUpperCase(), class: styles.basic };
-      case 'standard': return { label: t.shortcutCard.standard.toUpperCase(), class: styles.standard };
-      case 'hard': return { label: t.shortcutCard.hard.toUpperCase(), class: styles.hard };
-      case 'madmax': return { label: t.shortcutCard.madmax.toUpperCase(), class: styles.madmax };
-      case 'allrange': return { label: 'ALL', class: styles.allrange };
-      default: return { label: '', class: '' };
-    }
+    const difficultyMap = {
+      basic: { label: t.shortcutCard.basic.toUpperCase(), class: styles.basic },
+      standard: { label: t.shortcutCard.standard.toUpperCase(), class: styles.standard },
+      hard: { label: t.shortcutCard.hard.toUpperCase(), class: styles.hard },
+      madmax: { label: t.shortcutCard.madmax.toUpperCase(), class: styles.madmax },
+      allrange: { label: 'ALL', class: styles.allrange }
+    };
+    return difficulty ? difficultyMap[difficulty] || { label: '', class: '' } : { label: '', class: '' };
   }, [difficulty, t.shortcutCard]);
 
   const effectiveProtectionLevel = useMemo((): 'none' | 'preventable_fullscreen' | 'always-protected' => {
+    // Excel app内では安全なショートカットは保護レベルをnoneにする
     if (appContext === 'excel' && EXCEL_APP_SAFE_SHORTCUTS.has(shortcut)) {
       return 'none';
     }
 
-    let protectionLevel: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
-    if (CURRENT_OS === 'windows') {
-      protectionLevel = windows_protection_level;
-    } else if (CURRENT_OS === 'macos') {
-      protectionLevel = macos_protection_level;
-    } else {
-      protectionLevel = windows_protection_level;
-    }
+    // OS別の保護レベルを取得（macOS以外はWindowsの保護レベルを使用）
+    const protectionLevel = CURRENT_OS === 'macos' ? macos_protection_level : windows_protection_level;
 
-    if (protectionLevel === 'fullscreen-preventable') {
-      return 'preventable_fullscreen';
-    }
-    return protectionLevel || 'none';
+    // 表記の正規化: fullscreen-preventable → preventable_fullscreen
+    return protectionLevel === 'fullscreen-preventable' ? 'preventable_fullscreen' : (protectionLevel || 'none');
   }, [shortcut, appContext, windows_protection_level, macos_protection_level]);
 
-  // カードのスタイルクラス
-  const cardClassName = useMemo(() => {
-    const classes = [styles.card];
-    if (effectiveProtectionLevel === 'preventable_fullscreen') classes.push(styles.preventableFullscreen);
-    if (effectiveProtectionLevel === 'always-protected') classes.push(styles.alwaysProtected);
-    return classes.join(' ');
-  }, [effectiveProtectionLevel]);
+  // カードのスタイルクラス（簡略化）
+  const cardClassName = useMemo(() =>
+    [
+      styles.card,
+      effectiveProtectionLevel === 'preventable_fullscreen' && styles.preventableFullscreen,
+      effectiveProtectionLevel === 'always-protected' && styles.alwaysProtected
+    ].filter(Boolean).join(' ')
+  , [effectiveProtectionLevel]);
 
   // ツールチップテキスト
   const tooltipText = useMemo(() => {

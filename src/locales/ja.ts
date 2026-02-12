@@ -83,13 +83,14 @@ export const ja: Translations = {
 
     releaseNotesTitle: '最新アップデート',
     releaseNotesDescription: 'Keyboard Visualizerの最新機能と改善履歴',
-    releaseNotesVersion: 'v2.1.1',
-    releaseNotesDate: '2026-02-11',
-    releaseNotesSubtitle: 'Performance Optimization & Smooth Experience',
+    releaseNotesVersion: 'v2.2.0',
+    releaseNotesDate: '2026-02-12',
+    releaseNotesSubtitle: '多言語対応とSEO最適化',
     releaseNotesList: [
-      '🚀 レンダリングパフォーマンスを最適化し、スクロールをスムーズに',
-      '🔋 低スペックデバイス向けのアダプティブ・パフォーマンス機能をLPに適用',
-      '🖼️ 画像の遅延読み込みとサイズ指定でレイアウトシフト（CLS）を防止',
+      '🌐 英語/日本語の完全な多言語対応を実現',
+      '🔍 Canonical URL、構造化データ、メタタグでSEOを強化',
+      '⌨️ Windows USキーボードレイアウトを実装し、正しいキー配置に対応',
+      '✨ Mac USキーボードレイアウトの配置とキー幅の問題を修正',
     ],
     viewAllReleases: 'すべてのリリースノートを見る →',
 

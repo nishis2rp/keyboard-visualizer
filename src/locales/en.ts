@@ -81,13 +81,14 @@ export const en = {
 
     releaseNotesTitle: 'Latest Updates',
     releaseNotesDescription: 'Latest features and improvements for Keyboard Visualizer',
-    releaseNotesVersion: 'v2.1.1',
-    releaseNotesDate: '2026-02-11',
-    releaseNotesSubtitle: 'Performance Optimization & Smooth Experience',
+    releaseNotesVersion: 'v2.2.0',
+    releaseNotesDate: '2026-02-12',
+    releaseNotesSubtitle: 'Internationalization & SEO Optimization',
     releaseNotesList: [
-      '🚀 Optimized rendering performance for smooth scrolling',
-      '🔋 Applied adaptive performance features for low-spec devices to LP',
-      '🖼️ Prevented layout shift (CLS) with lazy image loading and size specification',
+      '🌐 Full internationalization support with English/Japanese UI',
+      '🔍 Enhanced SEO with canonical URLs, structured data, and meta tags',
+      '⌨️ Implemented Windows US keyboard layout with correct key mappings',
+      '✨ Fixed Mac US keyboard layout alignment and key width issues',
     ],
     viewAllReleases: 'View All Release Notes →',
 
