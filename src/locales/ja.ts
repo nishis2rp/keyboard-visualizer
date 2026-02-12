@@ -84,13 +84,13 @@ export const ja: Translations = {
     releaseNotesTitle: '最新アップデート',
     releaseNotesDescription: 'Keyboard Visualizerの最新機能と改善履歴',
     releaseNotesVersion: 'v2.2.0',
-    releaseNotesDate: '2026-02-12',
+    releaseNotesDate: '2026年2月12日',
     releaseNotesSubtitle: '多言語対応とSEO最適化',
     releaseNotesList: [
-      '🌐 英語/日本語の完全な多言語対応を実現',
-      '🔍 Canonical URL、構造化データ、メタタグでSEOを強化',
-      '⌨️ Windows USキーボードレイアウトを実装し、正しいキー配置に対応',
-      '✨ Mac USキーボードレイアウトの配置とキー幅の問題を修正',
+      '🌐 英語・日本語の完全な多言語対応を実現',
+      '🔍 検索エンジン最適化（SEO）を強化し、発見性を向上',
+      '⌨️ Windows US配列キーボードレイアウトを新規実装',
+      '✨ Mac US配列キーボードの表示崩れを修正',
     ],
     viewAllReleases: 'すべてのリリースノートを見る →',
 
