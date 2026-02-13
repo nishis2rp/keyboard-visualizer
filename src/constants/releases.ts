@@ -16,6 +16,63 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '2.3.0',
+    date: '2026-02-13',
+    titleKey: 'v2.3.0',
+    titleEn: 'Enhanced Authentication & Quiz Improvements',
+    titleJa: '認証システム強化とクイズ改善',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v2.3.0-password-strength',
+        descriptionEn: 'Added OWASP-compliant password strength validation with real-time 5-level scoring and feedback',
+        descriptionJa: 'OWASP準拠のパスワード強度検証を追加：リアルタイム5段階評価とフィードバック機能'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.3.0-auth-ux',
+        descriptionEn: 'Enhanced authentication UX with password visibility toggle, loading spinners, and improved error messages',
+        descriptionJa: '認証UX改善：パスワード表示切替、ローディングスピナー、エラーメッセージ改善'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v2.3.0-account-settings',
+        descriptionEn: 'Added in-app password change form in Account Settings (previously link-only)',
+        descriptionJa: 'アカウント設定にパスワード変更フォームを追加（以前はリンクのみ）'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.3.0-accessibility',
+        descriptionEn: 'Improved accessibility with ARIA attributes, keyboard navigation, and screen reader support',
+        descriptionJa: 'ARIA属性、キーボードナビゲーション、スクリーンリーダー対応でアクセシビリティ向上'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v2.3.0-alternative-shortcuts',
+        descriptionEn: 'Added Backspace and Alt+← as alternative shortcuts for "Go back" action in quiz mode',
+        descriptionJa: 'クイズモードで「戻る」アクションにBackspaceとAlt+←を代替ショートカットとして追加'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.3.0-vscode-filter',
+        descriptionEn: 'VS Code now hides Cmd+ shortcuts on Windows/Linux, showing only relevant shortcuts for the platform',
+        descriptionJa: 'VS CodeでWindows/Linux環境時にCmd+ショートカットを非表示化（プラットフォーム関連のみ表示）'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v2.3.0-modal-position',
+        descriptionEn: 'Fixed authentication modal positioning using React Portal - now centers on viewport instead of header',
+        descriptionJa: 'React Portalを使用して認証モーダルの配置を修正：ヘッダーではなくビューポート中央に表示'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.3.0-readme',
+        descriptionEn: 'Updated README.md with comprehensive 200+ line directory structure documentation',
+        descriptionJa: 'README.mdに200行以上の包括的なディレクトリ構造ドキュメントを追加'
+      }
+    ]
+  },
+  {
     version: '2.2.0',
     date: '2026-02-12',
     titleKey: 'v2.2.0',
