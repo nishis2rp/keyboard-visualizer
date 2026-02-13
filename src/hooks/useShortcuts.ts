@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { AllShortcuts, ShortcutDetails, RichShortcut, App } from '../types';
 import { normalizeShortcut } from '../utils/quizEngine';
 import { Shortcut } from '../lib/supabase';
+import { detectOS } from '../utils/os';
 
 interface UseShortcutsReturn {
   shortcuts: AllShortcuts;
@@ -85,8 +86,19 @@ export function useShortcuts(): UseShortcutsReturn {
       const newRichShortcuts = [...richShortcuts];
       const newlyLoadedApps = new Set<string>();
 
+      // OS検出（VS Code用のフィルタリング）
+      const currentOS = detectOS();
+
       (data as Shortcut[]).forEach((item) => {
         newlyLoadedApps.add(item.application);
+
+        // VS CodeでWindows環境の場合、Cmd+を含むショートカットをスキップ
+        if (item.application === 'vscode' && (currentOS === 'windows' || currentOS === 'linux')) {
+          if (item.keys.includes('Cmd')) {
+            return; // このショートカットをスキップ
+          }
+        }
+
         if (!newShortcutsMap[item.application]) {
           newShortcutsMap[item.application] = {};
         }
@@ -111,7 +123,7 @@ export function useShortcuts(): UseShortcutsReturn {
           press_type: item.press_type as any,
           alternative_group_id: item.alternative_group_id as any,
         };
-        
+
         // 重複チェック（全取得時に既にロード済みのものがある可能性があるため）
         if (!richShortcuts.some(rs => rs.id === richShortcut.id)) {
            newRichShortcuts.push(richShortcut);

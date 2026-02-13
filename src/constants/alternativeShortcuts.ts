@@ -174,6 +174,11 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
   // ズームリセット（Mac）
   'Cmd + 0': [],
 
+  // === ブラウザ・ナビゲーション ===
+  // 前のページに戻る（Chrome, Windows 11, VS Code, Slack）
+  'Backspace': ['Alt + ←'],
+  'Alt + ←': ['Backspace'],
+
   // === Slack固有の代替 ===
   // 新規メッセージ
   'Ctrl + N': ['Shift + Ctrl + K'],
