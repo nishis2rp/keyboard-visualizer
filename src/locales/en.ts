@@ -385,8 +385,10 @@ export const en = {
   // My Page Components
   myPage: {
     dashboard: 'Dashboard',
+    welcomeBack: 'Your learning progress at a glance',
     backToApp: '🏠 Back to App',
     statsSummary: '📊 Statistics Summary',
+    appPerformanceTitle: '📈 App Performance',
     weakShortcutsTitle: '⚠️ Review Focus Shortcuts',
     appStatsTitle: '📱 App Statistics',
     recentHistoryTitle: '🎯 Recent History',
@@ -423,6 +425,7 @@ export const en = {
     noStats: 'You haven\'t played any quizzes yet.',
     app: 'Application',
     sessions: 'Sessions',
+    sessionsShort: 'Sessions',
     lastPlayed: 'Last Played',
     difficulty: 'Difficulty',
     score: 'Score',
@@ -435,6 +438,7 @@ export const en = {
     completedQuizzes: 'Completed Quizzes',
     totalAnswers: 'Total Answers',
     questionsSolved: 'Questions Solved',
+    questionsSolvedShort: 'Qs',
   },
 
   // Session Detail Modal

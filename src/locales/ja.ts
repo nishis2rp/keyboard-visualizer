@@ -387,8 +387,10 @@ export const ja: Translations = {
   // My Page Components
   myPage: {
     dashboard: 'ダッシュボード',
+    welcomeBack: '学習の進捗をひと目で確認しましょう',
     backToApp: '🏠 アプリへ戻る',
     statsSummary: '📊 統計サマリー',
+    appPerformanceTitle: '📈 アプリ別パフォーマンス',
     weakShortcutsTitle: '⚠️ 重点復習ショートカット',
     appStatsTitle: '📱 アプリケーション別統計',
     recentHistoryTitle: '🎯 最近のプレイ履歴',
@@ -425,6 +427,7 @@ export const ja: Translations = {
     noStats: 'まだクイズをプレイしていません。',
     app: 'アプリケーション',
     sessions: 'セッション',
+    sessionsShort: 'セッション',
     lastPlayed: '最終プレイ',
     difficulty: '難易度',
     score: 'スコア',
@@ -437,6 +440,7 @@ export const ja: Translations = {
     completedQuizzes: '完了したクイズ数',
     totalAnswers: '回答総数',
     questionsSolved: 'これまでに解いた問題',
+    questionsSolvedShort: '問題',
   },
 
   // Session Detail Modal

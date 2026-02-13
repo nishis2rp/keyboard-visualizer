@@ -4,9 +4,13 @@ import {
   clearOAuthErrorFromUrl,
   mapAuthErrorToMessage,
   mapOAuthErrorToMessage,
-  AUTH_ERROR_MESSAGES,
 } from './authErrors';
 import { AuthError } from '@supabase/supabase-js';
+import { Translations } from '../locales/en';
+import enTranslations from '../locales/en';
+
+// Mock translation object for tests
+const mockTranslations: Translations = enTranslations;
 
 describe('authErrors', () => {
   beforeEach(() => {

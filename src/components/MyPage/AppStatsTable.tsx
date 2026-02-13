@@ -21,42 +21,47 @@ const AppStatsTable: React.FC<AppStatsTableProps> = ({ stats }) => {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="apple-table">
+    <div className="overflow-x-auto -mx-4 sm:mx-0">
+      <table className="w-full border-collapse">
         <thead>
-          <tr>
-            <th>{t.myPage.app}</th>
-            <th>{t.myPage.accuracy}</th>
-            <th>{t.myPage.correctCount}</th>
-            <th>{t.myPage.sessions}</th>
-            <th>{t.myPage.lastPlayed}</th>
+          <tr className="border-b border-gray-100">
+            <th className="py-3 px-4 text-left text-[11px] font-bold text-sf-gray uppercase tracking-wider">{t.myPage.app}</th>
+            <th className="py-3 px-4 text-left text-[11px] font-bold text-sf-gray uppercase tracking-wider">{t.myPage.accuracy}</th>
+            <th className="py-3 px-4 text-left text-[11px] font-bold text-sf-gray uppercase tracking-wider">{t.myPage.correctCount}</th>
+            <th className="py-3 px-4 text-left text-[11px] font-bold text-sf-gray uppercase tracking-wider">{t.myPage.sessions}</th>
+            <th className="py-3 px-4 text-left text-[11px] font-bold text-sf-gray uppercase tracking-wider">{t.myPage.lastPlayed}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-50">
           {stats.map((stat, index) => {
             const app = appMap[stat.application];
             const displayName = language === 'en' && app?.name_en ? app.name_en : (app?.name || stat.application);
             
             return (
-              <tr key={index} className="hover:bg-sf-gray-ultralight transition-colors">
-                <td className="font-semibold text-sf-primary">
-                  {displayName}
-                </td>
-                <td>
+              <tr key={index} className="hover:bg-sf-gray-ultralight/50 transition-colors group">
+                <td className="py-4 px-4 font-bold text-sf-primary text-sm">
                   <div className="flex items-center gap-2">
-                    <span className="min-w-[45px] font-bold">{stat.overall_accuracy.toFixed(1)}%</span>
-                    <div className="w-16 h-1 bg-gray-100 rounded-full overflow-hidden">
+                    {app?.icon && <img src={app.icon} alt="" className="w-5 h-5 opacity-80 group-hover:opacity-100" />}
+                    {displayName}
+                  </div>
+                </td>
+                <td className="py-4 px-4">
+                  <div className="flex items-center gap-2">
+                    <span className="min-w-[45px] font-black text-sf-blue text-sm">{stat.overall_accuracy.toFixed(1)}%</span>
+                    <div className="hidden sm:block w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-sf-blue rounded-full" 
+                        className="h-full bg-sf-blue rounded-full transition-all duration-700" 
                         style={{ width: `${stat.overall_accuracy}%` }}
                       ></div>
                     </div>
                   </div>
                 </td>
-                <td className="text-sf-gray font-medium">{stat.total_correct} / {stat.total_questions}</td>
-                <td className="text-sf-gray">{stat.total_sessions}</td>
-                <td className="text-[11px] text-sf-gray font-medium uppercase tracking-tighter">
-                  {new Date(stat.last_quiz_date).toLocaleDateString()}
+                <td className="py-4 px-4 text-xs font-bold text-sf-gray">
+                  {stat.total_correct} <span className="text-gray-300 font-normal">/</span> {stat.total_questions}
+                </td>
+                <td className="py-4 px-4 text-xs text-sf-gray font-medium">{stat.total_sessions}</td>
+                <td className="py-4 px-4 text-[10px] text-sf-gray font-bold uppercase tracking-tight">
+                  {new Date(stat.last_quiz_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                 </td>
               </tr>
             );

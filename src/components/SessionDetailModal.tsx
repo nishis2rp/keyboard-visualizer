@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useLanguage } from '../context/LanguageContext';
 import './SessionDetailModal.css';
 
 interface QuizAnswer {

@@ -65,19 +65,202 @@ Keyboard Lock API を使用して、システムショートカットの競合�
 ## 📂 ディレクトリ構造 (Master Index)
 
 ```text
-src/
-├── components/          # UIコンポーネント
-│   ├── AppHeader/       # ヘッダー・タイトル
-│   ├── MyPage/          # 統計・分析ダッシュボード
-│   └── KeyboardLayout/  # 仮想キーボード表示ロジック
-├── context/             # 状態管理 (Auth, Quiz, Settings, Shortcut, UI)
-├── hooks/               # カスタムフック (useKeyboardShortcuts, useShortcuts 等)
-├── utils/               # ユーティリティ (quizEngine, aiOptimization, fullscreen)
-├── constants/           # 定数 (keys.ts: 物理キーマッピング)
-└── types/               # TypeScript 型定義 (src/types/index.ts)
-supabase/
-└── migrations/          # SQL マイグレーション (Source of Truth)
-scripts/                 # DBメンテナンス・データ調整スクリプト
+keyboard-visualizer/
+├── public/                          # 静的アセット
+│   ├── icons/                       # アプリアイコン (PWA対応)
+│   ├── keyboard.svg                 # キーボードアイコン
+│   ├── manifest.json                # PWAマニフェスト
+│   ├── robots.txt                   # SEO設定
+│   ├── sitemap.xml                  # サイトマップ
+│   └── service-worker.js            # PWAサービスワーカー
+│
+├── src/
+│   ├── components/                  # UIコンポーネント
+│   │   ├── AppHeader/               # ヘッダー・タイトル・ナビゲーション
+│   │   ├── AppSelector/             # アプリケーション選択セレクター
+│   │   ├── Auth/                    # 認証関連コンポーネント
+│   │   │   ├── AuthModal.tsx        # ログイン/サインアップモーダル
+│   │   │   └── UserMenu.tsx         # ユーザーメニュードロップダウン
+│   │   ├── common/                  # 共通UIコンポーネント
+│   │   │   ├── AppIcon.tsx          # アプリケーションアイコン
+│   │   │   ├── HeaderLogo.tsx       # ヘッダーロゴ
+│   │   │   ├── Selector.tsx         # セレクター共通コンポーネント
+│   │   │   └── StyledButton.tsx     # スタイル付きボタン
+│   │   ├── DifficultyFilter/        # 難易度フィルターコンポーネント
+│   │   ├── KeyboardLayout/          # 仮想キーボード表示
+│   │   ├── KeyboardLayoutSelector/  # キーボードレイアウト選択
+│   │   ├── KeyDisplay/              # キー表示とショートカットリスト
+│   │   │   ├── KeyDisplay.tsx       # メインキー表示コンポーネント
+│   │   │   ├── PressedKeysIndicator.tsx  # 押下キーインジケーター
+│   │   │   └── ShortcutsList.tsx    # ショートカット一覧表示
+│   │   ├── LanguageSelector/        # 言語切り替えセレクター
+│   │   ├── MyPage/                  # マイページ・統計ダッシュボード
+│   │   │   ├── AccountSettings.tsx  # アカウント設定 (メール変更、パスワード変更、アカウント削除)
+│   │   │   ├── AppPerformanceChart.tsx  # アプリ別パフォーマンスチャート
+│   │   │   ├── AppStatsTable.tsx    # アプリ別統計テーブル
+│   │   │   ├── ProfileSection.tsx   # プロフィールセクション
+│   │   │   ├── RecentSessions.tsx   # 最近のクイズセッション履歴
+│   │   │   ├── StatCards.tsx        # 統計カード (正解率、総問題数等)
+│   │   │   └── WeakShortcuts.tsx    # 苦手なショートカット分析
+│   │   ├── Quiz/                    # クイズモード関連コンポーネント
+│   │   │   ├── QuestionCard.tsx     # クイズ問題カード
+│   │   │   ├── QuizProgressBar.tsx  # クイズ進捗バー
+│   │   │   ├── ResultModal.tsx      # 結果表示モーダル
+│   │   │   ├── ScoreBoard.tsx       # スコアボード
+│   │   │   └── SmartHint.tsx        # スマートヒント表示
+│   │   ├── SetupScreen/             # 初期設定画面
+│   │   ├── ShortcutCard/            # ショートカットカード表示
+│   │   ├── SystemShortcutWarning/   # システムショートカット警告表示
+│   │   ├── ErrorBoundary.tsx        # エラーバウンダリー
+│   │   ├── NormalModeView.tsx       # 通常モードビュー
+│   │   ├── QuizModeView.tsx         # クイズモードビュー
+│   │   └── SessionDetailModal.tsx   # セッション詳細モーダル
+│   │
+│   ├── context/                     # グローバル状態管理 (Context API)
+│   │   ├── AuthContext.tsx          # 認証状態管理 (Supabase Auth)
+│   │   ├── LanguageContext.tsx      # 多言語対応状態管理
+│   │   ├── QuizContext.tsx          # クイズ状態管理
+│   │   ├── QuizReducer.ts           # クイズステートリデューサー
+│   │   ├── SettingsContext.tsx      # 設定状態管理
+│   │   ├── ShortcutContext.tsx      # ショートカットデータ状態管理 (旧版)
+│   │   ├── UIContext.tsx            # UI状態管理
+│   │   └── index.ts                 # Context エクスポート
+│   │
+│   ├── hooks/                       # カスタムフック
+│   │   ├── useAdaptivePerformance.ts  # アダプティブパフォーマンス最適化
+│   │   ├── useFullscreen.ts         # 全画面モード制御
+│   │   ├── useKeyboardShortcuts.ts  # キーボード入力検出・ショートカットマッチング
+│   │   ├── useLocalizedData.ts      # ローカライズデータ取得
+│   │   ├── useLocalStorage.ts       # ローカルストレージ永続化
+│   │   ├── useQuizInputHandler.ts   # クイズ入力ハンドリング
+│   │   ├── useQuizProgress.ts       # クイズ進捗・履歴管理 (Supabase連携)
+│   │   ├── useShortcuts.ts          # ショートカットデータ取得 (Supabase)
+│   │   └── index.ts                 # Hooks エクスポート
+│   │
+│   ├── utils/                       # ユーティリティ関数
+│   │   ├── aiOptimization.ts        # AI最適化ユーティリティ
+│   │   ├── analytics.ts             # アナリティクス関数
+│   │   ├── authErrors.ts            # 認証エラーメッセージマッピング
+│   │   ├── authErrors.test.ts       # 認証エラーテスト
+│   │   ├── csvExport.ts             # CSVエクスポート機能
+│   │   ├── fullscreen.ts            # 全画面モード・Keyboard Lock API
+│   │   ├── i18n.ts                  # 国際化ヘルパー
+│   │   ├── keyboard.ts              # キーボード処理ユーティリティ
+│   │   ├── keyMapping.ts            # 物理キーコードとキー名のマッピング
+│   │   ├── keyUtils.ts              # キー関連ユーティリティ
+│   │   ├── os.ts                    # OS検出ユーティリティ
+│   │   ├── quizEngine.ts            # クイズエンジン (判定ロジック、正規化)
+│   │   ├── sequentialShortcuts.ts   # 順押しショートカット処理
+│   │   ├── shortcutUtils.ts         # ショートカット関連ユーティリティ
+│   │   ├── validation.ts            # バリデーション (パスワード強度、メール検証)
+│   │   └── index.ts                 # Utils エクスポート
+│   │
+│   ├── constants/                   # 定数定義
+│   │   ├── alternativeShortcuts.ts  # 代替ショートカット定義
+│   │   ├── app.ts                   # アプリケーション定義 (旧版、現在はDB管理)
+│   │   ├── categoryTranslations.ts  # カテゴリ翻訳
+│   │   ├── descriptionTranslations.ts  # 説明文翻訳
+│   │   ├── icons.ts                 # アイコン定義
+│   │   ├── keys.ts                  # 物理キーマッピング
+│   │   ├── releases.ts              # リリースノート定義
+│   │   ├── setup.ts                 # セットアップ定数
+│   │   ├── systemProtectedShortcuts.ts  # システム保護ショートカット (旧版)
+│   │   └── index.ts                 # Constants エクスポート
+│   │
+│   ├── data/                        # データファイル
+│   │   └── layouts/                 # キーボードレイアウトデータ
+│   │       ├── macJis.ts            # Mac JISレイアウト
+│   │       ├── macUs.ts             # Mac USレイアウト
+│   │       ├── windowsJis.ts        # Windows JISレイアウト
+│   │       ├── windowsUs.ts         # Windows USレイアウト
+│   │       └── index.ts             # Layouts エクスポート
+│   │
+│   ├── config/                      # 設定ファイル
+│   │   └── index.ts                 # アプリケーション設定
+│   │
+│   ├── lib/                         # 外部ライブラリ設定
+│   │   └── supabase.ts              # Supabase クライアント初期化
+│   │
+│   ├── locales/                     # 多言語対応翻訳ファイル
+│   │   ├── en.ts                    # 英語翻訳
+│   │   ├── ja.ts                    # 日本語翻訳
+│   │   └── index.ts                 # Locales エクスポート
+│   │
+│   ├── pages/                       # ページコンポーネント
+│   │   ├── Home.tsx                 # ホームページ
+│   │   ├── LandingPage.tsx          # ランディングページ
+│   │   ├── MyPage.tsx               # マイページ
+│   │   ├── PasswordReset.tsx        # パスワードリセットページ
+│   │   └── ReleaseNotes.tsx         # リリースノートページ
+│   │
+│   ├── styles/                      # スタイルシート
+│   │   ├── animations.css           # アニメーション定義
+│   │   ├── components.css           # コンポーネントスタイル
+│   │   ├── global.css               # グローバルスタイル
+│   │   ├── keyboard.css             # キーボードスタイル
+│   │   ├── quiz.css                 # クイズスタイル
+│   │   ├── tailwind.css             # Tailwind CSS設定
+│   │   ├── variables.css            # CSS変数定義
+│   │   └── index.ts                 # Styles エクスポート
+│   │
+│   ├── tests/                       # テストファイル
+│   │   ├── quizEngine.test.ts       # クイズエンジンテスト
+│   │   ├── sequentialShortcuts.test.ts  # 順押しショートカットテスト
+│   │   └── setup.ts                 # テストセットアップ
+│   │
+│   ├── types/                       # TypeScript型定義
+│   │   └── index.ts                 # 型定義エクスポート
+│   │
+│   ├── App.tsx                      # メインAppコンポーネント
+│   ├── main.tsx                     # エントリーポイント
+│   ├── custom.d.ts                  # カスタム型定義
+│   └── vite-env.d.ts                # Vite環境変数型定義
+│
+├── supabase/                        # Supabaseデータベース管理
+│   └── migrations/                  # SQLマイグレーションファイル (Source of Truth)
+│       ├── 001_create_shortcuts_table.sql
+│       ├── 002_insert_data.sql
+│       ├── ...
+│       └── 045_create_applications_table.sql
+│
+├── scripts/                         # データベース・メンテナンススクリプト
+│   ├── archive/                     # アーカイブされたスクリプト
+│   ├── lib/                         # スクリプト共通ライブラリ
+│   ├── check-categories.ts          # カテゴリ整合性チェック
+│   ├── check-english-descriptions.ts  # 英語説明チェック
+│   ├── export-shortcuts-csv.ts      # ショートカットCSVエクスポート
+│   ├── generate-sql.ts              # SQLファイル生成
+│   ├── list-shortcuts.ts            # ショートカット一覧表示
+│   ├── migrate-supabase.ts          # Supabaseマイグレーション実行
+│   ├── populate-english-data-pg.ts  # 英語データ投入
+│   ├── run-migration.ts             # マイグレーション実行
+│   ├── run-single-migration.ts      # 単一マイグレーション実行
+│   ├── update-sort-order.ts         # ソート順更新
+│   └── README.md                    # スクリプト説明書
+│
+├── .github/                         # GitHub Actions CI/CD設定
+│   └── workflows/
+│       └── deploy.yml               # デプロイワークフロー
+│
+├── docker-compose.yml               # Docker開発環境設定
+├── docker-compose.prod.yml          # Docker本番環境設定
+├── Dockerfile                       # Dockerイメージビルド設定
+├── nginx.conf                       # Nginx設定 (本番環境)
+│
+├── vite.config.ts                   # Vite設定ファイル
+├── tsconfig.json                    # TypeScript設定
+├── tsconfig.node.json               # TypeScript Node.js設定
+├── tsconfig.scripts.json            # TypeScript スクリプト設定
+├── postcss.config.js                # PostCSS設定 (Tailwind CSS v4)
+├── package.json                     # npm依存関係・スクリプト定義
+├── index.html                       # HTMLエントリーポイント
+│
+├── README.md                        # プロジェクト説明 (このファイル)
+├── CLAUDE.md                        # Claude Code用プロジェクトガイド
+├── AUTH_SETUP.md                    # 認証セットアップガイド
+├── DEPLOY.md                        # デプロイメントガイド
+├── DOCKER.md                        # Docker使用ガイド
+└── GEMINI.md                        # Gemini AI用ガイド
 ```
 
 ## ⚙️ 主要スクリプト (package.json)
