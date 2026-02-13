@@ -3,6 +3,7 @@ import SetupScreen from '../components/SetupScreen';
 import NormalModeView from '../components/NormalModeView';
 import QuizModeView from '../components/QuizModeView';
 import { useSettings, useUI, useShortcutData } from '../context';
+import { useLanguage } from '../context/LanguageContext';
 import { useFullscreen } from '../hooks';
 import { SetupCompleteOptions } from '../types';
 
@@ -17,6 +18,7 @@ const Home: React.FC = () => {
     setQuizDifficulty
   } = useUI();
   const { loading, error } = useShortcutData();
+  const { t } = useLanguage();
 
   const { isFullscreenMode, toggleFullscreenMode } = useFullscreen();
 
@@ -58,8 +60,8 @@ const Home: React.FC = () => {
     return (
       <main className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <article style={{ textAlign: 'center' }}>
-          <h2>キーボードショートカットを読み込み中...</h2>
-          <p>データを準備しています。少々お待ちください。</p>
+          <h2>{t.home.loadingTitle}</h2>
+          <p>{t.home.loadingSubtitle}</p>
           <div className="loading-spinner"></div>
         </article>
       </main>
@@ -71,10 +73,10 @@ const Home: React.FC = () => {
     return (
       <main className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <article style={{ textAlign: 'center', color: 'red' }}>
-          <h2>データの取得に失敗しました</h2>
+          <h2>{t.errors.failedToFetch}</h2>
           <p>{error.message}</p>
           <p style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
-            インターネット接続を確認するか、しばらく経ってから再度お試しください。
+            {t.errors.checkConnection}
           </p>
         </article>
       </main>

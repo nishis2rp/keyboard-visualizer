@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { mapAuthErrorToMessage, AUTH_ERROR_MESSAGES } from '../utils/authErrors';
+import { useLanguage } from '../context/LanguageContext';
+import { mapAuthErrorToMessage } from '../utils/authErrors';
 
 const PasswordReset: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -10,15 +11,16 @@ const PasswordReset: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Supabase automatically handles session from the URL fragment (access_token)
     // We just need to ensure the user is present to update the password
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user && _event === 'SIGNED_IN') {
-        setMessage('新しいパスワードを設定してください。');
+        setMessage(t.auth.setNewPasswordMessage);
       } else if (!session?.user && _event === 'SIGNED_OUT') {
-        setError('パスワードリセットのリンクが無効または期限切れです。\n再度パスワードリセットをリクエストしてください。');
+        setError(t.auth.linkInvalidError);
         // Optionally redirect after a delay
         setTimeout(() => navigate('/'), 5000);
       }
@@ -27,7 +29,7 @@ const PasswordReset: React.FC = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, t]);
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,13 +38,13 @@ const PasswordReset: React.FC = () => {
     setLoading(true);
 
     if (password !== confirmPassword) {
-      setError('パスワードが一致しません。');
+      setError(t.auth.error.passwordMismatch);
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError(AUTH_ERROR_MESSAGES.PASSWORD_TOO_SHORT);
+      setError(t.auth.error.weakPassword);
       setLoading(false);
       return;
     }
@@ -51,15 +53,15 @@ const PasswordReset: React.FC = () => {
       const { error: updateError } = await supabase.auth.updateUser({ password });
 
       if (updateError) {
-        setError(mapAuthErrorToMessage(updateError));
+        setError(mapAuthErrorToMessage(updateError, t));
       } else {
-        setMessage('パスワードが正常にリセットされました。\n3秒後に自動的にホーム画面に移動します。');
+        setMessage(t.auth.resetSuccessMessage);
         setPassword('');
         setConfirmPassword('');
         setTimeout(() => navigate('/'), 3000); // Redirect to home/login after 3 seconds
       }
     } catch (err: any) {
-      setError(AUTH_ERROR_MESSAGES.NETWORK_ERROR);
+      setError(t.errors.networkError);
     } finally {
       setLoading(false);
     }
@@ -67,14 +69,14 @@ const PasswordReset: React.FC = () => {
 
   return (
     <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-      <h1 style={{ textAlign: 'center', color: '#333', marginBottom: '30px' }}>パスワードリセット</h1>
+      <h1 style={{ textAlign: 'center', color: '#333', marginBottom: '30px' }}>{t.auth.passwordResetTitle}</h1>
 
       {error && <div style={{ color: 'red', backgroundColor: '#ffe0e0', padding: '10px', borderRadius: '4px', marginBottom: '15px' }}>{error}</div>}
       {message && <div style={{ color: 'green', backgroundColor: '#e0ffe0', padding: '10px', borderRadius: '4px', marginBottom: '15px' }}>{message}</div>}
 
       <form onSubmit={handlePasswordReset}>
         <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="password" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>新しいパスワード</label>
+          <label htmlFor="password" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>{t.auth.newPasswordLabel}</label>
           <input
             type="password"
             id="password"
@@ -86,7 +88,7 @@ const PasswordReset: React.FC = () => {
           />
         </div>
         <div style={{ marginBottom: '20px' }}>
-          <label htmlFor="confirmPassword" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>新しいパスワード（確認用）</label>
+          <label htmlFor="confirmPassword" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>{t.auth.confirmPasswordLabel}</label>
           <input
             type="password"
             id="confirmPassword"
@@ -102,7 +104,7 @@ const PasswordReset: React.FC = () => {
           disabled={loading}
           style={{ width: '100%', padding: '10px', backgroundColor: '#007AFF', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1em', opacity: loading ? 0.6 : 1 }}
         >
-          {loading ? '処理中...' : 'パスワードをリセット'}
+          {loading ? t.auth.processing : t.auth.resetPasswordButton}
         </button>
       </form>
     </div>

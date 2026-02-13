@@ -25,15 +25,3 @@ export const DEFAULTS = {
   /** Default keyboard layout. */
   LAYOUT: 'windows-jis'
 }
-
-/**
- * アプリケーション名の日本語表示マップ
- */
-export const APP_DISPLAY_NAMES: { [key: string]: string } = {
-  'windows11': 'Windows 11',
-  'macos': 'macOS',
-  'chrome': 'Chrome',
-  'excel': 'Excel',
-  'slack': 'Slack',
-  'gmail': 'Gmail',
-};

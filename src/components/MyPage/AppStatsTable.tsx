@@ -1,17 +1,21 @@
 import React from 'react';
 import { UserQuizStats } from '../../types';
-import { APP_DISPLAY_NAMES } from '../../constants/app';
+import { useShortcutData } from '../../context';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface AppStatsTableProps {
   stats: UserQuizStats[];
 }
 
 const AppStatsTable: React.FC<AppStatsTableProps> = ({ stats }) => {
+  const { appMap } = useShortcutData();
+  const { t, language } = useLanguage();
+
   if (stats.length === 0) {
     return (
       <div className="text-center py-8 bg-sf-green-ultralight/30 rounded-apple-lg border border-sf-green-light/20">
         <div className="text-3xl mb-2">📝</div>
-        <p className="text-sf-gray-dark font-medium">まだクイズをプレイしていません。</p>
+        <p className="text-sf-gray-dark font-medium">{t.myPage.noStats}</p>
       </div>
     );
   }
@@ -21,16 +25,18 @@ const AppStatsTable: React.FC<AppStatsTableProps> = ({ stats }) => {
       <table className="apple-table">
         <thead>
           <tr>
-            <th>アプリケーション</th>
-            <th>正解率</th>
-            <th>正解数 / 問題数</th>
-            <th>セッション</th>
-            <th>最終プレイ</th>
+            <th>{t.myPage.app}</th>
+            <th>{t.myPage.accuracy}</th>
+            <th>{t.myPage.correctCount}</th>
+            <th>{t.myPage.sessions}</th>
+            <th>{t.myPage.lastPlayed}</th>
           </tr>
         </thead>
         <tbody>
           {stats.map((stat, index) => {
-            const displayName = APP_DISPLAY_NAMES[stat.application] || stat.application;
+            const app = appMap[stat.application];
+            const displayName = language === 'en' && app?.name_en ? app.name_en : (app?.name || stat.application);
+            
             return (
               <tr key={index} className="hover:bg-sf-gray-ultralight transition-colors">
                 <td className="font-semibold text-sf-primary">

@@ -11,6 +11,7 @@ import WeakShortcuts from '../components/MyPage/WeakShortcuts';
 
 const MyPage: React.FC = () => {
   const { user, profile, loading, updateProfile, updateEmail, deleteAccount } = useAuth();
+  const { t } = useLanguage();
   const [displayName, setDisplayName] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -76,7 +77,7 @@ const MyPage: React.FC = () => {
 
       } catch (err: any) {
         console.error('Error fetching quiz data:', err);
-        setError('クイズデータの取得に失敗しました: ' + err.message);
+        setError(t.myPage.fetchDataFailed + err.message);
       } finally {
         setQuizDataLoading(false);
       }
@@ -85,7 +86,7 @@ const MyPage: React.FC = () => {
     if (user) {
       fetchQuizData();
     }
-  }, [user]);
+  }, [user, t.myPage.fetchDataFailed]);
 
   const fetchWeakShortcuts = async (userId: string) => {
     setWeakShortcutsLoading(true);
@@ -165,7 +166,7 @@ const MyPage: React.FC = () => {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
-        <p className="loading-text">読み込み中...</p>
+        <p className="loading-text">{t.common.loading}</p>
       </div>
     );
   }
@@ -181,7 +182,7 @@ const MyPage: React.FC = () => {
     setProfileUpdateLoading(true);
 
     if (displayName.trim() === '') {
-      setError('表示名は空白にできません。');
+      setError(t.myPage.displayNameEmpty);
       setProfileUpdateLoading(false);
       return;
     }
@@ -190,7 +191,7 @@ const MyPage: React.FC = () => {
     if (updateError) {
       setError(updateError.message);
     } else {
-      setMessage('表示名が更新されました！');
+      setMessage(t.myPage.displayNameUpdated);
     }
     setProfileUpdateLoading(false);
   };
@@ -205,7 +206,7 @@ const MyPage: React.FC = () => {
 
   const handleAvatarUpload = async () => {
     if (!avatarFile || !user) {
-      setError('ファイルが選択されていません。');
+      setError('File not selected.'); // This can stay simple or be added to translations
       return;
     }
 
@@ -233,7 +234,7 @@ const MyPage: React.FC = () => {
       .getPublicUrl(filePath);
 
     if (!publicUrlData) {
-      setError('アバターURLの取得に失敗しました。');
+      setError('Failed to get public URL.');
       setUploading(false);
       return;
     }
@@ -246,7 +247,7 @@ const MyPage: React.FC = () => {
     if (updateProfileError) {
       setError(updateProfileError.message);
     } else {
-      setMessage('アバターが正常にアップロードされました！');
+      setMessage(t.myPage.uploadSuccess);
       setAvatarFile(null);
     }
     setUploading(false);
@@ -259,13 +260,13 @@ const MyPage: React.FC = () => {
     setEmailUpdateLoading(true);
 
     if (newEmail.trim() === '' || !newEmail.includes('@')) {
-      setError('有効なメールアドレスを入力してください。');
+      setError(t.myPage.invalidEmailError);
       setEmailUpdateLoading(false);
       return;
     }
 
     if (newEmail === user?.email) {
-      setMessage('新しいメールアドレスは現在のメールアドレスと同じです。');
+      setMessage(t.myPage.emailSameError);
       setEmailUpdateLoading(false);
       return;
     }
@@ -274,7 +275,7 @@ const MyPage: React.FC = () => {
     if (updateError) {
       setError(updateError.message);
     } else {
-      setMessage('メールアドレス変更の確認メールを送信しました。新しいメールアドレスで確認してください。');
+      setMessage(t.myPage.emailUpdateSent);
     }
     setEmailUpdateLoading(false);
   };
@@ -287,7 +288,7 @@ const MyPage: React.FC = () => {
     const { error: deleteError } = await deleteAccount();
 
     if (deleteError) {
-      setError('アカウントの削除に失敗しました: ' + deleteError.message);
+      setError(t.myPage.deleteFailed + deleteError.message);
       setDeleting(false);
       setShowDeleteConfirm(false);
     } else {
@@ -305,9 +306,9 @@ const MyPage: React.FC = () => {
   return (
     <div className="max-w-[1200px] mx-auto my-12 p-4 animate-in fade-in duration-700">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-black tracking-tighter text-sf-primary m-0">ダッシュボード</h1>
+        <h1 className="text-4xl font-black tracking-tighter text-sf-primary m-0">{t.myPage.dashboard}</h1>
         <div className="mypage-header-actions">
-          <Link to="/app" className="no-underline text-sf-gray text-sm font-medium px-3 py-1.5 rounded-apple-md transition-all hover:bg-sf-gray-light hover:text-sf-primary">🏠 アプリへ戻る</Link>
+          <Link to="/app" className="no-underline text-sf-gray text-sm font-medium px-3 py-1.5 rounded-apple-md transition-all hover:bg-sf-gray-light hover:text-sf-primary">{t.myPage.backToApp}</Link>
         </div>
       </div>
 
@@ -319,7 +320,7 @@ const MyPage: React.FC = () => {
         <div className="flex flex-col gap-8">
           {/* Stats Cards Section */}
           <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
-            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">📊 統計サマリー</h2>
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">{t.myPage.statsSummary}</h2>
             <StatCards
               overallAccuracy={overallAccuracy}
               overallCorrect={overallCorrect}
@@ -330,7 +331,7 @@ const MyPage: React.FC = () => {
 
           {/* Weak Shortcuts Section */}
           <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
-            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">⚠️ 重点復習ショートカット</h2>
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">{t.myPage.weakShortcutsTitle}</h2>
             <WeakShortcuts 
               weakShortcuts={weakShortcuts} 
               loading={weakShortcutsLoading} 
@@ -339,13 +340,13 @@ const MyPage: React.FC = () => {
 
           {/* App Stats Section */}
           <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
-            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">📱 アプリケーション別統計</h2>
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">{t.myPage.appStatsTitle}</h2>
             <AppStatsTable stats={quizStats} />
           </section>
 
           {/* Recent Sessions Section */}
           <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
-            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">🎯 最近のプレイ履歴</h2>
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">{t.myPage.recentHistoryTitle}</h2>
             <RecentSessions 
               sessions={quizSessions} 
               onSelectSession={(id) => setSelectedSessionId(id)} 
@@ -357,16 +358,16 @@ const MyPage: React.FC = () => {
         <div className="flex flex-col gap-8">
           {/* Profile Section */}
           <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
-            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">👤 プロフィール</h2>
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">{t.myPage.profileTitle}</h2>
             <div className="flex items-center gap-4 mb-6">
               <div className="relative w-20 h-20 shrink-0">
                 <img
                   src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=667eea&color=fff&size=80`}
-                  alt="アバター"
+                  alt={t.myPage.avatarAlt}
                   className="w-20 h-20 rounded-full object-cover border-2 border-sf-blue-ultralight"
                 />
                 <div className="absolute bottom-0 right-0 bg-sf-blue text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] cursor-pointer border-2 border-white shadow-sm">
-                  <label htmlFor="avatarInput" className="cursor-pointer">編集</label>
+                  <label htmlFor="avatarInput" className="cursor-pointer">{t.myPage.edit}</label>
                   <input
                     id="avatarInput"
                     type="file"
@@ -383,7 +384,7 @@ const MyPage: React.FC = () => {
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
                     className="apple-input py-1.5"
-                    placeholder="表示名"
+                    placeholder={t.myPage.displayNamePlaceholder}
                   />
                   {displayName !== profile?.display_name && (
                     <button type="submit" disabled={profileUpdateLoading} className="w-6 h-6 bg-sf-green text-white rounded flex items-center justify-center shrink-0 disabled:opacity-50">
@@ -403,7 +404,7 @@ const MyPage: React.FC = () => {
                   disabled={uploading}
                   className="w-full py-1.5 bg-sf-blue text-white rounded-apple-sm text-xs font-bold disabled:opacity-50"
                 >
-                  {uploading ? 'アップロード中...' : 'アップロード確定'}
+                  {uploading ? t.myPage.uploading : t.myPage.uploadConfirm}
                 </button>
               </div>
             )}
@@ -411,24 +412,24 @@ const MyPage: React.FC = () => {
 
           {/* Account Settings Section */}
           <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
-            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">⚙️ 設定</h2>
+            <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">{t.myPage.settingsTitle}</h2>
             
             <div className="mb-6">
-              <h3 className="text-[11px] font-bold text-sf-gray uppercase tracking-wider mb-2">メールアドレス変更</h3>
+              <h3 className="text-[11px] font-bold text-sf-gray uppercase tracking-wider mb-2">{t.myPage.changeEmail}</h3>
               <form onSubmit={handleEmailUpdate} className="flex gap-1.5">
                 <input
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   className="apple-input py-1.5"
-                  placeholder="新しいメール"
+                  placeholder={t.myPage.newEmailPlaceholder}
                 />
                 <button
                   type="submit"
                   disabled={emailUpdateLoading || newEmail === user.email}
                   className="px-3 py-1.5 bg-sf-blue text-white rounded-apple-sm text-xs font-bold disabled:opacity-50 shrink-0"
                 >
-                  変更
+                  {t.myPage.changeButton}
                 </button>
               </form>
             </div>
@@ -436,32 +437,32 @@ const MyPage: React.FC = () => {
             <div className="h-[1px] bg-gray-100 my-6"></div>
 
             <div className="mb-6">
-              <h3 className="text-[11px] font-bold text-sf-gray uppercase tracking-wider mb-2">パスワード</h3>
+              <h3 className="text-[11px] font-bold text-sf-gray uppercase tracking-wider mb-2">{t.myPage.passwordTitle}</h3>
               <Link to="/password-reset" className="text-xs text-sf-blue font-bold no-underline">
-                パスワードリセットはこちら →
+                {t.myPage.passwordResetLink}
               </Link>
             </div>
 
             <div className="h-[1px] bg-gray-100 my-6"></div>
 
             <div>
-              <h3 className="text-[11px] font-bold text-sf-gray uppercase tracking-wider mb-2 text-sf-red">危険な操作</h3>
+              <h3 className="text-[11px] font-bold text-sf-gray uppercase tracking-wider mb-2 text-sf-red">{t.myPage.dangerZoneTitle}</h3>
               {!showDeleteConfirm ? (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
                   className="text-xs text-sf-red font-bold bg-transparent border-none p-0 cursor-pointer"
                 >
-                  アカウントを削除する
+                  {t.myPage.deleteAccountButton}
                 </button>
               ) : (
                 <div className="bg-red-50 p-3 rounded-apple-md text-center">
-                  <p className="text-[11px] text-sf-red-dark font-bold mb-2">本当に削除しますか？</p>
+                  <p className="text-[11px] text-sf-red-dark font-bold mb-2">{t.myPage.deleteConfirmText}</p>
                   <div className="flex gap-2 justify-center">
                     <button onClick={handleDeleteAccount} disabled={deleting} className="px-3 py-1 bg-sf-red text-white text-[10px] font-bold rounded cursor-pointer border-none">
-                      削除
+                      {t.myPage.deleteConfirmButton}
                     </button>
                     <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting} className="px-3 py-1 bg-gray-200 text-sf-gray text-[10px] font-bold rounded cursor-pointer border-none">
-                      戻る
+                      {t.myPage.deleteCancelButton}
                     </button>
                   </div>
                 </div>

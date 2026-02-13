@@ -116,7 +116,7 @@ const QuizModeView = () => {
         {quizState.status === 'paused' && (
           <div className="quiz-pause-overlay">
             <div className="quiz-pause-icon">⏸️</div>
-            <div className="quiz-pause-text">一時停止中</div>
+            <div className="quiz-pause-text">{t.quiz.paused}</div>
           </div>
         )}
 

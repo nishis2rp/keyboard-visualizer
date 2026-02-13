@@ -8,6 +8,7 @@ interface ShortcutContextType {
   allShortcuts: AllShortcuts;
   richShortcuts: RichShortcut[];
   apps: App[];
+  appMap: Record<string, App>;
   loading: boolean;
   error: Error | null;
   loadShortcuts: (appId: string) => Promise<void>;
@@ -32,6 +33,14 @@ export const ShortcutProvider: React.FC<{ children: ReactNode }> = ({ children }
   // Ensure apps is always an array
   const apps = useMemo(() => dbApps || [], [dbApps]);
 
+  // Create an appMap for quick lookups
+  const appMap = useMemo(() => {
+    return apps.reduce((acc, app) => {
+      acc[app.id] = app;
+      return acc;
+    }, {} as Record<string, App>);
+  }, [apps]);
+
   // 自動ロードロジック
   useEffect(() => {
     const targetApp = isQuizMode ? quizApp : selectedApp;
@@ -44,6 +53,7 @@ export const ShortcutProvider: React.FC<{ children: ReactNode }> = ({ children }
     allShortcuts,
     richShortcuts,
     apps,
+    appMap,
     loading,
     error,
     loadShortcuts: fetchShortcutsForApp

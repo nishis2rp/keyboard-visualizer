@@ -33,14 +33,14 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     {
       id: 'fullscreen',
       title: t.setup.displayMode.fullscreen.title,
-      icon: '🖥️',
+      icon: 'fullscreen',
       description: t.setup.displayMode.fullscreen.description,
       recommendation: t.setup.displayMode.fullscreen.recommendation
     },
     {
       id: 'windowed',
       title: t.setup.displayMode.windowed.title,
-      icon: '🪟',
+      icon: 'windowed',
       description: t.setup.displayMode.windowed.description
     }
   ], [t])
@@ -49,25 +49,25 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     {
       id: 'windows-jis',
       title: t.setup.keyboardLayout.windowsJis.title,
-      icon: '🪟',
+      icon: 'windows-jis',
       description: t.setup.keyboardLayout.windowsJis.description
     },
     {
       id: 'windows-us',
       title: t.setup.keyboardLayout.windowsUs?.title || 'Windows US',
-      icon: '🪟',
+      icon: 'windows-us',
       description: t.setup.keyboardLayout.windowsUs?.description || 'US (English) Keyboard (Windows)'
     },
     {
       id: 'mac-jis',
       title: t.setup.keyboardLayout.macJis.title,
-      icon: '🍎',
+      icon: 'mac-jis',
       description: t.setup.keyboardLayout.macJis.description
     },
     {
       id: 'mac-us',
       title: t.setup.keyboardLayout.macUs.title,
-      icon: '🇺🇸',
+      icon: 'mac-us',
       description: t.setup.keyboardLayout.macUs.description
     }
   ], [t])
@@ -76,13 +76,13 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     {
       id: 'visualizer',
       title: t.setup.modes.visualizer.title,
-      icon: '⌨️',
+      icon: 'visualizer',
       description: t.setup.modes.visualizer.description
     },
     {
       id: 'quiz',
       title: t.setup.modes.quiz.title,
-      icon: '🎯',
+      icon: 'quiz',
       description: t.setup.modes.quiz.description
     }
   ], [t])
@@ -91,31 +91,31 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     {
       id: 'basic',
       name: t.setup.difficultyOptions.basic.name,
-      icon: '🌟',
+      icon: 'basic',
       description: t.setup.difficultyOptions.basic.description
     },
     {
       id: 'standard',
       name: t.setup.difficultyOptions.standard.name,
-      icon: '⚡',
+      icon: 'standard',
       description: t.setup.difficultyOptions.standard.description
     },
     {
       id: 'hard',
       name: t.setup.difficultyOptions.hard.name,
-      icon: '💪',
+      icon: 'hard',
       description: t.setup.difficultyOptions.hard.description
     },
     {
       id: 'madmax',
       name: t.setup.difficultyOptions.madmax.name,
-      icon: '🔥',
+      icon: 'madmax',
       description: t.setup.difficultyOptions.madmax.description
     },
     {
       id: 'allrange',
       name: t.setup.difficultyOptions.allrange.name,
-      icon: '🎲',
+      icon: 'allrange',
       description: t.setup.difficultyOptions.allrange.description
     }
   ], [t])
@@ -131,8 +131,8 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   // ビジュアライザーモード用のアプリケーション選択肢
   const visualizerAppOptions = useMemo(() => apps.map(app => ({
     ...app,
-    title: app.name
-  })), [apps])
+    title: language === 'en' && app.name_en ? app.name_en : app.name
+  })), [apps, language])
 
   // クイズ用のアプリ選択肢（ランダムを含む）
   const quizAppOptions = useMemo(() => [
@@ -140,13 +140,13 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
       id: 'random',
       name: t.setup.randomApp,
       title: t.setup.randomApp,
-      icon: '🎲'
+      icon: 'random'
     },
     ...apps.map(app => ({
       ...app,
-      title: app.name
+      title: language === 'en' && app.name_en ? app.name_en : app.name
     }))
-  ], [apps, t.setup.randomApp])
+  ], [apps, t.setup.randomApp, language])
 
   const handleSelectMode = (mode: SetupOptionType) => {
     setSelectedMode(mode)

@@ -109,11 +109,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (oauthError) {
       console.error('OAuth callback error:', oauthError);
 
-      // Store error for AuthModal to display
-      sessionStorage.setItem('oauth_error', JSON.stringify({
-        provider: oauthError.error_code || 'unknown',
-        message: mapOAuthErrorToMessage(oauthError),
-      }));
+      // Store raw error details for AuthModal to localize and display
+      sessionStorage.setItem('oauth_error', JSON.stringify(oauthError));
 
       // Clear error from URL
       clearOAuthErrorFromUrl();
@@ -256,29 +253,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         },
       });
 
-      if (error) {
-        console.error('OAuth error:', error);
-
-        // Check if provider not configured
-        if (error.message.includes('Provider not found') ||
-            error.message.includes('not enabled')) {
-          return {
-            error: {
-              ...error,
-              message: 'Googleログインが設定されていません。管理者に連絡してください。',
-            } as AuthError,
-          };
-        }
-
-        return { error };
-      }
-
-      return { error: null };
+      return { error };
     } catch (err) {
       console.error('Unexpected OAuth error:', err);
       return {
         error: {
-          message: 'Googleログイン中にエラーが発生しました。もう一度お試しください。',
+          message: 'OAuth Error',
           name: 'OAuthError',
           status: 500,
         } as AuthError,

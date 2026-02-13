@@ -1,4 +1,5 @@
 import React from 'react';
+import { ICON_MAPPING } from '../../constants/icons';
 
 interface AppIconProps {
   appId: string;
@@ -13,57 +14,7 @@ interface AppIconProps {
  */
 export const AppIcon: React.FC<AppIconProps> = ({ appId, size = 24, className = '', fallbackIcon }) => {
   // アプリケーションIDとファイル名のマッピング
-  const getIconFilename = (id: string): string | null => {
-    switch (id) {
-      case 'windows11':
-      case 'windowed':
-      case 'windows-jis':
-        return 'windows.svg';
-      case 'macos':
-      case 'mac-jis':
-      case 'mac-us':
-        return 'macos.svg';
-      case 'chrome':
-        return 'chrome.svg';
-      case 'excel':
-        return 'excel.svg';
-      case 'word':
-        return 'word.svg';
-      case 'powerpoint':
-        return 'powerpoint.svg';
-      case 'slack':
-        return 'slack.svg';
-      case 'gmail':
-        return 'gmail.svg';
-      case 'vscode':
-        return 'vscode.svg';
-      case 'terminal':
-        return 'terminal.svg';
-      case 'xcode':
-        return 'xcode.svg';
-      case 'random':
-      case 'allrange':
-        return 'allrange.svg';
-      case 'fullscreen':
-        return 'fullscreen.svg';
-      case 'visualizer':
-        return 'visualizer.svg';
-      case 'quiz':
-        return 'quiz.svg';
-      case 'basic':
-        return 'basic.svg';
-      case 'standard':
-        return 'standard.svg';
-      case 'hard':
-        return 'hard.svg';
-      case 'madmax':
-        return 'madmax.svg';
-      default:
-        return null;
-    }
-  };
-
-  const filename = getIconFilename(appId);
+  const filename = ICON_MAPPING[appId] || null;
 
   if (!filename) {
     return <span>{fallbackIcon || '❓'}</span>;

@@ -167,6 +167,7 @@ export const generateQuestion = (
   difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard',
   richShortcuts: RichShortcut[] = [],
   apps: App[] = [],
+  questionFormat = '[{app}] What is the shortcut for "{description}"?',
   language: 'ja' | 'en' = 'ja'
 ) => {
   // 全ての許可されたアプリのショートカットを収集
@@ -176,7 +177,8 @@ export const generateQuestion = (
   // アプリ名のマップを作成
   const appNameMap = new Map<string, string>();
   apps.forEach(app => {
-    appNameMap.set(app.id, app.name);
+    const name = language === 'en' && app.name_en ? app.name_en : app.name;
+    appNameMap.set(app.id, name);
   });
 
   // richShortcutsからマップを作成（application + keys でルックアップ）
@@ -248,10 +250,12 @@ export const generateQuestion = (
   const randomIndex = Math.floor(Math.random() * allPossibleQuestions.length);
   const selected = allPossibleQuestions[randomIndex];
 
+  const questionText = questionFormat
+    .replace('{app}', selected.appName)
+    .replace('{description}', selected.description);
+
   const question = {
-    question: language === 'en'
-      ? `【${selected.appName}】What is the shortcut for "${selected.description}"?`
-      : `【${selected.appName}】${selected.description}のショートカットは？`,
+    question: questionText,
     correctShortcut: selected.shortcut,
     normalizedCorrectShortcut: selected.normalizedShortcut, // 既に計算済み
     appName: selected.appName,

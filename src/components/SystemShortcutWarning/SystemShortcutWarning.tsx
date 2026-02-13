@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { detectOS } from '../../constants'
+import { detectOS } from '../../utils/os'
+import { useLanguage } from '../../context/LanguageContext'
 import './SystemShortcutWarning.css'
 
 const LOCAL_STORAGE_KEY_WARNING_SHOWN = 'macOsSystemShortcutWarningShown';
@@ -7,6 +8,7 @@ const LOCAL_STORAGE_KEY_WARNING_SHOWN = 'macOsSystemShortcutWarningShown';
 const SystemShortcutWarning = ({ onOpenRequest }) => { // onOpenRequestをプロップとして受け取る
   const [os, setOs] = useState('unknown')
   const [isVisible, setIsVisible] = useState(false) // モーダルの表示状態
+  const { t } = useLanguage();
   const [hasShownWarning, setHasShownWarning] = useState(() => {
     // ローカルストレージから初回表示フラグを読み込む
     if (typeof window !== 'undefined') {
@@ -47,80 +49,63 @@ const SystemShortcutWarning = ({ onOpenRequest }) => { // onOpenRequestをプロ
 
   return (
     <>
-      {/* 警告モーダルを開くボタン。常に表示され、設定画面の一部として機能する */}
-      {/* AppHeaderに統合する予定なので、ここでは一時的に表示 */}
-      {/* <button 
-        className="warning-text-link"
-        onClick={handleOpen}
-        title="macOSシステムショートカットの設定について"
-        style={{ position: 'absolute', top: '10px', right: '10px' }} // 一時的に右上に配置
-      >
-        macOSシステムショートカットについて
-      </button> */}
-      
       {isVisible && (
         <div className="system-warning-container">
           <div className="system-warning-header">
             <span className="warning-icon">⚠️</span>
-            <h3>macOSシステムショートカットについて</h3>
+            <h3>{t.systemShortcutWarning.modalTitle}</h3>
             <button 
               className="warning-close-btn"
               onClick={handleClose}
-              aria-label="閉じる"
+              aria-label={t.common.close}
             >
               ✕
             </button>
           </div>
           
           <div className="system-warning-content">
+            <p className="warning-description" dangerouslySetInnerHTML={{ __html: t.systemShortcutWarning.description }} />
             <p className="warning-description">
-              macOSのシステムショートカット（<code>Ctrl + F2</code>など）は、Webアプリケーションでは無効化できません。
-              以下の方法で競合を解決できます：
+              {t.systemShortcutWarning.solutionTitle}
             </p>
 
             <div className="warning-solutions">
               <div className="solution-item">
-                <h4>方法1: フルスクリーンモードを使用</h4>
-                <p>
-                  アプリを<strong>フルスクリーンモード</strong>にすることで、一部のショートカットをキャプチャできます。
-                  右上の全画面ボタンをクリックしてください。
-                </p>
+                <h4>{t.systemShortcutWarning.method1Title}</h4>
+                <p dangerouslySetInnerHTML={{ __html: t.systemShortcutWarning.method1Desc }} />
               </div>
 
               <div className="solution-item">
-                <h4>方法2: システム設定で無効化</h4>
+                <h4>{t.systemShortcutWarning.method2Title}</h4>
                 <ol>
-                  <li>システム設定 → キーボード → キーボードショートカット を開く</li>
-                  <li>左側のメニューから該当するカテゴリを選択：
+                  <li>{t.systemShortcutWarning.method2Step1}</li>
+                  <li>{t.systemShortcutWarning.method2Step2}
                     <ul>
-                      <li><strong>Mission Control</strong>: <code>Ctrl + ↑↓←→</code>, <code>F3</code></li>
-                      <li><strong>Launchpad</strong>: <code>F4</code></li>
-                      <li><strong>キーボード</strong>: <code>Ctrl + F2</code>, <code>Ctrl + F3</code></li>
-                      <li><strong>スクリーンショット</strong>: <code>Cmd + Shift + 3/4/5</code></li>
+                      <li><strong>{t.systemShortcutWarning.method2Categories.missionControl}</strong>: <code>Ctrl + ↑↓←→</code>, <code>F3</code></li>
+                      <li><strong>{t.systemShortcutWarning.method2Categories.launchpad}</strong>: <code>F4</code></li>
+                      <li><strong>{t.systemShortcutWarning.method2Categories.keyboard}</strong>: <code>Ctrl + F2</code>, <code>Ctrl + F3</code></li>
+                      <li><strong>{t.systemShortcutWarning.method2Categories.screenshots}</strong>: <code>Cmd + Shift + 3/4/5</code></li>
                     </ul>
                   </li>
-                  <li>使用しないショートカットのチェックを外す</li>
+                  <li>{t.systemShortcutWarning.method2Step3}</li>
                 </ol>
               </div>
 
               <div className="solution-item">
-                <h4>主な競合ショートカット</h4>
+                <h4>{t.systemShortcutWarning.commonConflictsTitle}</h4>
                 <div className="shortcut-list">
                   {['Ctrl + F2', 'Ctrl + F3', 'F3', 'F4', 'Ctrl + ↑', 'Ctrl + ↓', 'Ctrl + ←', 'Ctrl + →', 'Cmd + Shift + 3', 'Cmd + Shift + 4'].map((shortcut) => (
                     <code key={shortcut} className="shortcut-badge">{shortcut}</code>
                   ))}
                 </div>
                 <p className="shortcut-note">
-                  これらは「システム設定」で無効化できます
+                  {t.systemShortcutWarning.canBeDisabledHint}
                 </p>
               </div>
             </div>
 
             <div className="warning-footer">
-              <p>
-                💡 <strong>ヒント:</strong> セキュリティ関連のショートカット（<code>Cmd + Option + Escape</code>、
-                <code>Ctrl + Cmd + Q</code>など）は、OSによって保護されており無効化できません。
-              </p>
+              <p dangerouslySetInnerHTML={{ __html: t.systemShortcutWarning.securityHint }} />
             </div>
           </div>
         </div>
@@ -131,3 +116,5 @@ const SystemShortcutWarning = ({ onOpenRequest }) => { // onOpenRequestをプロ
 
 
 export default SystemShortcutWarning
+
+

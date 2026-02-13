@@ -34,7 +34,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
   const { allShortcuts, richShortcuts, apps } = useShortcutData();
   const [quizState, dispatch] = useReducer(quizReducer, initialQuizState);
   const { startQuizSession, completeQuizSession } = useQuizProgress();
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
 
   // ★ タイマーロジック
   useEffect(() => {
@@ -82,6 +82,7 @@ export function QuizProvider({ children }: QuizProviderProps) {
       difficulty,
       richShortcuts || [],
       apps || [],
+      t.quiz.questionFormat,
       language
     );
 

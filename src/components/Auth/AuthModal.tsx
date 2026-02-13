@@ -28,14 +28,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     const storedError = sessionStorage.getItem('oauth_error');
     if (storedError) {
       try {
-        const { message } = JSON.parse(storedError);
-        setError(message);
+        const oauthError = JSON.parse(storedError);
+        // Localize message using current translations
+        setError(mapOAuthErrorToMessage(oauthError, t));
         sessionStorage.removeItem('oauth_error');
       } catch (err) {
         console.error('Failed to parse OAuth error:', err);
       }
     }
-  }, []);
+  }, [t]);
 
   if (!isOpen) return null;
 
@@ -49,20 +50,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       if (mode === 'signin') {
         const { error } = await signInWithEmail(email, password);
         if (error) {
-          setError(mapAuthErrorToMessage(error));
+          setError(mapAuthErrorToMessage(error, t));
         } else {
           onClose();
         }
       } else if (mode === 'signup') {
         const { error } = await signUpWithEmail(email, password, displayName);
         if (error) {
-          setError(mapAuthErrorToMessage(error));
+          setError(mapAuthErrorToMessage(error, t));
         } else {
           setMessage(t.auth.confirmationEmailSent);
         }
       }
     } catch (err) {
-      setError(AUTH_ERROR_MESSAGES.GENERIC_ERROR);
+      setError(t.auth.error.unknownError);
     } finally {
       setLoading(false);
     }
@@ -78,13 +79,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       // Supabase configuration needs to be set up to redirect to the password reset page
       const { error: resetError } = await sendPasswordResetEmail(email, `${window.location.origin}/password-reset`);
       if (resetError) {
-        setError(mapAuthErrorToMessage(resetError));
+        setError(mapAuthErrorToMessage(resetError, t));
       } else {
         setMessage(t.auth.passwordResetEmailSent);
         setEmail(''); // Clear email after sending
       }
     } catch (err) {
-      setError(AUTH_ERROR_MESSAGES.NETWORK_ERROR);
+      setError(t.errors.networkError);
     } finally {
       setLoading(false);
     }
@@ -99,12 +100,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       const { error: oauthError } = await signInWithOAuth(provider);
 
       if (oauthError) {
-        setError(mapAuthErrorToMessage(oauthError));
+        setError(mapAuthErrorToMessage(oauthError, t));
         setOAuthLoading(null);
       }
       // If successful, browser redirects - loading state remains until redirect
     } catch (err) {
-      setError(AUTH_ERROR_MESSAGES.OAUTH_PROVIDER_ERROR);
+      setError(t.auth.error.oauthProviderError);
       setOAuthLoading(null);
     }
   };

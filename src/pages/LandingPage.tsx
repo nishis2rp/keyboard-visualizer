@@ -1,8 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './LandingPage.module.css';
 import { useAdaptivePerformance } from '../hooks';
 import { useLanguage } from '../context/LanguageContext';
+import { useShortcutData } from '../context';
+import { ICON_MAPPING } from '../constants/icons';
 
 interface Particle {
   x: number;
@@ -12,6 +14,19 @@ interface Particle {
   radius: number;
 }
 
+// Fallback apps for initial load
+const FALLBACK_APPS = [
+  { id: 'windows11', name: 'Windows 11', icon: 'windows.svg' },
+  { id: 'macos', name: 'macOS', icon: 'macos.svg' },
+  { id: 'chrome', name: 'Chrome', icon: 'chrome.svg' },
+  { id: 'vscode', name: 'VS Code', icon: 'vscode.svg' },
+  { id: 'excel', name: 'Excel', icon: 'excel.svg' },
+  { id: 'word', name: 'Word', icon: 'word.svg' },
+  { id: 'powerpoint', name: 'PowerPoint', icon: 'powerpoint.svg' },
+  { id: 'slack', name: 'Slack', icon: 'slack.svg' },
+  { id: 'gmail', name: 'Gmail', icon: 'gmail.svg' }
+];
+
 const LandingPage: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -19,6 +34,18 @@ const LandingPage: React.FC = () => {
   const isCanvasVisible = useRef<boolean>(true);
   const { qualityLevel, performanceStyles } = useAdaptivePerformance();
   const { t, language, setLanguage } = useLanguage();
+  const { apps } = useShortcutData();
+
+  const displayApps = useMemo(() => {
+    if (apps && apps.length > 0) {
+      return apps.map(app => ({
+        id: app.id,
+        name: language === 'en' && app.name_en ? app.name_en : app.name,
+        icon: ICON_MAPPING[app.id] || 'allrange.svg'
+      }));
+    }
+    return FALLBACK_APPS;
+  }, [apps, language]);
 
   useEffect(() => {
     // Remove body padding for landing page (add it back on cleanup)
@@ -294,17 +321,7 @@ const LandingPage: React.FC = () => {
             {t.landing.appsDescription}
           </p>
           <div className={styles.appsGrid}>
-            {[
-              { id: 'windows', name: 'Windows 11', icon: 'windows.svg' },
-              { id: 'macos', name: 'macOS', icon: 'macos.svg' },
-              { id: 'chrome', name: 'Chrome', icon: 'chrome.svg' },
-              { id: 'vscode', name: 'VS Code', icon: 'vscode.svg' },
-              { id: 'excel', name: 'Excel', icon: 'excel.svg' },
-              { id: 'word', name: 'Word', icon: 'word.svg' },
-              { id: 'powerpoint', name: 'PowerPoint', icon: 'powerpoint.svg' },
-              { id: 'slack', name: 'Slack', icon: 'slack.svg' },
-              { id: 'gmail', name: 'Gmail', icon: 'gmail.svg' }
-            ].map(app => (
+            {displayApps.map(app => (
               <div key={app.id} className={styles.appCard}>
                 <img 
                   src={`${import.meta.env.BASE_URL}icons/${app.icon}`} 

@@ -1,10 +1,11 @@
 .languageSelectorGroup {
   display: flex;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(241, 245, 249, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   border-radius: 8px;
   overflow: hidden;
   padding: 2px;
+  gap: 2px;
 }
 
 .languageButton {
@@ -14,23 +15,26 @@
   padding: 6px 12px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: #64748b;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 6px;
+  opacity: 0.7;
 }
 
 .languageButton:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
+  color: #475569;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 1;
 }
 
 .languageButton.active {
-  background: #ffffff;
-  color: #000000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #6366f1;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+  opacity: 1;
 }
 
 .flag {

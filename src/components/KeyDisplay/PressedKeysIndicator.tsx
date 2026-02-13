@@ -70,10 +70,10 @@ const PressedKeysIndicator = memo<PressedKeysIndicatorProps>(({
     const difficulty = currentShortcut?.difficulty || 'basic';
 
     const difficultyConfig = {
-      basic: { label: 'BASIC', color: '#ecfdf5', text: '#059669' },
-      standard: { label: 'STANDARD', color: '#eff6ff', text: '#2563eb' },
-      hard: { label: 'HARD', color: '#fff7ed', text: '#d97706' },
-      madmax: { label: 'MADMAX', color: '#fef2f2', text: '#dc2626' },
+      basic: { label: t.shortcutCard.basic, color: '#ecfdf5', text: '#059669' },
+      standard: { label: t.shortcutCard.standard, color: '#eff6ff', text: '#2563eb' },
+      hard: { label: t.shortcutCard.hard, color: '#fff7ed', text: '#d97706' },
+      madmax: { label: t.shortcutCard.madmax, color: '#fef2f2', text: '#dc2626' },
       allrange: { label: 'ALL', color: '#f5f3ff', text: '#7c3aed' }
     };
     const config = difficultyConfig[difficulty as keyof typeof difficultyConfig] || difficultyConfig.basic;
@@ -103,7 +103,7 @@ const PressedKeysIndicator = memo<PressedKeysIndicatorProps>(({
             style={{ backgroundColor: config.color, color: config.text }}
           >
             <AppIcon appId={difficulty} size={12} className={styles.difficultyIcon} />
-            {config.label}
+            <span className="uppercase">{config.label}</span>
           </div>
         </div>
       </div>
