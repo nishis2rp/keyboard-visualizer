@@ -4,63 +4,95 @@
 export const en = {
   // Landing Page
   landing: {
-    badge: 'NEW VERSION 2.1',
+    badge: 'NEW VERSION 2.2',
     title: 'KEYBOARD VISUALIZER',
-    subtitle: 'Work at the speed of thought.',
-    description: 'A learning platform that visualizes 1,300+ shortcuts in real-time. Master your tools and maximize your creative time.',
+    subtitle: 'Unlock Professional Speed.',
+    description: 'The ultimate learning platform visualizing 1,300+ shortcuts in real-time. Master your tools, stay in the flow, and maximize your creative output.',
     ctaButton: 'Get Started for Free',
 
     stats: {
-      shortcuts: 'Shortcuts',
-      apps: 'Supported Apps',
-      levels: 'Difficulty Levels',
+      shortcuts: 'Shortcuts Included',
+      apps: 'Professional Apps',
+      levels: 'Skill Levels',
     },
 
     whyTitle: 'Why Keyboard Visualizer?',
 
     features: {
       visualFeedback: {
-        title: 'Visual Feedback',
-        description: 'Every key you press is beautifully visualized. Intuitively understand how the system behaves.',
+        title: 'Immersive Visualization',
+        description: 'Every keystroke is beautifully rendered. Bridge the gap between brain and fingers with intuitive visual feedback.',
       },
       quizMode: {
-        title: 'Interactive Quiz',
-        description: 'Retain knowledge through quiz-based practice. Your body naturally remembers the operations.',
+        title: 'Active Learning Quiz',
+        description: 'Retain knowledge through practice based on active recall. Let your muscle memory take over the repetitive tasks.',
       },
       multiPlatform: {
-        title: 'Master Every App',
-        description: 'From VS Code to Excel and Slack. Become a master of all the professional tools you use daily.',
+        title: 'Master Every Tool',
+        description: 'From VS Code to Excel and Gmail. Become a master of the professional software you use every single day.',
       },
     },
 
     appsTitle: 'Supported Applications',
-    appsDescription: 'Comprehensive shortcuts for the professional tools you use daily',
+    appsDescription: 'Comprehensive shortcut sets for the essential tools of modern professionals.',
 
     benefitsTitle: 'Benefits You\'ll Gain',
     benefits: {
       productivity: {
         number: '01',
-        title: 'Dramatically Boost Productivity',
-        description: 'Switching from mouse to keyboard operations increases work speed by an average of 30-50%.',
+        title: 'Exponential Productivity',
+        description: 'Replacing mouse actions with keyboard shortcuts increases your workflow speed by an average of 30-50%.',
       },
       flow: {
         number: '02',
-        title: 'Maintain Flow State',
-        description: 'Prevent concentration breaks from switching between mouse and keyboard, maintaining deep focus.',
+        title: 'Uninterrupted Flow State',
+        description: 'Minimize visual and physical context switching. Keep your focus where it belongs: on your creative work.',
       },
       skill: {
         number: '03',
-        title: 'Professional Skills',
-        description: 'Mastering shortcuts is visibly professional and impressive to others.',
+        title: 'Professional Mastery',
+        description: 'Fluent keyboard operation is a mark of true expertise, projecting confidence and technical proficiency.',
       },
       ergonomics: {
         number: '04',
-        title: 'Reduce Physical Strain',
-        description: 'Reduced mouse usage lessens shoulder and wrist strain, making long work sessions comfortable.',
+        title: 'Ergonomic Well-being',
+        description: 'Reduce repetitive strain from mouse usage. Protect your wrists and shoulders for a longer, healthier career.',
       },
     },
 
-    howItWorksTitle: 'Simple to Use',
+    targetTitle: 'Who is it for?',
+    targets: {
+      engineer: {
+        title: 'Engineers / Developers',
+        description: 'Speed up editor operations and focus on solving complex problems, not fighting the UI.',
+      },
+      designer: {
+        title: 'Designers / Creators',
+        description: 'Make tool switching subconscious. Let your creativity flow directly from mind to canvas.',
+      },
+      business: {
+        title: 'Business Professionals',
+        description: 'Blitz through documents and emails. Spend your time on high-value tasks that actually matter.',
+      },
+    },
+
+    faqTitle: 'Frequently Asked Questions',
+    faqs: [
+      {
+        q: 'Is it really free to use?',
+        a: 'Yes, all features are completely free. You can start learning immediately without even creating an account.'
+      },
+      {
+        q: 'Can I learn OS-specific shortcuts?',
+        a: 'Absolutely. We support both Windows and macOS. You can switch your preference in the settings at any time.'
+      },
+      {
+        q: 'Do I need to install anything?',
+        a: 'No installation required. It runs entirely in your browser, so you can practice anywhere, anytime.'
+      }
+    ],
+
+    howItWorksTitle: 'How It Works',
     steps: {
       step1: {
         number: 'STEP 1',
@@ -495,6 +527,7 @@ export const en = {
     edit: 'Edit',
     close: 'Close',
     back: 'Back',
+    retry: 'Retry',
     next: 'Next',
     previous: 'Previous',
     search: 'Search',

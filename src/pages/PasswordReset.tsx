@@ -60,7 +60,8 @@ const PasswordReset: React.FC = () => {
         setConfirmPassword('');
         setTimeout(() => navigate('/'), 3000); // Redirect to home/login after 3 seconds
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      console.error('Password reset error:', err);
       setError(t.errors.networkError);
     } finally {
       setLoading(false);

@@ -1,9 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { useMemo } from 'react';
 import { AllShortcuts, ShortcutDetails, RichShortcut, App } from '../types';
-import { normalizeShortcut } from '../utils/quizEngine';
-import { Shortcut } from '../lib/supabase';
-import { detectOS } from '../utils/os';
+import { useApplications } from './useApplications';
+import { useShortcutCache } from './useShortcutCache';
 
 interface UseShortcutsReturn {
   shortcuts: AllShortcuts;
@@ -17,151 +15,50 @@ interface UseShortcutsReturn {
 }
 
 /**
- * Supabaseからアプリケーション一覧と、必要に応じてショートカットデータを取得するカスタムフック
+ * アプリケーション一覧とショートカットデータを統合管理するカスタムフック
+ *
+ * このフックは以下の2つの専用フックを組み合わせています：
+ * - useApplications: アプリケーションメタデータの取得
+ * - useShortcutCache: ショートカットデータのキャッシング
+ *
+ * レガシー形式（AllShortcuts）と新形式（RichShortcut[]）の両方を提供します。
  */
 export function useShortcuts(): UseShortcutsReturn {
-  const [shortcuts, setShortcuts] = useState<AllShortcuts>({});
-  const [richShortcuts, setRichShortcuts] = useState<RichShortcut[]>([]);
-  const [apps, setApps] = useState<App[] | null>(null);
-  const [loadedApps, setLoadedApps] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  // アプリケーション一覧の取得
+  const {
+    apps,
+    loading: appsLoading,
+    error: appsError,
+    fetchApps,
+  } = useApplications();
 
-  const fetchApps = useCallback(async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('applications')
-        .select('*')
-        .order('display_order', { ascending: true });
+  // ショートカットデータのキャッシング
+  const {
+    richShortcuts,
+    loading: shortcutsLoading,
+    error: shortcutsError,
+    fetchShortcutsForApp,
+    isAppLoaded,
+  } = useShortcutCache();
 
-      if (error) throw error;
-      setApps(data as App[]);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch applications'));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchShortcutsForApp = useCallback(async (appId: string) => {
-    if (loadedApps.has(appId)) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      let query = supabase.from('shortcuts').select('*');
-
-      if (appId !== 'random') {
-        // 複数アプリ（カンマ区切り）に対応
-        const appIds = appId.split(',').filter(id => id && id !== 'random');
-        
-        if (appIds.length === 0) {
-          setLoading(false);
-          return;
-        }
-
-        // 未ロードのアプリのみ取得
-        const appsToFetch = appIds.filter(id => !loadedApps.has(id));
-        if (appsToFetch.length === 0) {
-          setLoading(false);
-          return;
-        }
-        query = query.in('application', appsToFetch);
-      } else {
-        // random の場合は全アプリロード済みとするか、全データを取得
-        // 既に全ロード済みのフラグがあればスキップ
-        if (loadedApps.has('all')) {
-          setLoading(false);
-          return;
-        }
+  // レガシー形式への変換（AllShortcuts）
+  const shortcuts = useMemo(() => {
+    const map: AllShortcuts = {};
+    richShortcuts.forEach(item => {
+      if (!map[item.application]) {
+        map[item.application] = {};
       }
+      map[item.application][item.keys] = {
+        description: item.description,
+        difficulty: item.difficulty,
+      } as ShortcutDetails;
+    });
+    return map;
+  }, [richShortcuts]);
 
-      const { data, error } = await query.limit(15000);
-
-      if (error) throw error;
-
-      const newShortcutsMap = { ...shortcuts };
-      const newRichShortcuts = [...richShortcuts];
-      const newlyLoadedApps = new Set<string>();
-
-      // OS検出（VS Code用のフィルタリング）
-      const currentOS = detectOS();
-
-      (data as Shortcut[]).forEach((item) => {
-        newlyLoadedApps.add(item.application);
-
-        // VS CodeでWindows環境の場合、Cmd+を含むショートカットをスキップ
-        if (item.application === 'vscode' && (currentOS === 'windows' || currentOS === 'linux')) {
-          if (item.keys.includes('Cmd')) {
-            return; // このショートカットをスキップ
-          }
-        }
-
-        if (!newShortcutsMap[item.application]) {
-          newShortcutsMap[item.application] = {};
-        }
-
-        const difficulty: ShortcutDetails['difficulty'] = (item.difficulty as ShortcutDetails['difficulty']) || 'standard';
-
-        const richShortcut: RichShortcut = {
-          id: item.id,
-          keys: item.keys,
-          description: item.description,
-          description_en: item.description_en,
-          difficulty: difficulty,
-          application: item.application,
-          category: item.category,
-          category_en: item.category_en,
-          created_at: item.created_at,
-          platform: item.platform,
-          windows_keys: item.windows_keys,
-          macos_keys: item.macos_keys,
-          windows_protection_level: item.windows_protection_level as any,
-          macos_protection_level: item.macos_protection_level as any,
-          press_type: item.press_type as any,
-          alternative_group_id: item.alternative_group_id as any,
-        };
-
-        // 重複チェック（全取得時に既にロード済みのものがある可能性があるため）
-        if (!richShortcuts.some(rs => rs.id === richShortcut.id)) {
-           newRichShortcuts.push(richShortcut);
-        }
-
-        newShortcutsMap[richShortcut.application][richShortcut.keys] = {
-          description: richShortcut.description,
-          difficulty: richShortcut.difficulty,
-        };
-      });
-
-      setShortcuts(newShortcutsMap);
-      setRichShortcuts(newRichShortcuts);
-      setLoadedApps(prev => {
-        const next = new Set(prev);
-        if (appId === 'random') {
-          next.add('all');
-          next.add('random');
-        }
-        newlyLoadedApps.forEach(id => next.add(id));
-        return next;
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error(`Failed to fetch shortcuts for ${appId}`));
-    } finally {
-      setLoading(false);
-    }
-  }, [loadedApps, shortcuts, richShortcuts]);
-
-  const isAppLoaded = useCallback((appId: string) => {
-    if (appId === 'random') return loadedApps.has('all') || loadedApps.has('random');
-    const appIds = appId.split(',').filter(id => id && id !== 'random');
-    return appIds.every(id => loadedApps.has(id));
-  }, [loadedApps]);
-
-  useEffect(() => {
-    fetchApps();
-  }, [fetchApps]);
+  // ローディング状態とエラーの統合
+  const loading = appsLoading || shortcutsLoading;
+  const error = appsError || shortcutsError;
 
   return {
     shortcuts,

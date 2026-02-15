@@ -149,9 +149,10 @@ const MyPage: React.FC = () => {
         // Fetch weak shortcuts
         await fetchWeakShortcuts(user.id);
 
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching quiz data:', err);
-        setError(t.myPage.fetchDataFailed + (err.message || ''));
+        const errorMessage = err instanceof Error ? err.message : '';
+        setError(t.myPage.fetchDataFailed + errorMessage);
       } finally {
         setQuizDataLoading(false);
       }
@@ -233,8 +234,9 @@ const MyPage: React.FC = () => {
 
       setMessage(t.myPage.uploadSuccess);
       setAvatarFile(null);
-    } catch (err: any) {
-      setError(err.message || 'Upload failed');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Upload failed';
+      setError(errorMessage);
     } finally {
       setUploading(false);
     }

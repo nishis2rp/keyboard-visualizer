@@ -2,8 +2,9 @@ import { useEffect, useRef, useCallback } from 'react';
 import { isModifierKey, isWindowsKey } from '../utils/keyUtils';
 import { SequentialKeyRecorder, getSequentialKeys } from '../utils/sequentialShortcuts';
 import { normalizePressedKeys, checkAnswer, normalizeShortcut } from '../utils/quizEngine';
-import { QuizAction, QuizState } from '../context/QuizContext';
+import { QuizAction, QuizState } from '../context/QuizReducer';
 import { QuizQuestion, RichShortcut } from '../types';
+import { TIMINGS } from '../constants/timings';
 
 interface UseQuizInputHandlerProps {
   quizState: QuizState; // 型を明確化
@@ -121,7 +122,7 @@ export const useQuizInputHandler = ({ quizState, dispatch, getNextQuestion, rich
 
       const timer = setTimeout(() => {
         cooldownRef.current = false;
-      }, 300);
+      }, TIMINGS.QUIZ_INPUT_COOLDOWN_MS);
 
       return () => clearTimeout(timer);
     }

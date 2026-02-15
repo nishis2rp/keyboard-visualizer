@@ -65,7 +65,9 @@
       "Bash(cmd //c taskkill //PID 25072 //F)",
       "Bash(rm:*)",
       "Bash(timeout:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(else echo \"❌ .env file not found\")",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

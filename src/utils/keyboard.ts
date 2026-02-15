@@ -49,6 +49,101 @@ export const normalizeShortcutCombo = (combo: string): string => {
 const MAX_SHORTCUTS_DISPLAY = Infinity
 
 /**
+ * 修飾キーのセットが一致するかチェック
+ * 両方のセットのサイズが同じで、すべての要素が一致する必要がある
+ */
+const modifierKeysMatch = (
+  pressedModifiers: string[],
+  shortcutModifiers: string[]
+): boolean => {
+  const pressedSet = new Set(pressedModifiers.map(m => normalizeKey(m)));
+  const shortcutSet = new Set(shortcutModifiers.map(m => normalizeKey(m)));
+
+  return pressedSet.size === shortcutSet.size &&
+         [...pressedSet].every(m => shortcutSet.has(m));
+};
+
+/**
+ * 押されたキーがショートカットに含まれているかチェック（Shift対応）
+ */
+const isKeyInShortcut = (
+  pressedKey: string,
+  shortcutKeys: string[],
+  shiftPressed: boolean,
+  layout: string
+): boolean => {
+  const normalizedShortcutKeys = shortcutKeys.map(k => normalizeKey(k));
+  const normalizedPressedKey = normalizeKey(pressedKey);
+
+  // 直接一致するかチェック
+  if (normalizedShortcutKeys.includes(normalizedPressedKey)) return true;
+
+  // Shiftが押されている場合、代替キー（記号 <-> 数字）もチェック
+  if (shiftPressed) {
+    const unshifted = getUnshiftedKeyForSymbol(pressedKey, layout);
+    if (unshifted && normalizedShortcutKeys.includes(normalizeKey(unshifted))) {
+      return true;
+    }
+
+    // 逆のパターン（1 -> !）も考慮
+    if (/^\d$/.test(pressedKey)) {
+      const shifted = getShiftedSymbolForKey(`Digit${pressedKey}`, layout);
+      if (shifted && normalizedShortcutKeys.includes(normalizeKey(shifted))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+/**
+ * すべての押されたキーがショートカットに含まれているかチェック
+ */
+const allPressedKeysInShortcut = (
+  pressedKeys: string[],
+  shortcutKeys: string[],
+  shiftPressed: boolean,
+  layout: string
+): boolean => {
+  return pressedKeys.every(pressedKey =>
+    isKeyInShortcut(pressedKey, shortcutKeys, shiftPressed, layout)
+  );
+};
+
+/**
+ * ショートカットを候補として含めるべきか判定
+ */
+const shouldIncludeShortcutAsCandidate = (
+  pressedKeys: string[],
+  shortcutKeys: string[],
+  allKeysMatch: boolean
+): boolean => {
+  const pressedModifiers = pressedKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
+  const shortcutModifiers = shortcutKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
+  const hasNonModifierPressed = pressedKeys.some(key => !MODIFIER_KEY_NAMES.has(key));
+
+  // 1. 完全一致
+  if (allKeysMatch && pressedKeys.length === shortcutKeys.length) {
+    return true;
+  }
+
+  // 2. 非修飾キーが含まれている場合
+  if (hasNonModifierPressed) {
+    // 修飾キーの構成が完全に一致し、ショートカットの方がキー数が多い（未完成）
+    const modifiersMatch = modifierKeysMatch(pressedModifiers, shortcutModifiers);
+    return modifiersMatch && allKeysMatch && pressedKeys.length < shortcutKeys.length;
+  }
+
+  // 3. 修飾キーのみが押されている場合
+  if (pressedModifiers.length > 0) {
+    return pressedModifiers.every(mod => shortcutModifiers.includes(mod));
+  }
+
+  return false;
+};
+
+/**
  * キーコードを修飾キーの順序でソート
  * @param {Array<string>} codes - ソートするキーの配列 (KeyboardEvent.code)
  * @returns {Array<string>} ソート済みのキー配列
@@ -245,73 +340,27 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
       }
       const normalizedTargetShortcut = normalizeShortcutCombo(targetShortcutString); // ここで正規化
 
-      const shortcutKeys = item.press_type === 'sequential' 
+      const shortcutKeys = item.press_type === 'sequential'
         ? getSequentialKeys(normalizedTargetShortcut)
         : normalizedTargetShortcut.split(' + ');
-      
-      // pressedDisplayNamesはSet<string>なので、Array.from()で配列に変換してから処理
-      const allPressedKeysInShortcut = Array.from(pressedDisplayNames).every((pressedKey: string) => {
-        // shortcutKeysの各要素も正規化して比較
-        const normalizedShortcutKeys = shortcutKeys.map(k => normalizeKey(k));
-        const normalizedPressedKey = normalizeKey(pressedKey);
-        
-        // 直接一致するかチェック
-        if (normalizedShortcutKeys.includes(normalizedPressedKey)) return true;
-        
-        // Shiftが押されている場合、代替キー（記号 <-> 数字）もチェック
-        if (shiftPressed) {
-          const unshifted = getUnshiftedKeyForSymbol(pressedKey, layout);
-          if (unshifted && normalizedShortcutKeys.includes(normalizeKey(unshifted))) return true;
-          
-          // 逆のパターン（1 -> !）はShortcut定義側が記号で、入力が数字の場合だが、
-          // 通常Shiftを押していれば入力は記号になる。
-          // ただし、定義が記号で入力が数字として扱われる可能性も考慮して逆もチェック
-          if (/^\d$/.test(pressedKey)) {
-             const shifted = getShiftedSymbolForKey(`Digit${pressedKey}`, layout);
-             if (shifted && normalizedShortcutKeys.includes(normalizeKey(shifted))) return true;
-          }
-        }
-        
-        return false;
-      });
 
-      const pressedModifiers = Array.from(pressedDisplayNames).filter((key: string) => MODIFIER_KEY_NAMES.has(key));
-      const shortcutModifiers = shortcutKeys.filter(key => MODIFIER_KEY_NAMES.has(key));
+      // 押されたキーの配列を取得
+      const pressedKeysArray = Array.from(pressedDisplayNames);
 
-      let shouldInclude = false;
+      // すべての押されたキーがショートカットに含まれているかチェック
+      const allKeysMatch = allPressedKeysInShortcut(
+        pressedKeysArray,
+        shortcutKeys,
+        shiftPressed,
+        layout
+      );
 
-      // 1. 完全一致
-      if (allPressedKeysInShortcut && pressedDisplayNames.length === shortcutKeys.length) {
-        shouldInclude = true;
-      }
-      // 2. 候補の表示条件を厳格化
-      // - 少なくとも1つは非修飾キー（文字や矢印など）が含まれている場合、
-      //   その組み合わせが完全に一致していなければ候補として出さない
-      // - 修飾キーのみが押されている場合は、その修飾キーを含むショートカットを候補として出す
-      else {
-        const hasNonModifierPressed = Array.from(pressedDisplayNames).some(key => !MODIFIER_KEY_NAMES.has(key));
-        
-        if (hasNonModifierPressed) {
-          // 非修飾キー（例：→）が含まれている場合、修飾キーの構成が完全に一致している必要がある
-          // かつ、ショートカットの方がキー数が多い（未完成のショートカット）
-          const pressedModifiersSet = new Set(pressedModifiers.map(m => normalizeKey(m)));
-          const shortcutModifiersSet = new Set(shortcutModifiers.map(m => normalizeKey(m)));
-          
-          const modifiersMatch = pressedModifiersSet.size === shortcutModifiersSet.size && 
-                               [...pressedModifiersSet].every(m => shortcutModifiersSet.has(m));
-          
-          if (modifiersMatch && allPressedKeysInShortcut && pressedDisplayNames.length < shortcutKeys.length) {
-            shouldInclude = true;
-          }
-        } else if (pressedModifiers.length > 0) {
-          // 修飾キーのみが押されている場合、その修飾キーをすべて含むショートカットを候補に出す
-          if (pressedModifiers.every((mod: string) => shortcutModifiers.includes(mod))) {
-            shouldInclude = true;
-          }
-        }
-      }
-
-      return shouldInclude;
+      // ショートカットを候補として含めるべきか判定
+      return shouldIncludeShortcutAsCandidate(
+        pressedKeysArray,
+        shortcutKeys,
+        allKeysMatch
+      );
     })
     .map(item => ({
       ...item, // RichShortcutのプロパティをすべてコピー

@@ -1,11 +1,13 @@
 import React from 'react';
-import { SetupOption as SetupOptionType } from '../../types';
+import { SetupOption as SetupOptionType, App } from '../../types';
 import { AppIcon } from '../common/AppIcon';
 
+type SelectableOption = SetupOptionType | App | (App & { title: string });
+
 interface SetupOptionProps {
-  option: SetupOptionType;
+  option: SelectableOption;
   isSelected: boolean;
-  onSelect: (option: any) => void;
+  onSelect: (option: SelectableOption) => void;
   className?: string;
   showRecommendation?: boolean;
   recommendationText?: string;
@@ -28,7 +30,7 @@ const SetupOption: React.FC<SetupOptionProps> = ({
         <AppIcon appId={option.id} fallbackIcon={option.icon} size={28} />
       </div>
       <div className="option-content">
-        <h3>{option.title || option.name}</h3>
+        <h3>{'title' in option ? option.title : option.name}</h3>
         {showRecommendation && option.id === 'fullscreen' && recommendationText && (
           <p className="setup-recommendation">{recommendationText}</p>
         )}

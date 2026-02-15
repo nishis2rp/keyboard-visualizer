@@ -1,0 +1,128 @@
+.error-alert {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  border-left: 4px solid;
+  background-color: var(--bg-secondary, #f5f5f5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-alert--error {
+  border-left-color: #ef4444;
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+.error-alert--warning {
+  border-left-color: #f59e0b;
+  background-color: #fffbeb;
+  color: #92400e;
+}
+
+.error-alert--info {
+  border-left-color: #3b82f6;
+  background-color: #eff6ff;
+  color: #1e40af;
+}
+
+.error-alert__content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.error-alert__icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.error-alert__message {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.error-alert__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.error-alert__button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.error-alert__button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error-alert__button:active {
+  transform: translateY(0);
+}
+
+.error-alert__button--retry {
+  background-color: var(--primary-color, #0078D4);
+  color: white;
+}
+
+.error-alert__button--retry:hover {
+  background-color: var(--primary-hover, #005a9e);
+}
+
+.error-alert__button--dismiss {
+  background-color: transparent;
+  color: currentColor;
+  padding: 0.25rem 0.5rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.error-alert__button--dismiss:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 640px) {
+  .error-alert {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .error-alert__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .error-alert__button--retry {
+    flex: 1;
+  }
+}

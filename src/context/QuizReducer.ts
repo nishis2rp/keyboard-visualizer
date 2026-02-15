@@ -1,4 +1,5 @@
 import { QuizQuestion } from '../types';
+import { TIMINGS } from '../constants/timings';
 
 export interface QuizSettings {
   quizMode: 'default' | 'hardcore';
@@ -60,7 +61,7 @@ export const initialQuizState: QuizState = {
   keyboardLayout: null,
   currentQuestion: null,
   questionStartTime: null,
-  timeRemaining: 10,
+  timeRemaining: TIMINGS.DEFAULT_TIME_LIMIT_S,
   lastAnswerResult: null,
   lastWrongAnswer: null,
   showAnswer: false,
@@ -72,7 +73,7 @@ export const initialQuizState: QuizState = {
   settings: {
     quizMode: 'default',
     difficulty: 'standard',
-    timeLimit: 10,
+    timeLimit: TIMINGS.DEFAULT_TIME_LIMIT_S,
     totalQuestions: 10,
     isFullscreen: false,
   },

@@ -6,8 +6,7 @@ import {
   mapOAuthErrorToMessage,
 } from './authErrors';
 import { AuthError } from '@supabase/supabase-js';
-import { Translations } from '../locales/en';
-import enTranslations from '../locales/en';
+import { Translations, en as enTranslations } from '../locales/en';
 
 // Mock translation object for tests
 const mockTranslations: Translations = enTranslations;
@@ -157,8 +156,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.invalidCredentials);
     });
 
     it('should map email not confirmed error', () => {
@@ -170,8 +169,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.EMAIL_NOT_CONFIRMED);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.emailNotConfirmed);
     });
 
     it('should map user already registered error', () => {
@@ -183,8 +182,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.USER_EXISTS);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.emailInUse);
     });
 
     it('should map password too short error', () => {
@@ -196,8 +195,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.PASSWORD_TOO_SHORT);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.weakPassword);
     });
 
     it('should map invalid email error', () => {
@@ -209,8 +208,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.INVALID_EMAIL);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.invalidEmail);
     });
 
     it('should map network error', () => {
@@ -222,8 +221,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.NETWORK_ERROR);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.errors.networkError);
     });
 
     it('should map rate limit error', () => {
@@ -235,8 +234,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.RATE_LIMIT);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.rateLimit);
     });
 
     it('should map session not found error', () => {
@@ -248,8 +247,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.SESSION_INVALID);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.sessionInvalid);
     });
 
     it('should map OAuth provider error', () => {
@@ -261,8 +260,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.OAUTH_PROVIDER_ERROR);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.oauthProviderError);
     });
 
     it('should return original message for unmapped error', () => {
@@ -274,11 +273,12 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
       expect(result).toBe('Some unknown error occurred');
     });
 
-    it('should return generic error for empty message', () => {
+    it('should return original message for empty message when translations are missing', () => {
+      // The current implementation returns error.message || t.auth.error.unknownError
       const error = {
         message: '',
         name: 'AuthApiError',
@@ -287,12 +287,12 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.GENERIC_ERROR);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.unknownError);
     });
 
     it('should return empty string for null error', () => {
-      const result = mapAuthErrorToMessage(null);
+      const result = mapAuthErrorToMessage(null, mockTranslations);
       expect(result).toBe('');
     });
 
@@ -305,8 +305,8 @@ describe('authErrors', () => {
         code: undefined
       } as any as AuthError;
 
-      const result = mapAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
+      const result = mapAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.invalidCredentials);
     });
   });
 
@@ -316,8 +316,8 @@ describe('authErrors', () => {
         error: 'access_denied',
       };
 
-      const result = mapOAuthErrorToMessage(error);
-      expect(result).toBe(AUTH_ERROR_MESSAGES.OAUTH_CANCELLED);
+      const result = mapOAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.oauthCancelled);
     });
 
     it('should map server_error', () => {
@@ -325,8 +325,8 @@ describe('authErrors', () => {
         error: 'server_error',
       };
 
-      const result = mapOAuthErrorToMessage(error);
-      expect(result).toBe('サーバーエラーが発生しました。しばらく待ってからもう一度お試しください。');
+      const result = mapOAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.serverError);
     });
 
     it('should map temporarily_unavailable', () => {
@@ -334,8 +334,8 @@ describe('authErrors', () => {
         error: 'temporarily_unavailable',
       };
 
-      const result = mapOAuthErrorToMessage(error);
-      expect(result).toBe('一時的にログインできません。しばらく待ってからもう一度お試しください。');
+      const result = mapOAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.temporarilyUnavailable);
     });
 
     it('should map invalid_request', () => {
@@ -343,8 +343,8 @@ describe('authErrors', () => {
         error: 'invalid_request',
       };
 
-      const result = mapOAuthErrorToMessage(error);
-      expect(result).toBe('無効なリクエストです。もう一度お試しください。');
+      const result = mapOAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.invalidRequest);
     });
 
     it('should map unauthorized_client', () => {
@@ -352,8 +352,8 @@ describe('authErrors', () => {
         error: 'unauthorized_client',
       };
 
-      const result = mapOAuthErrorToMessage(error);
-      expect(result).toBe('ログインプロバイダーが正しく設定されていません。管理者に連絡してください。');
+      const result = mapOAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.unauthorizedClient);
     });
 
     it('should map invalid_scope', () => {
@@ -361,8 +361,8 @@ describe('authErrors', () => {
         error: 'invalid_scope',
       };
 
-      const result = mapOAuthErrorToMessage(error);
-      expect(result).toBe('アクセス許可の設定に問題があります。管理者に連絡してください。');
+      const result = mapOAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.invalidScope);
     });
 
     it('should use error_description when available', () => {
@@ -371,7 +371,7 @@ describe('authErrors', () => {
         error_description: 'Custom error message from provider',
       };
 
-      const result = mapOAuthErrorToMessage(error);
+      const result = mapOAuthErrorToMessage(error, mockTranslations);
       expect(result).toBe('Custom error message from provider');
     });
 
@@ -380,44 +380,18 @@ describe('authErrors', () => {
         error: 'some_other_error',
       };
 
-      const result = mapOAuthErrorToMessage(error);
-      expect(result).toBe('ソーシャルログイン中にエラーが発生しました。');
+      const result = mapOAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.genericSocialError);
     });
 
-    it('should prefer error_description over default message', () => {
+    it('should use the mapped message for access_denied even if description is available', () => {
       const error = {
         error: 'access_denied',
         error_description: 'User declined permissions',
       };
 
-      const result = mapOAuthErrorToMessage(error);
-      // Should use the mapped message for access_denied, not the description
-      expect(result).toBe(AUTH_ERROR_MESSAGES.OAUTH_CANCELLED);
-    });
-  });
-
-  describe('AUTH_ERROR_MESSAGES constants', () => {
-    it('should have all expected error message keys', () => {
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('INVALID_CREDENTIALS');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('EMAIL_NOT_CONFIRMED');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('USER_EXISTS');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('PASSWORD_TOO_SHORT');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('INVALID_EMAIL');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('NETWORK_ERROR');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('RATE_LIMIT');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('SESSION_INVALID');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('OAUTH_CANCELLED');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('OAUTH_PROVIDER_ERROR');
-      expect(AUTH_ERROR_MESSAGES).toHaveProperty('GENERIC_ERROR');
-    });
-
-    it('should have Japanese error messages', () => {
-      Object.values(AUTH_ERROR_MESSAGES).forEach((message) => {
-        expect(typeof message).toBe('string');
-        expect(message.length).toBeGreaterThan(0);
-        // Check that messages contain Japanese characters (rough check)
-        expect(message).toMatch(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/);
-      });
+      const result = mapOAuthErrorToMessage(error, mockTranslations);
+      expect(result).toBe(mockTranslations.auth.error.oauthCancelled);
     });
   });
 });

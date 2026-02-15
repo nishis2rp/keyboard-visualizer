@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
 import { useLocalStorage } from '../hooks';
 import { STORAGE_KEYS, DEFAULTS, SETUP_VERSION } from '../constants';
 import { keyboardLayoutOptions, KeyboardLayoutOption } from '../data/layouts';
@@ -28,8 +28,15 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     { setupCompleted: false, app: DEFAULTS.APP, layout: DEFAULTS.LAYOUT },
     {
       version: SETUP_VERSION,
-      validator: (data: any): data is SetupData => 
-        data && typeof data.app === 'string' && typeof data.layout === 'string'
+      validator: (data: unknown): data is SetupData =>
+        typeof data === 'object' &&
+        data !== null &&
+        'app' in data &&
+        'layout' in data &&
+        'setupCompleted' in data &&
+        typeof (data as Record<string, unknown>).app === 'string' &&
+        typeof (data as Record<string, unknown>).layout === 'string' &&
+        typeof (data as Record<string, unknown>).setupCompleted === 'boolean'
     }
   );
 
@@ -47,7 +54,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     setSetup(prev => ({ ...prev, layout }));
   };
 
-  const value = {
+  const value = useMemo(() => ({
     setup,
     selectedApp,
     keyboardLayout,
@@ -55,7 +62,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     setSetup,
     setSelectedApp,
     setKeyboardLayout
-  };
+  }), [setup, selectedApp, keyboardLayout, setSetup]);
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 };

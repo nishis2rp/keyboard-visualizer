@@ -2,7 +2,7 @@ import { useState, useEffect, Dispatch, SetStateAction } from 'react';
 
 interface LocalStorageOptions<T> {
   version?: string;
-  validator?: (data: any) => data is T;
+  validator?: (data: unknown) => data is T;
 }
 
 type LocalStorageReturn<T> = [T, Dispatch<SetStateAction<T>>, () => void];

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
 
 interface UIContextType {
   showSetup: boolean;
@@ -20,7 +20,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [quizApp, setQuizApp] = useState<string | null>(null);
   const [quizDifficulty, setQuizDifficulty] = useState<'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null>(null);
 
-  const value = {
+  const value = useMemo(() => ({
     showSetup,
     isQuizMode,
     quizApp,
@@ -29,7 +29,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     setIsQuizMode,
     setQuizApp,
     setQuizDifficulty,
-  };
+  }), [showSetup, isQuizMode, quizApp, quizDifficulty]);
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 };

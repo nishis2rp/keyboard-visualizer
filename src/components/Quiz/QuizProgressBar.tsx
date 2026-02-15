@@ -1,10 +1,11 @@
 import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { QuizHistoryEntry } from '../../context/QuizReducer';
 import styles from './QuizProgressBar.module.css';
 
 interface QuizProgressBarProps {
   status: 'idle' | 'playing' | 'paused' | 'finished';
-  quizHistory: any[];
+  quizHistory: QuizHistoryEntry[];
   settings: { totalQuestions: number };
 }
 

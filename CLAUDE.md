@@ -835,6 +835,98 @@ npm run preview  # Preview locally
    - Apply via className concatenation: `\`shortcut-card \${protectionClass}\``
    - Avoid inline styles except for dynamic positioning
 
+## Critical Performance Issues
+
+### Context Provider Infinite Loops
+
+**Problem:** Context providers can cause infinite re-render loops if not properly optimized.
+
+**Solution:**
+1. **Always wrap Context `value` with `useMemo`:**
+   ```typescript
+   const value = useMemo(() => ({
+     state1,
+     state2,
+     setState1,
+     setState2,
+   }), [state1, state2]); // Only include state, not setters
+   ```
+
+2. **Use `useRef` for synchronous state access in hooks:**
+   ```typescript
+   const [loadedApps, setLoadedApps] = useState<Set<string>>(new Set());
+   const loadedAppsRef = useRef<Set<string>>(new Set());
+
+   // Always sync ref when updating state
+   setLoadedApps(prev => {
+     const next = new Set(prev);
+     next.add(appId);
+     loadedAppsRef.current = next; // Sync ref
+     return next;
+   });
+   ```
+
+3. **Empty dependency arrays for stable callbacks:**
+   ```typescript
+   const fetchData = useCallback(async (id: string) => {
+     // Use functional setState to access current state
+     setData(prev => {
+       // Check prev state without adding to dependencies
+       if (prev.has(id)) return prev;
+       // ... update logic
+     });
+   }, []); // Empty array - function never recreates
+   ```
+
+4. **Remove function dependencies from useEffect:**
+   ```typescript
+   // ❌ Wrong: Creates infinite loop
+   useEffect(() => {
+     fetchData(id);
+   }, [id, fetchData]); // fetchData changes → effect runs → state updates → fetchData changes...
+
+   // ✅ Correct: Only depend on primitive values
+   useEffect(() => {
+     fetchData(id);
+   }, [id]); // fetchData is stable (empty deps in useCallback)
+   ```
+
+**Files to check:**
+- `src/context/SettingsContext.tsx`
+- `src/context/UIContext.tsx`
+- `src/context/ShortcutContext.tsx`
+- `src/hooks/useShortcuts.ts`
+
+### Development Server Environment Variables
+
+**Problem:** Vite dev server may not reload environment variables from `.env` file after changes or on initial start.
+
+**Symptoms:**
+- Supabase queries timeout after 10 seconds
+- `import.meta.env.VITE_SUPABASE_URL` is undefined or empty
+- Data fetching hangs on "Loading..." screen
+
+**Solution:**
+1. **Always restart dev server after `.env` changes:**
+   ```bash
+   # Kill existing dev server (Ctrl+C or find PID)
+   # Then restart
+   npm run dev
+   ```
+
+2. **Verify environment variables are loaded:**
+   - Check browser console for Supabase initialization logs
+   - Supabase URL and key should be visible in logs (first 20 chars of key)
+   - If "NOT SET" appears, dev server needs restart
+
+3. **Clear Vite cache if issues persist:**
+   ```bash
+   rm -rf node_modules/.vite
+   npm run dev
+   ```
+
+**Root cause:** Vite caches environment variables on server start. Changes to `.env` require full restart, not just HMR.
+
 ## Common Pitfalls
 
 1. **Don't mutate `pressedKeys` Set directly**
@@ -898,6 +990,7 @@ npm run preview  # Preview locally
 9. **User Authentication & Quiz Progress Tracking** (2026-02): Added optional authentication with Google, GitHub, and Email/Password. Users can now save quiz history and track progress across sessions. Implemented AuthContext, AuthModal, UserMenu, and useQuizProgress hook with database tables for user_profiles, quiz_sessions, and quiz_history
 10. **Database-driven app configuration** (2026-02): Migrated from hardcoded `apps.ts` and `shortcutDifficulty.ts` to database tables. Created `applications` table for app metadata. Frontend now dynamically fetches app list from database via `useShortcuts()` hook
 11. **Tailwind CSS v4 migration** (2026-02): Migrated from Tailwind CSS v3 to v4. Replaced `@tailwind` directives with `@import "tailwindcss"`, migrated to `@theme` for CSS variables, removed `@apply` directives in favor of vanilla CSS, and installed `@tailwindcss/postcss` plugin for PostCSS integration
+12. **Context Provider Performance Optimization** (2026-02): Fixed infinite re-render loops by wrapping all Context `value` objects with `useMemo`, using `useRef` for synchronous state access in `useShortcuts` hook, and removing function dependencies from `useEffect` dependency arrays. Ensures stable callback references and prevents unnecessary re-renders
 
 ## Git Workflow
 

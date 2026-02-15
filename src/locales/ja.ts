@@ -6,63 +6,95 @@ import { Translations } from './en';
 export const ja: Translations = {
   // Landing Page
   landing: {
-    badge: 'NEW VERSION 2.1',
+    badge: 'NEW VERSION 2.2',
     title: 'KEYBOARD VISUALIZER',
-    subtitle: 'Work at the speed of thought.',
-    description: '1,300以上のショートカットをリアルタイムで可視化する学習プラットフォーム。ツールを使いこなし、創造的な時間を最大化しましょう。',
-    ctaButton: '無料で今すぐはじめる',
+    subtitle: '指先に、思考の速さを。',
+    description: '1,300以上のショートカットをリアルタイムに可視化。ブラウザ上で動作する最高峰の練習プラットフォームで、クリエイティブな時間を最大化しましょう。',
+    ctaButton: '今すぐ無料で始める',
 
     stats: {
-      shortcuts: 'ショートカット',
-      apps: '対応アプリ',
-      levels: '難易度レベル',
+      shortcuts: 'ショートカット収録数',
+      apps: '対応アプリケーション',
+      levels: '難易度ステップ',
     },
 
-    whyTitle: 'なぜKeyboard Visualizerなのか',
+    whyTitle: '選ばれる理由',
 
     features: {
       visualFeedback: {
-        title: 'Visual Feedback',
-        description: '入力したすべてのキーが美しく可視化されます。システムの挙動を直感的に理解しましょう。',
+        title: '圧倒的な視覚体験',
+        description: '打鍵した全てのキーを美しく可視化。脳と指の連携を深め、直感的に操作を記憶できます。',
       },
       quizMode: {
-        title: 'Active Learning',
-        description: 'クイズ形式の反復練習により、記憶に定着。苦手な操作も自然と体が覚えます。',
+        title: '実践的なクイズ形式',
+        description: '忘却曲線に基づいた反復練習。苦手な項目をAIが分析し、効率的な学習をサポートします。',
       },
       multiPlatform: {
-        title: 'Master Every App',
-        description: 'VS CodeからExcel、Slackまで。日常的に使うあらゆるプロツールの達人へ。',
+        title: '主要アプリを網羅',
+        description: 'VS Code, Excel, SlackからGmailまで。プロが毎日使うツールの全てをマスターできます。',
       },
     },
 
     appsTitle: '対応アプリケーション',
-    appsDescription: '日常的に使うプロフェッショナルツールのショートカットを網羅',
+    appsDescription: 'エンジニア、デザイナー、ビジネスパーソンのための主要ツールを完備',
 
-    benefitsTitle: '得られるメリット',
+    benefitsTitle: '習得することで得られる価値',
     benefits: {
       productivity: {
         number: '01',
-        title: '生産性の劇的な向上',
-        description: 'マウス操作からキーボード操作へ移行することで、作業速度が平均30-50%向上します。',
+        title: '圧倒的な生産性向上',
+        description: 'マウス操作をキーボードに置き換えることで、作業スピードは平均30〜50%向上します。',
       },
       flow: {
         number: '02',
-        title: 'フロー状態の維持',
-        description: 'マウスとキーボードの切り替えによる集中力の途切れを防ぎ、深い集中状態を保てます。',
+        title: '深い集中状態（フロー）の維持',
+        description: '視線と手の移動を最小限に抑えることで、思考の断絶を防ぎ、没入感を維持できます。',
       },
       skill: {
         number: '03',
-        title: 'プロフェッショナルなスキル',
-        description: 'ショートカットを使いこなす姿は、周囲から見ても圧倒的にプロフェッショナルです。',
+        title: 'プロフェッショナルの証',
+        description: '流れるようなキーボード操作は、周囲にプロとしての信頼感と洗練された印象を与えます。',
       },
       ergonomics: {
         number: '04',
-        title: '身体的な負担軽減',
-        description: 'マウス操作の減少により、肩や手首への負担が軽減され、長時間の作業も快適になります。',
+        title: '疲労の軽減と健康',
+        description: 'マウスの多用による肩こりや手首の負担を軽減し、長時間の作業も快適になります。',
       },
     },
 
-    howItWorksTitle: '使い方はシンプル',
+    targetTitle: 'こんな方におすすめ',
+    targets: {
+      engineer: {
+        title: 'エンジニア / 開発者',
+        description: 'エディタ操作を高速化し、コードを書くことに集中したい方。',
+      },
+      designer: {
+        title: 'デザイナー / クリエイター',
+        description: 'ツール切り替えを無意識化し、創造性を妨げたくない方。',
+      },
+      business: {
+        title: 'ビジネスパーソン',
+        description: '資料作成やメール対応を最速で終わらせ、価値ある仕事に時間を使いたい方。',
+      },
+    },
+
+    faqTitle: 'よくある質問',
+    faqs: [
+      {
+        q: '本当に無料で使えますか？',
+        a: 'はい、全ての機能を無料でご利用いただけます。アカウント登録なしでもすぐに学習を始められます。'
+      },
+      {
+        q: '特定のOS専用のショートカットも学べますか？',
+        a: 'WindowsとmacOSの両方に対応しており、設定からお使いの環境に合わせて切り替えが可能です。'
+      },
+      {
+        q: 'インストールは必要ですか？',
+        a: '不要です。ブラウザ上で全ての機能が動作するため、場所を選ばず練習できます。'
+      }
+    ],
+
+    howItWorksTitle: '使い方は簡単',
     steps: {
       step1: {
         number: 'STEP 1',
@@ -497,6 +529,7 @@ export const ja: Translations = {
     edit: '編集',
     close: '閉じる',
     back: '戻る',
+    retry: '再試行',
     next: '次へ',
     previous: '前へ',
     search: '検索',

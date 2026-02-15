@@ -4,7 +4,7 @@ import { LANGUAGE_OPTIONS } from '../../constants/setup'
 import { useUI, useShortcutData } from '../../context'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage, Language } from '../../context/LanguageContext'
-import { SetupOption as SetupOptionType, SetupCompleteOptions, ShortcutDifficulty } from '../../types'
+import { SetupOption as SetupOptionType, SetupCompleteOptions, ShortcutDifficulty, App } from '../../types'
 import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
 import SetupOption from './SetupOption'
@@ -23,8 +23,8 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   const [selectedFullscreen, setSelectedFullscreen] = useState<SetupOptionType | null>(null)
   const [selectedLayout, setSelectedLayout] = useState<SetupOptionType | null>(null)
   const [selectedMode, setSelectedMode] = useState<SetupOptionType | null>(null)
-  const [selectedApp, setSelectedApp] = useState<any>(null)
-  const [selectedQuizApps, setSelectedQuizApps] = useState<any[]>([]) // 複数選択対応
+  const [selectedApp, setSelectedApp] = useState<App | null>(null)
+  const [selectedQuizApps, setSelectedQuizApps] = useState<App[]>([]) // 複数選択対応
   const [selectedDifficulty, setSelectedDifficulty] = useState<SetupOptionType | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
 
@@ -157,7 +157,7 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
     }
   }
 
-  const handleSelectQuizApp = (app: any) => {
+  const handleSelectQuizApp = (app: App) => {
     setSelectedQuizApps(prev => {
       if (prev.some(a => a.id === app.id)) {
         return prev.filter(a => a.id !== app.id)
@@ -298,7 +298,11 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
                   key={app.id}
                   option={app}
                   isSelected={selectedApp?.id === app.id}
-                  onSelect={setSelectedApp}
+                  onSelect={(option) => {
+                    if ('os' in option) {
+                      setSelectedApp(option as App);
+                    }
+                  }}
                 />
               ))}
             </div>

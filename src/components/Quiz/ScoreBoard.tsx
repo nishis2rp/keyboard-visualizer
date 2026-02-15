@@ -1,10 +1,11 @@
 import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { QuizHistoryEntry } from '../../context/QuizReducer';
 import styles from './ScoreBoard.module.css';
 
 interface ScoreBoardProps {
   status: 'idle' | 'playing' | 'paused' | 'finished';
-  quizHistory: any[]; // A more specific type would be better
+  quizHistory: QuizHistoryEntry[];
   settings: { totalQuestions: number };
 }
 
