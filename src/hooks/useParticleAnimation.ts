@@ -38,8 +38,8 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
     const initParticles = () => {
       const isMobile = window.innerWidth < 768;
-      // Drastically increase particle count for dense geometric effect
-      let particleCount = isMobile ? 100 : 250; // Increased from 80/200 to ensure connectivity
+      // Drastically increase particle count for dense geometric effect and persistent connections
+      let particleCount = isMobile ? 120 : 300; // Further increased to ensure always-visible connections
 
       // Adjust count based on performance level
       if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.8);
@@ -50,8 +50,8 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         particles.push({
           x: Math.random() * rect.width,
           y: Math.random() * rect.height,
-          vx: (Math.random() - 0.5) * 0.3, // Reduced from 0.6 to 0.3 for slower movement
-          vy: (Math.random() - 0.5) * 0.3, // Reduced from 0.6 to 0.3 for slower movement
+          vx: (Math.random() - 0.5) * 0.15, // Further reduced to 0.15 for very slow movement
+          vy: (Math.random() - 0.5) * 0.15, // Further reduced to 0.15 for very slow movement
           radius: Math.random() * 1.5 + 0.5,
         });
       }
@@ -83,9 +83,10 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     window.addEventListener('resize', setCanvasSize);
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Increase connection distance significantly to ensure persistent connections
-    const connectionDistance = window.innerWidth < 768 ? 180 : 350; // Increased from 120/250
-    const mouseDistance = 150;
+    // Significantly large connection distance to ensure persistent connections
+    // Use percentage of screen size for responsive behavior
+    const connectionDistance = window.innerWidth < 768 ? 200 : 450; // Further increased
+    const mouseDistance = 200;
 
     let lastFrameTime = 0;
     const frameInterval = 1000 / 45; // Slightly higher FPS for smoother lines
