@@ -48,6 +48,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Skip cross-origin requests and non-http(s) schemes (chrome-extension, etc.)
+  const url = new URL(event.request.url);
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return;
+  }
+
   // console.log('[Service Worker] Fetching:', event.request.url);
   event.respondWith(
     caches.match(event.request)
