@@ -17,6 +17,14 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number>(0);
   const mouseRef = useRef({ x: -1000, y: -1000 });
+  const qualityLevelRef = useRef(qualityLevel);
+  const isCanvasVisibleRef = useRef(isCanvasVisible);
+
+  // Update refs when props change without restarting animation
+  useEffect(() => {
+    qualityLevelRef.current = qualityLevel;
+    isCanvasVisibleRef.current = isCanvasVisible;
+  }, [qualityLevel, isCanvasVisible]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -34,8 +42,8 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       let particleCount = isMobile ? 80 : 200;
 
       // Adjust count based on performance level
-      if (qualityLevel === 'medium') particleCount = Math.floor(particleCount * 0.8);
-      if (qualityLevel === 'low') particleCount = Math.floor(particleCount * 0.4);
+      if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.8);
+      if (qualityLevelRef.current === 'low') particleCount = Math.floor(particleCount * 0.4);
 
       particles.length = 0;
       for (let i = 0; i < particleCount; i++) {
@@ -85,7 +93,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     const animate = (currentTime: number) => {
       animationFrameRef.current = requestAnimationFrame(animate);
 
-      if (!isCanvasVisible) return;
+      if (!isCanvasVisibleRef.current) return;
 
       const deltaTime = currentTime - lastFrameTime;
       if (deltaTime < frameInterval) return;
@@ -101,7 +109,18 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         p.x += p.vx;
         p.y += p.vy;
 
+        // Mouse interaction: push/pull effect (subtle)
+        const dxm = p.x - mouseRef.current.x;
+        const dym = p.y - mouseRef.current.y;
+        const dMouse = Math.sqrt(dxm * dxm + dym * dym);
+        if (dMouse < mouseDistance && dMouse > 0) {
+          const force = (mouseDistance - dMouse) / mouseDistance;
+          p.x += (dxm / dMouse) * force * 2;
+          p.y += (dym / dMouse) * force * 2;
+        }
+
         // Bounce off edges and clamp position to prevent particles from going off-screen
+        // Apply bounds check AFTER mouse interaction to ensure particles stay visible
         if (p.x < 0) {
           p.x = 0;
           p.vx *= -1;
@@ -118,16 +137,6 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
           p.vy *= -1;
         }
 
-        // Mouse interaction: push/pull effect (subtle)
-        const dxm = p.x - mouseRef.current.x;
-        const dym = p.y - mouseRef.current.y;
-        const dMouse = Math.sqrt(dxm * dxm + dym * dym);
-        if (dMouse < mouseDistance) {
-          const force = (mouseDistance - dMouse) / mouseDistance;
-          p.x += (dxm / dMouse) * force * 2;
-          p.y += (dym / dMouse) * force * 2;
-        }
-
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
@@ -135,7 +144,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       }
 
       // Second pass: Draw connections
-      if (qualityLevel !== 'low') {
+      if (qualityLevelRef.current !== 'low') {
         ctx.lineWidth = 1.2; // Increased from 0.5 for better visibility
         for (let i = 0; i < pCount; i++) {
           const p = particles[i];
@@ -166,7 +175,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [qualityLevel, isCanvasVisible]);
+  }, []); // Empty deps - animation runs once and uses refs for dynamic values
 
   return canvasRef;
 };
