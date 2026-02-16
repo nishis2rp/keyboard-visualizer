@@ -52,7 +52,7 @@ export const useAdaptivePerformance = () => {
   // クオリティに応じたCSS変数の値を定義
   const performanceStyles = {
     '--glass-blur': qualityLevel === 'high' ? '20px' : qualityLevel === 'medium' ? '10px' : '0px',
-    '--animation-speed': qualityLevel === 'low' ? '0.1s' : '0.3s',
+    '--animation-speed': '0.3s', // Keep consistent to avoid transition glitches
     '--shadow-opacity': qualityLevel === 'high' ? '0.1' : '0.02',
   } as React.CSSProperties;
 

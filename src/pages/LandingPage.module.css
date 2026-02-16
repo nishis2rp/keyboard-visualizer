@@ -74,8 +74,25 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 1;
+  z-index: 1; /* Above background, below content */
   opacity: 0.7;
+}
+
+.landingWrapper {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  background: #050505;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  padding: 0;
+  z-index: 0;
 }
 
 .landingWrapper::before {
@@ -119,7 +136,7 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  z-index: 2;
+  z-index: 2; /* Ensure content is above canvas */
 }
 
 /* Scroll Reveal Base */

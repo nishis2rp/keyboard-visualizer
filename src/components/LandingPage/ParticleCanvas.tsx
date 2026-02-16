@@ -8,19 +8,22 @@ const ParticleCanvas: React.FC = () => {
   const { qualityLevel } = useAdaptivePerformance();
   const { showLandingVisualizer } = useUI();
 
-  // Canvas visibility is managed by UIContext
+  // Canvas visibility is managed by logic inside the hook, 
+  // but we keep the canvas element rendered to avoid re-mounting
   const canvasRef = useParticleAnimation({
     qualityLevel,
     isCanvasVisible: showLandingVisualizer
   });
-
-  if (!showLandingVisualizer) return null;
 
   return (
     <canvas
       className={styles.particleCanvas}
       id="particleCanvas"
       ref={canvasRef}
+      style={{ 
+        display: showLandingVisualizer ? 'block' : 'none',
+        opacity: showLandingVisualizer ? 0.7 : 0 
+      }}
     />
   );
 };

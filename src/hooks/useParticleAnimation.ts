@@ -19,8 +19,9 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
   const mouseRef = useRef({ x: -1000, y: -1000 });
   const qualityLevelRef = useRef(qualityLevel);
   const isCanvasVisibleRef = useRef(isCanvasVisible);
+  const particlesRef = useRef<Particle[]>([]);
 
-  // Update refs when props change without restarting animation
+  // Update refs when props change
   useEffect(() => {
     qualityLevelRef.current = qualityLevel;
     isCanvasVisibleRef.current = isCanvasVisible;
@@ -34,27 +35,27 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     if (!ctx) return;
 
     let rect = canvas.getBoundingClientRect();
-    const particles: Particle[] = [];
 
     const initParticles = () => {
       const isMobile = window.innerWidth < 768;
       // Drastically increase particle count for dense geometric effect and persistent connections
-      let particleCount = isMobile ? 120 : 300; // Further increased to ensure always-visible connections
+      let particleCount = isMobile ? 120 : 300; 
 
-      // Adjust count based on performance level - Less aggressive reduction to keep it "infinite"
+      // Adjust count based on performance level
       if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.9);
       if (qualityLevelRef.current === 'low') particleCount = Math.floor(particleCount * 0.8);
 
-      particles.length = 0;
+      const newParticles: Particle[] = [];
       for (let i = 0; i < particleCount; i++) {
-        particles.push({
+        newParticles.push({
           x: Math.random() * rect.width,
           y: Math.random() * rect.height,
-          vx: (Math.random() - 0.5) * 0.15, // Further reduced to 0.15 for very slow movement
-          vy: (Math.random() - 0.5) * 0.15, // Further reduced to 0.15 for very slow movement
+          vx: (Math.random() - 0.5) * 0.15,
+          vy: (Math.random() - 0.5) * 0.15,
           radius: Math.random() * 1.5 + 0.5,
         });
       }
+      particlesRef.current = newParticles;
     };
 
     const setCanvasSize = () => {
@@ -83,22 +84,25 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     window.addEventListener('resize', setCanvasSize);
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Significantly large connection distance to ensure persistent connections
-    // Use percentage of screen size for responsive behavior
-    const connectionDistance = window.innerWidth < 768 ? 200 : 450; // Further increased
+    const connectionDistance = window.innerWidth < 768 ? 200 : 450;
     const mouseDistance = 200;
 
     let lastFrameTime = 0;
-    const frameInterval = 1000 / 45; // Slightly higher FPS for smoother lines
+    const frameInterval = 1000 / 45;
 
     const animate = (currentTime: number) => {
       animationFrameRef.current = requestAnimationFrame(animate);
 
+      // Even if not visible in terms of logic, we keep the loop running
+      // but skip the heavy rendering if explicitly told to be hidden
       if (!isCanvasVisibleRef.current) return;
 
       const deltaTime = currentTime - lastFrameTime;
       if (deltaTime < frameInterval) return;
       lastFrameTime = currentTime - (deltaTime % frameInterval);
+
+      const particles = particlesRef.current;
+      if (particles.length === 0) return;
 
       ctx.clearRect(0, 0, rect.width, rect.height);
 
@@ -110,7 +114,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         p.x += p.vx;
         p.y += p.vy;
 
-        // Mouse interaction: push/pull effect (subtle)
+        // Mouse interaction
         const dxm = p.x - mouseRef.current.x;
         const dym = p.y - mouseRef.current.y;
         const dMouse = Math.sqrt(dxm * dxm + dym * dym);
@@ -120,23 +124,12 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
           p.y += (dym / dMouse) * force * 2;
         }
 
-        // Bounce off edges and clamp position to prevent particles from going off-screen
-        // Apply bounds check AFTER mouse interaction to ensure particles stay visible
-        if (p.x < 0) {
-          p.x = 0;
-          p.vx *= -1;
-        } else if (p.x > rect.width) {
-          p.x = rect.width;
-          p.vx *= -1;
-        }
+        // Bounce off edges
+        if (p.x < 0) { p.x = 0; p.vx *= -1; }
+        else if (p.x > rect.width) { p.x = rect.width; p.vx *= -1; }
 
-        if (p.y < 0) {
-          p.y = 0;
-          p.vy *= -1;
-        } else if (p.y > rect.height) {
-          p.y = rect.height;
-          p.vy *= -1;
-        }
+        if (p.y < 0) { p.y = 0; p.vy *= -1; }
+        else if (p.y > rect.height) { p.y = rect.height; p.vy *= -1; }
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -146,14 +139,13 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
       // Second pass: Draw connections
       const currentQuality = qualityLevelRef.current;
-      const opacityMultiplier = currentQuality === 'low' ? 0.2 : 0.5;
-      const effectiveDistance = currentQuality === 'low' ? connectionDistance * 0.7 : connectionDistance;
+      const opacityMultiplier = currentQuality === 'low' ? 0.3 : 0.5; // Slightly increased for low
+      const effectiveDistance = currentQuality === 'low' ? connectionDistance * 0.8 : connectionDistance;
       const effectiveDistanceSq = effectiveDistance * effectiveDistance;
 
-      ctx.lineWidth = currentQuality === 'low' ? 0.8 : 1.2;
+      ctx.lineWidth = currentQuality === 'low' ? 1.0 : 1.2;
       for (let i = 0; i < pCount; i++) {
         // Optimization: In low quality, only check connections for every 2nd particle
-        // This reduces the O(N^2) loop complexity significantly
         if (currentQuality === 'low' && i % 2 !== 0) continue;
         
         const p = particles[i];
@@ -183,7 +175,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameRef.current);
     };
-  }, []); // Empty deps - animation runs once and uses refs for dynamic values
+  }, []); // Run once on mount
 
   return canvasRef;
 };

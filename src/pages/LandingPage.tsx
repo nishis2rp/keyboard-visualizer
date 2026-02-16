@@ -59,7 +59,7 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className={styles.landingWrapper} style={performanceStyles}>
-      {showLandingVisualizer && <ParticleCanvas />}
+      <ParticleCanvas />
       
       <LandingHeader />
 
