@@ -101,8 +101,22 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         p.x += p.vx;
         p.y += p.vy;
 
-        if (p.x < 0 || p.x > rect.width) p.vx *= -1;
-        if (p.y < 0 || p.y > rect.height) p.vy *= -1;
+        // Bounce off edges and clamp position to prevent particles from going off-screen
+        if (p.x < 0) {
+          p.x = 0;
+          p.vx *= -1;
+        } else if (p.x > rect.width) {
+          p.x = rect.width;
+          p.vx *= -1;
+        }
+
+        if (p.y < 0) {
+          p.y = 0;
+          p.vy *= -1;
+        } else if (p.y > rect.height) {
+          p.y = rect.height;
+          p.vy *= -1;
+        }
 
         // Mouse interaction: push/pull effect (subtle)
         const dxm = p.x - mouseRef.current.x;
