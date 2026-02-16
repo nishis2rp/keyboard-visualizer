@@ -39,7 +39,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     const initParticles = () => {
       const isMobile = window.innerWidth < 768;
       // Drastically increase particle count for dense geometric effect
-      let particleCount = isMobile ? 80 : 200;
+      let particleCount = isMobile ? 100 : 250; // Increased from 80/200 to ensure connectivity
 
       // Adjust count based on performance level
       if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.8);
@@ -50,8 +50,8 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         particles.push({
           x: Math.random() * rect.width,
           y: Math.random() * rect.height,
-          vx: (Math.random() - 0.5) * 0.6,
-          vy: (Math.random() - 0.5) * 0.6,
+          vx: (Math.random() - 0.5) * 0.3, // Reduced from 0.6 to 0.3 for slower movement
+          vy: (Math.random() - 0.5) * 0.3, // Reduced from 0.6 to 0.3 for slower movement
           radius: Math.random() * 1.5 + 0.5,
         });
       }
@@ -67,7 +67,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
       ctx.resetTransform();
       ctx.scale(dpr, dpr);
-      
+
       initParticles();
     };
 
@@ -83,8 +83,8 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     window.addEventListener('resize', setCanvasSize);
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Increase connection distance significantly
-    const connectionDistance = window.innerWidth < 768 ? 120 : 250;
+    // Increase connection distance significantly to ensure persistent connections
+    const connectionDistance = window.innerWidth < 768 ? 180 : 350; // Increased from 120/250
     const mouseDistance = 150;
 
     let lastFrameTime = 0;
