@@ -72,14 +72,14 @@
 
 .app-tab:hover {
   transform: translateY(-4px);
-  border-color: #6366f1;
-  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1);
+  border-color: #4a5568;
+  box-shadow: 0 10px 20px rgba(74, 85, 104, 0.15);
 }
 
 .app-tab.active {
   background: #f8fafc;
-  border: 2px solid #6366f1;
-  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.12);
+  border: 2px solid #2d3748;
+  box-shadow: 0 8px 16px rgba(45, 55, 72, 0.18);
 }
 
 .app-icon {
@@ -90,7 +90,7 @@
 
 .app-tab:hover .app-icon,
 .app-tab.active .app-icon {
-  color: #6366f1;
+  color: #2d3748;
   transform: scale(1.1);
 }
 
@@ -138,17 +138,17 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(0, 122, 255, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(74, 85, 104, 0.06) 0%, transparent 70%);
   opacity: 0;
   transition: opacity var(--transition-slow);
   pointer-events: none;
 }
 
 .display-area.active {
-  border-color: var(--sf-blue);
+  border-color: #4a5568;
   border-style: solid;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.08) 0%, rgba(90, 200, 250, 0.05) 100%);
-  box-shadow: var(--shadow-md), var(--shadow-blue), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, rgba(74, 85, 104, 0.08) 0%, rgba(45, 55, 72, 0.05) 100%);
+  box-shadow: var(--shadow-md), 0 8px 24px rgba(45, 55, 72, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   transform: scale(1.01);
 }
 
@@ -213,32 +213,32 @@
 }
 
 .special-key {
-  background: linear-gradient(180deg, var(--sf-blue) 0%, var(--sf-blue-hover) 100%);
+  background: linear-gradient(180deg, #4a5568 0%, #2d3748 100%);
   color: var(--white);
-  border-color: var(--sf-blue);
+  border-color: #2d3748;
   box-shadow:
-    0 2px 0 rgba(0, 122, 255, 0.4),
-    0 4px 16px rgba(0, 122, 255, 0.25);
+    0 2px 0 rgba(45, 55, 72, 0.4),
+    0 4px 16px rgba(45, 55, 72, 0.25);
 }
 
 /* Modifier keys - must come after .special-key for proper specificity */
 .key.modifier-key {
-  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%) !important;
+  background: linear-gradient(180deg, #4a5568 0%, #2d3748 100%) !important;
   color: var(--white) !important;
-  border-color: #4338ca !important;
+  border-color: #1a202c !important;
   box-shadow:
-    0 2px 0 rgba(99, 102, 241, 0.3),
-    0 4px 12px rgba(99, 102, 241, 0.2) !important;
+    0 2px 0 rgba(45, 55, 72, 0.3),
+    0 4px 12px rgba(45, 55, 72, 0.2) !important;
 }
 
 /* Windows key in display area - Unified with Modifier Keys */
 .key.windows-key {
-  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%) !important;
+  background: linear-gradient(180deg, #4a5568 0%, #2d3748 100%) !important;
   color: var(--white) !important;
-  border-color: #4338ca !important;
+  border-color: #1a202c !important;
   box-shadow:
-    0 3px 0 rgba(99, 102, 241, 0.4),
-    0 5px 16px rgba(99, 102, 241, 0.35) !important;
+    0 3px 0 rgba(45, 55, 72, 0.4),
+    0 5px 16px rgba(45, 55, 72, 0.35) !important;
   font-weight: 700 !important;
 }
 
@@ -316,7 +316,7 @@
 .shortcut-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
-  border-color: #6366f1;
+  border-color: #4a5568;
 }
 
 .shortcut-combo {

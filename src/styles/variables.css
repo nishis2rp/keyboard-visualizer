@@ -106,8 +106,8 @@
   --line-height-loose: 2;
 
   /* Gradients */
-  --gradient-blue: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
-  --gradient-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-blue: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  --gradient-purple: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
   --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --gradient-red: linear-gradient(135deg, #FF3B30 0%, #E62E24 100%);
   --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
@@ -120,8 +120,8 @@
   --blur-2xl: blur(40px);
 
   /* Quiz Colors */
-  --quiz-purple-start: #667eea;
-  --quiz-purple-end: #764ba2;
+  --quiz-purple-start: #4a5568;
+  --quiz-purple-end: #2d3748;
   --quiz-correct: #10b981;
   --quiz-correct-dark: #059669;
   --quiz-incorrect: #ef4444;
