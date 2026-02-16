@@ -67,7 +67,9 @@
       "Bash(timeout:*)",
       "Bash(test:*)",
       "Bash(else echo \"❌ .env file not found\")",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "WebFetch(domain:nishis2rp.github.io)",
+      "Bash(npx vite build)"
     ],
     "deny": [],
     "ask": []

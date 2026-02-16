@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
+import LandingSection from './LandingSection';
 
 type TargetKey = 'engineer' | 'designer' | 'business';
 
@@ -30,7 +31,7 @@ const TargetSection: React.FC = () => {
   const targetsContent = t.landing.targets as Record<TargetKey, { title: string; description: string }>;
 
   return (
-    <section className={styles.featuresSection}>
+    <LandingSection className={styles.featuresSection}>
       <h2 className={styles.sectionTitle}>{t.landing.targetTitle}</h2>
       <div className={styles.featuresGrid}>
         {targets.map((target) => {
@@ -53,7 +54,7 @@ const TargetSection: React.FC = () => {
           );
         })}
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

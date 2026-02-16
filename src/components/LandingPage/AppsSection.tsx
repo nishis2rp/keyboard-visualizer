@@ -3,6 +3,7 @@ import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
 import { useShortcutData } from '../../context';
 import { ICON_MAPPING } from '../../constants/icons';
+import LandingSection from './LandingSection';
 
 // Fallback apps for initial load
 const FALLBACK_APPS = [
@@ -33,7 +34,7 @@ const AppsSection: React.FC = () => {
   }, [apps, language]);
 
   return (
-    <section className={styles.appsSection}>
+    <LandingSection className={styles.appsSection}>
       <h2 className={styles.sectionTitle}>{t.landing.appsTitle}</h2>
       <p className={styles.sectionSubtitle}>
         {t.landing.appsDescription}
@@ -53,7 +54,7 @@ const AppsSection: React.FC = () => {
           </div>
         ))}
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

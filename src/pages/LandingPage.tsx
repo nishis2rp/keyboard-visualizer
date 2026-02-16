@@ -20,9 +20,8 @@ import FinalCtaSection from '../components/LandingPage/FinalCtaSection';
 import Footer from '../components/LandingPage/Footer';
 
 const LandingPage: React.FC = () => {
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const { performanceStyles } = useAdaptivePerformance();
-  const { showLandingVisualizer, setShowLandingVisualizer } = useUI();
+  const { setShowLandingVisualizer } = useUI();
 
   useEffect(() => {
     // Ensure visualizer is shown on mount
@@ -34,26 +33,10 @@ const LandingPage: React.FC = () => {
     document.body.style.padding = '0';
     document.body.style.background = '#050505';
 
-    // Scroll reveal animation
-    observerRef.current = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add(styles.isVisible);
-        }
-      });
-    }, { threshold: TIMINGS.INTERSECTION_THRESHOLD });
-
-    // Wait for components to mount before observing
-    setTimeout(() => {
-      const sections = document.querySelectorAll('section');
-      sections.forEach(section => observerRef.current?.observe(section));
-    }, TIMINGS.ANIMATION_DELAY_MS);
-
     return () => {
       // Restore original body styles
       document.body.style.padding = originalPadding;
       document.body.style.background = originalBackground;
-      observerRef.current?.disconnect();
     };
   }, [setShowLandingVisualizer]);
 

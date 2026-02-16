@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
 import { releases } from '../../constants/releases';
+import LandingSection from './LandingSection';
 
 const ReleaseNotesSection: React.FC = () => {
   const { t, language } = useLanguage();
@@ -11,7 +12,7 @@ const ReleaseNotesSection: React.FC = () => {
   if (!latestRelease) return null;
 
   return (
-    <section className={styles.releaseNotesSection}>
+    <LandingSection className={styles.releaseNotesSection}>
       <h2 className={styles.sectionTitle}>{t.landing.releaseNotesTitle}</h2>
       <p className={styles.sectionSubtitle}>
         {t.landing.releaseNotesDescription}
@@ -40,7 +41,7 @@ const ReleaseNotesSection: React.FC = () => {
           {t.landing.viewAllReleases}
         </Link>
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

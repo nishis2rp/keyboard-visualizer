@@ -1,12 +1,13 @@
 import React from 'react';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
+import LandingSection from './LandingSection';
 
 const BenefitsSection: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <section className={styles.benefitsSection}>
+    <LandingSection className={styles.benefitsSection}>
       <h2 className={styles.sectionTitle}>{t.landing.benefitsTitle}</h2>
       <div className={styles.benefitsGrid}>
         <div className={styles.benefitCard}>
@@ -38,7 +39,7 @@ const BenefitsSection: React.FC = () => {
           </p>
         </div>
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

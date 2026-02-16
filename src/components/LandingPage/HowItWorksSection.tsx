@@ -1,12 +1,13 @@
 import React from 'react';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
+import LandingSection from './LandingSection';
 
 const HowItWorksSection: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <section className={styles.howItWorksSection}>
+    <LandingSection className={styles.howItWorksSection}>
       <h2 className={styles.sectionTitle}>{t.landing.howItWorksTitle}</h2>
       <div className={styles.stepsGrid}>
         <div className={styles.stepCard}>
@@ -27,7 +28,7 @@ const HowItWorksSection: React.FC = () => {
           <p className={styles.stepDescription}>{t.landing.steps.step3.description}</p>
         </div>
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

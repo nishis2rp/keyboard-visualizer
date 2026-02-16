@@ -1,12 +1,13 @@
 import React from 'react';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
+import LandingSection from './LandingSection';
 
 const FaqSection: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <section className={styles.faqSection}>
+    <LandingSection className={styles.faqSection}>
       <h2 className={styles.sectionTitle}>{t.landing.faqTitle}</h2>
       <div className={styles.faqGrid}>
         {t.landing.faqs.map((faq, index) => (
@@ -16,7 +17,7 @@ const FaqSection: React.FC = () => {
           </div>
         ))}
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

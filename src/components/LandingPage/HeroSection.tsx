@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
 import { releases } from '../../constants/releases';
+import LandingSection from './LandingSection';
 
 const HeroSection: React.FC = () => {
   const { t } = useLanguage();
   const latestVersion = releases[0]?.version || '2.3';
 
   return (
-    <section className={`${styles.heroSection} ${styles.isVisible}`}>
+    <LandingSection className={`${styles.heroSection} ${styles.isVisible}`}>
       <div className={styles.badge}>NEW VERSION {latestVersion}</div>
       <h1 className={styles.title}>{t.landing.title}</h1>
       <p className={styles.subtitle}>
@@ -26,7 +27,7 @@ const HeroSection: React.FC = () => {
           </svg>
         </Link>
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

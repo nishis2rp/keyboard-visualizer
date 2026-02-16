@@ -1,12 +1,13 @@
 import React from 'react';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
+import LandingSection from './LandingSection';
 
 const FeaturesSection: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <section className={styles.featuresSection}>
+    <LandingSection className={styles.featuresSection}>
       <h2 className={styles.sectionTitle}>{t.landing.whyTitle}</h2>
       <div className={styles.featuresGrid}>
         <div className={styles.featureCard}>
@@ -52,7 +53,7 @@ const FeaturesSection: React.FC = () => {
           <p>{t.landing.features.multiPlatform.description}</p>
         </div>
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

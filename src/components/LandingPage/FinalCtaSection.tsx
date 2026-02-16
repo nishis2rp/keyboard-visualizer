@@ -2,12 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
+import LandingSection from './LandingSection';
 
 const FinalCtaSection: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <section className={styles.finalCtaSection}>
+    <LandingSection className={styles.finalCtaSection}>
       <h2 className={styles.finalCtaTitle}>{t.landing.finalCtaTitle}</h2>
       <p className={styles.finalCtaDescription}>
         {t.landing.finalCtaDescription}
@@ -18,7 +19,7 @@ const FinalCtaSection: React.FC = () => {
           <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </Link>
-    </section>
+    </LandingSection>
   );
 };
 
