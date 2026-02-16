@@ -1,18 +1,13 @@
-const CACHE_NAME = 'keyboard-visualizer-cache-v1';
+const CACHE_NAME = 'keyboard-visualizer-cache-v2';
+// Base path is set at runtime from registration scope
+const BASE_PATH = self.registration.scope;
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/keyboard.svg', // favicon
-  '/logo192.png',
-  '/logo512.png',
-  // アプリケーションのCSSとJavaScriptバンドル (ビルド後にパスが変わる可能性があるので注意)
-  // Viteの場合、ビルド後のファイル名はハッシュを含むため、動的に取得するか、
-  // Workboxなどのライブラリを使うのがより堅牢。
-  // ここでは開発時の'/src/main.jsx'と'/src/styles/index.js'を記述するが、
-  // 実際にはビルド後のdistフォルダ内のアセットをキャッシュすべき。
-  // デモ目的のため、'/src/main.jsx'と'/src/styles'は含めず、静的アセットのみキャッシュ。
-  // Service Workerはルートディレクトリに配置されるため、パスはルートからの相対パス
+  BASE_PATH,
+  `${BASE_PATH}index.html`,
+  `${BASE_PATH}manifest.json`,
+  `${BASE_PATH}keyboard.svg`,
+  `${BASE_PATH}404.html`,
+  // Dynamic assets with hashes will be cached on-demand via fetch event
 ];
 
 self.addEventListener('install', (event) => {
