@@ -64,7 +64,7 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
           </Link>
           <StyledButton
             onClick={onQuizModeToggle}
-            backgroundColor="#6366f1"
+            backgroundColor="#4a5568"
             textColor="white"
             title={isQuizMode ? t.header.returnToVisualizer : t.header.startQuizMode}
           >

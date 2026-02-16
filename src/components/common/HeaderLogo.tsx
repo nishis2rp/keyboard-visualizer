@@ -21,11 +21,11 @@ export const HeaderLogo: React.FC<HeaderLogoProps> = ({ size = 48, className = '
     >
       <defs>
         <linearGradient id="logo_base_grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#6366F1" />
-          <stop offset="1" stopColor="#A78BFA" />
+          <stop stopColor="#4a5568" />
+          <stop offset="1" stopColor="#2d3748" />
         </linearGradient>
         <filter id="logo_shadow" x="-4" y="0" width="108" height="108" filterUnits="userSpaceOnUse">
-          <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#6366F1" floodOpacity="0.3" />
+          <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#2d3748" floodOpacity="0.3" />
         </filter>
       </defs>
 
