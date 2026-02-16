@@ -111,6 +111,19 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       for (let i = 0; i < pCount; i++) {
         const p = particles[i];
+        
+        // Add subtle random steering for organic movement
+        p.vx += (Math.random() - 0.5) * 0.012;
+        p.vy += (Math.random() - 0.5) * 0.012;
+        
+        // Limit speed
+        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+        const maxSpeed = 0.28;
+        if (speed > maxSpeed) {
+          p.vx = (p.vx / speed) * maxSpeed;
+          p.vy = (p.vy / speed) * maxSpeed;
+        }
+
         p.x += p.vx;
         p.y += p.vy;
 
