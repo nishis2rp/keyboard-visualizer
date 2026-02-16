@@ -49,9 +49,9 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         newParticles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.15, // Slightly faster
-          vy: (Math.random() - 0.5) * 0.15,
-          radius: Math.random() * 1.2 + 0.6, // Slightly larger particles
+          vx: (Math.random() - 0.5) * 0.35, // Faster initial speed
+          vy: (Math.random() - 0.5) * 0.35,
+          radius: Math.random() * 1.2 + 0.6,
         });
       }
       particlesRef.current = newParticles;
@@ -113,12 +113,12 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         const p = particles[i];
         
         // Add subtle random steering for organic movement
-        p.vx += (Math.random() - 0.5) * 0.012;
-        p.vy += (Math.random() - 0.5) * 0.012;
+        p.vx += (Math.random() - 0.5) * 0.024; // Increased from 0.012
+        p.vy += (Math.random() - 0.5) * 0.024;
         
         // Limit speed
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-        const maxSpeed = 0.28;
+        const maxSpeed = 0.55; // Increased from 0.28
         if (speed > maxSpeed) {
           p.vx = (p.vx / speed) * maxSpeed;
           p.vy = (p.vy / speed) * maxSpeed;
