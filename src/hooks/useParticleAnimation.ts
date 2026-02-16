@@ -20,6 +20,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
   const qualityLevelRef = useRef(qualityLevel);
   const isCanvasVisibleRef = useRef(isCanvasVisible);
   const particlesRef = useRef<Particle[]>([]);
+  const dimensionsRef = useRef({ width: 0, height: 0 });
 
   // Update refs when props change
   useEffect(() => {
@@ -34,24 +35,21 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    let rect = canvas.getBoundingClientRect();
-
-    const initParticles = () => {
+    const initParticles = (width: number, height: number) => {
       const isMobile = window.innerWidth < 768;
-      // Drastically increase particle count for dense geometric effect and persistent connections
-      let particleCount = isMobile ? 120 : 300; 
+      let particleCount = isMobile ? 120 : 250; 
 
-      // Adjust count based on performance level
+      // Less aggressive reduction
       if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.9);
       if (qualityLevelRef.current === 'low') particleCount = Math.floor(particleCount * 0.8);
 
       const newParticles: Particle[] = [];
       for (let i = 0; i < particleCount; i++) {
         newParticles.push({
-          x: Math.random() * rect.width,
-          y: Math.random() * rect.height,
-          vx: (Math.random() - 0.5) * 0.15,
-          vy: (Math.random() - 0.5) * 0.15,
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.2,
+          vy: (Math.random() - 0.5) * 0.2,
           radius: Math.random() * 1.5 + 0.5,
         });
       }
@@ -60,7 +58,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
     const setCanvasSize = () => {
       if (!canvas) return;
-      rect = canvas.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
 
       canvas.width = rect.width * dpr;
@@ -69,7 +67,8 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       ctx.resetTransform();
       ctx.scale(dpr, dpr);
 
-      initParticles();
+      dimensionsRef.current = { width: rect.width, height: rect.height };
+      initParticles(rect.width, rect.height);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -84,31 +83,31 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     window.addEventListener('resize', setCanvasSize);
     window.addEventListener('mousemove', handleMouseMove);
 
-    const connectionDistance = window.innerWidth < 768 ? 200 : 450;
-    const mouseDistance = 200;
+    const connectionDistance = 350;
+    const mouseDistance = 150;
 
     let lastFrameTime = 0;
-    const frameInterval = 1000 / 45;
+    const frameInterval = 1000 / 40; // 40 FPS target for stability
 
     const animate = (currentTime: number) => {
       animationFrameRef.current = requestAnimationFrame(animate);
-
-      // Even if not visible in terms of logic, we keep the loop running
-      // but skip the heavy rendering if explicitly told to be hidden
-      if (!isCanvasVisibleRef.current) return;
 
       const deltaTime = currentTime - lastFrameTime;
       if (deltaTime < frameInterval) return;
       lastFrameTime = currentTime - (deltaTime % frameInterval);
 
       const particles = particlesRef.current;
-      if (particles.length === 0) return;
+      const { width, height } = dimensionsRef.current;
 
-      ctx.clearRect(0, 0, rect.width, rect.height);
+      if (particles.length === 0 || width === 0) return;
 
-      const pCount = particles.length;
+      ctx.clearRect(0, 0, width, height);
       
-      // First pass: Update positions
+      const pCount = particles.length;
+      const currentQuality = qualityLevelRef.current;
+      
+      // Update and Draw Particles
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       for (let i = 0; i < pCount; i++) {
         const p = particles[i];
         p.x += p.vx;
@@ -117,35 +116,31 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         // Mouse interaction
         const dxm = p.x - mouseRef.current.x;
         const dym = p.y - mouseRef.current.y;
-        const dMouse = Math.sqrt(dxm * dxm + dym * dym);
-        if (dMouse < mouseDistance && dMouse > 0) {
+        const dMouseSq = dxm * dxm + dym * dym;
+        if (dMouseSq < mouseDistance * mouseDistance) {
+          const dMouse = Math.sqrt(dMouseSq);
           const force = (mouseDistance - dMouse) / mouseDistance;
-          p.x += (dxm / dMouse) * force * 2;
-          p.y += (dym / dMouse) * force * 2;
+          p.x += (dxm / dMouse) * force * 1.5;
+          p.y += (dym / dMouse) * force * 1.5;
         }
 
-        // Bounce off edges
-        if (p.x < 0) { p.x = 0; p.vx *= -1; }
-        else if (p.x > rect.width) { p.x = rect.width; p.vx *= -1; }
-
-        if (p.y < 0) { p.y = 0; p.vy *= -1; }
-        else if (p.y > rect.height) { p.y = rect.height; p.vy *= -1; }
+        // Wrap around instead of bounce for more "infinite" feel
+        if (p.x < 0) p.x = width;
+        else if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        else if (p.y > height) p.y = 0;
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         ctx.fill();
       }
 
-      // Second pass: Draw connections
-      const currentQuality = qualityLevelRef.current;
-      const opacityMultiplier = currentQuality === 'low' ? 0.3 : 0.5; // Slightly increased for low
-      const effectiveDistance = currentQuality === 'low' ? connectionDistance * 0.8 : connectionDistance;
-      const effectiveDistanceSq = effectiveDistance * effectiveDistance;
+      // Draw connections
+      const opacityMultiplier = currentQuality === 'low' ? 0.2 : 0.4;
+      const effectiveDistSq = connectionDistance * connectionDistance;
 
-      ctx.lineWidth = currentQuality === 'low' ? 1.0 : 1.2;
+      ctx.lineWidth = 0.8;
       for (let i = 0; i < pCount; i++) {
-        // Optimization: In low quality, only check connections for every 2nd particle
         if (currentQuality === 'low' && i % 2 !== 0) continue;
         
         const p = particles[i];
@@ -155,9 +150,9 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
           const dy = p.y - p2.y;
           const distSq = dx * dx + dy * dy;
 
-          if (distSq < effectiveDistanceSq) {
+          if (distSq < effectiveDistSq) {
             const distance = Math.sqrt(distSq);
-            const opacity = (1 - distance / effectiveDistance) * opacityMultiplier;
+            const opacity = (1 - distance / connectionDistance) * opacityMultiplier;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
@@ -175,7 +170,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameRef.current);
     };
-  }, []); // Run once on mount
+  }, []); 
 
   return canvasRef;
 };
