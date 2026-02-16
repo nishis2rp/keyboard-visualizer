@@ -37,7 +37,8 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
     const initParticles = (width: number, height: number) => {
       const isMobile = window.innerWidth < 768;
-      let particleCount = isMobile ? 120 : 250; 
+      // Reduced particle count for better legibility
+      let particleCount = isMobile ? 60 : 150; 
 
       // Less aggressive reduction
       if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.9);
@@ -48,9 +49,9 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         newParticles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.2,
-          vy: (Math.random() - 0.5) * 0.2,
-          radius: Math.random() * 1.5 + 0.5,
+          vx: (Math.random() - 0.5) * 0.12, // Slower movement
+          vy: (Math.random() - 0.5) * 0.12,
+          radius: Math.random() * 1.0 + 0.5,
         });
       }
       particlesRef.current = newParticles;
@@ -136,10 +137,10 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       }
 
       // Draw connections
-      const opacityMultiplier = currentQuality === 'low' ? 0.2 : 0.4;
+      const opacityMultiplier = currentQuality === 'low' ? 0.15 : 0.25;
       const effectiveDistSq = connectionDistance * connectionDistance;
 
-      ctx.lineWidth = 0.8;
+      ctx.lineWidth = 0.6;
       for (let i = 0; i < pCount; i++) {
         if (currentQuality === 'low' && i % 2 !== 0) continue;
         

@@ -74,8 +74,8 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 10; /* High z-index to be above all sections */
-  opacity: 0.8; /* Higher opacity for better visibility */
+  z-index: 1; /* Back to background */
+  opacity: 0.4; /* More subtle */
 }
 
 .landingWrapper {
@@ -87,7 +87,7 @@
   position: relative;
   overflow-x: hidden;
   scroll-behavior: smooth;
-  background: #050505;
+  background: #000000;
   color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   margin: 0;
@@ -101,13 +101,14 @@
   left: 0;
   right: 0;
   bottom: 0;
+  /* Dark mask in center to clear text area */
   background:
-    radial-gradient(circle at 10% 20%, rgba(0, 122, 255, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(175, 82, 222, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.04) 0%, transparent 60%);
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.8) 0%, transparent 80%),
+    radial-gradient(circle at 10% 20%, rgba(0, 122, 255, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(175, 82, 222, 0.05) 0%, transparent 40%);
   pointer-events: none;
-  z-index: 0;
-  opacity: 0.3; /* Reduced opacity of background gradients */
+  z-index: 2; /* Between lines and text */
+  opacity: 1;
 }
 
 /* Subtle grid background */
@@ -123,8 +124,8 @@
     linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
   background-size: 50px 50px;
   pointer-events: none;
-  z-index: 0;
-  opacity: 0.3; /* Reduced opacity of grid */
+  z-index: 1; /* Same as canvas */
+  opacity: 0.2;
 }
 
 .landingContainer {
@@ -135,7 +136,7 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  z-index: 2; /* Ensure content is above canvas */
+  z-index: 5; /* Content well above masks */
 }
 
 /* Scroll Reveal Base */
