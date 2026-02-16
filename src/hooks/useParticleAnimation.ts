@@ -123,7 +123,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
       // Second pass: Draw connections
       if (qualityLevel !== 'low') {
-        ctx.lineWidth = 0.5;
+        ctx.lineWidth = 1.2; // Increased from 0.5 for better visibility
         for (let i = 0; i < pCount; i++) {
           const p = particles[i];
           for (let j = i + 1; j < pCount; j++) {

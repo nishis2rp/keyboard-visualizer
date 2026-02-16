@@ -16,6 +16,39 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '2.4.0',
+    date: '2026-02-16',
+    titleKey: 'v2.4.0',
+    titleEn: 'Dynamic Landing Page & Enhanced Visuals',
+    titleJa: 'LPの動的更新とビジュアル強化',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v2.4.0-dynamic-lp',
+        descriptionEn: 'Automated Landing Page release notes to stay in sync with database/release constants',
+        descriptionJa: 'LPのリリースノートを自動化：リリース定義ファイルとの完全同期を実現'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.4.0-lp-layout',
+        descriptionEn: 'Reordered Landing Page sections to prioritize latest updates for returning users',
+        descriptionJa: 'LPレイアウトを最適化：最新情報をヒーローセクション直後に移動し視認性を向上'
+      },
+      {
+        category: 'style',
+        descriptionKey: 'v2.4.0-constellation',
+        descriptionEn: 'Enhanced "Constellation" background with thicker geometric lines and mouse interactivity',
+        descriptionJa: '幾何学的な「星座」背景の強化：太い接続線とマウスインタラクションの追加'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.4.0-version-badge',
+        descriptionEn: 'Implemented dynamic version badge in Hero section to automatically show latest release',
+        descriptionJa: 'ヒーローセクションのバージョンバッジを動的化：常に最新の版数を表示'
+      }
+    ]
+  },
+  {
     version: '2.3.0',
     date: '2026-02-13',
     titleKey: 'v2.3.0',
