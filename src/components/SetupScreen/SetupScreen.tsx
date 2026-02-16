@@ -9,6 +9,8 @@ import AuthModal from '../Auth/AuthModal'
 import UserMenu from '../Auth/UserMenu'
 import SetupOption from './SetupOption'
 import SetupSection from './SetupSection'
+import ParticleCanvas from '../LandingPage/ParticleCanvas'
+import styles from '../../pages/LandingPage.module.css'
 import './SetupScreen.css'
 
 interface SetupScreenProps {
@@ -203,7 +205,8 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
   }
 
   return (
-    <div className="setup-overlay">
+    <div className={`setup-overlay ${styles.landingWrapper}`}>
+      <ParticleCanvas />
       <div className="setup-container">
         <div className="setup-header">
           <div className="setup-header-top">
