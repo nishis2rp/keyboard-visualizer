@@ -30,11 +30,11 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
     const initParticles = () => {
       const isMobile = window.innerWidth < 768;
-      // Increase particle count for a richer geometric effect
-      let particleCount = isMobile ? 50 : 100;
+      // Drastically increase particle count for dense geometric effect
+      let particleCount = isMobile ? 80 : 200;
 
       // Adjust count based on performance level
-      if (qualityLevel === 'medium') particleCount = Math.floor(particleCount * 0.7);
+      if (qualityLevel === 'medium') particleCount = Math.floor(particleCount * 0.8);
       if (qualityLevel === 'low') particleCount = Math.floor(particleCount * 0.4);
 
       particles.length = 0;
@@ -42,10 +42,9 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         particles.push({
           x: Math.random() * rect.width,
           y: Math.random() * rect.height,
-          // Increase velocity for more movement
-          vx: (Math.random() - 0.5) * 0.8,
-          vy: (Math.random() - 0.5) * 0.8,
-          radius: Math.random() * 2 + 0.5,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6,
+          radius: Math.random() * 1.5 + 0.5,
         });
       }
     };
@@ -76,9 +75,9 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     window.addEventListener('resize', setCanvasSize);
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Increase connection distance for more lines
-    const connectionDistance = window.innerWidth < 768 ? 100 : 180;
-    const mouseDistance = 200;
+    // Increase connection distance significantly
+    const connectionDistance = window.innerWidth < 768 ? 120 : 250;
+    const mouseDistance = 150;
 
     let lastFrameTime = 0;
     const frameInterval = 1000 / 45; // Slightly higher FPS for smoother lines
@@ -134,7 +133,7 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
             if (distSq < connectionDistance * connectionDistance) {
               const distance = Math.sqrt(distSq);
-              const opacity = (1 - distance / connectionDistance) * 0.3;
+              const opacity = (1 - distance / connectionDistance) * 0.5; // Increased opacity
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(p2.x, p2.y);
