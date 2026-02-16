@@ -11,7 +11,14 @@ import './styles';
 // Service Workerの登録
 if ('serviceWorker' in navigator && import.meta.env.PROD) { // 開発環境では登録しない
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
+    const baseUrl = import.meta.env.BASE_URL;
+    const swPath = `${baseUrl}service-worker.js`;
+    navigator.serviceWorker.register(swPath, {
+      scope: baseUrl  // スコープをベースURLに設定
+    })
+      .then(registration => {
+        console.log('Service Worker registered with scope:', registration.scope);
+      })
       .catch(error => {
         console.error('Service Worker registration failed:', error);
       });
