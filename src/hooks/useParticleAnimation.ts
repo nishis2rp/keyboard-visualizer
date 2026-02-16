@@ -16,6 +16,7 @@ interface UseParticleAnimationProps {
 export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParticleAnimationProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number>(0);
+  const mouseRef = useRef({ x: -1000, y: -1000 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -29,10 +30,11 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
     const initParticles = () => {
       const isMobile = window.innerWidth < 768;
-      let particleCount = isMobile ? 30 : 50;
+      // Increase particle count for a richer geometric effect
+      let particleCount = isMobile ? 50 : 100;
 
       // Adjust count based on performance level
-      if (qualityLevel === 'medium') particleCount = Math.floor(particleCount * 0.6);
+      if (qualityLevel === 'medium') particleCount = Math.floor(particleCount * 0.7);
       if (qualityLevel === 'low') particleCount = Math.floor(particleCount * 0.4);
 
       particles.length = 0;
@@ -40,14 +42,14 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
         particles.push({
           x: Math.random() * rect.width,
           y: Math.random() * rect.height,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-          radius: Math.random() * 1.5 + 0.5,
+          // Increase velocity for more movement
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          radius: Math.random() * 2 + 0.5,
         });
       }
     };
 
-    // Canvas size setup with device pixel ratio for crisp rendering
     const setCanvasSize = () => {
       if (!canvas) return;
       rect = canvas.getBoundingClientRect();
@@ -56,61 +58,74 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
 
-      ctx.resetTransform(); // Reset transform before scaling
+      ctx.resetTransform();
       ctx.scale(dpr, dpr);
-
-      // Update CSS size (optional if handled by CSS)
-      // canvas.style.width = rect.width + 'px';
-      // canvas.style.height = rect.height + 'px';
       
       initParticles();
     };
 
+    const handleMouseMove = (e: MouseEvent) => {
+      const canvasRect = canvas.getBoundingClientRect();
+      mouseRef.current = {
+        x: e.clientX - canvasRect.left,
+        y: e.clientY - canvasRect.top
+      };
+    };
+
     setCanvasSize();
     window.addEventListener('resize', setCanvasSize);
+    window.addEventListener('mousemove', handleMouseMove);
 
-    const connectionDistance = window.innerWidth < 768 ? 80 : 120;
+    // Increase connection distance for more lines
+    const connectionDistance = window.innerWidth < 768 ? 100 : 180;
+    const mouseDistance = 200;
 
-    // Throttle animation to reduce CPU usage
     let lastFrameTime = 0;
-    const frameInterval = 1000 / 30; // 30 FPS for smooth performance
+    const frameInterval = 1000 / 45; // Slightly higher FPS for smoother lines
 
-    // Animation loop
     const animate = (currentTime: number) => {
       animationFrameRef.current = requestAnimationFrame(animate);
 
-      if (!isCanvasVisible) {
-        return;
-      }
+      if (!isCanvasVisible) return;
 
-      // Throttle to 30 FPS
       const deltaTime = currentTime - lastFrameTime;
-      if (deltaTime < frameInterval) {
-        return;
-      }
+      if (deltaTime < frameInterval) return;
       lastFrameTime = currentTime - (deltaTime % frameInterval);
 
       ctx.clearRect(0, 0, rect.width, rect.height);
 
-      // Update and draw particles
       const pCount = particles.length;
+      
+      // First pass: Update positions
       for (let i = 0; i < pCount; i++) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
 
-        // Bounce off edges
         if (p.x < 0 || p.x > rect.width) p.vx *= -1;
         if (p.y < 0 || p.y > rect.height) p.vy *= -1;
 
-        // Draw particle (simple, no glow for performance)
+        // Mouse interaction: push/pull effect (subtle)
+        const dxm = p.x - mouseRef.current.x;
+        const dym = p.y - mouseRef.current.y;
+        const dMouse = Math.sqrt(dxm * dxm + dym * dym);
+        if (dMouse < mouseDistance) {
+          const force = (mouseDistance - dMouse) / mouseDistance;
+          p.x += (dxm / dMouse) * force * 2;
+          p.y += (dym / dMouse) * force * 2;
+        }
+
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         ctx.fill();
+      }
 
-        // Connections (only for higher quality)
-        if (qualityLevel !== 'low') {
+      // Second pass: Draw connections
+      if (qualityLevel !== 'low') {
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < pCount; i++) {
+          const p = particles[i];
           for (let j = i + 1; j < pCount; j++) {
             const p2 = particles[j];
             const dx = p.x - p2.x;
@@ -119,18 +134,29 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
             if (distSq < connectionDistance * connectionDistance) {
               const distance = Math.sqrt(distSq);
+              const opacity = (1 - distance / connectionDistance) * 0.3;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(p2.x, p2.y);
-              const opacity = (1 - distance / connectionDistance) * 0.4;
               ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-              ctx.lineWidth = 0.8;
               ctx.stroke();
             }
           }
         }
       }
     };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('resize', setCanvasSize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameRef.current);
+    };
+  }, [qualityLevel, isCanvasVisible]);
+
+  return canvasRef;
+};
 
     animationFrameRef.current = requestAnimationFrame(animate);
 
