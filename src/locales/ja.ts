@@ -134,6 +134,7 @@ export const ja: Translations = {
     settings: '設定',
     releaseNotes: 'リリースノート',
     backToHome: 'ホームに戻る',
+    backToLP: 'LPに戻る',
     quizMode: 'Quiz Mode',
     visualizer: 'Visualizer',
     fullscreen: '全画面',

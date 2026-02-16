@@ -132,6 +132,7 @@ export const en = {
     settings: 'Settings',
     releaseNotes: 'Release Notes',
     backToHome: 'Back to Home',
+    backToLP: 'Back to LP',
     quizMode: 'Quiz Mode',
     visualizer: 'Visualizer',
     fullscreen: 'Fullscreen',

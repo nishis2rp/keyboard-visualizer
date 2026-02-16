@@ -156,14 +156,3 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
 
   return canvasRef;
 };
-
-    animationFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      window.removeEventListener('resize', setCanvasSize);
-      cancelAnimationFrame(animationFrameRef.current);
-    };
-  }, [qualityLevel, isCanvasVisible]);
-
-  return canvasRef;
-};
