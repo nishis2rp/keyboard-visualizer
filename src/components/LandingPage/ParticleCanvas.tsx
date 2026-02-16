@@ -2,16 +2,19 @@ import React from 'react';
 import styles from '../../pages/LandingPage.module.css';
 import { useParticleAnimation } from '../../hooks/useParticleAnimation';
 import { useAdaptivePerformance } from '../../hooks';
+import { useUI } from '../../context/UIContext';
 
 const ParticleCanvas: React.FC = () => {
   const { qualityLevel } = useAdaptivePerformance();
+  const { showLandingVisualizer } = useUI();
 
-  // Canvas is always visible since it's fixed to viewport
-  // Use the custom hook for animation logic
+  // Canvas visibility is managed by UIContext
   const canvasRef = useParticleAnimation({
     qualityLevel,
-    isCanvasVisible: true
+    isCanvasVisible: showLandingVisualizer
   });
+
+  if (!showLandingVisualizer) return null;
 
   return (
     <canvas

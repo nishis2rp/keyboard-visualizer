@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styles from './LandingPage.module.css';
 import { useAdaptivePerformance } from '../hooks';
 import { TIMINGS } from '../constants/timings';
+import { useUI } from '../context';
 
 // Components
 import ParticleCanvas from '../components/LandingPage/ParticleCanvas';
@@ -21,8 +22,12 @@ import Footer from '../components/LandingPage/Footer';
 const LandingPage: React.FC = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const { performanceStyles } = useAdaptivePerformance();
+  const { showLandingVisualizer, setShowLandingVisualizer } = useUI();
 
   useEffect(() => {
+    // Ensure visualizer is shown on mount
+    setShowLandingVisualizer(true);
+
     // Remove body padding for landing page (add it back on cleanup)
     const originalPadding = document.body.style.padding;
     const originalBackground = document.body.style.background;
@@ -50,11 +55,11 @@ const LandingPage: React.FC = () => {
       document.body.style.background = originalBackground;
       observerRef.current?.disconnect();
     };
-  }, []);
+  }, [setShowLandingVisualizer]);
 
   return (
     <div className={styles.landingWrapper} style={performanceStyles}>
-      <ParticleCanvas />
+      {showLandingVisualizer && <ParticleCanvas />}
       
       <LandingHeader />
 

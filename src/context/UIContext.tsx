@@ -5,10 +5,12 @@ interface UIContextType {
   isQuizMode: boolean;
   quizApp: string | null;
   quizDifficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null;
+  showLandingVisualizer: boolean;
   setShowSetup: (show: boolean) => void;
   setIsQuizMode: (mode: boolean) => void;
   setQuizApp: (app: string | null) => void;
   setQuizDifficulty: (difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null) => void;
+  setShowLandingVisualizer: (show: boolean) => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
@@ -19,17 +21,20 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizApp, setQuizApp] = useState<string | null>(null);
   const [quizDifficulty, setQuizDifficulty] = useState<'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null>(null);
+  const [showLandingVisualizer, setShowLandingVisualizer] = useState(true);
 
   const value = useMemo(() => ({
     showSetup,
     isQuizMode,
     quizApp,
     quizDifficulty,
+    showLandingVisualizer,
     setShowSetup,
     setIsQuizMode,
     setQuizApp,
     setQuizDifficulty,
-  }), [showSetup, isQuizMode, quizApp, quizDifficulty]);
+    setShowLandingVisualizer,
+  }), [showSetup, isQuizMode, quizApp, quizDifficulty, showLandingVisualizer]);
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 };

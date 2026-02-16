@@ -41,9 +41,9 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       // Drastically increase particle count for dense geometric effect and persistent connections
       let particleCount = isMobile ? 120 : 300; // Further increased to ensure always-visible connections
 
-      // Adjust count based on performance level
-      if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.8);
-      if (qualityLevelRef.current === 'low') particleCount = Math.floor(particleCount * 0.4);
+      // Adjust count based on performance level - Less aggressive reduction to keep it "infinite"
+      if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.9);
+      if (qualityLevelRef.current === 'low') particleCount = Math.floor(particleCount * 0.8);
 
       particles.length = 0;
       for (let i = 0; i < particleCount; i++) {
