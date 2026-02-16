@@ -4,7 +4,6 @@
 export const en = {
   // Landing Page
   landing: {
-    badge: 'NEW VERSION 2.2',
     title: 'KEYBOARD VISUALIZER',
     subtitle: 'Unlock Professional Speed.',
     description: 'The ultimate learning platform visualizing 1,300+ shortcuts in real-time. Master your tools, stay in the flow, and maximize your creative output.',
@@ -113,15 +112,6 @@ export const en = {
 
     releaseNotesTitle: 'Latest Updates',
     releaseNotesDescription: 'Latest features and improvements for Keyboard Visualizer',
-    releaseNotesVersion: 'v2.2.0',
-    releaseNotesDate: '2026-02-12',
-    releaseNotesSubtitle: 'Internationalization & SEO Optimization',
-    releaseNotesList: [
-      '🌐 Full internationalization support with English/Japanese UI',
-      '🔍 Enhanced SEO with canonical URLs, structured data, and meta tags',
-      '⌨️ Implemented Windows US keyboard layout with correct key mappings',
-      '✨ Fixed Mac US keyboard layout alignment and key width issues',
-    ],
     viewAllReleases: 'View All Release Notes →',
 
     finalCtaTitle: 'Start now and maximize your productivity',

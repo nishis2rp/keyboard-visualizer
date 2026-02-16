@@ -2,9 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
+import { releases } from '../../constants/releases';
 
 const ReleaseNotesSection: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const latestRelease = releases[0];
+
+  if (!latestRelease) return null;
 
   return (
     <section className={styles.releaseNotesSection}>
@@ -14,14 +18,23 @@ const ReleaseNotesSection: React.FC = () => {
       </p>
       <div className={styles.releaseNotesCard}>
         <div className={styles.releaseNotesHeader}>
-          <span className={styles.releaseVersion}>{t.landing.releaseNotesVersion}</span>
-          <span className={styles.releaseDate}>{t.landing.releaseNotesDate}</span>
+          <span className={styles.releaseVersion}>v{latestRelease.version}</span>
+          <span className={styles.releaseDate}>{latestRelease.date}</span>
         </div>
-        <h3 className={styles.releaseNotesTitle}>{t.landing.releaseNotesSubtitle}</h3>
+        <h3 className={styles.releaseNotesTitle}>
+          {language === 'ja' ? latestRelease.titleJa : latestRelease.titleEn}
+        </h3>
         <ul className={styles.releaseNotesList}>
-          {t.landing.releaseNotesList.map((note, index) => (
-            <li key={index}>{note}</li>
+          {latestRelease.changes.slice(0, 5).map((change, index) => (
+            <li key={index}>
+              {language === 'ja' ? change.descriptionJa : change.descriptionEn}
+            </li>
           ))}
+          {latestRelease.changes.length > 5 && (
+            <li className={styles.moreChanges}>
+              ...and {latestRelease.changes.length - 5} more improvements
+            </li>
+          )}
         </ul>
         <Link to="/release-notes" className={styles.releaseNotesLink}>
           {t.landing.viewAllReleases}

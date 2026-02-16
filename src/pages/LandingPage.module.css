@@ -137,7 +137,7 @@ section.isVisible {
 
 .heroSection {
   text-align: center;
-  margin-bottom: 140px;
+  margin-bottom: 80px;
   max-width: 1200px;
   width: 100%;
   opacity: 1;
@@ -549,8 +549,8 @@ section.isVisible {
 /* Release Notes Section */
 .releaseNotesSection {
   width: 100%;
-  padding: 100px 0;
-  margin-bottom: 100px;
+  padding: 60px 0;
+  margin-bottom: 80px;
 }
 
 .releaseNotesCard {
@@ -610,6 +610,13 @@ section.isVisible {
 
 .releaseNotesList li:last-child {
   border-bottom: none;
+}
+
+.moreChanges {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 0.9rem !important;
+  margin-top: 8px;
 }
 
 .releaseNotesLink {

@@ -60,6 +60,7 @@ const LandingPage: React.FC = () => {
 
       <main className={styles.landingContainer}>
         <HeroSection />
+        <ReleaseNotesSection />
         <StatsSection />
         <FeaturesSection />
         <TargetSection />
@@ -67,7 +68,6 @@ const LandingPage: React.FC = () => {
         <BenefitsSection />
         <HowItWorksSection />
         <FaqSection />
-        <ReleaseNotesSection />
         <FinalCtaSection />
         <Footer />
       </main>

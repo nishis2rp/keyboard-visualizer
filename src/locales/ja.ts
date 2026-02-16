@@ -6,7 +6,6 @@ import { Translations } from './en';
 export const ja: Translations = {
   // Landing Page
   landing: {
-    badge: 'NEW VERSION 2.2',
     title: 'KEYBOARD VISUALIZER',
     subtitle: '指先に、思考の速さを。',
     description: '1,300以上のショートカットをリアルタイムに可視化。ブラウザ上で動作する最高峰の練習プラットフォームで、クリエイティブな時間を最大化しましょう。',
@@ -115,15 +114,6 @@ export const ja: Translations = {
 
     releaseNotesTitle: '最新アップデート',
     releaseNotesDescription: 'Keyboard Visualizerの最新機能と改善履歴',
-    releaseNotesVersion: 'v2.2.0',
-    releaseNotesDate: '2026年2月12日',
-    releaseNotesSubtitle: '多言語対応とSEO最適化',
-    releaseNotesList: [
-      '🌐 英語・日本語の完全な多言語対応を実現',
-      '🔍 検索エンジン最適化（SEO）を強化し、発見性を向上',
-      '⌨️ Windows US配列キーボードレイアウトを新規実装',
-      '✨ Mac US配列キーボードの表示崩れを修正',
-    ],
     viewAllReleases: 'すべてのリリースノートを見る →',
 
     finalCtaTitle: '今すぐ始めて、生産性を最大化しましょう',
