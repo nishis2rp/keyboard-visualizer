@@ -7,6 +7,7 @@ export const useAdaptivePerformance = () => {
   const [qualityLevel, setQualityLevel] = useState<'high' | 'medium' | 'low'>('high');
   const frameTimes = useRef<number[]>([]);
   const lastTime = useRef<number>(performance.now());
+  const startTime = useRef<number>(performance.now());
 
   useEffect(() => {
     let animationFrameId: number;
@@ -15,18 +16,25 @@ export const useAdaptivePerformance = () => {
       const delta = time - lastTime.current;
       lastTime.current = time;
 
+      // Ignore the first 2 seconds to allow for page load/rendering stabilization
+      if (time - startTime.current < 2000) {
+        animationFrameId = requestAnimationFrame(measure);
+        return;
+      }
+
       if (delta > 0) {
         frameTimes.current.push(delta);
-        if (frameTimes.current.length > 60) {
+        // Increase window to 120 frames (~2 seconds) for more stable average
+        if (frameTimes.current.length > 120) {
           frameTimes.current.shift();
           
           // 平均FPSを計算
           const avgDelta = frameTimes.current.reduce((a, b) => a + b, 0) / frameTimes.current.length;
           
-          // 閾値判定 (AI Optimization logic)
-          if (avgDelta > 32) { // < 30fps
+          // 閾値判定 (AI Optimization logic) - Slightly more lenient thresholds
+          if (avgDelta > 40) { // < 25fps (More lenient than 30fps)
             setQualityLevel('low');
-          } else if (avgDelta > 20) { // < 50fps
+          } else if (avgDelta > 25) { // < 40fps
             setQualityLevel('medium');
           } else {
             setQualityLevel('high');

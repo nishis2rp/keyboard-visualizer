@@ -145,25 +145,32 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       }
 
       // Second pass: Draw connections
-      if (qualityLevelRef.current !== 'low') {
-        ctx.lineWidth = 1.2; // Increased from 0.5 for better visibility
-        for (let i = 0; i < pCount; i++) {
-          const p = particles[i];
-          for (let j = i + 1; j < pCount; j++) {
-            const p2 = particles[j];
-            const dx = p.x - p2.x;
-            const dy = p.y - p2.y;
-            const distSq = dx * dx + dy * dy;
+      const currentQuality = qualityLevelRef.current;
+      const opacityMultiplier = currentQuality === 'low' ? 0.2 : 0.5;
+      const effectiveDistance = currentQuality === 'low' ? connectionDistance * 0.7 : connectionDistance;
+      const effectiveDistanceSq = effectiveDistance * effectiveDistance;
 
-            if (distSq < connectionDistance * connectionDistance) {
-              const distance = Math.sqrt(distSq);
-              const opacity = (1 - distance / connectionDistance) * 0.5; // Increased opacity
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(p2.x, p2.y);
-              ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-              ctx.stroke();
-            }
+      ctx.lineWidth = currentQuality === 'low' ? 0.8 : 1.2;
+      for (let i = 0; i < pCount; i++) {
+        // Optimization: In low quality, only check connections for every 2nd particle
+        // This reduces the O(N^2) loop complexity significantly
+        if (currentQuality === 'low' && i % 2 !== 0) continue;
+        
+        const p = particles[i];
+        for (let j = i + 1; j < pCount; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < effectiveDistanceSq) {
+            const distance = Math.sqrt(distSq);
+            const opacity = (1 - distance / effectiveDistance) * opacityMultiplier;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+            ctx.stroke();
           }
         }
       }
