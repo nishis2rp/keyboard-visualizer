@@ -36,21 +36,42 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
     if (!ctx) return;
 
     const initParticles = (width: number, height: number) => {
-      const isMobile = window.innerWidth < 768;
-      // Increased particle count for better density
-      let particleCount = isMobile ? 80 : 200; 
+      // Reference dimensions for base particle count (1920x1080)
+      const referenceWidth = 1920;
+      const referenceHeight = 1080;
+      const referenceArea = referenceWidth * referenceHeight;
 
-      // Less aggressive reduction
-      if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.95);
-      if (qualityLevelRef.current === 'low') particleCount = Math.floor(particleCount * 0.9);
+      // Base particle count at reference resolution
+      const isMobile = window.innerWidth < 768;
+      const baseParticleCount = isMobile ? 80 : 200;
+
+      // Calculate actual screen area
+      const screenArea = width * height;
+
+      // Scale particle count proportionally to screen area
+      let particleCount = Math.round(baseParticleCount * (screenArea / referenceArea));
+
+      // Ensure minimum and maximum particle counts for performance
+      // 4K (3840x2160) support: ~800 particles at reference density
+      const minParticles = isMobile ? 60 : 80;
+      const maxParticles = isMobile ? 150 : 800;
+      particleCount = Math.max(minParticles, Math.min(maxParticles, particleCount));
+
+      // Quality level adjustments
+      if (qualityLevelRef.current === 'medium') particleCount = Math.floor(particleCount * 0.9);
+      if (qualityLevelRef.current === 'low') particleCount = Math.floor(particleCount * 0.8);
+
+      // Calculate speed scaling factor based on screen width
+      // Larger screens need proportionally faster movement to appear at same speed
+      const speedScale = Math.sqrt(width / referenceWidth);
 
       const newParticles: Particle[] = [];
       for (let i = 0; i < particleCount; i++) {
         newParticles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.35, // Faster initial speed
-          vy: (Math.random() - 0.5) * 0.35,
+          vx: (Math.random() - 0.5) * 0.7 * speedScale,
+          vy: (Math.random() - 0.5) * 0.7 * speedScale,
           radius: Math.random() * 1.2 + 0.6,
         });
       }
@@ -107,18 +128,22 @@ export const useParticleAnimation = ({ qualityLevel, isCanvasVisible }: UseParti
       const pCount = particles.length;
       const currentQuality = qualityLevelRef.current;
       
+      // Calculate speed scaling for larger screens
+      const referenceWidth = 1920;
+      const speedScale = Math.sqrt(width / referenceWidth);
+
       // Update and Draw Particles
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       for (let i = 0; i < pCount; i++) {
         const p = particles[i];
-        
-        // Add subtle random steering for organic movement
-        p.vx += (Math.random() - 0.5) * 0.024; // Increased from 0.012
-        p.vy += (Math.random() - 0.5) * 0.024;
-        
-        // Limit speed
+
+        // Add subtle random steering for organic movement (scaled by screen size)
+        p.vx += (Math.random() - 0.5) * 0.048 * speedScale;
+        p.vy += (Math.random() - 0.5) * 0.048 * speedScale;
+
+        // Limit speed (scaled by screen size)
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-        const maxSpeed = 0.55; // Increased from 0.28
+        const maxSpeed = 1.1 * speedScale;
         if (speed > maxSpeed) {
           p.vx = (p.vx / speed) * maxSpeed;
           p.vy = (p.vy / speed) * maxSpeed;
