@@ -279,7 +279,7 @@
 
 .shortcuts-grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(14, 1fr);
   gap: 5px;
   padding: 0;
   width: 100%;
@@ -287,19 +287,37 @@
   margin: 0 auto;
 }
 
-@media (max-width: 1500px) {
+@media (max-width: 1800px) {
+  .shortcuts-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+@media (max-width: 1600px) {
+  .shortcuts-grid {
+    grid-template-columns: repeat(10, 1fr);
+  }
+}
+
+@media (max-width: 1280px) {
   .shortcuts-grid {
     grid-template-columns: repeat(8, 1fr);
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 990px) {
+  .shortcuts-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
   .shortcuts-grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .shortcuts-grid {
     grid-template-columns: repeat(2, 1fr);
   }
