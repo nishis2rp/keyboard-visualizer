@@ -14,6 +14,7 @@ import AppsSection from '../components/LandingPage/AppsSection';
 import BenefitsSection from '../components/LandingPage/BenefitsSection';
 import HowItWorksSection from '../components/LandingPage/HowItWorksSection';
 import TargetSection from '../components/LandingPage/TargetSection';
+import TestimonialsSection from '../components/LandingPage/TestimonialsSection';
 import FaqSection from '../components/LandingPage/FaqSection';
 import ReleaseNotesSection from '../components/LandingPage/ReleaseNotesSection';
 import FinalCtaSection from '../components/LandingPage/FinalCtaSection';
@@ -55,6 +56,7 @@ const LandingPage: React.FC = () => {
         <AppsSection />
         <BenefitsSection />
         <HowItWorksSection />
+        <TestimonialsSection />
         <FaqSection />
         <FinalCtaSection />
         <Footer />
