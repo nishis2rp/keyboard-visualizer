@@ -94,22 +94,22 @@ export const en = {
     testimonialsTitle: 'User Testimonials',
     testimonials: [
       {
-        name: 'Kenichi Sato (Software Engineer)',
+        name: 'K. S. (Software Engineer)',
         comment: 'I could never remember VS Code shortcuts, but thanks to this app, I mastered the main ones in a week. My development speed has increased dramatically!',
         rating: 5,
       },
       {
-        name: 'Misaki Tanaka (Designer)',
+        name: 'M. T. (Designer)',
         comment: 'The visual feedback of the keys is very intuitive. I want to use it for Figma and Photoshop practice too. The quiz format keeps me engaged.',
         rating: 5,
       },
       {
-        name: 'Yuta Suzuki (University Student)',
+        name: 'Y. S. (University Student)',
         comment: 'It runs smoothly in the browser, so I practice during my spare time. Not just typing speed, but knowing shortcuts made my overall PC operation much faster.',
         rating: 4,
       },
       {
-        name: 'Shinichi Ito (Administrative Staff)',
+        name: 'S. I. (Administrative Staff)',
         comment: 'I started using this to learn Excel shortcuts. I reach for the mouse less often, and I feel like my stiff shoulders have improved a bit (lol).',
         rating: 5,
       },
