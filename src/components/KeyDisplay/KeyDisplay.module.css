@@ -15,7 +15,7 @@
 }
 
 .containerPressedKeys {
-  border: 2px solid rgba(167, 139, 250, 0.5);
+  border: 2px solid rgba(74, 85, 104, 0.5);
 }
 
 .active {
@@ -66,8 +66,8 @@
 }
 
 .blueBorder {
-  border-left: 4px solid #0078D4;
-  background: linear-gradient(145deg, rgba(240, 249, 255, 0.8) 0%, rgba(224, 242, 254, 0.7) 100%);
+  border-left: 4px solid #4a5568;
+  background: linear-gradient(145deg, rgba(74, 85, 104, 0.15) 0%, rgba(45, 55, 72, 0.1) 100%);
 }
 
 .redBorder {
@@ -156,15 +156,15 @@
 }
 
 .modifierKey {
-  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(180deg, #6b7280 0%, #4b5563 100%);
   color: #ffffff;
-  border-color: #4338ca;
+  border-color: #374151;
 }
 
 .windowsKey {
-  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(180deg, #6b7280 0%, #4b5563 100%);
   color: #ffffff;
-  border-color: #4338ca;
+  border-color: #374151;
   font-weight: 700;
 }
 

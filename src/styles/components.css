@@ -343,8 +343,8 @@
 
 /* Protection Level Styles for Shortcut Cards */
 .shortcut-card.preventable-fullscreen {
-  border-left: 4px solid #3b82f6;
-  background: linear-gradient(to right, rgba(59, 130, 246, 0.02), white);
+  border-left: 4px solid #4a5568;
+  background: linear-gradient(to right, rgba(74, 85, 104, 0.02), white);
 }
 
 .shortcut-card.always-protected {
