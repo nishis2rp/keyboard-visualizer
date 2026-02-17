@@ -249,6 +249,37 @@
 }
 
 /* Responsive Design */
+@media (max-height: 1500px) {
+  .keyboard-grid {
+    grid-template-rows: repeat(6, minmax(
+      clamp(28px, calc(28px + (35 - 28) * ((100vh - 1000px) / (1500 - 1000))), 35px),
+      clamp(32px, calc(32px + (38 - 32) * ((100vh - 1000px) / (1500 - 1000))), 38px)
+    ));
+    min-height: clamp(180px, calc(180px + (210 - 180) * ((100vh - 1000px) / (1500 - 1000))), 210px);
+  }
+
+  .keyboard-container {
+    margin: clamp(2px, calc(2px + (4 - 2) * ((100vh - 1000px) / (1500 - 1000))), 4px) 0;
+    padding: clamp(8px, calc(8px + (12 - 8) * ((100vh - 1000px) / (1500 - 1000))), 12px);
+  }
+
+  .keyboard-base {
+    padding: clamp(8px, calc(8px + (12 - 8) * ((100vh - 1000px) / (1500 - 1000))), 12px);
+  }
+
+  .key-cap {
+    font-size: clamp(11px, calc(11px + (13 - 11) * ((100vh - 1000px) / (1500 - 1000))), 13px);
+  }
+
+  .key-label {
+    font-size: clamp(11px, calc(11px + (13 - 11) * ((100vh - 1000px) / (1500 - 1000))), 13px);
+  }
+
+  .key-sublabel {
+    font-size: clamp(9px, calc(9px + (11 - 9) * ((100vh - 1000px) / (1500 - 1000))), 11px);
+  }
+}
+
 @media (max-width: 1280px) {
   .keyboard-container {
     transform: scale(0.95);

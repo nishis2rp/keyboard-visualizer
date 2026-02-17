@@ -15,6 +15,14 @@
   margin-right: auto;
 }
 
+@media (max-height: 1500px) {
+  .indicator-filter-container {
+    margin-top: clamp(6px, calc(6px + (12 - 6) * ((100vh - 1000px) / (1500 - 1000))), 12px);
+    margin-bottom: clamp(12px, calc(12px + (24 - 12) * ((100vh - 1000px) / (1500 - 1000))), 24px);
+    gap: clamp(10px, calc(10px + (20 - 10) * ((100vh - 1000px) / (1500 - 1000))), 20px);
+  }
+}
+
 .indicator-wrapper {
   flex: 1;
 }
@@ -133,6 +141,22 @@
   box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   position: relative;
   overflow: hidden;
+}
+
+@media (max-height: 1500px) {
+  .display-area {
+    padding: clamp(10px, calc(10px + (20 - 10) * ((100vh - 1000px) / (1500 - 1000))), 20px);
+    min-height: clamp(80px, calc(80px + (120 - 80) * ((100vh - 1000px) / (1500 - 1000))), 120px);
+    gap: clamp(10px, calc(10px + (18 - 10) * ((100vh - 1000px) / (1500 - 1000))), 18px);
+    margin-top: clamp(6px, calc(6px + (12 - 6) * ((100vh - 1000px) / (1500 - 1000))), 12px);
+    margin-bottom: clamp(12px, calc(12px + (28 - 12) * ((100vh - 1000px) / (1500 - 1000))), 28px);
+  }
+
+  .key {
+    padding: clamp(8px, calc(8px + (12 - 8) * ((100vh - 1000px) / (1500 - 1000))), 12px) clamp(16px, calc(16px + (22 - 16) * ((100vh - 1000px) / (1500 - 1000))), 22px);
+    font-size: clamp(14px, calc(14px + (16 - 14) * ((100vh - 1000px) / (1500 - 1000))), 16px);
+    min-width: clamp(48px, calc(48px + (54 - 48) * ((100vh - 1000px) / (1500 - 1000))), 54px);
+  }
 }
 
 .display-area::before {
@@ -382,6 +406,37 @@
 }
 
 /* Responsive Design for Components */
+@media (max-height: 1500px) {
+  .selectors-container {
+    margin-bottom: clamp(6px, calc(6px + (16 - 6) * ((100vh - 1000px) / (1500 - 1000))), 16px);
+    column-gap: clamp(5px, calc(5px + (8 - 5) * ((100vh - 1000px) / (1500 - 1000))), 8px);
+  }
+
+  .selector-section {
+    gap: clamp(3px, calc(3px + (7 - 3) * ((100vh - 1000px) / (1500 - 1000))), 7px);
+  }
+
+  .selector-title {
+    margin: 0 0 clamp(3px, calc(3px + (6 - 3) * ((100vh - 1000px) / (1500 - 1000))), 6px) clamp(3px, calc(3px + (4 - 3) * ((100vh - 1000px) / (1500 - 1000))), 4px);
+    font-size: clamp(9px, calc(9px + (11 - 9) * ((100vh - 1000px) / (1500 - 1000))), 11px);
+  }
+
+  .app-tab {
+    padding: clamp(5px, calc(5px + (9 - 5) * ((100vh - 1000px) / (1500 - 1000))), 9px) clamp(3px, calc(3px + (5 - 3) * ((100vh - 1000px) / (1500 - 1000))), 5px);
+    min-height: clamp(56px, calc(56px + (72 - 56) * ((100vh - 1000px) / (1500 - 1000))), 72px);
+    gap: clamp(3px, calc(3px + (6 - 3) * ((100vh - 1000px) / (1500 - 1000))), 6px);
+  }
+
+  .app-icon {
+    font-size: clamp(16px, calc(16px + (19 - 16) * ((100vh - 1000px) / (1500 - 1000))), 19px);
+  }
+
+  .app-name {
+    font-size: clamp(9px, calc(9px + (10.5 - 9) * ((100vh - 1000px) / (1500 - 1000))), 10.5px);
+    line-height: clamp(1.1, calc(1.1 + (1.2 - 1.1) * ((100vh - 1000px) / (1500 - 1000))), 1.2);
+  }
+}
+
 @media (max-width: 1400px) {
   .selectors-container {
     max-width: 100%;

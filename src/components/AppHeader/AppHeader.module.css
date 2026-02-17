@@ -140,3 +140,43 @@
   font-weight: 700;
   letter-spacing: 0.5px;
 }
+
+/* Responsive - Smoothly scale between 1000px and 1500px height */
+@media (max-height: 1500px) {
+  .headerContainer {
+    margin-bottom: clamp(6px, calc(6px + (12 - 6) * ((100vh - 1000px) / (1500 - 1000))), 12px);
+    padding: clamp(8px, calc(8px + (12 - 8) * ((100vh - 1000px) / (1500 - 1000))), 12px) clamp(16px, calc(16px + (24 - 16) * ((100vh - 1000px) / (1500 - 1000))), 24px);
+  }
+
+  .titleText {
+    font-size: clamp(18px, calc(18px + (22 - 18) * ((100vh - 1000px) / (1500 - 1000))), 22px);
+  }
+
+  .titleContainer {
+    gap: clamp(8px, calc(8px + (12 - 8) * ((100vh - 1000px) / (1500 - 1000))), 12px);
+  }
+
+  .buttonGroup {
+    gap: clamp(6px, calc(6px + (10 - 6) * ((100vh - 1000px) / (1500 - 1000))), 10px);
+  }
+
+  .csvDownloadButton {
+    padding: 0 clamp(10px, calc(10px + (14 - 10) * ((100vh - 1000px) / (1500 - 1000))), 14px);
+    height: clamp(32px, calc(32px + (38 - 32) * ((100vh - 1000px) / (1500 - 1000))), 38px);
+    font-size: clamp(12px, calc(12px + (13 - 12) * ((100vh - 1000px) / (1500 - 1000))), 13px);
+  }
+
+  .csvIcon {
+    font-size: clamp(12px, calc(12px + (14 - 12) * ((100vh - 1000px) / (1500 - 1000))), 14px);
+  }
+
+  .csvText {
+    font-size: clamp(10px, calc(10px + (11 - 10) * ((100vh - 1000px) / (1500 - 1000))), 11px);
+  }
+
+  .warningText {
+    padding: clamp(4px, calc(4px + (6 - 4) * ((100vh - 1000px) / (1500 - 1000))), 6px) clamp(8px, calc(8px + (12 - 8) * ((100vh - 1000px) / (1500 - 1000))), 12px);
+    margin-left: clamp(8px, calc(8px + (12 - 8) * ((100vh - 1000px) / (1500 - 1000))), 12px);
+    font-size: clamp(0.8em, calc(0.8em + (0.85 - 0.8) * ((100vh - 1000px) / (1500 - 1000))), 0.85em);
+  }
+}
