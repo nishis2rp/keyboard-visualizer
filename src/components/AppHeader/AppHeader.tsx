@@ -55,6 +55,7 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
         <div className={styles.buttonGroup}>
           <Link to="/">
             <StyledButton
+              onClick={() => {}}
               backgroundColor="#2d3748"
               textColor="white"
               title={t.header.backToLP}

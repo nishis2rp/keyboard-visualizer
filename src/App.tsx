@@ -6,6 +6,7 @@ import MyPage from './pages/MyPage';
 import LandingPage from './pages/LandingPage';
 import ReleaseNotes from './pages/ReleaseNotes';
 import PasswordReset from './pages/PasswordReset';
+import SEO from './components/common/SEO';
 import { useUI } from './context';
 import { useFullscreen, useAdaptivePerformance } from './hooks';
 import './styles/global.css';
@@ -35,15 +36,19 @@ function App() {
 
   if (isLandingPage || isReleaseNotesPage) {
     return (
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/release-notes" element={<ReleaseNotes />} />
-      </Routes>
+      <>
+        <SEO />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/release-notes" element={<ReleaseNotes />} />
+        </Routes>
+      </>
     );
   }
 
   return (
     <div className="container" style={performanceStyles}>
+      <SEO />
       <AppHeader
         fullscreenMode={isFullscreenMode}
         onToggleFullscreen={toggleFullscreenMode}

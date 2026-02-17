@@ -80,7 +80,7 @@ export const releases: Release[] = [
         descriptionJa: 'LPレイアウトを最適化：最新情報をヒーローセクション直後に移動し視認性を向上'
       },
       {
-        category: 'style',
+        category: 'improvement',
         descriptionKey: 'v2.4.0-constellation',
         descriptionEn: 'Enhanced "Constellation" background with thicker geometric lines and mouse interactivity',
         descriptionJa: '幾何学的な「星座」背景の強化：太い接続線とマウスインタラクションの追加'

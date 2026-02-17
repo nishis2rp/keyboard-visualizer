@@ -1,13 +1,13 @@
 {
-  "name": "キーボードビジュアライザー | ショートカット学習・可視化ツール",
-  "short_name": "キーボードビジュ",
-  "description": "1,300種類以上のキーボードショートカットをリアルタイムで可視化。クイズモードでタイピングスキルとショートカット習得をサポートします。",
+  "name": "Keyboard Visualizer | Shortcut Learning Tool",
+  "short_name": "KB Visualizer",
+  "description": "Visualize 1,300+ keyboard shortcuts in real-time. Master VS Code, Excel, and Chrome shortcuts with interactive quizzes.",
   "start_url": ".",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f8f9fa",
   "theme_color": "#667eea",
-  "lang": "ja",
+  "lang": "en",
   "categories": ["education", "productivity", "utilities"],
   "icons": [
     {

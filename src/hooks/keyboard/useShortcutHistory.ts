@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 
 export interface HistoryItem {
-  combo: string;
+  comboText: string;
   description: string | null;
 }
 
@@ -16,7 +16,7 @@ export const useShortcutHistory = (maxSize: number = DEFAULT_MAX_HISTORY) => {
   const addToHistory = useCallback((item: HistoryItem) => {
     setHistory(prev => {
       // 直前と同じコンボなら追加しない
-      if (prev.length > 0 && prev[0].combo === item.combo) {
+      if (prev.length > 0 && prev[0].comboText === item.comboText) {
         return prev;
       }
       return [item, ...prev].slice(0, maxSize);
