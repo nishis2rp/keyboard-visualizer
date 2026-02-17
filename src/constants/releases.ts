@@ -16,6 +16,51 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '2.5.0',
+    date: '2026-02-17',
+    titleKey: 'v2.5.0',
+    titleEn: 'UI/UX Refinement & Layout Optimization',
+    titleJa: 'UI/UX改善とレイアウト最適化',
+    changes: [
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.5.0-header-buttons',
+        descriptionEn: 'Unified header button color scheme to dark gray theme (#2d3748) with refined hover effects',
+        descriptionJa: 'ヘッダーボタンのカラーをダークグレーテーマ（#2d3748）に統一し、ホバーエフェクトを洗練化'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.5.0-language-selector',
+        descriptionEn: 'Redesigned language selector (JA/EN) with improved spacing, shadows, and hover animations',
+        descriptionJa: '言語セレクター（JA/EN）を再設計：間隔、影、ホバーアニメーションを改善'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.5.0-layout-width',
+        descriptionEn: 'Expanded selector and indicator areas to 1400px width to match keyboard layout for visual consistency',
+        descriptionJa: 'セレクターとインジケーターエリアを1400pxに拡大：キーボードレイアウトと幅を統一'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.5.0-button-sizing',
+        descriptionEn: 'Optimized button sizes and spacing (gap: 10px, padding: 8px 16px) for better UX',
+        descriptionJa: 'ボタンサイズと間隔を最適化（gap: 10px、padding: 8px 16px）してUX向上'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.5.0-csv-button',
+        descriptionEn: 'Refined CSV download button from square (44x44px) to rectangular with improved typography',
+        descriptionJa: 'CSVダウンロードボタンを正方形（44x44px）から長方形に変更し、タイポグラフィを改善'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v2.5.0-string-literal',
+        descriptionEn: 'Fixed unterminated string literal bug in Key.tsx for proper newline escaping',
+        descriptionJa: 'Key.tsxの改行エスケープ不足によるビルドエラーを修正'
+      }
+    ]
+  },
+  {
     version: '2.4.0',
     date: '2026-02-16',
     titleKey: 'v2.4.0',

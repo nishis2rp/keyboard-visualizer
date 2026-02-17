@@ -171,7 +171,6 @@ export const generateQuestion = (
   language: 'ja' | 'en' = 'ja'
 ) => {
   // 全ての許可されたアプリのショートカットを収集
-  const allSafeShortcuts: any[] = [];
   if (!allowedApps || !Array.isArray(allowedApps)) return null;
 
   // アプリ名のマップを作成
@@ -203,7 +202,7 @@ export const generateQuestion = (
       return;
     }
 
-    Object.entries(appShortcuts).forEach(([shortcut, details]: [string, ShortcutDetails]) => {
+    Object.entries(appShortcuts).forEach(([shortcut, details]) => {
       const normalized = normalizeShortcut(shortcut);
 
       // 既に出題済みのショートカットは除外

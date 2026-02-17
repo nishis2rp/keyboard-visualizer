@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -24,15 +24,39 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
   profileUpdateLoading,
 }) => {
   const { t } = useLanguage();
-  const { user, profile } = useAuth();
+  const { user, profile, updateProfile } = useAuth();
+  
+  const [bio, setBio] = useState('');
+  const [goal, setGoal] = useState('');
+  const [isEditingExtra, setIsEditingExtra] = useState(false);
+  const [extraUpdateLoading, setExtraUpdateLoading] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setBio(profile.bio || '');
+      setGoal(profile.goal || '');
+    }
+  }, [profile]);
+
+  const handleExtraUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setExtraUpdateLoading(true);
+    await updateProfile({ bio, goal });
+    setExtraUpdateLoading(false);
+    setIsEditingExtra(false);
+  };
 
   if (!user) return null;
+
+  const hasChanges = bio !== (profile?.bio || '') || goal !== (profile?.goal || '');
 
   return (
     <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100 transition-all hover:shadow-apple-lg">
       <h2 className="text-lg font-bold text-sf-primary mb-6 flex items-center gap-2 tracking-tight border-b border-gray-100 pb-2">
         {t.myPage.profileTitle}
       </h2>
+      
+      {/* Avatar & Display Name */}
       <div className="flex items-center gap-4 mb-6">
         <div className="relative w-20 h-20 shrink-0">
           <img
@@ -75,7 +99,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
       </div>
       
       {avatarFile && (
-        <div className="bg-sf-blue-ultralight p-3 rounded-apple-md text-center">
+        <div className="bg-sf-blue-ultralight p-3 rounded-apple-md text-center mb-6">
           <p className="text-[10px] text-sf-blue font-bold truncate mb-2">{avatarFile.name}</p>
           <button
             onClick={handleAvatarUpload}
@@ -86,6 +110,39 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
           </button>
         </div>
       )}
+
+      {/* Bio & Goal */}
+      <form onSubmit={handleExtraUpdate} className="space-y-4 pt-4 border-t border-gray-50">
+        <div>
+          <label className="apple-label">{t.myPage.bioLabel}</label>
+          <textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            className="apple-input min-h-[80px] py-2 resize-none"
+            placeholder={t.myPage.bioPlaceholder}
+          />
+        </div>
+        <div>
+          <label className="apple-label">{t.myPage.goalLabel}</label>
+          <input
+            type="text"
+            value={goal}
+            onChange={(e) => setGoal(e.target.value)}
+            className="apple-input py-2"
+            placeholder={t.myPage.goalPlaceholder}
+          />
+        </div>
+        
+        {hasChanges && (
+          <button
+            type="submit"
+            disabled={extraUpdateLoading}
+            className="w-full py-2 bg-sf-primary text-white rounded-apple-md text-sm font-bold transition-all hover:bg-black disabled:opacity-50 active:scale-95"
+          >
+            {extraUpdateLoading ? '...' : t.common.save}
+          </button>
+        )}
+      </form>
     </section>
   );
 };

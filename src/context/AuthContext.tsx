@@ -2,14 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { parseOAuthCallbackError, clearOAuthErrorFromUrl, mapOAuthErrorToMessage } from '../utils/authErrors';
-
-interface UserProfile {
-  id: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import { UserProfile } from '../types';
 
 interface AuthContextType {
   user: User | null;

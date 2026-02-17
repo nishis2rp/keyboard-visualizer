@@ -1,11 +1,12 @@
 .languageSelectorGroup {
   display: flex;
-  background: rgba(241, 245, 249, 0.8);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
   overflow: hidden;
-  padding: 2px;
-  gap: 2px;
+  padding: 3px;
+  gap: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .languageButton {
@@ -16,35 +17,42 @@
   background: transparent;
   border: none;
   color: #64748b;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 6px;
-  opacity: 0.7;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 7px;
+  min-width: 60px;
+  justify-content: center;
 }
 
 .languageButton:hover {
-  color: #475569;
-  background: rgba(255, 255, 255, 0.5);
-  opacity: 1;
+  color: #2d3748;
+  background: #f8fafc;
+  transform: translateY(-1px);
 }
 
 .languageButton.active {
-  background: #6366f1;
+  background: #2d3748;
   color: #ffffff;
-  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
-  opacity: 1;
+  box-shadow: 0 2px 6px rgba(45, 55, 72, 0.2);
+  transform: translateY(0);
 }
 
 .flag {
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1;
+  transition: transform 0.25s ease;
+}
+
+.languageButton:hover .flag {
+  transform: scale(1.1);
 }
 
 .label {
   font-family: inherit;
   letter-spacing: 0.5px;
+  font-size: 11px;
 }
 
 @media (max-width: 768px) {

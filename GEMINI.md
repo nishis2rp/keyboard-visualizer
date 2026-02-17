@@ -79,20 +79,101 @@ Supabase を使用して以下のデータを管理しています：
 ---
 
 ## Technical Dependency Map
-- **Input Flow**: Window EventListener -> `useKeyboardShortcuts` -> `ShortcutContext` -> UI Display
-- **Quiz Flow**: `QuizContext` -> `QuizReducer` -> `useQuizInputHandler` -> `quizEngine.ts`
+
+- **Input Flow**: Window EventListener -> `useKeyStates` -> `useShortcutDetection` -> `useKeyboardShortcuts` -> UI Display
+
+- **Quiz Flow**: `QuizContext` -> `QuizReducer` -> `useQuizGame` -> `useQuizInputHandler` -> `quizEngine.ts`
+
 - **Optimization Flow**: `useAdaptivePerformance` -> CSS Variables -> Components Rendering
 
+
+
+## API Specification & Data Structures
+
+
+
+### UserProfile
+
+```typescript
+
+interface UserProfile {
+
+  id: string;          // UUID from Supabase Auth
+
+  display_name: string;
+
+  avatar_url: string;
+
+  bio: string;         // User biography
+
+  goal: string;        // Learning goal
+
+  created_at: string;
+
+  updated_at: string;
+
+}
+
+```
+
+
+
+### RichShortcut (Core Data Model)
+
+```typescript
+
+interface RichShortcut {
+
+  id: number;
+
+  keys: string;        // e.g., "Ctrl + C"
+
+  description: string;
+
+  difficulty: 'basic' | 'standard' | 'hard' | 'madmax';
+
+  application: string;
+
+  press_type: 'simultaneous' | 'sequential';
+
+  windows_protection_level: ProtectionLevel;
+
+  macos_protection_level: ProtectionLevel;
+
+}
+
+```
+
+
+
 ## AI Inference Rules (Critical for ChatGPT/Gemini)
+
 1. **Naming Convention**: Use PascalCase for components, camelCase for hooks and utils.
+
 2. **Type Safety**: Strictly use `src/types/index.ts`. Avoid `any`.
+
 3. **Logic Placement**: 
+
    - State should be in `Context`.
+
    - Complex logic should be in `Hooks`.
+
    - Pure UI should be in `Components` (using CSS Modules).
-4. **Performance**: All animations must use the `--animation-speed` CSS variable managed by the Adaptive Performance Hook.
+
+4. **Performance**: 
+
+   - All animations must use the `--animation-speed` CSS variable managed by the Adaptive Performance Hook.
+
+   - Use `memo` and `useMemo` for high-frequency keyboard event components (Key, KeyboardLayout).
+
+
 
 ## Master Directory Index
+
+- `src/hooks/keyboard/`: Low-level keyboard event handling.
+
 - `src/constants/keys.ts`: Master list of physical key mappings.
-- `src/utils/aiOptimization.ts`: AI Deduction logic.
+
+- `src/utils/quizEngine.ts`: Quiz logic and shortcut validation.
+
 - `supabase/migrations`: Source of truth for database schema.

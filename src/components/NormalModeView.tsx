@@ -9,6 +9,8 @@ import { useSettings, useShortcutData } from '../context';
 import { specialKeys } from '../constants/keys';
 import { ShortcutDifficulty } from '../types';
 
+import { getSingleKeyShortcuts } from '../utils';
+
 const NormalModeView = () => {
   const {
     selectedApp,
@@ -53,13 +55,18 @@ const NormalModeView = () => {
   // 難易度でフィルタリングされたショートカット
   const filteredShortcuts = useMemo(() => {
     if (selectedDifficulties.size === 0) {
-      // 何も選択されていない場合は全て表示
       return currentRichShortcuts;
     }
     return currentRichShortcuts.filter((shortcut) =>
       selectedDifficulties.has(shortcut.difficulty as ShortcutDifficulty)
     );
   }, [currentRichShortcuts, selectedDifficulties]);
+
+  // 単独キーショートカットをメモ化（ShortcutsListの再レンダリング抑制のため）
+  const singleKeyShortcuts = useMemo(() => 
+    getSingleKeyShortcuts(filteredShortcuts, selectedApp),
+    [filteredShortcuts, selectedApp]
+  );
 
   const {
     pressedKeys,
@@ -110,6 +117,7 @@ const NormalModeView = () => {
         availableShortcuts={availableShortcuts}
         selectedApp={selectedApp}
         richShortcuts={filteredShortcuts}
+        singleKeyShortcuts={singleKeyShortcuts}
         description={currentDescription}
       />
     </>

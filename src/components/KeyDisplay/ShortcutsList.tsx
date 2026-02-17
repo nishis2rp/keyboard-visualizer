@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { getSingleKeyShortcuts } from '../../utils';
 import { MODIFIER_CODES } from '../../utils/keyUtils';
 import ShortcutCard from '../ShortcutCard';
 import { AvailableShortcut, RichShortcut } from '../../types';
@@ -12,6 +11,7 @@ interface ShortcutsListProps {
   availableShortcuts?: AvailableShortcut[];
   selectedApp?: string;
   richShortcuts?: RichShortcut[];
+  singleKeyShortcuts?: AvailableShortcut[];
   description?: string | null;
 }
 
@@ -19,14 +19,13 @@ const ShortcutsList = memo<ShortcutsListProps>(({
   pressedKeys = new Set(),
   availableShortcuts = [],
   selectedApp,
-  richShortcuts = [],
+  singleKeyShortcuts = [],
   description
 }) => {
   const { language, t } = useLanguage();
-  // キーが押されていない場合：単独キーショートカットを表示
+  
+  // キーが押されていない場合：渡されたメモ化済みの単独キーショートカットを表示
   if (pressedKeys.size === 0) {
-    const singleKeyShortcuts = getSingleKeyShortcuts(richShortcuts, selectedApp || '')
-
     if (singleKeyShortcuts.length > 0) {
       return (
         <div className={`${styles.container} ${styles.active}`}>
@@ -56,7 +55,7 @@ const ShortcutsList = memo<ShortcutsListProps>(({
           <div className={styles.grid}>
             {singleKeyShortcuts.map((item, index) => (
               <ShortcutCard
-                key={index}
+                key={`${item.id}-${index}`}
                 shortcut={item.shortcut}
                 description={getLocalizedDescription(item, language)}
                 appContext={selectedApp}
@@ -77,13 +76,10 @@ const ShortcutsList = memo<ShortcutsListProps>(({
   // 修飾キーのみが押されているかをチェック
   const isOnlyModifierKeys = Array.from(pressedKeys).every(key => MODIFIER_CODES.has(key));
 
-  // 完全なショートカットが押されている場合は何も表示しない
-  // ただし、修飾キーのみの場合は候補を表示する（Win単独など）
   if (description && !isOnlyModifierKeys) {
     return null;
   }
 
-  // 修飾キーのみが押されている場合、利用可能なショートカット一覧を表示
   if (availableShortcuts.length > 0) {
     return (
       <div className={`${styles.container} ${styles.active}`}>
@@ -107,7 +103,7 @@ const ShortcutsList = memo<ShortcutsListProps>(({
         <div className={styles.grid}>
           {availableShortcuts.map((item, index) => (
             <ShortcutCard
-              key={index}
+              key={`${item.id}-${index}`}
               shortcut={item.shortcut}
               description={getLocalizedDescription(item, language)}
               appContext={selectedApp}

@@ -9,6 +9,10 @@
   align-items: flex-start;
   margin-top: 12px;
   margin-bottom: 24px;
+  width: 100%;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .indicator-wrapper {
@@ -278,6 +282,9 @@
   grid-template-columns: repeat(10, 1fr);
   gap: 5px;
   padding: 0;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 @media (max-width: 1500px) {
@@ -350,13 +357,30 @@
   display: grid;
   grid-template-columns: repeat(13, 1fr);
   column-gap: 8px;
-  min-width: 990px;
-  max-width: 990px;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto 16px auto;
   align-items: start;
 }
 
 /* Responsive Design for Components */
+@media (max-width: 1400px) {
+  .selectors-container {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+
+  .indicator-filter-container {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+
+  .shortcuts-grid {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+}
+
 @media (max-width: 990px) {
   .selectors-container {
     grid-template-columns: 1fr;

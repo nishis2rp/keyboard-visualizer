@@ -69,7 +69,9 @@
       "Bash(else echo \"❌ .env file not found\")",
       "Bash(git reset:*)",
       "WebFetch(domain:nishis2rp.github.io)",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "Bash(move:*)",
+      "Bash(cmd //c move:*)"
     ],
     "deny": [],
     "ask": []

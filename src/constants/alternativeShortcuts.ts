@@ -94,8 +94,9 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
   'F11': [],
 
   // ズームイン
-  'Ctrl + +': ['Ctrl + ='],
-  'Ctrl + =': ['Ctrl + +'],
+  'Ctrl + +': ['Ctrl + =', 'Ctrl + ;'],
+  'Ctrl + =': ['Ctrl + +', 'Ctrl + ;'],
+  'Ctrl + ;': ['Ctrl + +', 'Ctrl + ='],
 
   // ズームアウト
   'Ctrl + -': [],
@@ -166,7 +167,9 @@ export const ALTERNATIVE_SHORTCUTS: Record<string, string[]> = {
   'Cmd + L': [],
 
   // ズームイン（Mac）
-  'Cmd + +': ['Cmd + ='],
+  'Cmd + +': ['Cmd + =', 'Cmd + ;'],
+  'Cmd + =': ['Cmd + +', 'Cmd + ;'],
+  'Cmd + ;': ['Cmd + +', 'Cmd + ='],
 
   // ズームアウト（Mac）
   'Cmd + -': [],

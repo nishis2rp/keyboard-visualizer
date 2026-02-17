@@ -168,3 +168,13 @@ export interface WeakShortcut extends RichShortcut {
   correct_count: number;
   accuracy: number;
 }
+
+export interface UserProfile {
+  id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio?: string | null;
+  goal?: string | null;
+  created_at: string;
+  updated_at: string;
+}

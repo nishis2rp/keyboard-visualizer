@@ -55,7 +55,7 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
         <div className={styles.buttonGroup}>
           <Link to="/">
             <StyledButton
-              backgroundColor="#10b981"
+              backgroundColor="#2d3748"
               textColor="white"
               title={t.header.backToLP}
             >
@@ -64,7 +64,7 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
           </Link>
           <StyledButton
             onClick={onQuizModeToggle}
-            backgroundColor="#4a5568"
+            backgroundColor={isQuizMode ? "#475569" : "#2d3748"}
             textColor="white"
             title={isQuizMode ? t.header.returnToVisualizer : t.header.startQuizMode}
           >
@@ -72,12 +72,12 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
           </StyledButton>
           <StyledButton
             onClick={onToggleFullscreen}
-            backgroundColor="#f1f5f9"
-            textColor="#475569"
+            backgroundColor={fullscreenMode ? "#f1f5f9" : "#ffffff"}
+            textColor="#2d3748"
             borderColor="#e2e8f0"
             title={fullscreenMode ? t.header.exitFullscreen : t.header.fullscreen}
           >
-            {fullscreenMode ? t.header.exitFullscreen : t.header.fullscreen}
+            {fullscreenMode ? "⛶ " + t.header.exitFullscreen : "⛶ " + t.header.fullscreen}
           </StyledButton>
           <button
             className={styles.csvDownloadButton}
@@ -92,7 +92,7 @@ const AppHeader = memo<AppHeaderProps>(({ fullscreenMode, onToggleFullscreen, is
           ) : (
             <StyledButton
               onClick={() => setShowAuthModal(true)}
-              backgroundColor="#1e293b"
+              backgroundColor="#2d3748"
               textColor="white"
               title={t.header.login}
             >
