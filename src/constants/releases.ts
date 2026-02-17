@@ -16,6 +16,45 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '2.6.0',
+    date: '2026-02-17',
+    titleKey: 'v2.6.0',
+    titleEn: 'SEO Enhancement & International Optimization',
+    titleJa: 'SEO強化と国際化最適化',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v2.6.0-seo-component',
+        descriptionEn: 'Added dynamic SEO component for automatic meta tag management across all pages',
+        descriptionJa: '全ページに動的SEOコンポーネントを追加：メタタグの自動管理を実現'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.6.0-english-meta',
+        descriptionEn: 'Localized all meta tags to English for international reach with Open Graph locale support',
+        descriptionJa: 'メタタグを英語化して国際的なリーチを向上：Open Graph locale対応'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.6.0-sitemap',
+        descriptionEn: 'Expanded sitemap.xml with app, mypage, and release-notes pages for better SEO indexing',
+        descriptionJa: 'サイトマップを拡充：app、mypage、release-notesページを追加してSEOインデックス改善'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.6.0-manifest',
+        descriptionEn: 'Updated PWA manifest to English (short_name: "KB Visualizer") for global audience',
+        descriptionJa: 'PWAマニフェストを英語化（short_name: "KB Visualizer"）してグローバル対応'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v2.6.0-history-refactor',
+        descriptionEn: 'Refactored useShortcutHistory hook to use comboText instead of combo for consistency',
+        descriptionJa: 'useShortcutHistoryフックをリファクタリング：comboをcomboTextに統一'
+      }
+    ]
+  },
+  {
     version: '2.5.0',
     date: '2026-02-17',
     titleKey: 'v2.5.0',
