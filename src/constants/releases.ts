@@ -16,6 +16,45 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '2.7.0',
+    date: '2026-02-18',
+    titleKey: 'v2.7.0',
+    titleEn: 'Social Proof & High-Resolution Optimization',
+    titleJa: 'ソーシャルプルーフと高解像度最適化',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v2.7.0-testimonials',
+        descriptionEn: 'Added "User Testimonials" section to Landing Page to showcase real-world benefits',
+        descriptionJa: 'LPに「お客様の声」セクションを追加：実際の利用メリットを視覚化'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.7.0-responsive-scaling',
+        descriptionEn: 'Implemented advanced responsive layout scaling for high-resolution displays (up to 1500px height)',
+        descriptionJa: '高解像度ディスプレイ（高さ1500pxまで）向けの高度なレスポンシブスケーリングを実装'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.7.0-color-theme',
+        descriptionEn: 'Unified color palette to a sleek gray/black theme for a more professional and modern look',
+        descriptionJa: 'カラーパレットをグレー/ブラックに統一：よりプロフェッショナルでモダンな外観に'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.7.0-particles',
+        descriptionEn: 'Optimized particle background animation density and speed scaling for better performance',
+        descriptionJa: 'パーティクル背景の密度と速度スケーリングを最適化し、パフォーマンスを向上'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v2.7.0-ctrl-cv-fix',
+        descriptionEn: 'Resolved display issue for Ctrl+C and Ctrl+V shortcuts on Windows 11 platform',
+        descriptionJa: 'Windows 11プラットフォームにおけるCtrl+CおよびCtrl+Vの表示問題を修正'
+      }
+    ]
+  },
+  {
     version: '2.6.0',
     date: '2026-02-17',
     titleKey: 'v2.6.0',

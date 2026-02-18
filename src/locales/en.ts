@@ -113,6 +113,16 @@ export const en = {
         comment: 'I started using this to learn Excel shortcuts. I reach for the mouse less often, and I feel like my stiff shoulders have improved a bit (lol).',
         rating: 5,
       },
+      {
+        name: 'E. Rodriguez (Content Writer)',
+        comment: 'My browser and text editor operations have become dramatically smoother. Especially tab management and text editing shortcuts are essential for maintaining focus during writing.',
+        rating: 5,
+      },
+      {
+        name: 'T. Nakamura (System Administrator)',
+        comment: 'It\'s invaluable for learning command-line operations for server management. Even in critical tasks, having shortcuts ingrained makes me feel more confident.',
+        rating: 5,
+      },
     ],
 
     howItWorksTitle: 'How It Works',
