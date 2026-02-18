@@ -10,9 +10,9 @@
     <!-- Inner circle gap -->
     <circle cx="24" cy="24" r="11" fill="black" />
   </mask>
-  
+
   <g mask="url(#gaps)">
-    <circle cx="24" cy="24" r="24" />
+    <circle cx="24" cy="24" r="24" fill="white" />
   </g>
-  <circle cx="24" cy="24" r="9.5" />
+  <circle cx="24" cy="24" r="9.5" fill="white" />
 </svg>
