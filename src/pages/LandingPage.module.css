@@ -415,13 +415,15 @@ section.isVisible {
   width: 44px;
   height: 44px;
   margin-bottom: 20px;
-  /* No filter needed - SVG icons already have fill="white" */
-  opacity: 0.7;
+  /* SVG icons have fill="white" - full opacity by default */
+  opacity: 1;
+  filter: none;
   transition: all 0.3s ease;
 }
 
 .appCard:hover .appIcon {
-  opacity: 1;
+  /* Invert color on hover - white becomes black */
+  filter: brightness(0) invert(1);
   transform: scale(1.1);
 }
 
