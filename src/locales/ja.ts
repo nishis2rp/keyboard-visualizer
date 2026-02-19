@@ -333,6 +333,8 @@ export const ja: Translations = {
     gmailSingleKeyShortcuts: 'Gmail 単独キーショートカット',
     sequential: '順押し',
     browserConflict: 'ブラウザ競合',
+    browserConflictWarning: 'ブラウザショートカット競合',
+    browserConflictDescription: 'このキーはChromeブラウザのショートカットと競合する可能性があります（全画面モードで解消）',
     preventableInFullscreen: '全画面で防げる',
     systemProtected: 'システム保護',
     difficultyDescriptions: {

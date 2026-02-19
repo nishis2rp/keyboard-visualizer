@@ -21,6 +21,12 @@
   height: 100%;
 }
 
+.compact {
+  padding: 6px 8px;
+  min-height: auto;
+  height: auto;
+}
+
 .card:hover {
   transform: translateY(-6px) scale(1.02);
   background: linear-gradient(145deg, rgba(255, 255, 255, 1) 0%, rgba(252, 252, 252, 0.98) 100%);

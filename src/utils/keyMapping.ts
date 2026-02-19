@@ -104,12 +104,9 @@ const OS_MODIFIER_MAP = {
   },
   'macos': {
     'MetaLeft': 'Cmd', 'MetaRight': 'Cmd',
-    'ControlLeft': '⌃', // Control Symbol
-    'ControlRight': '⌃',
-    'ShiftLeft': '⇧', // Shift Symbol
-    'ShiftRight': '⇧',
-    'AltLeft': '⌥', // Option Symbol
-    'AltRight': '⌥',
+    'ControlLeft': 'Ctrl', 'ControlRight': 'Ctrl', // Changed from symbol to text for matching
+    'ShiftLeft': 'Shift', 'ShiftRight': 'Shift', // Changed from symbol to text for matching
+    'AltLeft': 'Alt', 'AltRight': 'Alt', // Changed from symbol to text for matching
   },
 };
 

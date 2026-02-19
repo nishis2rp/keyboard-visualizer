@@ -4,7 +4,7 @@
 
 1,300以上のショートカットデータを Supabase で管理し、タイピング体験を通じて効率的な学習をサポートします。
 
-[![Version](https://img.shields.io/badge/version-2.7.0-blue)](https://github.com/nishis2rp/keyboard-visualizer)
+[![Version](https://img.shields.io/badge/version-2.9.0-blue)](https://github.com/nishis2rp/keyboard-visualizer)
 [![GitHub Pages](https://img.shields.io/badge/demo-live-success)](https://nishis2rp.github.io/keyboard-visualizer/)
 [![React](https://img.shields.io/badge/React-18.3-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
@@ -24,6 +24,7 @@ Keyboard Visualizer は、キーボード入力を即座に画面上の仮想キ
 
 - **✨ ランディングページ**: Canvas API による動的な幾何学背景とグラスモーフィズムを採用した洗練された導入画面
 - **⌨️ ビジュアライザーモード**: 修飾キーに応じたショートカット候補の動的表示
+- **⚠️ ブラウザ競合警告**: Chrome以外のアプリ使用時に競合するブラウザショートカットを自動検出・表示
 - **🎯 クイズモード**: 順押し（Sequential）を含む複雑なショートカットの対話的学習
 - **📊 マイページ**: プレイ履歴に基づいた「苦手なショートカット」の分析と統計の可視化
 - **👥 ユーザー認証**: Google、GitHub、メール/パスワードによる学習履歴の保存
@@ -43,8 +44,9 @@ Keyboard Visualizer は、キーボード入力を即座に画面上の仮想キ
 
 ### 1. 保護レベル (Protection Levels)
 システムとブラウザの競合を考慮し、データベースレベルで3段階の保護レベルを管理しています。
-- `fullscreen-preventable`: 全画面モードでキャプチャ可能なショートカット（例: Win+Tab）。
-- `always-protected`: OSによって予約されており、ブラウザではキャプチャできないもの（例: Cmd+Tab）。
+- `preventable_fullscreen`: 全画面モードでキャプチャ可能なショートカット（例: Ctrl+T, Win+Tab）。ブラウザ競合検出の対象。
+- `always-protected`: OSによって予約されており、ブラウザではキャプチャできないもの（例: Alt+F4, Cmd+Q）。
+- `browser-conflict`: Chrome以外のアプリ使用時に、Chromeのショートカットと競合する可能性があるもの（例: Ctrl+1〜9）を自動検出して警告表示。
 - OS別設定: Windows/macOS ごとに個別の保護フラグを保持。
 
 ### 2. 難易度体系 (Difficulty)

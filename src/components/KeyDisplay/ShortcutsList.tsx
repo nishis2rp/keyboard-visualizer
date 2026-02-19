@@ -9,6 +9,7 @@ import styles from './KeyDisplay.module.css';
 interface ShortcutsListProps {
   pressedKeys?: Set<string>;
   availableShortcuts?: AvailableShortcut[];
+  browserConflicts?: AvailableShortcut[];
   selectedApp?: string;
   richShortcuts?: RichShortcut[];
   singleKeyShortcuts?: AvailableShortcut[];
@@ -18,6 +19,7 @@ interface ShortcutsListProps {
 const ShortcutsList = memo<ShortcutsListProps>(({
   pressedKeys = new Set(),
   availableShortcuts = [],
+  browserConflicts = [],
   selectedApp,
   singleKeyShortcuts = [],
   description
@@ -84,7 +86,7 @@ const ShortcutsList = memo<ShortcutsListProps>(({
     return null;
   }
 
-  if (availableShortcuts.length > 0) {
+  if (availableShortcuts.length > 0 || browserConflicts.length > 0) {
     return (
       <div className={`${styles.container} ${styles.active}`}>
         <div className={styles.header}>
@@ -122,6 +124,35 @@ const ShortcutsList = memo<ShortcutsListProps>(({
             />
           ))}
         </div>
+        {browserConflicts.length > 0 && (
+          <>
+            <div className={styles.header} style={{ marginTop: '2rem' }}>
+              <h3 className={styles.title}>
+                <span className={styles.descriptionIcon}>⚠️</span>
+                {t.normalMode.browserConflictWarning || 'ブラウザショートカット競合'}
+              </h3>
+              <p style={{ fontSize: '0.875rem', opacity: 0.8, marginTop: '0.5rem' }}>
+                {t.normalMode.browserConflictDescription || 'このキーはChromeブラウザのショートカットと競合する可能性があります'}
+              </p>
+            </div>
+            <div className={styles.grid}>
+              {browserConflicts.map((item, index) => (
+                <ShortcutCard
+                  key={`conflict-${item.id}-${index}`}
+                  shortcut={item.shortcut}
+                  description={getLocalizedDescription(item, language)}
+                  appContext="chrome"
+                  windows_protection_level={item.windows_protection_level}
+                  macos_protection_level={item.macos_protection_level}
+                  difficulty={item.difficulty}
+                  press_type={item.press_type}
+                  isBrowserConflict={true}
+                  compact={true}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     )
   }

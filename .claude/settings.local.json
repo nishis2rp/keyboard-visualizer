@@ -71,7 +71,9 @@
       "WebFetch(domain:nishis2rp.github.io)",
       "Bash(npx vite build)",
       "Bash(move:*)",
-      "Bash(cmd //c move:*)"
+      "Bash(cmd //c move:*)",
+      "Bash(start public/create-og-image.html)",
+      "Bash(npx playwright install:*)"
     ],
     "deny": [],
     "ask": []

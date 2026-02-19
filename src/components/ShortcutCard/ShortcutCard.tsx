@@ -19,9 +19,11 @@ interface ShortcutCardProps {
   macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
   difficulty?: ShortcutDifficulty;
   press_type?: 'sequential' | 'simultaneous';
+  isBrowserConflict?: boolean;
+  compact?: boolean;
 }
 
-const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none', difficulty, press_type }) => {
+const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none', difficulty, press_type, isBrowserConflict = false, compact = false }) => {
   const { t } = useLanguage();
 
   // 難易度表示のテキストとクラスを取得（オブジェクトマッピングで簡略化）
@@ -37,6 +39,11 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
   }, [difficulty, t.shortcutCard]);
 
   const effectiveProtectionLevel = useMemo((): 'none' | 'preventable_fullscreen' | 'always-protected' | 'browser-conflict' => {
+    // 明示的にブラウザ競合として指定されている場合
+    if (isBrowserConflict) {
+      return 'browser-conflict';
+    }
+
     // Excel app内では安全なショートカットは保護レベルをnoneにする
     if (appContext === 'excel' && EXCEL_APP_SAFE_SHORTCUTS.has(shortcut)) {
       return 'none';
@@ -50,27 +57,20 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
       return 'always-protected';
     }
 
-    // Chrome以外のアプリで、かつpreventable_fullscreenショートカットの場合
-    // → ブラウザショートカットと競合する可能性が高い（通常のウィンドウモードではブラウザが優先される）
-    if (appContext && appContext !== 'chrome') {
-      if (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable') {
-        return 'browser-conflict';
-      }
-    }
-
     // 表記の正規化: fullscreen-preventable → preventable_fullscreen
     return protectionLevel === 'fullscreen-preventable' ? 'preventable_fullscreen' : (protectionLevel || 'none');
-  }, [shortcut, appContext, windows_protection_level, macos_protection_level]);
+  }, [shortcut, appContext, windows_protection_level, macos_protection_level, isBrowserConflict]);
 
   // カードのスタイルクラス（簡略化）
   const cardClassName = useMemo(() =>
     [
       styles.card,
+      compact && styles.compact,
       effectiveProtectionLevel === 'preventable_fullscreen' && styles.preventableFullscreen,
       effectiveProtectionLevel === 'always-protected' && styles.alwaysProtected,
       effectiveProtectionLevel === 'browser-conflict' && styles.browserConflict
     ].filter(Boolean).join(' ')
-  , [effectiveProtectionLevel]);
+  , [effectiveProtectionLevel, compact]);
 
   // ツールチップテキスト
   const tooltipText = useMemo(() => {
@@ -118,16 +118,20 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
           ))}
         </div>
       </div>
-      
-      <div className={styles.description}>
-        {description}
-      </div>
 
-      {difficultyInfo.label && (
-        <div className={`${styles.difficultyBadge} ${difficultyInfo.class}`}>
-          {difficulty && <AppIcon appId={difficulty} size={12} className={styles.difficultyIcon} />}
-          {difficultyInfo.label}
-        </div>
+      {!compact && (
+        <>
+          <div className={styles.description}>
+            {description}
+          </div>
+
+          {difficultyInfo.label && (
+            <div className={`${styles.difficultyBadge} ${difficultyInfo.class}`}>
+              {difficulty && <AppIcon appId={difficulty} size={12} className={styles.difficultyIcon} />}
+              {difficultyInfo.label}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

@@ -20,15 +20,17 @@ export const useKeyboardShortcuts = (
   keyboardLayout: string,
   selectedApp: string,
   _shortcutDescriptions: AppShortcuts,
-  isQuizMode = false
+  isQuizMode = false,
+  allRichShortcuts?: RichShortcut[] // 全ショートカット（ブラウザ競合検出用）
 ) => {
   const {
     currentDescription,
     currentShortcut,
     availableShortcuts,
+    browserConflicts,
     detectShortcuts,
     getShortcutInfo
-  } = useShortcutDetection(richShortcuts, keyboardLayout, selectedApp);
+  } = useShortcutDetection(richShortcuts, keyboardLayout, selectedApp, allRichShortcuts);
 
   const { history, addToHistory, clearHistory } = useShortcutHistory();
 
@@ -85,6 +87,7 @@ export const useKeyboardShortcuts = (
     currentDescription,
     currentShortcut,
     availableShortcuts,
+    browserConflicts,
     handleClear: clearHistory,
     clearAllKeys: clearKeys // Added for compatibility if needed
   };

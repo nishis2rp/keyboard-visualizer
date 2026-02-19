@@ -352,6 +352,109 @@ const countModifierKeys = (shortcut: string): number => {
 }
 
 /**
+ * ブラウザ競合ショートカットを取得
+ * Chrome以外のアプリで使用時に、Chromeのpreventable_fullscreenショートカットと競合するものを返す
+ * @param {string[]} pressedCodes - 現在押されているキーの配列 (KeyboardEvent.code)
+ * @param {string} layout - キーボードレイアウト
+ * @param {RichShortcut[]} richShortcuts - 全てのRichShortcutデータ
+ * @param {string} selectedApp - 現在選択されているアプリケーション
+ * @returns {AvailableShortcut[]} ブラウザ競合ショートカット一覧
+ */
+export const getBrowserConflictShortcuts = (pressedCodes: string[], layout: string, richShortcuts: RichShortcut[], selectedApp: string): AvailableShortcut[] => {
+  // Chromeアプリが選択されている場合は空を返す
+  if (selectedApp === 'chrome') {
+    return [];
+  }
+
+  const shiftPressed = pressedCodes.includes('ShiftLeft') || pressedCodes.includes('ShiftRight');
+  const pressedDisplayNames = Array.from(pressedCodes).map(code => getCodeDisplayName(code, null, layout, shiftPressed));
+  const os = detectOS();
+
+  // 押されているキーにWindowsキー（Win/Cmd）が含まれている場合は空を返す
+  // Win+Ctrl+1などはブラウザ競合ではなく、OSレベルのショートカット
+  const hasWindowsKey = pressedDisplayNames.some(key => key === 'Win' || key === 'Cmd');
+  if (hasWindowsKey) {
+    return [];
+  }
+
+  const chromeConflicts = richShortcuts
+    .filter(item => item.application === 'chrome')
+    .filter(item => {
+      const protectionLevel = os === 'macos' ? item.macos_protection_level : item.windows_protection_level;
+      // preventable_fullscreenのショートカットのみ
+      if (protectionLevel !== 'preventable_fullscreen') {
+        return false;
+      }
+
+      const targetShortcutString = getOSSpecificKeys(item, os);
+      if (!targetShortcutString) {
+        return false;
+      }
+      const normalizedTargetShortcut = normalizeShortcutCombo(targetShortcutString);
+
+      // WindowsキーまたはCmdキーを含むショートカットは除外
+      // これらはブラウザ競合ではなく、OSレベルのショートカット（全画面で防げる）
+      // 例: Win+Ctrl+1などはブラウザではなくOSが処理する
+      if (normalizedTargetShortcut.includes('Win') || normalizedTargetShortcut.includes('Cmd')) {
+        return false;
+      }
+
+      const shortcutKeys = item.press_type === 'sequential'
+        ? getSequentialKeys(normalizedTargetShortcut)
+        : normalizedTargetShortcut.split(' + ');
+
+      const pressedKeysArray = Array.from(pressedDisplayNames);
+
+      const allKeysMatch = allPressedKeysInShortcut(
+        pressedKeysArray,
+        shortcutKeys,
+        shiftPressed,
+        layout
+      );
+
+      return shouldIncludeShortcutAsCandidate(
+        pressedKeysArray,
+        shortcutKeys,
+        allKeysMatch
+      );
+    })
+    .map(item => ({
+      ...item,
+      shortcut: getOSSpecificKeys(item, os),
+      windows_protection_level: item.windows_protection_level || 'none',
+      macos_protection_level: item.macos_protection_level || 'none',
+    }))
+    .filter((item, index, self) =>
+      index === self.findIndex(t => normalizeShortcutCombo(t.shortcut) === normalizeShortcutCombo(item.shortcut))
+    )
+    .sort((a, b) => {
+      // ソートロジック：修飾キーの数 → キーボード配列順
+      const aModifierCount = countModifierKeys(a.shortcut);
+      const bModifierCount = countModifierKeys(b.shortcut);
+
+      if (aModifierCount !== bModifierCount) {
+        return aModifierCount - bModifierCount;
+      }
+
+      const aLastKey = getLastKey(a.shortcut);
+      const bLastKey = getLastKey(b.shortcut);
+
+      // キーボード配列順でソート
+      const aIndex = getKeyboardLayoutIndex(aLastKey);
+      const bIndex = getKeyboardLayoutIndex(bLastKey);
+
+      if (aIndex !== bIndex) {
+        return aIndex - bIndex;
+      }
+
+      // インデックスが同じ場合は文字列比較
+      return aLastKey.localeCompare(bLastKey);
+    });
+
+  return chromeConflicts;
+};
+
+/**
  * 利用可能なショートカット一覧を取得
  * 現在押されているキーで始まるショートカットをすべて取得
  * @param {string[]} pressedCodes - 現在押されているキーの配列 (KeyboardEvent.code)

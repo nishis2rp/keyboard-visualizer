@@ -331,6 +331,8 @@ export const en = {
     gmailSingleKeyShortcuts: 'Gmail Single Key Shortcuts',
     sequential: 'Sequential',
     browserConflict: 'Browser Conflict',
+    browserConflictWarning: 'Browser Shortcut Conflict',
+    browserConflictDescription: 'These keys may conflict with Chrome browser shortcuts (resolved in fullscreen mode)',
     preventableInFullscreen: 'Preventable in Fullscreen',
     systemProtected: 'System Protected',
     difficultyDescriptions: {

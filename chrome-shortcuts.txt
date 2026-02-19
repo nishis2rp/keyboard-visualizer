@@ -1,0 +1,207 @@
+[dotenv@17.2.3] injecting env (3) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+🔍 Checking Chrome shortcuts with preventable_fullscreen protection level...
+
+Found 25 Chrome shortcuts with preventable_fullscreen protection:
+
+ID: 89
+Keys: Alt + Shift + B
+Windows Keys: N/A
+macOS Keys: N/A
+Description: ツールバーにフォーカス
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 80
+Keys: Alt + Shift + I
+Windows Keys: N/A
+macOS Keys: N/A
+Description: フィードバックを送信
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 1727
+Keys: Ctrl + ;
+Windows Keys: N/A
+macOS Keys: N/A
+Description: Google プレビュー（または拡張機能など）
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 50
+Keys: Ctrl + +
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 拡大
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 11
+Keys: Ctrl + 1
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 1番目のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 12
+Keys: Ctrl + 2
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 2番目のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 13
+Keys: Ctrl + 3
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 3番目のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 14
+Keys: Ctrl + 4
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 4番目のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 15
+Keys: Ctrl + 5
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 5番目のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 16
+Keys: Ctrl + 6
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 6番目のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 17
+Keys: Ctrl + 7
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 7番目のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 18
+Keys: Ctrl + 8
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 8番目のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 19
+Keys: Ctrl + 9
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 最後のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 3
+Keys: Ctrl + F4
+Windows Keys: N/A
+macOS Keys: N/A
+Description: タブを閉じる
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 20
+Keys: Ctrl + N
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 新しいウィンドウを開く
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 1263
+Keys: Ctrl + PageDown
+Windows Keys: N/A
+macOS Keys: Cmd + PageDown
+Description: 次のタブへ移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 1262
+Keys: Ctrl + PageUp
+Windows Keys: N/A
+macOS Keys: Cmd + PageUp
+Description: 前のタブへ移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 21
+Keys: Ctrl + Shift + N
+Windows Keys: N/A
+macOS Keys: N/A
+Description: シークレットウィンドウを開く
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 1726
+Keys: Ctrl + Shift + PageDown
+Windows Keys: N/A
+macOS Keys: N/A
+Description: タブを右に移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 1725
+Keys: Ctrl + Shift + PageUp
+Windows Keys: N/A
+macOS Keys: N/A
+Description: タブを左に移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 6
+Keys: Ctrl + Shift + Tab
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 前のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 85
+Keys: Ctrl + Shift + W
+Windows Keys: N/A
+macOS Keys: N/A
+Description: ウィンドウを閉じる
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 1
+Keys: Ctrl + T
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 新しいタブを開く
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 5
+Keys: Ctrl + Tab
+Windows Keys: N/A
+macOS Keys: N/A
+Description: 次のタブに移動
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+ID: 2
+Keys: Ctrl + W
+Windows Keys: N/A
+macOS Keys: N/A
+Description: タブを閉じる
+Windows Protection: preventable_fullscreen
+macOS Protection: preventable_fullscreen
+---
+
+✅ Total: 25 shortcuts

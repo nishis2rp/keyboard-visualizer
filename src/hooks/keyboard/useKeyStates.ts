@@ -16,9 +16,20 @@ export const useKeyStates = (options: UseKeyStatesOptions = {}) => {
   const pressedKeysRef = useRef(pressedKeys);
   const { onKeyDown, onKeyUp, onBlur, shouldPreventDefault, isDisabled } = options;
 
+  // Store callbacks in refs to avoid recreating event listeners
+  const onKeyDownRef = useRef(onKeyDown);
+  const onKeyUpRef = useRef(onKeyUp);
+  const shouldPreventDefaultRef = useRef(shouldPreventDefault);
+
   useEffect(() => {
     pressedKeysRef.current = pressedKeys;
   }, [pressedKeys]);
+
+  useEffect(() => {
+    onKeyDownRef.current = onKeyDown;
+    onKeyUpRef.current = onKeyUp;
+    shouldPreventDefaultRef.current = shouldPreventDefault;
+  });
 
   const clearKeys = useCallback(() => {
     setPressedKeys(new Set());
@@ -36,7 +47,7 @@ export const useKeyStates = (options: UseKeyStatesOptions = {}) => {
 
       const isAlreadyPressed = pressedKeysRef.current.has(e.code);
 
-      if (shouldPreventDefault?.(e, pressedKeysRef.current)) {
+      if (shouldPreventDefaultRef.current?.(e, pressedKeysRef.current)) {
         e.preventDefault();
       }
 
@@ -44,9 +55,9 @@ export const useKeyStates = (options: UseKeyStatesOptions = {}) => {
         const next = new Set(pressedKeysRef.current);
         next.add(e.code);
         setPressedKeys(next);
-        onKeyDown?.(e, next);
+        onKeyDownRef.current?.(e, next);
       } else {
-        onKeyDown?.(e, pressedKeysRef.current);
+        onKeyDownRef.current?.(e, pressedKeysRef.current);
       }
     };
 
@@ -55,7 +66,7 @@ export const useKeyStates = (options: UseKeyStatesOptions = {}) => {
 
       // キーを離す前の状態を渡す必要がある場合があるため、
       // コールバックに現在の状態を渡してから更新する
-      onKeyUp?.(e, pressedKeysRef.current);
+      onKeyUpRef.current?.(e, pressedKeysRef.current);
 
       const next = new Set(pressedKeysRef.current);
       next.delete(e.code);
@@ -66,16 +77,24 @@ export const useKeyStates = (options: UseKeyStatesOptions = {}) => {
       clearKeys();
     };
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        clearKeys();
+      }
+    };
+
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     window.addEventListener('blur', handleBlurWindow);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('blur', handleBlurWindow);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [onKeyDown, onKeyUp, clearKeys, shouldPreventDefault, isDisabled]);
+  }, [clearKeys, isDisabled]);
 
   return {
     pressedKeys,

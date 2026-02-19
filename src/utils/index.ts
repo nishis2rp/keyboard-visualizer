@@ -6,6 +6,7 @@ export {
   getKeyComboText,
   getShortcutDescription,
   getAvailableShortcuts,
+  getBrowserConflictShortcuts,
   getSingleKeyShortcuts,
   normalizeKey
 } from './keyboard'

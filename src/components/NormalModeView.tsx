@@ -24,7 +24,16 @@ const NormalModeView = () => {
     allShortcuts,
     apps,
     richShortcuts,
+    loadShortcuts,
   } = useShortcutData();
+
+  // Chrome以外のアプリが選択されている場合、Chromeのショートカットもロード
+  // （ブラウザ競合検出のため）
+  React.useEffect(() => {
+    if (selectedApp && selectedApp !== 'chrome') {
+      loadShortcuts('chrome');
+    }
+  }, [selectedApp, loadShortcuts]);
 
   const shortcutDescriptions = useMemo(
     () => allShortcuts?.[selectedApp] || {},
@@ -73,7 +82,8 @@ const NormalModeView = () => {
     currentDescription,
     currentShortcut,
     availableShortcuts,
-  } = useKeyboardShortcuts(filteredShortcuts, keyboardLayout, selectedApp, shortcutDescriptions, false);
+    browserConflicts,
+  } = useKeyboardShortcuts(filteredShortcuts, keyboardLayout, selectedApp, shortcutDescriptions, false, currentRichShortcuts);
 
   return (
     <>
@@ -115,6 +125,7 @@ const NormalModeView = () => {
       <ShortcutsList
         pressedKeys={pressedKeys}
         availableShortcuts={availableShortcuts}
+        browserConflicts={browserConflicts}
         selectedApp={selectedApp}
         richShortcuts={filteredShortcuts}
         singleKeyShortcuts={singleKeyShortcuts}
