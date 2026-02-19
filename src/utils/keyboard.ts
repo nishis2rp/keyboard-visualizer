@@ -1,8 +1,9 @@
 import { getCodeDisplayName, getShiftedSymbolForKey, getPossibleKeyNamesFromDisplay, getUnshiftedKeyForSymbol } from './keyMapping'
 import { MODIFIER_ORDER, MODIFIER_KEY_NAMES } from './keyUtils'
-import { AppShortcuts, ShortcutDetails, RichShortcut, AvailableShortcut } from '../types' // ★ RichShortcut, AvailableShortcutを追加
+import { AppShortcuts, ShortcutDetails, RichShortcut, AvailableShortcut, ProtectionLevel } from '../types' // ★ RichShortcut, AvailableShortcutを追加
 import { detectOS } from './os' // ★ detectOSを追加
 import { getSequentialKeys } from './sequentialShortcuts' // ★ 追加
+import { normalizeProtectionLevel, PROTECTION_LEVELS } from '../constants/protectionLevels' // ★ 保護レベル定数
 
 /**
  * キーの正規化
@@ -247,10 +248,10 @@ export const checkBrowserShortcutConflict = (
   for (const item of chromeShortcuts) {
     const protectionLevel = os === 'macos' ? item.macos_protection_level : item.windows_protection_level;
     // 保護レベルの正規化: fullscreen-preventable → preventable_fullscreen
-    const normalized = protectionLevel === 'fullscreen-preventable' ? 'preventable_fullscreen' : protectionLevel;
+    const normalized = normalizeProtectionLevel(protectionLevel);
 
     // preventable_fullscreenのショートカットをチェック（データベース駆動）
-    if (normalized === 'preventable_fullscreen') {
+    if (normalized === PROTECTION_LEVELS.PREVENTABLE_FULLSCREEN) {
       const shortcutKeys = getOSSpecificKeys(item, os);
       if (normalizeShortcutCombo(shortcutKeys) === normalizedCombo) {
         return true;
@@ -386,8 +387,8 @@ export const getBrowserConflictShortcuts = (pressedCodes: string[], layout: stri
       const protectionLevel = os === 'macos' ? item.macos_protection_level : item.windows_protection_level;
       // preventable_fullscreen または fullscreen-preventable のショートカットのみ
       // データベースから取得するため、両方の形式をサポート
-      const normalized = protectionLevel === 'fullscreen-preventable' ? 'preventable_fullscreen' : protectionLevel;
-      if (normalized !== 'preventable_fullscreen') {
+      const normalized = normalizeProtectionLevel(protectionLevel);
+      if (normalized !== PROTECTION_LEVELS.PREVENTABLE_FULLSCREEN) {
         return false;
       }
 
@@ -427,8 +428,8 @@ export const getBrowserConflictShortcuts = (pressedCodes: string[], layout: stri
       ...item,
       shortcut: getOSSpecificKeys(item, os),
       // 保護レベルの正規化: fullscreen-preventable → preventable_fullscreen
-      windows_protection_level: (item.windows_protection_level === 'fullscreen-preventable' ? 'preventable_fullscreen' : item.windows_protection_level) || 'none',
-      macos_protection_level: (item.macos_protection_level === 'fullscreen-preventable' ? 'preventable_fullscreen' : item.macos_protection_level) || 'none',
+      windows_protection_level: normalizeProtectionLevel(item.windows_protection_level),
+      macos_protection_level: normalizeProtectionLevel(item.macos_protection_level),
     }))
     .filter((item, index, self) =>
       index === self.findIndex(t => normalizeShortcutCombo(t.shortcut) === normalizeShortcutCombo(item.shortcut))
