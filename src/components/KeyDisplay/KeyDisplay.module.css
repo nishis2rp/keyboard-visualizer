@@ -65,6 +65,11 @@
   border: 1px solid rgba(200, 200, 200, 0.3);
 }
 
+.yellowBorder {
+  border-left: 4px solid #eab308;
+  background: linear-gradient(145deg, rgba(253, 224, 71, 0.2) 0%, rgba(250, 204, 21, 0.15) 100%);
+}
+
 .blueBorder {
   border-left: 4px solid #4a5568;
   background: linear-gradient(145deg, rgba(74, 85, 104, 0.15) 0%, rgba(45, 55, 72, 0.1) 100%);

@@ -330,6 +330,7 @@ export const en = {
     singleKeyShortcuts: 'Single Key Shortcuts',
     gmailSingleKeyShortcuts: 'Gmail Single Key Shortcuts',
     sequential: 'Sequential',
+    browserConflict: 'Browser Conflict',
     preventableInFullscreen: 'Preventable in Fullscreen',
     systemProtected: 'System Protected',
     difficultyDescriptions: {
@@ -351,6 +352,7 @@ export const en = {
     crossPlatform: 'Cross-Platform',
     protected: 'System Protected',
     preventableInFullscreen: 'Preventable in Fullscreen',
+    browserConflict: 'Browser Shortcut Conflict (Fullscreen to resolve)',
   },
 
   // Authentication

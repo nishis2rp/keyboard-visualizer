@@ -332,6 +332,7 @@ export const ja: Translations = {
     singleKeyShortcuts: '単独キーショートカット',
     gmailSingleKeyShortcuts: 'Gmail 単独キーショートカット',
     sequential: '順押し',
+    browserConflict: 'ブラウザ競合',
     preventableInFullscreen: '全画面で防げる',
     systemProtected: 'システム保護',
     difficultyDescriptions: {
@@ -353,6 +354,7 @@ export const ja: Translations = {
     crossPlatform: 'クロスプラットフォーム',
     protected: 'システム保護',
     preventableInFullscreen: 'フルスクリーンで防止可能',
+    browserConflict: 'ブラウザショートカットと競合（全画面モードで解消）',
   },
 
   // Authentication

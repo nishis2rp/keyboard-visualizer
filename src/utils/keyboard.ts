@@ -225,6 +225,41 @@ export const getOSSpecificKeys = (item: RichShortcut, os?: string): string => {
 };
 
 /**
+ * 指定されたショートカットがChromeブラウザで競合するかチェック
+ * Chrome以外のアプリを使用中に、Chromeのpreventable_fullscreenショートカットが押された場合にtrueを返す
+ */
+export const checkBrowserShortcutConflict = (
+  currentCombo: string,
+  richShortcuts: RichShortcut[],
+  selectedApp: string
+): boolean => {
+  // Chromeアプリが選択されている場合は競合なし
+  if (selectedApp === 'chrome') {
+    return false;
+  }
+
+  const os = detectOS();
+  const normalizedCombo = normalizeShortcutCombo(currentCombo);
+
+  // Chromeアプリのpreventable_fullscreenショートカットをチェック
+  const chromeShortcuts = richShortcuts.filter(item => item.application === 'chrome');
+
+  for (const item of chromeShortcuts) {
+    const protectionLevel = os === 'macos' ? item.macos_protection_level : item.windows_protection_level;
+
+    // preventable_fullscreenまたはfullscreen-preventableのショートカットをチェック
+    if (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable') {
+      const shortcutKeys = getOSSpecificKeys(item, os);
+      if (normalizeShortcutCombo(shortcutKeys) === normalizedCombo) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+/**
  * ショートカットの説明を取得（代替表現にも対応）
  * @param {string} currentDisplayComboText - 現在押されているキーの表示名形式の組み合わせ文字列
  * @param {RichShortcut[]} richShortcuts - 全てのRichShortcutデータ

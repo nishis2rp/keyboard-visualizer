@@ -43,6 +43,10 @@ const ShortcutsList = memo<ShortcutsListProps>(({
                 <span>{t.normalMode.sequential}</span>
               </div>
               <div className={styles.legendItem}>
+                <span className={`${styles.legendIcon} ${styles.yellowBorder}`}></span>
+                <span>{t.normalMode.browserConflict || 'ブラウザ競合'}</span>
+              </div>
+              <div className={styles.legendItem}>
                 <span className={`${styles.legendIcon} ${styles.blueBorder}`}></span>
                 <span>{t.normalMode.preventableInFullscreen}</span>
               </div>
@@ -89,6 +93,10 @@ const ShortcutsList = memo<ShortcutsListProps>(({
             <div className={styles.legendItem}>
               <span>▶</span>
               <span>{t.normalMode.sequential}</span>
+            </div>
+            <div className={styles.legendItem}>
+              <span className={`${styles.legendIcon} ${styles.yellowBorder}`}></span>
+              <span>{t.normalMode.browserConflict || 'ブラウザ競合'}</span>
             </div>
             <div className={styles.legendItem}>
               <span className={`${styles.legendIcon} ${styles.blueBorder}`}></span>

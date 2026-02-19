@@ -36,7 +36,7 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
     return difficulty ? difficultyMap[difficulty] || { label: '', class: '' } : { label: '', class: '' };
   }, [difficulty, t.shortcutCard]);
 
-  const effectiveProtectionLevel = useMemo((): 'none' | 'preventable_fullscreen' | 'always-protected' => {
+  const effectiveProtectionLevel = useMemo((): 'none' | 'preventable_fullscreen' | 'always-protected' | 'browser-conflict' => {
     // Excel app内では安全なショートカットは保護レベルをnoneにする
     if (appContext === 'excel' && EXCEL_APP_SAFE_SHORTCUTS.has(shortcut)) {
       return 'none';
@@ -44,6 +44,19 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
 
     // OS別の保護レベルを取得（macOS以外はWindowsの保護レベルを使用）
     const protectionLevel = CURRENT_OS === 'macos' ? macos_protection_level : windows_protection_level;
+
+    // 常時保護されているショートカットは最優先
+    if (protectionLevel === 'always-protected') {
+      return 'always-protected';
+    }
+
+    // Chrome以外のアプリで、かつpreventable_fullscreenショートカットの場合
+    // → ブラウザショートカットと競合する可能性が高い（通常のウィンドウモードではブラウザが優先される）
+    if (appContext && appContext !== 'chrome') {
+      if (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable') {
+        return 'browser-conflict';
+      }
+    }
 
     // 表記の正規化: fullscreen-preventable → preventable_fullscreen
     return protectionLevel === 'fullscreen-preventable' ? 'preventable_fullscreen' : (protectionLevel || 'none');
@@ -54,13 +67,15 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
     [
       styles.card,
       effectiveProtectionLevel === 'preventable_fullscreen' && styles.preventableFullscreen,
-      effectiveProtectionLevel === 'always-protected' && styles.alwaysProtected
+      effectiveProtectionLevel === 'always-protected' && styles.alwaysProtected,
+      effectiveProtectionLevel === 'browser-conflict' && styles.browserConflict
     ].filter(Boolean).join(' ')
   , [effectiveProtectionLevel]);
 
   // ツールチップテキスト
   const tooltipText = useMemo(() => {
     if (effectiveProtectionLevel === 'always-protected') return `⚠️ ${t.shortcutCard.protected}`;
+    if (effectiveProtectionLevel === 'browser-conflict') return `🌐 ${t.shortcutCard.browserConflict || 'ブラウザショートカットと競合（全画面モードで解消）'}`;
     if (effectiveProtectionLevel === 'preventable_fullscreen') return `ℹ️ ${t.shortcutCard.preventableInFullscreen}`;
     return '';
   }, [effectiveProtectionLevel, t.shortcutCard]);
