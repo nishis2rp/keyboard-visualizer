@@ -16,6 +16,39 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '2.8.0',
+    date: '2026-02-19',
+    titleKey: 'v2.8.0',
+    titleEn: 'OG Image & Documentation Updates',
+    titleJa: 'OGイメージとドキュメント更新',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v2.8.0-og-image',
+        descriptionEn: 'Added custom OG image (1200x630px) for enhanced social media sharing with preview tool',
+        descriptionJa: 'ソーシャルメディア共有用のカスタムOGイメージ（1200x630px）とプレビューツールを追加'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.8.0-icon-hover',
+        descriptionEn: 'Updated app icon hover effect from opacity to color inversion for better visual feedback',
+        descriptionJa: 'アプリアイコンのホバーエフェクトを不透明度から色反転に変更し、視覚フィードバックを改善'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.8.0-icon-color',
+        descriptionEn: 'Unified all application icons to white color scheme for consistent visual appearance',
+        descriptionJa: '全アプリケーションアイコンを白色に統一し、一貫性のある外観を実現'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.8.0-readme',
+        descriptionEn: 'Enhanced README.md with version badge, structured feature list, and latest capabilities',
+        descriptionJa: 'README.mdにバージョンバッジ、構造化された機能リスト、最新機能を追加'
+      }
+    ]
+  },
+  {
     version: '2.7.0',
     date: '2026-02-18',
     titleKey: 'v2.7.0',

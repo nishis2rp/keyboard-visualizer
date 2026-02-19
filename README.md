@@ -4,6 +4,7 @@
 
 1,300以上のショートカットデータを Supabase で管理し、タイピング体験を通じて効率的な学習をサポートします。
 
+[![Version](https://img.shields.io/badge/version-2.7.0-blue)](https://github.com/nishis2rp/keyboard-visualizer)
 [![GitHub Pages](https://img.shields.io/badge/demo-live-success)](https://nishis2rp.github.io/keyboard-visualizer/)
 [![React](https://img.shields.io/badge/React-18.3-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
@@ -19,11 +20,16 @@
 
 Keyboard Visualizer は、キーボード入力を即座に画面上の仮想キーボードへ反映し、各アプリケーション（VS Code, Excel, Chrome等）で利用可能なショートカットを学習できるツールです。
 
-- **ランディングページ**: Canvas API による動的な幾何学背景とグラスモーフィズムを採用した洗練された導入画面。
-- **ビジュアライザーモード**: 修飾キーに応じたショートカット候補の動的表示。
-- **クイズモード**: 順押し（Sequential）を含む複雑なショートカットの対話的学習。
-- **マイページ**: プレイ履歴に基づいた「苦手なショートカット」の分析と統計の可視化。
-- **SEO最適化**: 動的メタタグ管理と多言語対応（英語/日本語）による国際的なリーチ向上。
+### 主な機能
+
+- **✨ ランディングページ**: Canvas API による動的な幾何学背景とグラスモーフィズムを採用した洗練された導入画面
+- **⌨️ ビジュアライザーモード**: 修飾キーに応じたショートカット候補の動的表示
+- **🎯 クイズモード**: 順押し（Sequential）を含む複雑なショートカットの対話的学習
+- **📊 マイページ**: プレイ履歴に基づいた「苦手なショートカット」の分析と統計の可視化
+- **👥 ユーザー認証**: Google、GitHub、メール/パスワードによる学習履歴の保存
+- **💬 ソーシャルプルーフ**: 実際のユーザーの声を掲載した信頼性の高いUI
+- **🌐 SEO最適化**: 動的メタタグ管理と多言語対応（英語/日本語）による国際的なリーチ向上
+- **🎨 高解像度対応**: 1500px以上の高解像度ディスプレイでも美しく表示されるレスポンシブデザイン
 
 ## 🛠 技術スタック
 
