@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react'
 import { isModifierKeyName, isWindowsKeyName } from '../../utils/keyUtils'
 import { detectOS } from '../../utils/os'
 import { EXCEL_APP_SAFE_SHORTCUTS } from '../../constants/systemProtectedShortcuts'
-import { ShortcutDifficulty } from '../../types'
+import { ShortcutDifficulty, ProtectionLevel } from '../../types'
 import { getSequentialKeys } from '../../utils/sequentialShortcuts'
 import { AppIcon } from '../common/AppIcon'
 import { useLanguage } from '../../context/LanguageContext'
@@ -15,8 +15,8 @@ interface ShortcutCardProps {
   description: string;
   appContext?: string | null;
   showDebugLog?: boolean;
-  windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
-  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
+  windows_protection_level?: ProtectionLevel;
+  macos_protection_level?: ProtectionLevel;
   difficulty?: ShortcutDifficulty;
   press_type?: 'sequential' | 'simultaneous';
   isBrowserConflict?: boolean;

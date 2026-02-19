@@ -47,6 +47,19 @@ export interface KeyDefinition {
 
 export type ShortcutDifficulty = 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange';
 
+/**
+ * 保護レベルの型定義
+ * - none: 保護なし
+ * - preventable_fullscreen: 全画面モードでキャプチャ可能
+ * - always-protected: 常に保護されている（キャプチャ不可）
+ */
+export type ProtectionLevel = 'none' | 'preventable_fullscreen' | 'fullscreen-preventable' | 'always-protected';
+
+/**
+ * OS種別
+ */
+export type OSType = 'windows' | 'macos' | 'linux' | 'unknown';
+
 export interface ShortcutDetails {
   description: string;
   difficulty: ShortcutDifficulty;
@@ -75,16 +88,16 @@ export interface RichShortcut {
   platform?: 'Windows' | 'macOS' | 'Cross-Platform';
   windows_keys?: string | null;
   macos_keys?: string | null;
-  windows_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
-  macos_protection_level?: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
+  windows_protection_level?: ProtectionLevel;
+  macos_protection_level?: ProtectionLevel;
   press_type: 'sequential' | 'simultaneous'; // 追加
   alternative_group_id?: number | null; // 追加
 }
 
 export interface AvailableShortcut extends RichShortcut {
   shortcut: string; // 表示用のショートカット文字列
-  windows_protection_level: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
-  macos_protection_level: 'none' | 'fullscreen-preventable' | 'always-protected' | 'preventable_fullscreen';
+  windows_protection_level: ProtectionLevel;
+  macos_protection_level: ProtectionLevel;
 }
 
 /**

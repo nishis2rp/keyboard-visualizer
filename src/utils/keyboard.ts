@@ -246,9 +246,11 @@ export const checkBrowserShortcutConflict = (
 
   for (const item of chromeShortcuts) {
     const protectionLevel = os === 'macos' ? item.macos_protection_level : item.windows_protection_level;
+    // 保護レベルの正規化: fullscreen-preventable → preventable_fullscreen
+    const normalized = protectionLevel === 'fullscreen-preventable' ? 'preventable_fullscreen' : protectionLevel;
 
-    // preventable_fullscreenまたはfullscreen-preventableのショートカットをチェック
-    if (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable') {
+    // preventable_fullscreenのショートカットをチェック（データベース駆動）
+    if (normalized === 'preventable_fullscreen') {
       const shortcutKeys = getOSSpecificKeys(item, os);
       if (normalizeShortcutCombo(shortcutKeys) === normalizedCombo) {
         return true;
@@ -319,7 +321,7 @@ export const getShortcutDescription = (currentDisplayComboText: string, richShor
  * @param {string} shortcut - ショートカット文字列（例: "Win + A"）
  * @returns {string} 最後のキー（例: "A"）
  */
-const getLastKey = (shortcut: string): string => {
+export const getLastKey = (shortcut: string): string => {
   // Sequential かどうかで分割ルールを変える
   if (shortcut.includes(' → ')) {
     const parts = shortcut.split(' → ')
@@ -334,7 +336,7 @@ const getLastKey = (shortcut: string): string => {
  * @param {string} shortcut - ショートカット文字列（例: "Win + Shift + S"）
  * @returns {number} 修飾キーの数
  */
-const countModifierKeys = (shortcut: string): number => {
+export const countModifierKeys = (shortcut: string): number => {
   const separators = [' + ', ' → '];
   let parts: string[] = [];
   
@@ -377,12 +379,15 @@ export const getBrowserConflictShortcuts = (pressedCodes: string[], layout: stri
     return [];
   }
 
+  // Chromeのpreventable_fullscreenショートカットをフィルタリング
   const chromeConflicts = richShortcuts
     .filter(item => item.application === 'chrome')
     .filter(item => {
       const protectionLevel = os === 'macos' ? item.macos_protection_level : item.windows_protection_level;
-      // preventable_fullscreenのショートカットのみ
-      if (protectionLevel !== 'preventable_fullscreen') {
+      // preventable_fullscreen または fullscreen-preventable のショートカットのみ
+      // データベースから取得するため、両方の形式をサポート
+      const normalized = protectionLevel === 'fullscreen-preventable' ? 'preventable_fullscreen' : protectionLevel;
+      if (normalized !== 'preventable_fullscreen') {
         return false;
       }
 
@@ -421,37 +426,31 @@ export const getBrowserConflictShortcuts = (pressedCodes: string[], layout: stri
     .map(item => ({
       ...item,
       shortcut: getOSSpecificKeys(item, os),
-      windows_protection_level: item.windows_protection_level || 'none',
-      macos_protection_level: item.macos_protection_level || 'none',
+      // 保護レベルの正規化: fullscreen-preventable → preventable_fullscreen
+      windows_protection_level: (item.windows_protection_level === 'fullscreen-preventable' ? 'preventable_fullscreen' : item.windows_protection_level) || 'none',
+      macos_protection_level: (item.macos_protection_level === 'fullscreen-preventable' ? 'preventable_fullscreen' : item.macos_protection_level) || 'none',
     }))
     .filter((item, index, self) =>
       index === self.findIndex(t => normalizeShortcutCombo(t.shortcut) === normalizeShortcutCombo(item.shortcut))
-    )
-    .sort((a, b) => {
-      // ソートロジック：修飾キーの数 → キーボード配列順
-      const aModifierCount = countModifierKeys(a.shortcut);
-      const bModifierCount = countModifierKeys(b.shortcut);
+    );
 
-      if (aModifierCount !== bModifierCount) {
-        return aModifierCount - bModifierCount;
-      }
-
-      const aLastKey = getLastKey(a.shortcut);
-      const bLastKey = getLastKey(b.shortcut);
-
-      // キーボード配列順でソート
-      const aIndex = getKeyboardLayoutIndex(aLastKey);
-      const bIndex = getKeyboardLayoutIndex(bLastKey);
-
-      if (aIndex !== bIndex) {
-        return aIndex - bIndex;
-      }
-
-      // インデックスが同じ場合は文字列比較
-      return aLastKey.localeCompare(bLastKey);
-    });
-
-  return chromeConflicts;
+  // sortShortcuts関数を使用してソート（将来的に導入予定）
+  // 現在は互換性のためインラインソートを維持
+  return chromeConflicts.sort((a, b) => {
+    const aModifierCount = countModifierKeys(a.shortcut);
+    const bModifierCount = countModifierKeys(b.shortcut);
+    if (aModifierCount !== bModifierCount) {
+      return aModifierCount - bModifierCount;
+    }
+    const aLastKey = getLastKey(a.shortcut);
+    const bLastKey = getLastKey(b.shortcut);
+    const aIndex = getKeyboardLayoutIndex(aLastKey);
+    const bIndex = getKeyboardLayoutIndex(bLastKey);
+    if (aIndex !== bIndex) {
+      return aIndex - bIndex;
+    }
+    return aLastKey.localeCompare(bLastKey);
+  });
 };
 
 /**
@@ -579,7 +578,7 @@ const KEYBOARD_LAYOUT_ORDER = [
  * @param {string} key - キー名
  * @returns {number} キーボード配列でのインデックス（見つからない場合は999）
  */
-const getKeyboardLayoutIndex = (key: string): number => {
+export const getKeyboardLayoutIndex = (key: string): number => {
   const lowerKey = key.toLowerCase()
   const index = KEYBOARD_LAYOUT_ORDER.indexOf(lowerKey)
   return index === -1 ? 999 : index
