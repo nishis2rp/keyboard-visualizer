@@ -2,6 +2,7 @@ import { memo, useMemo } from 'react';
 import { ShortcutDifficulty } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { AppIcon } from '../common/AppIcon';
+import { analytics } from '../../utils/analytics';
 import styles from './DifficultyFilter.module.css';
 
 interface DifficultyOption {
@@ -30,6 +31,13 @@ const DifficultyFilter = memo<DifficultyFilterProps>(({
 
   const handleToggle = (difficulty: ShortcutDifficulty) => {
     onToggleDifficulty(difficulty);
+    // Analytics: Track difficulty filter after toggle
+    setTimeout(() => {
+      const selected = Array.from(selectedDifficulties);
+      if (selected.length > 0) {
+        analytics.difficultyFiltered(selected);
+      }
+    }, 100);
   };
 
   const allSelected = difficultyOptions.every(opt => selectedDifficulties.has(opt.id));

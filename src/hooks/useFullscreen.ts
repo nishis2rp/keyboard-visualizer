@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { toggleFullscreen, isFullscreen, onFullscreenChange } from '../utils'
+import { analytics } from '../utils/analytics'
 
 /**
  * フルスクリーン管理フック
@@ -18,6 +19,8 @@ export const useFullscreen = () => {
     // フルスクリーン変更イベントをリッスン
     const cleanup = onFullscreenChange((isFs) => {
       setIsFullscreenMode(isFs)
+      // Analytics: Track fullscreen toggle
+      analytics.fullscreenToggled(isFs)
     })
 
     return cleanup

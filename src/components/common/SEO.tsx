@@ -18,12 +18,25 @@ const SEO: React.FC<SEOProps> = ({ title, description, keywords }) => {
 
     // Build title
     const baseTitle = 'Keyboard Visualizer';
-    const localizedTitle = language === 'ja' 
-      ? 'キーボードビジュアライザー' 
+    const localizedTitle = language === 'ja'
+      ? 'キーボードビジュアライザー'
       : 'Keyboard Visualizer';
-    
+
     const pageTitle = title || t.landing.title;
     document.title = `${pageTitle} | ${localizedTitle}`;
+
+    // Update canonical URL based on current path
+    const baseURL = 'https://nishis2rp.github.io/keyboard-visualizer';
+    const canonicalPath = location.pathname === '/' ? '' : location.pathname;
+    const canonicalURL = `${baseURL}${canonicalPath}`;
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', canonicalURL);
 
     // Update meta description
     const metaDescription = document.querySelector('meta[name="description"]');
@@ -49,6 +62,11 @@ const SEO: React.FC<SEOProps> = ({ title, description, keywords }) => {
     const ogDescription = document.querySelector('meta[property="og:description"]');
     if (ogDescription) {
       ogDescription.setAttribute('content', description || t.landing.description);
+    }
+
+    const ogURL = document.querySelector('meta[property="og:url"]');
+    if (ogURL) {
+      ogURL.setAttribute('content', canonicalURL);
     }
 
     const ogLocale = document.querySelector('meta[property="og:locale"]');

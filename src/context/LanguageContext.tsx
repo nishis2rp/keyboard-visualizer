@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { translations, Translations } from '../locales';
+import { analytics } from '../utils/analytics';
 
 export type Language = 'ja' | 'en';
 
@@ -34,6 +35,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    // Analytics: Track language change
+    analytics.languageChanged(lang);
   };
 
   // Get translations for current language

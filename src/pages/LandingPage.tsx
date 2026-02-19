@@ -19,6 +19,7 @@ import FaqSection from '../components/LandingPage/FaqSection';
 import ReleaseNotesSection from '../components/LandingPage/ReleaseNotesSection';
 import FinalCtaSection from '../components/LandingPage/FinalCtaSection';
 import Footer from '../components/LandingPage/Footer';
+import FAQStructuredData from '../components/common/FAQStructuredData';
 
 const LandingPage: React.FC = () => {
   const { performanceStyles } = useAdaptivePerformance();
@@ -43,8 +44,9 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className={styles.landingWrapper} style={performanceStyles}>
+      <FAQStructuredData />
       <ParticleCanvas />
-      
+
       <LandingHeader />
 
       <main className={styles.landingContainer}>

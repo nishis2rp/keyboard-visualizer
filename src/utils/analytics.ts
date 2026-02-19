@@ -74,5 +74,43 @@ export const analytics = {
       event: 'shortcut_mastered',
       shortcut: shortcutKeys,
     });
+  },
+  fullscreenToggled: (enabled: boolean) => {
+    trackEvent({
+      event: 'fullscreen_toggle',
+      fullscreen_enabled: enabled,
+    });
+  },
+  languageChanged: (language: string) => {
+    trackEvent({
+      event: 'language_change',
+      language: language,
+    });
+  },
+  difficultyFiltered: (difficulties: string[]) => {
+    trackEvent({
+      event: 'difficulty_filter',
+      selected_difficulties: difficulties.join(','),
+      difficulty_count: difficulties.length,
+    });
+  },
+  sessionEnded: (duration: number, app: string) => {
+    trackEvent({
+      event: 'session_end',
+      session_duration: duration,
+      session_app: app,
+    });
+  },
+  keyboardLayoutChanged: (layout: string) => {
+    trackEvent({
+      event: 'keyboard_layout_change',
+      layout: layout,
+    });
+  },
+  modeToggled: (mode: 'quiz' | 'visualizer') => {
+    trackEvent({
+      event: 'mode_toggle',
+      selected_mode: mode,
+    });
   }
 };
