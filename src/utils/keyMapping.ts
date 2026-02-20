@@ -31,7 +31,7 @@ const BASE_KEY_MAP = {
   'NumpadDecimal': 'Num .', 'NumpadEnter': 'Num Enter', 'NumpadComma': 'Num ,',
 
   // Others
-  'Escape': 'Esc', 'Tab': 'Tab', 'Backspace': 'Bksp', 'Enter': 'Enter', 'Space': 'Space',
+  'Escape': 'Esc', 'Tab': 'Tab', 'Backspace': 'BS', 'Enter': 'Enter', 'Space': 'Space',
   'CapsLock': 'Caps Lock', 'PrintScreen': 'PrtSc', 'ScrollLock': 'Scroll Lock', 'Pause': 'Pause',
   'Insert': 'Ins', 'Home': 'Home', 'PageUp': 'PgUp', 'Delete': 'Del', 'End': 'End', 'PageDown': 'PgDn',
   'ArrowUp': '↑', 'ArrowDown': '↓', 'ArrowLeft': '←', 'ArrowRight': '→',

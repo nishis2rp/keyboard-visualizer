@@ -263,6 +263,42 @@
 
 .compactGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 5px;
+}
+
+@media (max-width: 1800px) {
+  .compactGrid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+@media (max-width: 1600px) {
+  .compactGrid {
+    grid-template-columns: repeat(10, 1fr);
+  }
+}
+
+@media (max-width: 1280px) {
+  .compactGrid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+@media (max-width: 990px) {
+  .compactGrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .compactGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .compactGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
