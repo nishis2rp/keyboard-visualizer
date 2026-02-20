@@ -16,222 +16,222 @@ export interface Release {
 
 export const releases: Release[] = [
   {
-    version: '2.10.0',
+    version: '3.5.0',
     date: '2026-02-20',
-    titleKey: 'v2.10.0',
+    titleKey: 'v3.5.0',
     titleEn: 'Codebase Refactoring & Performance Optimization',
     titleJa: 'コードベースのリファクタリングとパフォーマンス最適化',
     changes: [
       {
         category: 'improvement',
-        descriptionKey: 'v2.10.0-refactor',
+        descriptionKey: 'v3.5.0-refactor',
         descriptionEn: 'Major refactoring: Removed 200+ lines of redundant code and unified event listener logic',
         descriptionJa: '大規模リファクタリング：200行以上の冗長なコードを削減し、イベントリスナーロジックを統一'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.10.0-i18n-logic',
+        descriptionKey: 'v3.5.0-i18n-logic',
         descriptionEn: 'Unified localization logic across components using a centralized utility function',
         descriptionJa: 'コンポーネント間のローカライゼーションロジックを統一ユーティリティ関数に集約'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.10.0-os-detect',
+        descriptionKey: 'v3.5.0-os-detect',
         descriptionEn: 'Optimized OS detection and keyboard sorting algorithms for better runtime performance',
         descriptionJa: 'OS判定とキーボードソートアルゴリズムを最適化し、実行時のパフォーマンスを向上'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.10.0-type-safety',
+        descriptionKey: 'v3.5.0-type-safety',
         descriptionEn: 'Strengthened type safety by unifying ShortcutDifficulty and ProtectionLevel types',
         descriptionJa: 'ShortcutDifficultyとProtectionLevel型の統一により型安全性を強化'
       }
     ]
   },
   {
-    version: '2.9.0',
+    version: '3.4.0',
     date: '2026-02-19',
-    titleKey: 'v2.9.0',
+    titleKey: 'v3.4.0',
     titleEn: 'Dashboard Enhancements & Browser Conflict Detection',
     titleJa: 'ダッシュボード強化とブラウザ競合検出機能',
     changes: [
       {
         category: 'feature',
-        descriptionKey: 'v2.9.0-dashboard',
+        descriptionKey: 'v3.4.0-dashboard',
         descriptionEn: 'Completely redesigned MyPage with visual statistics, performance charts, and weak shortcut analysis',
         descriptionJa: 'マイページを刷新：統計の視覚化、パフォーマンスチャート、苦手なショートカット分析を追加'
       },
       {
         category: 'feature',
-        descriptionKey: 'v2.9.0-conflict-detect',
+        descriptionKey: 'v3.4.0-conflict-detect',
         descriptionEn: 'Added automatic browser shortcut conflict detection with visual warning indicators',
         descriptionJa: 'ブラウザのショートカット競合を自動検出する機能と視覚的な警告表示を追加'
       },
       {
         category: 'fix',
-        descriptionKey: 'v2.9.0-macos-fix',
+        descriptionKey: 'v3.4.0-macos-fix',
         descriptionEn: 'Resolved macOS modifier key mapping issues for consistent cross-platform experience',
         descriptionJa: 'macOSの修飾キーマッピングの問題を修正し、プラットフォーム間の一貫性を向上'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.9.0-performance-viz',
+        descriptionKey: 'v3.4.0-performance-viz',
         descriptionEn: 'Implemented data-driven progress bars and charts for intuitive learning progress tracking',
         descriptionJa: 'データ駆動のプログレスバーとチャートを実装し、直感的な学習進捗の把握が可能に'
       }
     ]
   },
   {
-    version: '2.8.0',
+    version: '3.3.0',
     date: '2026-02-19',
-    titleKey: 'v2.8.0',
+    titleKey: 'v3.3.0',
     titleEn: 'OG Image & Documentation Updates',
     titleJa: 'OGイメージとドキュメント更新',
     changes: [
       {
         category: 'feature',
-        descriptionKey: 'v2.8.0-og-image',
+        descriptionKey: 'v3.3.0-og-image',
         descriptionEn: 'Added custom OG image (1200x630px) for enhanced social media sharing with preview tool',
         descriptionJa: 'ソーシャルメディア共有用のカスタムOGイメージ（1200x630px）とプレビューツールを追加'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.8.0-icon-hover',
+        descriptionKey: 'v3.3.0-icon-hover',
         descriptionEn: 'Updated app icon hover effect from opacity to color inversion for better visual feedback',
         descriptionJa: 'アプリアイコンのホバーエフェクトを不透明度から色反転に変更し、視覚フィードバックを改善'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.8.0-icon-color',
+        descriptionKey: 'v3.3.0-icon-color',
         descriptionEn: 'Unified all application icons to white color scheme for consistent visual appearance',
         descriptionJa: '全アプリケーションアイコンを白色に統一し、一貫性のある外観を実現'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.8.0-readme',
+        descriptionKey: 'v3.3.0-readme',
         descriptionEn: 'Enhanced README.md with version badge, structured feature list, and latest capabilities',
         descriptionJa: 'README.mdにバージョンバッジ、構造化された機能リスト、最新機能を追加'
       }
     ]
   },
   {
-    version: '2.7.0',
+    version: '3.2.0',
     date: '2026-02-18',
-    titleKey: 'v2.7.0',
+    titleKey: 'v3.2.0',
     titleEn: 'Social Proof & High-Resolution Optimization',
     titleJa: 'ソーシャルプルーフと高解像度最適化',
     changes: [
       {
         category: 'feature',
-        descriptionKey: 'v2.7.0-testimonials',
+        descriptionKey: 'v3.2.0-testimonials',
         descriptionEn: 'Added "User Testimonials" section to Landing Page to showcase real-world benefits',
         descriptionJa: 'LPに「お客様の声」セクションを追加：実際の利用メリットを視覚化'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.7.0-responsive-scaling',
+        descriptionKey: 'v3.2.0-responsive-scaling',
         descriptionEn: 'Implemented advanced responsive layout scaling for high-resolution displays (up to 1500px height)',
         descriptionJa: '高解像度ディスプレイ（高さ1500pxまで）向けの高度なレスポンシブスケーリングを実装'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.7.0-color-theme',
+        descriptionKey: 'v3.2.0-color-theme',
         descriptionEn: 'Unified color palette to a sleek gray/black theme for a more professional and modern look',
         descriptionJa: 'カラーパレットをグレー/ブラックに統一：よりプロフェッショナルでモダンな外観に'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.7.0-particles',
+        descriptionKey: 'v3.2.0-particles',
         descriptionEn: 'Optimized particle background animation density and speed scaling for better performance',
         descriptionJa: 'パーティクル背景の密度と速度スケーリングを最適化し、パフォーマンスを向上'
       },
       {
         category: 'fix',
-        descriptionKey: 'v2.7.0-ctrl-cv-fix',
+        descriptionKey: 'v3.2.0-ctrl-cv-fix',
         descriptionEn: 'Resolved display issue for Ctrl+C and Ctrl+V shortcuts on Windows 11 platform',
         descriptionJa: 'Windows 11プラットフォームにおけるCtrl+CおよびCtrl+Vの表示問題を修正'
       }
     ]
   },
   {
-    version: '2.6.0',
+    version: '3.1.0',
     date: '2026-02-17',
-    titleKey: 'v2.6.0',
+    titleKey: 'v3.1.0',
     titleEn: 'SEO Enhancement & International Optimization',
     titleJa: 'SEO強化と国際化最適化',
     changes: [
       {
         category: 'feature',
-        descriptionKey: 'v2.6.0-seo-component',
+        descriptionKey: 'v3.1.0-seo-component',
         descriptionEn: 'Added dynamic SEO component for automatic meta tag management across all pages',
         descriptionJa: '全ページに動的SEOコンポーネントを追加：メタタグの自動管理を実現'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.6.0-english-meta',
+        descriptionKey: 'v3.1.0-english-meta',
         descriptionEn: 'Localized all meta tags to English for international reach with Open Graph locale support',
         descriptionJa: 'メタタグを英語化して国際的なリーチを向上：Open Graph locale対応'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.6.0-sitemap',
+        descriptionKey: 'v3.1.0-sitemap',
         descriptionEn: 'Expanded sitemap.xml with app, mypage, and release-notes pages for better SEO indexing',
         descriptionJa: 'サイトマップを拡充：app、mypage、release-notesページを追加してSEOインデックス改善'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.6.0-manifest',
+        descriptionKey: 'v3.1.0-manifest',
         descriptionEn: 'Updated PWA manifest to English (short_name: "KB Visualizer") for global audience',
         descriptionJa: 'PWAマニフェストを英語化（short_name: "KB Visualizer"）してグローバル対応'
       },
       {
         category: 'fix',
-        descriptionKey: 'v2.6.0-history-refactor',
+        descriptionKey: 'v3.1.0-history-refactor',
         descriptionEn: 'Refactored useShortcutHistory hook to use comboText instead of combo for consistency',
         descriptionJa: 'useShortcutHistoryフックをリファクタリング：comboをcomboTextに統一'
       }
     ]
   },
   {
-    version: '2.5.0',
+    version: '3.0.0',
     date: '2026-02-17',
-    titleKey: 'v2.5.0',
+    titleKey: 'v3.0.0',
     titleEn: 'UI/UX Refinement & Layout Optimization',
     titleJa: 'UI/UX改善とレイアウト最適化',
     changes: [
       {
         category: 'improvement',
-        descriptionKey: 'v2.5.0-header-buttons',
+        descriptionKey: 'v3.0.0-header-buttons',
         descriptionEn: 'Unified header button color scheme to dark gray theme (#2d3748) with refined hover effects',
         descriptionJa: 'ヘッダーボタンのカラーをダークグレーテーマ（#2d3748）に統一し、ホバーエフェクトを洗練化'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.5.0-language-selector',
+        descriptionKey: 'v3.0.0-language-selector',
         descriptionEn: 'Redesigned language selector (JA/EN) with improved spacing, shadows, and hover animations',
         descriptionJa: '言語セレクター（JA/EN）を再設計：間隔、影、ホバーアニメーションを改善'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.5.0-layout-width',
+        descriptionKey: 'v3.0.0-layout-width',
         descriptionEn: 'Expanded selector and indicator areas to 1400px width to match keyboard layout for visual consistency',
         descriptionJa: 'セレクターとインジケーターエリアを1400pxに拡大：キーボードレイアウトと幅を統一'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.5.0-button-sizing',
+        descriptionKey: 'v3.0.0-button-sizing',
         descriptionEn: 'Optimized button sizes and spacing (gap: 10px, padding: 8px 16px) for better UX',
         descriptionJa: 'ボタンサイズと間隔を最適化（gap: 10px、padding: 8px 16px）してUX向上'
       },
       {
         category: 'improvement',
-        descriptionKey: 'v2.5.0-csv-button',
+        descriptionKey: 'v3.0.0-csv-button',
         descriptionEn: 'Refined CSV download button from square (44x44px) to rectangular with improved typography',
         descriptionJa: 'CSVダウンロードボタンを正方形（44x44px）から長方形に変更し、タイポグラフィを改善'
       },
       {
         category: 'fix',
-        descriptionKey: 'v2.5.0-string-literal',
+        descriptionKey: 'v3.0.0-string-literal',
         descriptionEn: 'Fixed unterminated string literal bug in Key.tsx for proper newline escaping',
         descriptionJa: 'Key.tsxの改行エスケープ不足によるビルドエラーを修正'
       }
