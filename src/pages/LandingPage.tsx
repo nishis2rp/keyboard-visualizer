@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import styles from './LandingPage.module.css';
 import { useAdaptivePerformance } from '../hooks';
 import { TIMINGS } from '../constants/timings';
-import { useUI } from '../context';
+import { useUI, useSettings } from '../context';
 
 // Components
 import ParticleCanvas from '../components/LandingPage/ParticleCanvas';
@@ -23,7 +23,7 @@ import FAQStructuredData from '../components/common/FAQStructuredData';
 
 const LandingPage: React.FC = () => {
   const { performanceStyles } = useAdaptivePerformance();
-  const { setShowLandingVisualizer } = useUI();
+  const { setShowLandingVisualizer } = useSettings();
 
   useEffect(() => {
     // Ensure visualizer is shown on mount

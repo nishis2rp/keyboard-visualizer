@@ -5,12 +5,9 @@ interface UIContextType {
   showSetup: boolean;
   isQuizMode: boolean;
   quizApp: string | null;
-  quizDifficulty: ShortcutDifficulty | null;
-  showLandingVisualizer: boolean;
   setShowSetup: (show: boolean) => void;
   setIsQuizMode: (mode: boolean) => void;
   setQuizApp: (app: string | null) => void;
-  setQuizDifficulty: (difficulty: ShortcutDifficulty | null) => void;
   setShowLandingVisualizer: (show: boolean) => void;
 }
 
@@ -21,21 +18,16 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [showSetup, setShowSetup] = useState(true);
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizApp, setQuizApp] = useState<string | null>(null);
-  const [quizDifficulty, setQuizDifficulty] = useState<ShortcutDifficulty | null>(null);
-  const [showLandingVisualizer, setShowLandingVisualizer] = useState(true);
 
   const value = useMemo(() => ({
     showSetup,
     isQuizMode,
     quizApp,
-    quizDifficulty,
-    showLandingVisualizer,
     setShowSetup,
     setIsQuizMode,
     setQuizApp,
-    setQuizDifficulty,
-    setShowLandingVisualizer,
-  }), [showSetup, isQuizMode, quizApp, quizDifficulty, showLandingVisualizer]);
+    setShowLandingVisualizer: () => {}, // No-op as it's moved to SettingsContext
+  }), [showSetup, isQuizMode, quizApp]);
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 };

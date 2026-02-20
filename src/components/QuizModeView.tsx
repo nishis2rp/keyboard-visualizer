@@ -17,8 +17,8 @@ import '../styles/quiz.css';
 
 const QuizModeView = () => {
   const { isFullscreenMode } = useFullscreen();
-  const { selectedApp, keyboardLayout } = useSettings();
-  const { quizApp, quizDifficulty } = useUI();
+  const { selectedApp, keyboardLayout, difficulty } = useSettings();
+  const { quizApp } = useUI();
   const { allShortcuts, richShortcuts } = useShortcutData();
   const { quizState, startQuiz, getNextQuestion, dispatch, updateFullscreen, handleKeyPress } = useQuiz();
   const { t } = useLanguage();
@@ -47,7 +47,7 @@ const QuizModeView = () => {
     if (os === 'macos' && openMacWarningModalRef.current) {
       openMacWarningModalRef.current();
     }
-    startQuiz(quizApp || selectedApp, isFullscreenMode, keyboardLayout, (quizDifficulty as ShortcutDifficulty) || 'standard');
+    startQuiz(quizApp || selectedApp, isFullscreenMode, keyboardLayout, difficulty || 'standard');
 
     return () => {
       dispatch({ type: 'RESET_QUIZ' });

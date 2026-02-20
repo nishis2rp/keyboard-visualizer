@@ -59,6 +59,14 @@ describe('quizEngine', () => {
       expect(normalizeShortcut('Shift + PgUp')).toBe('Shift + PageUp');
       expect(normalizeShortcut('Shift + PgDn')).toBe('Shift + PageDown');
     });
+
+    it('should handle Mac symbols (\u2303, \u2325, \u2318, \u21e7)', () => {
+      expect(normalizeShortcut('\u2303 + A')).toBe('Ctrl + A');
+      expect(normalizeShortcut('\u2325 + B')).toBe('Alt + B');
+      expect(normalizeShortcut('\u2318 + S')).toBe('Meta + S');
+      expect(normalizeShortcut('\u21e7 + C')).toBe('Shift + C');
+      expect(normalizeShortcut('\u2303 + \u2325 + \u2318 + \u21e7 + Z')).toBe('Ctrl + Alt + Meta + Shift + Z');
+    });
   });
 
   // --- normalizePressedKeys ---
@@ -74,14 +82,18 @@ describe('quizEngine', () => {
       expect(normalizePressedKeys(pressed, mockLayout)).toBe('Ctrl');
     });
 
-    it('should combine and sort modifiers with main keys (Windows)', () => {
-      const pressed = new Set(['ControlLeft', 'ShiftLeft', 'KeyA']);
-      expect(normalizePressedKeys(pressed, mockLayout)).toBe('Ctrl + Shift + A');
+    it('should combine and sort modifiers with main keys in a fixed order', () => {
+      // Order: Ctrl > Alt > Meta > Shift
+      const pressed = new Set(['ShiftLeft', 'MetaLeft', 'AltLeft', 'ControlLeft', 'KeyA']);
+      expect(normalizePressedKeys(pressed, mockLayout)).toBe('Ctrl + Alt + Meta + Shift + A');
     });
 
     it('should map arrow keys correctly', () => {
       const pressed = new Set(['ArrowUp']);
       expect(normalizePressedKeys(pressed, mockLayout)).toBe('↑');
+      expect(normalizePressedKeys(new Set(['ArrowDown']), mockLayout)).toBe('↓');
+      expect(normalizePressedKeys(new Set(['ArrowLeft']), mockLayout)).toBe('←');
+      expect(normalizePressedKeys(new Set(['ArrowRight']), mockLayout)).toBe('→');
     });
 
     it('should handle Windows Meta key', () => {
@@ -94,6 +106,12 @@ describe('quizEngine', () => {
       const pressed = new Set(['MetaLeft', 'KeyS']);
       const macMockLayout = 'mac-us';
       expect(normalizePressedKeys(pressed, macMockLayout)).toBe('Meta + S'); 
+    });
+
+    it('should handle sequential key combinations (represented as a sequence string)', () => {
+      // In sequential mode, the UI accumulates keys like "Alt + H + O + I"
+      // normalizeShortcut should be able to handle this format as well
+      expect(normalizeShortcut('Alt + H + O + I')).toBe('Alt + H + O + I');
     });
   });
 
@@ -228,12 +246,31 @@ describe('quizEngine', () => {
       expect(checkAnswer(normalizeShortcut('ctrl + a'), normalizeShortcut('Ctrl + A'))).toBe(true);
     });
 
-    it('should handle Shift-symbol-digit equivalents (e.g., ! vs 1)', () => {
-      const mockLayout = 'windows-jis';
-      // User presses Shift + 1 which produces '!' in some layouts
-      // The correct answer is defined as 'Ctrl + Shift + 1'
-      expect(checkAnswer('Ctrl + Shift + !', 'Ctrl + Shift + 1', [], mockLayout)).toBe(true);
-      expect(checkAnswer('Ctrl + Shift + 1', 'Ctrl + Shift + !', [], mockLayout)).toBe(true);
+        it('should handle Shift-symbol-digit equivalents (e.g., ! vs 1)', () => {
+          const mockLayout = 'windows-jis';
+          // User presses Shift + 1 which produces '!' in some layouts
+          // The correct answer is defined as 'Ctrl + Shift + 1'
+          expect(checkAnswer('Ctrl + Shift + !', 'Ctrl + Shift + 1', [], mockLayout)).toBe(true);
+          expect(checkAnswer('Ctrl + Shift + 1', 'Ctrl + Shift + !', [], mockLayout)).toBe(true);
+        });
+    
+        it('should handle JIS-specific Shift mappings (e.g., " vs 2)', () => {
+          const jisLayout = 'windows-jis';
+          // JIS: Shift + 2 = "
+          expect(checkAnswer('Ctrl + Shift + "', 'Ctrl + Shift + 2', [], jisLayout)).toBe(true);
+        });
+    
+        it('should handle US-specific Shift mappings (e.g., @ vs 2)', () => {
+          const usLayout = 'windows-us';
+          // US: Shift + 2 = @
+          expect(checkAnswer('Ctrl + Shift + @', 'Ctrl + Shift + 2', [], usLayout)).toBe(true);
+        });
+    
+        it('should NOT match if the layout does not support the mapping', () => {
+          // JIS does not map @ to 2 (Shift + 2 is " in JIS)
+          const jisLayout = 'windows-jis';
+          expect(checkAnswer('Ctrl + Shift + @', 'Ctrl + Shift + 2', [], jisLayout)).toBe(false);
+        });
+      });
     });
-  });
-});
+    

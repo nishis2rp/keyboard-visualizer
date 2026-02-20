@@ -1,7 +1,10 @@
 import { detectOS } from './os';
 import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
+import { PROTECTION_LEVELS, DIFFICULTIES, PRESS_TYPES } from '../constants';
+import { normalizeProtectionLevel } from '../constants/protectionLevels';
 
-import { getCodeDisplayName, getUnshiftedKeyForSymbol } from './keyMapping'; // Import getCodeDisplayName and getUnshiftedKeyForSymbol
+import { getCodeDisplayName, getUnshiftedKeyForSymbol } from './keyMapping';
+ // Import getCodeDisplayName and getUnshiftedKeyForSymbol
 import { AllShortcuts, ShortcutDetails, RichShortcut, App, ShortcutDifficulty } from '../types';
 import { getLocalizedDescription } from './i18n';
 
@@ -23,10 +26,10 @@ const MODIFIER_ORDER: { [key: string]: number } = {
  */
 const normalizeModifierKeyString = (key: string): string => {
   const lowerKey = key.toLowerCase();
-  if (lowerKey === 'win' || lowerKey === 'cmd') return 'Meta';
-  if (lowerKey === 'ctrl' || lowerKey === 'control' || lowerKey === '⌃') return 'Ctrl';
-  if (lowerKey === 'alt' || lowerKey === 'option' || lowerKey === '⌥') return 'Alt';
-  if (lowerKey === 'shift' || lowerKey === '⇧') return 'Shift';
+  if (lowerKey === 'win' || lowerKey === 'cmd' || lowerKey === '⌘' || lowerKey === '\u2318') return 'Meta';
+  if (lowerKey === 'ctrl' || lowerKey === 'control' || lowerKey === '⌃' || lowerKey === '\u2303') return 'Ctrl';
+  if (lowerKey === 'alt' || lowerKey === 'option' || lowerKey === '⌥' || lowerKey === '\u2325') return 'Alt';
+  if (lowerKey === 'shift' || lowerKey === '⇧' || lowerKey === '\u21e7') return 'Shift';
   return key; // その他のキーはそのまま
 };
 
@@ -107,14 +110,16 @@ const isShortcutSafe = (
 ): boolean => {
   if (!richShortcut) return true;
 
-  const protectionLevel = currentOS === 'macos'
-    ? richShortcut.macos_protection_level
-    : richShortcut.windows_protection_level;
+  const protectionLevel = normalizeProtectionLevel(
+    currentOS === 'macos'
+      ? richShortcut.macos_protection_level
+      : richShortcut.windows_protection_level
+  );
 
-  if (protectionLevel === 'always-protected') return false;
+  if (protectionLevel === PROTECTION_LEVELS.ALWAYS_PROTECTED) return false;
   if (quizMode === 'hardcore') return true;
 
-  if (!isFullscreen && (protectionLevel === 'preventable_fullscreen' || protectionLevel === 'fullscreen-preventable')) {
+  if (!isFullscreen && protectionLevel === PROTECTION_LEVELS.PREVENTABLE_FULLSCREEN) {
     return false;
   }
 
@@ -165,7 +170,7 @@ export const generateQuestion = (
   quizMode = 'default',
   isFullscreen = false,
   usedShortcuts = new Set<string>(),
-  difficulty: ShortcutDifficulty = 'standard',
+  difficulty: ShortcutDifficulty = DIFFICULTIES.STANDARD,
   richShortcuts: RichShortcut[] = [],
   apps: App[] = [],
   questionFormat = '[{app}] What is the shortcut for "{description}"?',
@@ -221,8 +226,8 @@ export const generateQuestion = (
       }
 
       // 難易度フィルタリング
-      const shortcutDifficulty = richShortcut?.difficulty || 'standard';
-      const isDifficultyMatch = difficulty === 'allrange' || shortcutDifficulty === difficulty;
+      const shortcutDifficulty = richShortcut?.difficulty || DIFFICULTIES.STANDARD;
+      const isDifficultyMatch = difficulty === DIFFICULTIES.ALLRANGE || shortcutDifficulty === difficulty;
 
       if (isDifficultyMatch) {
         // Get localized description
@@ -236,7 +241,7 @@ export const generateQuestion = (
           shortcut,
           description,
           normalizedShortcut: normalized,
-          press_type: richShortcut?.press_type || 'simultaneous', // ★ 追加
+          press_type: richShortcut?.press_type || PRESS_TYPES.SIMULTANEOUS, // ★ 追加
         });
       }
     });

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { SETUP_VERSION } from '../../constants/app'
+import { DIFFICULTIES } from '../../constants/shortcuts'
 import { LANGUAGE_OPTIONS } from '../../constants/setup'
 import { useUI, useShortcutData } from '../../context'
 import { useAuth } from '../../context/AuthContext'
@@ -18,6 +19,7 @@ interface SetupScreenProps {
 }
 
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
+  const { setSetup, setDifficulty, setSelectedApp, setKeyboardLayout } = useSettings()
   const { isQuizMode } = useUI()
   const { apps } = useShortcutData()
   const { user } = useAuth()
@@ -91,33 +93,33 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
 
   const difficultyOptionsTranslated = useMemo(() => [
     {
-      id: 'basic',
+      id: DIFFICULTIES.BASIC,
       name: t.setup.difficultyOptions.basic.name,
-      icon: 'basic',
+      icon: DIFFICULTIES.BASIC,
       description: t.setup.difficultyOptions.basic.description
     },
     {
-      id: 'standard',
+      id: DIFFICULTIES.STANDARD,
       name: t.setup.difficultyOptions.standard.name,
-      icon: 'standard',
+      icon: DIFFICULTIES.STANDARD,
       description: t.setup.difficultyOptions.standard.description
     },
     {
-      id: 'hard',
+      id: DIFFICULTIES.HARD,
       name: t.setup.difficultyOptions.hard.name,
-      icon: 'hard',
+      icon: DIFFICULTIES.HARD,
       description: t.setup.difficultyOptions.hard.description
     },
     {
-      id: 'madmax',
+      id: DIFFICULTIES.MADMAX,
       name: t.setup.difficultyOptions.madmax.name,
-      icon: 'madmax',
+      icon: DIFFICULTIES.MADMAX,
       description: t.setup.difficultyOptions.madmax.description
     },
     {
-      id: 'allrange',
+      id: DIFFICULTIES.ALLRANGE,
       name: t.setup.difficultyOptions.allrange.name,
-      icon: 'allrange',
+      icon: DIFFICULTIES.ALLRANGE,
       description: t.setup.difficultyOptions.allrange.description
     }
   ], [t])
@@ -181,13 +183,6 @@ const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
       const appId = selectedMode.id === 'quiz'
         ? (selectedLayout.id === 'windows-jis' ? 'windows11' : 'macos')
         : selectedApp.id
-
-      localStorage.setItem('keyboard-visualizer-setup', JSON.stringify({
-        app: appId,
-        layout: selectedLayout.id,
-        setupCompleted: true,
-        version: SETUP_VERSION
-      }))
 
       const quizAppsIds = selectedMode.id === 'quiz'
         ? selectedQuizApps.map(app => app.id).join(',')

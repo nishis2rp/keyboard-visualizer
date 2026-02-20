@@ -152,7 +152,7 @@ export interface QuizResult {
   skipped: boolean;
 }
 
-export type QuizMode = 'standard' | 'speedrun' | 'practice';
+export type QuizMode = 'standard' | 'speedrun' | 'practice' | 'default' | 'hardcore';
 
 export interface UserQuizStats {
   user_id: string;
@@ -190,4 +190,12 @@ export interface UserProfile {
   goal?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface UserSettings {
+  layout: string;
+  difficulty: ShortcutDifficulty;
+  theme: 'light' | 'dark' | 'system';
+  showLandingVisualizer: boolean;
+  selectedApp?: string;
 }

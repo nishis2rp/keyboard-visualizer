@@ -8,14 +8,13 @@ import { useFullscreen } from '../hooks';
 import { SetupCompleteOptions } from '../types';
 
 const Home: React.FC = () => {
-  const { setSelectedApp, setKeyboardLayout, setSetup } = useSettings();
+  const { setSelectedApp, setKeyboardLayout, setSetup, setDifficulty, setShowLandingVisualizer } = useSettings();
   const {
     showSetup,
     setShowSetup,
     isQuizMode,
     setIsQuizMode,
-    setQuizApp,
-    setQuizDifficulty
+    setQuizApp
   } = useUI();
   const { loading, error } = useShortcutData();
   const { t } = useLanguage();
@@ -41,16 +40,19 @@ const Home: React.FC = () => {
     // Settings Update
     setSelectedApp(app);
     setKeyboardLayout(layout);
+    setDifficulty(difficulty || 'allrange');
     setSetup({
       setupCompleted: true,
       app,
-      layout
+      layout,
+      difficulty: difficulty || 'allrange',
+      theme: 'system',
+      showLandingVisualizer: true
     });
 
     // UI Update
     setIsQuizMode(mode === 'quiz');
     setQuizApp(quizApp);
-    setQuizDifficulty(difficulty);
     setShowSetup(false);
   };
 
