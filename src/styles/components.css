@@ -5,10 +5,10 @@
 /* Indicator and Filter Container */
 .indicator-filter-container {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   align-items: flex-start;
-  margin-top: 12px;
-  margin-bottom: 24px;
+  margin-top: 4px;
+  margin-bottom: 8px;
   width: 100%;
   max-width: 1400px;
   margin-left: auto;
@@ -17,9 +17,9 @@
 
 @media (max-height: 1500px) {
   .indicator-filter-container {
-    margin-top: clamp(6px, calc(6px + (12 - 6) * ((100vh - 1000px) / (1500 - 1000))), 12px);
-    margin-bottom: clamp(12px, calc(12px + (24 - 12) * ((100vh - 1000px) / (1500 - 1000))), 24px);
-    gap: clamp(10px, calc(10px + (20 - 10) * ((100vh - 1000px) / (1500 - 1000))), 20px);
+    margin-top: clamp(2px, calc(2px + (4 - 2) * ((100vh - 1000px) / (1500 - 1000))), 4px);
+    margin-bottom: clamp(4px, calc(4px + (8 - 4) * ((100vh - 1000px) / (1500 - 1000))), 8px);
+    gap: clamp(6px, calc(6px + (10 - 6) * ((100vh - 1000px) / (1500 - 1000))), 10px);
   }
 }
 
@@ -398,42 +398,42 @@
 .selectors-container {
   display: grid;
   grid-template-columns: repeat(13, 1fr);
-  column-gap: 8px;
+  column-gap: 6px;
   width: 100%;
   max-width: 1400px;
-  margin: 0 auto 16px auto;
+  margin: 0 auto 6px auto;
   align-items: start;
 }
 
 /* Responsive Design for Components */
 @media (max-height: 1500px) {
   .selectors-container {
-    margin-bottom: clamp(6px, calc(6px + (16 - 6) * ((100vh - 1000px) / (1500 - 1000))), 16px);
-    column-gap: clamp(5px, calc(5px + (8 - 5) * ((100vh - 1000px) / (1500 - 1000))), 8px);
+    margin-bottom: clamp(3px, calc(3px + (6 - 3) * ((100vh - 1000px) / (1500 - 1000))), 6px);
+    column-gap: clamp(4px, calc(4px + (6 - 4) * ((100vh - 1000px) / (1500 - 1000))), 6px);
   }
 
   .selector-section {
-    gap: clamp(3px, calc(3px + (7 - 3) * ((100vh - 1000px) / (1500 - 1000))), 7px);
+    gap: clamp(2px, calc(2px + (5 - 2) * ((100vh - 1000px) / (1500 - 1000))), 5px);
   }
 
   .selector-title {
-    margin: 0 0 clamp(3px, calc(3px + (6 - 3) * ((100vh - 1000px) / (1500 - 1000))), 6px) clamp(3px, calc(3px + (4 - 3) * ((100vh - 1000px) / (1500 - 1000))), 4px);
-    font-size: clamp(9px, calc(9px + (11 - 9) * ((100vh - 1000px) / (1500 - 1000))), 11px);
+    margin: 0 0 clamp(2px, calc(2px + (4 - 2) * ((100vh - 1000px) / (1500 - 1000))), 4px) clamp(2px, calc(2px + (3 - 2) * ((100vh - 1000px) / (1500 - 1000))), 3px);
+    font-size: clamp(9px, calc(9px + (10 - 9) * ((100vh - 1000px) / (1500 - 1000))), 10px);
   }
 
   .app-tab {
-    padding: clamp(5px, calc(5px + (9 - 5) * ((100vh - 1000px) / (1500 - 1000))), 9px) clamp(3px, calc(3px + (5 - 3) * ((100vh - 1000px) / (1500 - 1000))), 5px);
-    min-height: clamp(56px, calc(56px + (72 - 56) * ((100vh - 1000px) / (1500 - 1000))), 72px);
-    gap: clamp(3px, calc(3px + (6 - 3) * ((100vh - 1000px) / (1500 - 1000))), 6px);
+    padding: clamp(4px, calc(4px + (7 - 4) * ((100vh - 1000px) / (1500 - 1000))), 7px) clamp(3px, calc(3px + (4 - 3) * ((100vh - 1000px) / (1500 - 1000))), 4px);
+    min-height: clamp(48px, calc(48px + (60 - 48) * ((100vh - 1000px) / (1500 - 1000))), 60px);
+    gap: clamp(2px, calc(2px + (4 - 2) * ((100vh - 1000px) / (1500 - 1000))), 4px);
   }
 
   .app-icon {
-    font-size: clamp(16px, calc(16px + (19 - 16) * ((100vh - 1000px) / (1500 - 1000))), 19px);
+    font-size: clamp(14px, calc(14px + (17 - 14) * ((100vh - 1000px) / (1500 - 1000))), 17px);
   }
 
   .app-name {
-    font-size: clamp(9px, calc(9px + (10.5 - 9) * ((100vh - 1000px) / (1500 - 1000))), 10.5px);
-    line-height: clamp(1.1, calc(1.1 + (1.2 - 1.1) * ((100vh - 1000px) / (1500 - 1000))), 1.2);
+    font-size: clamp(8.5px, calc(8.5px + (9.5 - 8.5) * ((100vh - 1000px) / (1500 - 1000))), 9.5px);
+    line-height: clamp(1.1, calc(1.1 + (1.15 - 1.1) * ((100vh - 1000px) / (1500 - 1000))), 1.15);
   }
 }
 
