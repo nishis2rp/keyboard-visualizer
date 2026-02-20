@@ -225,3 +225,44 @@
 .difficultyIcon {
   flex-shrink: 0;
 }
+
+/* Browser Conflict Compact Section */
+.browserConflictSection {
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: linear-gradient(145deg, rgba(253, 224, 71, 0.1) 0%, rgba(250, 204, 21, 0.05) 100%);
+  border-left: 4px solid #eab308;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.compactHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.warningIcon {
+  font-size: 14px;
+}
+
+.compactTitle {
+  font-weight: 700;
+  color: #92400e;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.compactHint {
+  font-size: 10px;
+  color: #78716c;
+  opacity: 0.8;
+}
+
+.compactGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 6px;
+}

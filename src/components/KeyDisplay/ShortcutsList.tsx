@@ -89,53 +89,19 @@ const ShortcutsList = memo<ShortcutsListProps>(({
   if (availableShortcuts.length > 0 || browserConflicts.length > 0) {
     return (
       <div className={`${styles.container} ${styles.active}`}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>{t.normalMode.availableShortcuts}</h3>
-          <div className={styles.legend}>
-            <div className={styles.legendItem}>
-              <span>▶</span>
-              <span>{t.normalMode.sequential}</span>
-            </div>
-            <div className={styles.legendItem}>
-              <span className={`${styles.legendIcon} ${styles.yellowBorder}`}></span>
-              <span>{t.normalMode.browserConflict || 'ブラウザ競合'}</span>
-            </div>
-            <div className={styles.legendItem}>
-              <span className={`${styles.legendIcon} ${styles.blueBorder}`}></span>
-              <span>{t.normalMode.preventableInFullscreen}</span>
-            </div>
-            <div className={styles.legendItem}>
-              <span className={`${styles.legendIcon} ${styles.redBorder}`}></span>
-              <span>{t.normalMode.systemProtected}</span>
-            </div>
-          </div>
-        </div>
-        <div className={styles.grid}>
-          {availableShortcuts.map((item, index) => (
-            <ShortcutCard
-              key={`${item.id}-${index}`}
-              shortcut={item.shortcut}
-              description={getLocalizedDescription(item, language)}
-              appContext={selectedApp}
-              windows_protection_level={item.windows_protection_level}
-              macos_protection_level={item.macos_protection_level}
-              difficulty={item.difficulty}
-              press_type={item.press_type}
-            />
-          ))}
-        </div>
+        {/* ブラウザ競合を最上段にコンパクト表示 */}
         {browserConflicts.length > 0 && (
-          <>
-            <div className={styles.header} style={{ marginTop: '2rem' }}>
-              <h3 className={styles.title}>
-                <span className={styles.descriptionIcon}>⚠️</span>
+          <div className={styles.browserConflictSection}>
+            <div className={styles.compactHeader}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.compactTitle}>
                 {t.normalMode.browserConflictWarning || 'ブラウザショートカット競合'}
-              </h3>
-              <p style={{ fontSize: '0.875rem', opacity: 0.8, marginTop: '0.5rem' }}>
-                {t.normalMode.browserConflictDescription || 'このキーはChromeブラウザのショートカットと競合する可能性があります'}
-              </p>
+              </span>
+              <span className={styles.compactHint}>
+                ({t.normalMode.browserConflictDescription || '全画面モードで解消'})
+              </span>
             </div>
-            <div className={styles.grid}>
+            <div className={styles.compactGrid}>
               {browserConflicts.map((item, index) => (
                 <ShortcutCard
                   key={`conflict-${item.id}-${index}`}
@@ -148,6 +114,47 @@ const ShortcutsList = memo<ShortcutsListProps>(({
                   press_type={item.press_type}
                   isBrowserConflict={true}
                   compact={true}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 利用可能なショートカット */}
+        {availableShortcuts.length > 0 && (
+          <>
+            <div className={styles.header}>
+              <h3 className={styles.title}>{t.normalMode.availableShortcuts}</h3>
+              <div className={styles.legend}>
+                <div className={styles.legendItem}>
+                  <span>▶</span>
+                  <span>{t.normalMode.sequential}</span>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.legendIcon} ${styles.yellowBorder}`}></span>
+                  <span>{t.normalMode.browserConflict || 'ブラウザ競合'}</span>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.legendIcon} ${styles.blueBorder}`}></span>
+                  <span>{t.normalMode.preventableInFullscreen}</span>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.legendIcon} ${styles.redBorder}`}></span>
+                  <span>{t.normalMode.systemProtected}</span>
+                </div>
+              </div>
+            </div>
+            <div className={styles.grid}>
+              {availableShortcuts.map((item, index) => (
+                <ShortcutCard
+                  key={`${item.id}-${index}`}
+                  shortcut={item.shortcut}
+                  description={getLocalizedDescription(item, language)}
+                  appContext={selectedApp}
+                  windows_protection_level={item.windows_protection_level}
+                  macos_protection_level={item.macos_protection_level}
+                  difficulty={item.difficulty}
+                  press_type={item.press_type}
                 />
               ))}
             </div>
