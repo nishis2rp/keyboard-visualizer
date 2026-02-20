@@ -515,5 +515,308 @@ export const releases: Release[] = [
         descriptionJa: 'CSS重複スタイルを削除しcomponents.cssに集約'
       }
     ]
+  },
+  {
+    version: '0.9.0',
+    date: '2025-11-20',
+    titleKey: 'v0.9.0',
+    titleEn: 'Supabase Migration & Database-Driven Architecture',
+    titleJa: 'Supabase移行とデータベース駆動アーキテクチャ',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v0.9.0-supabase',
+        descriptionEn: 'Migrated from Railway to Supabase PostgreSQL for robust shortcut data storage',
+        descriptionJa: 'RailwayからSupabase PostgreSQLに移行：堅牢なショートカットデータストレージ'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.9.0-vscode',
+        descriptionEn: 'Added VS Code shortcuts with platform-specific key support',
+        descriptionJa: 'VS Codeショートカットを追加（プラットフォーム固有キー対応）'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.9.0-difficulty',
+        descriptionEn: 'Rebalanced difficulty levels across all applications for better learning progression',
+        descriptionJa: '全アプリケーションの難易度レベルを再調整：学習進行を改善'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.9.0-sequential',
+        descriptionEn: 'Improved sequential shortcut detection for Windows 11 and macOS',
+        descriptionJa: 'Windows 11とmacOSの順押しショートカット検出を改善'
+      }
+    ]
+  },
+  {
+    version: '0.8.0',
+    date: '2025-11-10',
+    titleKey: 'v0.8.0',
+    titleEn: 'Quiz Mode Enhancement & Gmail Support',
+    titleJa: 'クイズモード強化とGmail対応',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v0.8.0-gmail',
+        descriptionEn: 'Added comprehensive Gmail keyboard shortcuts (66 new shortcuts)',
+        descriptionJa: 'Gmailキーボードショートカットを包括的に追加（66個の新規ショートカット）'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.8.0-difficulty-filter',
+        descriptionEn: 'Added difficulty filter to visualizer mode for targeted learning',
+        descriptionJa: 'ビジュアライザーモードに難易度フィルターを追加：的を絞った学習が可能に'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.8.0-madmax',
+        descriptionEn: 'Promoted minor shortcuts to "madmax" difficulty for better distribution',
+        descriptionJa: 'マイナーショートカットを"madmax"難易度に昇格：分布を改善'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.8.0-labels',
+        descriptionEn: 'Changed all difficulty labels from Japanese to English for consistency',
+        descriptionJa: '全難易度ラベルを日本語から英語に変更：一貫性の向上'
+      }
+    ]
+  },
+  {
+    version: '0.7.0',
+    date: '2025-10-25',
+    titleKey: 'v0.7.0',
+    titleEn: 'Quiz Mode Complete Implementation',
+    titleJa: 'クイズモード完全実装',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v0.7.0-quiz',
+        descriptionEn: 'Implemented comprehensive quiz mode with 4-tier difficulty system (Basic, Standard, Hard, Madmax)',
+        descriptionJa: '4段階難易度システム（Basic、Standard、Hard、Madmax）を持つ包括的なクイズモードを実装'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.7.0-alternatives',
+        descriptionEn: 'Added alternative shortcut support (e.g., Ctrl+C = Ctrl+Insert)',
+        descriptionJa: '代替ショートカット対応を追加（例：Ctrl+C = Ctrl+Insert）'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.7.0-sequential',
+        descriptionEn: 'Enhanced sequential shortcut visualization with progress indicators',
+        descriptionJa: '順押しショートカットの視覚化を強化：進捗インジケーターを追加'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.7.0-pwa',
+        descriptionEn: 'Implemented Progressive Web App (PWA) support with offline capabilities',
+        descriptionJa: 'プログレッシブWebアプリ（PWA）対応を実装：オフライン機能を追加'
+      }
+    ]
+  },
+  {
+    version: '0.6.0',
+    date: '2025-10-05',
+    titleKey: 'v0.6.0',
+    titleEn: 'Excel Advanced Shortcuts & Sequential Input',
+    titleJa: 'Excel高度ショートカットと順押し入力',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v0.6.0-excel',
+        descriptionEn: 'Added Excel ribbon shortcuts with sequential key support (e.g., Alt + H + O + I)',
+        descriptionJa: 'Excelリボンショートカットを追加：順押しキー対応（例：Alt + H + O + I）'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.6.0-sequential-ui',
+        descriptionEn: 'Implemented visual distinction between simultaneous and sequential shortcuts',
+        descriptionJa: '同時押しと順押しショートカットの視覚的区別を実装'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.6.0-kbd-layout',
+        descriptionEn: 'Reorganized keyboard layouts to match physical keyboard arrangements',
+        descriptionJa: 'キーボードレイアウトを物理キーボード配置に合わせて再編成'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.6.0-nav-keys',
+        descriptionEn: 'Added navigation keys (Home, End, PageUp, PageDown) to all layouts',
+        descriptionJa: 'ナビゲーションキー（Home、End、PageUp、PageDown）を全レイアウトに追加'
+      }
+    ]
+  },
+  {
+    version: '0.5.0',
+    date: '2025-09-20',
+    titleKey: 'v0.5.0',
+    titleEn: 'macOS Support & Multi-Platform Expansion',
+    titleJa: 'macOS対応とマルチプラットフォーム拡張',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v0.5.0-macos',
+        descriptionEn: 'Added macOS keyboard layouts (JIS/US) with Command key support',
+        descriptionJa: 'macOSキーボードレイアウト（JIS/US）を追加：Commandキー対応'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.5.0-macos-shortcuts',
+        descriptionEn: 'Implemented macOS-specific shortcuts for Windows 11, Chrome, Excel, and Slack',
+        descriptionJa: 'Windows 11、Chrome、Excel、SlackのmacOS固有ショートカットを実装'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.5.0-protection',
+        descriptionEn: 'Enhanced system-protected shortcut classification with 3-tier color coding',
+        descriptionJa: 'システム保護ショートカットの分類を強化：3段階の色分けを実装'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v0.5.0-key-stuck',
+        descriptionEn: 'Fixed persistent key state issue when releasing modifier keys',
+        descriptionJa: '修飾キー解放時のキー状態残存問題を修正'
+      }
+    ]
+  },
+  {
+    version: '0.4.0',
+    date: '2025-09-01',
+    titleKey: 'v0.4.0',
+    titleEn: 'Setup Screen & Fullscreen Mode',
+    titleJa: 'セットアップ画面と全画面モード',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v0.4.0-setup',
+        descriptionEn: 'Added initial setup screen with app selection and keyboard layout configuration',
+        descriptionJa: '初回セットアップ画面を追加：アプリ選択とキーボードレイアウト設定'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.4.0-fullscreen',
+        descriptionEn: 'Implemented fullscreen mode for enhanced keyboard shortcut capture',
+        descriptionJa: 'キーボードショートカットキャプチャ強化のための全画面モードを実装'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.4.0-key-clear',
+        descriptionEn: 'Improved key release detection with faster response time',
+        descriptionJa: 'キー解放検出を改善：レスポンス時間を高速化'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.4.0-cursor',
+        descriptionEn: 'Added arrow keys to keyboard layout for better navigation',
+        descriptionJa: 'ナビゲーション改善のため矢印キーをキーボードレイアウトに追加'
+      }
+    ]
+  },
+  {
+    version: '0.3.0',
+    date: '2025-08-15',
+    titleKey: 'v0.3.0',
+    titleEn: 'UI Redesign & Multi-Application Support',
+    titleJa: 'UI再設計と複数アプリケーション対応',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v0.3.0-multi-app',
+        descriptionEn: 'Added support for Chrome, Excel, and Slack shortcuts',
+        descriptionJa: 'Chrome、Excel、Slackのショートカットサポートを追加'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.3.0-ui',
+        descriptionEn: 'Redesigned UI with modern Apple-inspired aesthetic and gradient styling',
+        descriptionJa: 'モダンなApple風デザインとグラデーションスタイリングでUIを再設計'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.3.0-favicon',
+        descriptionEn: 'Added custom favicon and improved HTML metadata',
+        descriptionJa: 'カスタムファビコンを追加しHTMLメタデータを改善'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.3.0-app-selector',
+        descriptionEn: 'Implemented single-line app selector with horizontal scroll',
+        descriptionJa: '横スクロール対応の1行アプリセレクターを実装'
+      }
+    ]
+  },
+  {
+    version: '0.2.0',
+    date: '2025-08-01',
+    titleKey: 'v0.2.0',
+    titleEn: 'Windows Key Support & Shortcut Expansion',
+    titleJa: 'Windowsキー対応とショートカット拡張',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v0.2.0-win-key',
+        descriptionEn: 'Added Windows key (Win+) shortcut support for Windows 11',
+        descriptionJa: 'Windows 11のWindowsキー（Win+）ショートカット対応を追加'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.2.0-protection-visual',
+        descriptionEn: 'Implemented visual indication for system-protected shortcuts',
+        descriptionJa: 'システム保護ショートカットの視覚的表示を実装'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.2.0-modifier-sort',
+        descriptionEn: 'Added modifier key count-based sorting for better shortcut organization',
+        descriptionJa: '修飾キー数に基づくソートを追加：ショートカット整理を改善'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v0.2.0-component',
+        descriptionEn: 'Refactored React components for better code organization',
+        descriptionJa: 'Reactコンポーネントをリファクタリング：コード整理を改善'
+      }
+    ]
+  },
+  {
+    version: '0.1.0',
+    date: '2025-07-20',
+    titleKey: 'v0.1.0',
+    titleEn: 'Initial Release - Windows 11 Keyboard Visualizer',
+    titleJa: '初回リリース - Windows 11キーボードビジュアライザー',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v0.1.0-core',
+        descriptionEn: 'Core keyboard visualization functionality with real-time key press detection',
+        descriptionJa: 'リアルタイムのキー押下検出を備えたコアキーボード可視化機能'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.1.0-windows11',
+        descriptionEn: 'Initial Windows 11 shortcut database with basic shortcuts',
+        descriptionJa: '基本ショートカットを含む初期Windows 11ショートカットデータベース'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.1.0-fullscreen',
+        descriptionEn: 'Fullscreen mode with browser shortcut capture support',
+        descriptionJa: 'ブラウザショートカットキャプチャ対応の全画面モード'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.1.0-gmail-single',
+        descriptionEn: 'Gmail single-key shortcut support (g, i, etc.)',
+        descriptionJa: 'Gmail単一キーショートカット対応（g、iなど）'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v0.1.0-ci-cd',
+        descriptionEn: 'GitHub Actions workflow for automated deployment to GitHub Pages',
+        descriptionJa: 'GitHub Pagesへの自動デプロイ用GitHub Actionsワークフロー'
+      }
+    ]
   }
 ];
