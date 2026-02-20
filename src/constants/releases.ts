@@ -518,7 +518,7 @@ export const releases: Release[] = [
   },
   {
     version: '0.9.0',
-    date: '2025-11-20',
+    date: '2026-01-23',
     titleKey: 'v0.9.0',
     titleEn: 'Supabase Migration & Database-Driven Architecture',
     titleJa: 'Supabase移行とデータベース駆動アーキテクチャ',
@@ -551,7 +551,7 @@ export const releases: Release[] = [
   },
   {
     version: '0.8.0',
-    date: '2025-11-10',
+    date: '2026-02-03',
     titleKey: 'v0.8.0',
     titleEn: 'Quiz Mode Enhancement & Gmail Support',
     titleJa: 'クイズモード強化とGmail対応',
@@ -584,7 +584,7 @@ export const releases: Release[] = [
   },
   {
     version: '0.7.0',
-    date: '2025-10-25',
+    date: '2026-01-08',
     titleKey: 'v0.7.0',
     titleEn: 'Quiz Mode Complete Implementation',
     titleJa: 'クイズモード完全実装',
@@ -617,7 +617,7 @@ export const releases: Release[] = [
   },
   {
     version: '0.6.0',
-    date: '2025-10-05',
+    date: '2026-01-20',
     titleKey: 'v0.6.0',
     titleEn: 'Excel Advanced Shortcuts & Sequential Input',
     titleJa: 'Excel高度ショートカットと順押し入力',
@@ -650,7 +650,7 @@ export const releases: Release[] = [
   },
   {
     version: '0.5.0',
-    date: '2025-09-20',
+    date: '2025-12-26',
     titleKey: 'v0.5.0',
     titleEn: 'macOS Support & Multi-Platform Expansion',
     titleJa: 'macOS対応とマルチプラットフォーム拡張',
@@ -683,7 +683,7 @@ export const releases: Release[] = [
   },
   {
     version: '0.4.0',
-    date: '2025-09-01',
+    date: '2025-12-26',
     titleKey: 'v0.4.0',
     titleEn: 'Setup Screen & Fullscreen Mode',
     titleJa: 'セットアップ画面と全画面モード',
@@ -716,7 +716,7 @@ export const releases: Release[] = [
   },
   {
     version: '0.3.0',
-    date: '2025-08-15',
+    date: '2025-12-25',
     titleKey: 'v0.3.0',
     titleEn: 'UI Redesign & Multi-Application Support',
     titleJa: 'UI再設計と複数アプリケーション対応',
@@ -749,7 +749,7 @@ export const releases: Release[] = [
   },
   {
     version: '0.2.0',
-    date: '2025-08-01',
+    date: '2025-12-24',
     titleKey: 'v0.2.0',
     titleEn: 'Windows Key Support & Shortcut Expansion',
     titleJa: 'Windowsキー対応とショートカット拡張',
@@ -782,7 +782,7 @@ export const releases: Release[] = [
   },
   {
     version: '0.1.0',
-    date: '2025-07-20',
+    date: '2025-12-24',
     titleKey: 'v0.1.0',
     titleEn: 'Initial Release - Windows 11 Keyboard Visualizer',
     titleJa: '初回リリース - Windows 11キーボードビジュアライザー',
