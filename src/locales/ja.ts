@@ -32,6 +32,18 @@ export const ja: Translations = {
         title: '主要アプリを網羅',
         description: 'VS Code, Excel, SlackからGmailまで。プロが毎日使うツールの全てをマスターできます。',
       },
+      dashboard: {
+        title: '学習ダッシュボード',
+        description: '統計の視覚化やパフォーマンスチャートで進捗を可視化。AIが苦手な項目を自動分析します。',
+      },
+      conflictDetection: {
+        title: '競合の自動検出',
+        description: 'アプリとブラウザのショートカット競合を自動的に検出し、リアルタイムで解決策を提示します。',
+      },
+      sequentialInput: {
+        title: '順押し入力への対応',
+        description: 'Ctrl + K, Ctrl + S のような連続したキー入力が必要な高度なショートカットにも完全対応しています。',
+      },
     },
 
     appsTitle: '対応アプリケーション',

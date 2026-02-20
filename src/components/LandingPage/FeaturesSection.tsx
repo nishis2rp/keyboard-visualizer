@@ -52,6 +52,48 @@ const FeaturesSection: React.FC = () => {
           <h3>{t.landing.features.multiPlatform.title}</h3>
           <p>{t.landing.features.multiPlatform.description}</p>
         </div>
+        <div className={styles.featureCard}>
+          <div className={styles.iconWrapper}>
+            <img
+              src={`${import.meta.env.BASE_URL}icons/terminal.svg`}
+              alt="Dashboard"
+              className={styles.featureIcon}
+              loading="lazy"
+              width="32"
+              height="32"
+            />
+          </div>
+          <h3>{t.landing.features.dashboard.title}</h3>
+          <p>{t.landing.features.dashboard.description}</p>
+        </div>
+        <div className={styles.featureCard}>
+          <div className={styles.iconWrapper}>
+            <img
+              src={`${import.meta.env.BASE_URL}icons/fullscreen.svg`}
+              alt="Conflict"
+              className={styles.featureIcon}
+              loading="lazy"
+              width="32"
+              height="32"
+            />
+          </div>
+          <h3>{t.landing.features.conflictDetection.title}</h3>
+          <p>{t.landing.features.conflictDetection.description}</p>
+        </div>
+        <div className={styles.featureCard}>
+          <div className={styles.iconWrapper}>
+            <img
+              src={`${import.meta.env.BASE_URL}keyboard.svg`}
+              alt="Sequential"
+              className={styles.featureIcon}
+              loading="lazy"
+              width="32"
+              height="32"
+            />
+          </div>
+          <h3>{t.landing.features.sequentialInput.title}</h3>
+          <p>{t.landing.features.sequentialInput.description}</p>
+        </div>
       </div>
     </LandingSection>
   );

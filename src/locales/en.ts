@@ -30,6 +30,18 @@ export const en = {
         title: 'Master Every Tool',
         description: 'From VS Code to Excel and Gmail. Become a master of the professional software you use every single day.',
       },
+      dashboard: {
+        title: 'Learning Dashboard',
+        description: 'Visualize your progress with statistical charts and AI-driven analysis of your weak shortcuts.',
+      },
+      conflictDetection: {
+        title: 'Conflict Detection',
+        description: 'Automatically detect application and browser shortcut conflicts with real-time guidance and solutions.',
+      },
+      sequentialInput: {
+        title: 'Sequential Input',
+        description: 'Full support for advanced shortcuts requiring sequential keystrokes like Ctrl + K followed by Ctrl + S.',
+      },
     },
 
     appsTitle: 'Supported Applications',

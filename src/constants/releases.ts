@@ -16,6 +16,72 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '2.10.0',
+    date: '2026-02-20',
+    titleKey: 'v2.10.0',
+    titleEn: 'Codebase Refactoring & Performance Optimization',
+    titleJa: 'コードベースのリファクタリングとパフォーマンス最適化',
+    changes: [
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.10.0-refactor',
+        descriptionEn: 'Major refactoring: Removed 200+ lines of redundant code and unified event listener logic',
+        descriptionJa: '大規模リファクタリング：200行以上の冗長なコードを削減し、イベントリスナーロジックを統一'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.10.0-i18n-logic',
+        descriptionEn: 'Unified localization logic across components using a centralized utility function',
+        descriptionJa: 'コンポーネント間のローカライゼーションロジックを統一ユーティリティ関数に集約'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.10.0-os-detect',
+        descriptionEn: 'Optimized OS detection and keyboard sorting algorithms for better runtime performance',
+        descriptionJa: 'OS判定とキーボードソートアルゴリズムを最適化し、実行時のパフォーマンスを向上'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.10.0-type-safety',
+        descriptionEn: 'Strengthened type safety by unifying ShortcutDifficulty and ProtectionLevel types',
+        descriptionJa: 'ShortcutDifficultyとProtectionLevel型の統一により型安全性を強化'
+      }
+    ]
+  },
+  {
+    version: '2.9.0',
+    date: '2026-02-19',
+    titleKey: 'v2.9.0',
+    titleEn: 'Dashboard Enhancements & Browser Conflict Detection',
+    titleJa: 'ダッシュボード強化とブラウザ競合検出機能',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v2.9.0-dashboard',
+        descriptionEn: 'Completely redesigned MyPage with visual statistics, performance charts, and weak shortcut analysis',
+        descriptionJa: 'マイページを刷新：統計の視覚化、パフォーマンスチャート、苦手なショートカット分析を追加'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v2.9.0-conflict-detect',
+        descriptionEn: 'Added automatic browser shortcut conflict detection with visual warning indicators',
+        descriptionJa: 'ブラウザのショートカット競合を自動検出する機能と視覚的な警告表示を追加'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v2.9.0-macos-fix',
+        descriptionEn: 'Resolved macOS modifier key mapping issues for consistent cross-platform experience',
+        descriptionJa: 'macOSの修飾キーマッピングの問題を修正し、プラットフォーム間の一貫性を向上'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.9.0-performance-viz',
+        descriptionEn: 'Implemented data-driven progress bars and charts for intuitive learning progress tracking',
+        descriptionJa: 'データ駆動のプログレスバーとチャートを実装し、直感的な学習進捗の把握が可能に'
+      }
+    ]
+  },
+  {
     version: '2.8.0',
     date: '2026-02-19',
     titleKey: 'v2.8.0',
