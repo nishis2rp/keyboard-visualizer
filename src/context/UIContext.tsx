@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
+import { ShortcutDifficulty } from '../types';
 
 interface UIContextType {
   showSetup: boolean;
   isQuizMode: boolean;
   quizApp: string | null;
-  quizDifficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null;
+  quizDifficulty: ShortcutDifficulty | null;
   showLandingVisualizer: boolean;
   setShowSetup: (show: boolean) => void;
   setIsQuizMode: (mode: boolean) => void;
   setQuizApp: (app: string | null) => void;
-  setQuizDifficulty: (difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null) => void;
+  setQuizDifficulty: (difficulty: ShortcutDifficulty | null) => void;
   setShowLandingVisualizer: (show: boolean) => void;
 }
 
@@ -20,7 +21,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [showSetup, setShowSetup] = useState(true);
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizApp, setQuizApp] = useState<string | null>(null);
-  const [quizDifficulty, setQuizDifficulty] = useState<'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' | null>(null);
+  const [quizDifficulty, setQuizDifficulty] = useState<ShortcutDifficulty | null>(null);
   const [showLandingVisualizer, setShowLandingVisualizer] = useState(true);
 
   const value = useMemo(() => ({

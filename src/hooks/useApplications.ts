@@ -31,19 +31,32 @@ export function useApplications(): UseApplicationsReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchApps = useCallback(async () => {
+  const fetchApps = useCallback(async (isActive: { current: boolean } = { current: true }) => {
     try {
       if (import.meta.env.DEV) {
         console.log('🔵 fetchApps: Starting...');
       }
       setLoading(true);
       const data = await performAppFetch();
+
+      if (!isActive.current) {
+        if (import.meta.env.DEV) {
+          console.log('⏭️ fetchApps: Component unmounted, ignoring result');
+        }
+        return;
+      }
+
       if (import.meta.env.DEV) {
         console.log('✅ fetchApps: Success', data?.length, 'apps');
       }
       setApps(data);
     } catch (err: unknown) {
-      // AbortErrorは無視（クリーンアップ時の正常な動作）
+      if (!isActive.current) {
+        if (import.meta.env.DEV) {
+          console.log('⏭️ fetchApps: Component unmounted, ignoring error');
+        }
+        return;
+      }
       const error = err as Error;
       if (error.name === 'AbortError' || error.message?.includes('AbortError')) {
         if (import.meta.env.DEV) {
@@ -54,70 +67,27 @@ export function useApplications(): UseApplicationsReturn {
       console.error('❌ fetchApps: Error', error);
       setError(error instanceof Error ? error : new Error('Failed to fetch applications'));
     } finally {
-      if (import.meta.env.DEV) {
-        console.log('🔵 fetchApps: setLoading(false)');
+      if (isActive.current) {
+        if (import.meta.env.DEV) {
+          console.log('🔵 fetchApps: setLoading(false)');
+        }
+        setLoading(false);
       }
-      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    let isActive = true;
+    const isActiveRef = { current: true };
 
-    const fetchWithAbort = async () => {
-      try {
-        if (import.meta.env.DEV) {
-          console.log('🔵 fetchApps (useEffect): Starting...');
-        }
-        setLoading(true);
-        const data = await performAppFetch();
-
-        if (!isActive) {
-          if (import.meta.env.DEV) {
-            console.log('⏭️ fetchApps (useEffect): Component unmounted, ignoring result');
-          }
-          return;
-        }
-
-        if (import.meta.env.DEV) {
-          console.log('✅ fetchApps (useEffect): Success', data?.length, 'apps');
-        }
-        setApps(data);
-      } catch (err: unknown) {
-        if (!isActive) {
-          if (import.meta.env.DEV) {
-            console.log('⏭️ fetchApps (useEffect): Component unmounted, ignoring error');
-          }
-          return;
-        }
-        const error = err as Error;
-        if (error.name === 'AbortError' || error.message?.includes('AbortError')) {
-          if (import.meta.env.DEV) {
-            console.log('⏭️ fetchApps (useEffect): Aborted');
-          }
-          return;
-        }
-        console.error('❌ fetchApps (useEffect): Error', error);
-        setError(error instanceof Error ? error : new Error('Failed to fetch applications'));
-      } finally {
-        if (isActive) {
-          if (import.meta.env.DEV) {
-            console.log('🔵 fetchApps (useEffect): setLoading(false)');
-          }
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchWithAbort();
+    fetchApps(isActiveRef);
 
     return () => {
       if (import.meta.env.DEV) {
         console.log('🧹 fetchApps (useEffect): Cleanup');
       }
-      isActive = false;
+      isActiveRef.current = false;
     };
-  }, []);
+  }, [fetchApps]);
 
   return {
     apps,

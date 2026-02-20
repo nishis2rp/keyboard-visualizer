@@ -1,9 +1,9 @@
-import { QuizQuestion } from '../types';
+import { QuizQuestion, ShortcutDifficulty } from '../types';
 import { TIMINGS } from '../constants/timings';
 
 export interface QuizSettings {
   quizMode: 'default' | 'hardcore';
-  difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange';
+  difficulty: ShortcutDifficulty;
   timeLimit: number;
   totalQuestions: number;
   isFullscreen: boolean;
@@ -39,7 +39,7 @@ export interface QuizState {
 }
 
 export type QuizAction =
-  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' } }
+  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: ShortcutDifficulty } }
   | { type: 'SET_QUESTION'; payload: { question: QuizQuestion } }
   | { type: 'ANSWER_QUESTION'; payload: { userAnswer: string; isCorrect: boolean; answerTimeMs: number } }
   | { type: 'SKIP_QUESTION' }

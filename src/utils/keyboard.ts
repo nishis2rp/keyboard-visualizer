@@ -4,6 +4,10 @@ import { AppShortcuts, ShortcutDetails, RichShortcut, AvailableShortcut, Protect
 import { detectOS } from './os' // ★ detectOSを追加
 import { getSequentialKeys } from './sequentialShortcuts' // ★ 追加
 import { normalizeProtectionLevel, PROTECTION_LEVELS } from '../constants/protectionLevels' // ★ 保護レベル定数
+import { sortByModifierAndKeyboard } from './shortcutSort'
+
+// Detect OS once at module level (value never changes during session)
+const OS = detectOS();
 
 /**
  * キーの正規化
@@ -239,7 +243,7 @@ export const checkBrowserShortcutConflict = (
     return false;
   }
 
-  const os = detectOS();
+  const os = OS;
   const normalizedCombo = normalizeShortcutCombo(currentCombo);
 
   // Chromeアプリのpreventable_fullscreenショートカットをチェック
@@ -271,7 +275,7 @@ export const checkBrowserShortcutConflict = (
  * @returns {string|null} ショートカットの説明、見つからない場合はnull
  */
 export const getShortcutDescription = (currentDisplayComboText: string, richShortcuts: RichShortcut[], selectedApp: string, layout: string): string | null => {
-  const os = detectOS();
+  const os = OS;
   const normalizedCurrentCombo = normalizeShortcutCombo(currentDisplayComboText); // 正規化
 
   // 選択されたアプリのショートカットのみをフィルタ
@@ -371,7 +375,7 @@ export const getBrowserConflictShortcuts = (pressedCodes: string[], layout: stri
 
   const shiftPressed = pressedCodes.includes('ShiftLeft') || pressedCodes.includes('ShiftRight');
   const pressedDisplayNames = Array.from(pressedCodes).map(code => getCodeDisplayName(code, null, layout, shiftPressed));
-  const os = detectOS();
+  const os = OS;
 
   // 押されているキーにWindowsキー（Win/Cmd）が含まれている場合は空を返す
   // Win+Ctrl+1などはブラウザ競合ではなく、OSレベルのショートカット
@@ -435,23 +439,7 @@ export const getBrowserConflictShortcuts = (pressedCodes: string[], layout: stri
       index === self.findIndex(t => normalizeShortcutCombo(t.shortcut) === normalizeShortcutCombo(item.shortcut))
     );
 
-  // sortShortcuts関数を使用してソート（将来的に導入予定）
-  // 現在は互換性のためインラインソートを維持
-  return chromeConflicts.sort((a, b) => {
-    const aModifierCount = countModifierKeys(a.shortcut);
-    const bModifierCount = countModifierKeys(b.shortcut);
-    if (aModifierCount !== bModifierCount) {
-      return aModifierCount - bModifierCount;
-    }
-    const aLastKey = getLastKey(a.shortcut);
-    const bLastKey = getLastKey(b.shortcut);
-    const aIndex = getKeyboardLayoutIndex(aLastKey);
-    const bIndex = getKeyboardLayoutIndex(bLastKey);
-    if (aIndex !== bIndex) {
-      return aIndex - bIndex;
-    }
-    return aLastKey.localeCompare(bLastKey);
-  });
+  return chromeConflicts.sort(sortByModifierAndKeyboard);
 };
 
 /**
@@ -467,7 +455,7 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
   const shiftPressed = pressedCodes.includes('ShiftLeft') || pressedCodes.includes('ShiftRight');
   const pressedDisplayNames = Array.from(pressedCodes).map(code => getCodeDisplayName(code, null, layout, shiftPressed));
   const normalizedPressedDisplayCombo = normalizeShortcutCombo(pressedDisplayNames.join(' + ')); // ここで正規化
-  const os = detectOS();
+  const os = OS;
 
   const filteredRichShortcuts = richShortcuts
     .filter(item => item.application === selectedApp)
@@ -503,37 +491,16 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
     .map(item => ({
       ...item, // RichShortcutのプロパティをすべてコピー
       shortcut: getOSSpecificKeys(item, os), // 表示用のショートカット文字列
-      windows_protection_level: item.windows_protection_level || 'none', // non-nullableにする
-      macos_protection_level: item.macos_protection_level || 'none',     // non-nullableにする
+      windows_protection_level: normalizeProtectionLevel(item.windows_protection_level),
+      macos_protection_level: normalizeProtectionLevel(item.macos_protection_level),
     }))
     .filter((item, index, self) =>
       index === self.findIndex(t => normalizeShortcutCombo(t.shortcut) === normalizeShortcutCombo(item.shortcut))
     );
 
 
-  const sortedShortcuts = filteredRichShortcuts.sort((a, b) => {
-      // ソートロジック：修飾キーの数 → キーボード配列順
-      const aModifierCount = countModifierKeys(a.shortcut)
-      const bModifierCount = countModifierKeys(b.shortcut)
-
-      if (aModifierCount !== bModifierCount) {
-        return aModifierCount - bModifierCount
-      }
-
-      const aLastKey = getLastKey(a.shortcut)
-      const bLastKey = getLastKey(b.shortcut)
-
-      // キーボード配列順でソート
-      const aIndex = getKeyboardLayoutIndex(aLastKey)
-      const bIndex = getKeyboardLayoutIndex(bLastKey)
-
-      if (aIndex !== bIndex) {
-        return aIndex - bIndex
-      }
-
-      // インデックスが同じ場合は文字列比較
-      return aLastKey.localeCompare(bLastKey)
-    })
+  const sortedShortcuts = filteredRichShortcuts
+    .sort(sortByModifierAndKeyboard)
     .slice(0, MAX_SHORTCUTS_DISPLAY);
 
   return sortedShortcuts;
@@ -592,7 +559,7 @@ export const getKeyboardLayoutIndex = (key: string): number => {
  * @returns {AvailableShortcut[]} 単独キーショートカット一覧
  */
 export const getSingleKeyShortcuts = (richShortcuts: RichShortcut[], selectedApp: string): AvailableShortcut[] => {
-  const os = detectOS();
+  const os = OS;
 
   const appShortcuts = richShortcuts.filter(item => item.application === selectedApp);
   
@@ -619,8 +586,8 @@ export const getSingleKeyShortcuts = (richShortcuts: RichShortcut[], selectedApp
     .map(item => ({
       ...item,
       shortcut: getOSSpecificKeys(item, os),
-      windows_protection_level: item.windows_protection_level || 'none',
-      macos_protection_level: item.macos_protection_level || 'none',
+      windows_protection_level: normalizeProtectionLevel(item.windows_protection_level),
+      macos_protection_level: normalizeProtectionLevel(item.macos_protection_level),
     }))
     .sort((a, b) => {
       const aKey = a.shortcut

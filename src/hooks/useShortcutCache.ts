@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { RichShortcut, ShortcutDifficulty } from '../types';
 import { Shortcut } from '../lib/supabase';
 import { detectOS } from '../utils/os';
+import { normalizeProtectionLevel } from '../constants/protectionLevels';
 
 interface UseShortcutCacheReturn {
   richShortcuts: RichShortcut[];
@@ -110,8 +111,8 @@ export function useShortcutCache(): UseShortcutCacheReturn {
           platform: item.platform,
           windows_keys: item.windows_keys,
           macos_keys: item.macos_keys,
-          windows_protection_level: (item.windows_protection_level as RichShortcut['windows_protection_level']) || 'none',
-          macos_protection_level: (item.macos_protection_level as RichShortcut['macos_protection_level']) || 'none',
+          windows_protection_level: normalizeProtectionLevel(item.windows_protection_level),
+          macos_protection_level: normalizeProtectionLevel(item.macos_protection_level),
           press_type: (item.press_type as RichShortcut['press_type']) || 'simultaneous',
           alternative_group_id: item.alternative_group_id || null,
         };

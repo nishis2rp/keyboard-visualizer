@@ -2,6 +2,7 @@ import React from 'react';
 import { WeakShortcut } from '../../types';
 import { useShortcutData } from '../../context';
 import { useLanguage } from '../../context/LanguageContext';
+import { getLocalizedDescription } from '../../utils/i18n';
 
 interface WeakShortcutsProps {
   weakShortcuts: WeakShortcut[];
@@ -42,7 +43,7 @@ const WeakShortcuts: React.FC<WeakShortcutsProps> = ({ weakShortcuts, loading })
                 ))}
               </div>
               <div className="text-sm font-bold text-sf-primary leading-tight mb-1">
-                {language === 'en' && shortcut.description_en ? shortcut.description_en : shortcut.description}
+                {getLocalizedDescription(shortcut, language)}
               </div>
               <div className="text-[10px] text-sf-gray font-bold uppercase tracking-wider">
                 {appName}

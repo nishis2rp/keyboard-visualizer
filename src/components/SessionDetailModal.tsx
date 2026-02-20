@@ -135,8 +135,8 @@ const SessionDetailModal: React.FC<SessionDetailModalProps> = ({ sessionId, onCl
                     <td>{index + 1}</td>
                     <td className="shortcut-cell">{answer.shortcuts.keys}</td>
                     <td>
-                      {language === 'en' && answer.shortcuts.description_en 
-                        ? answer.shortcuts.description_en 
+                      {language === 'en' && answer.shortcuts.description_en
+                        ? answer.shortcuts.description_en
                         : answer.shortcuts.description}
                     </td>
                     <td>

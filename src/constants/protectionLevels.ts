@@ -14,10 +14,10 @@ export const PROTECTION_LEVELS = {
  * 保護レベルの正規化
  * fullscreen-preventable → preventable_fullscreen
  */
-export const normalizeProtectionLevel = (level: ProtectionLevel | null | undefined): ProtectionLevel => {
+export const normalizeProtectionLevel = (level: string | ProtectionLevel | null | undefined): ProtectionLevel => {
   if (!level) return PROTECTION_LEVELS.NONE;
   if (level === 'fullscreen-preventable') return PROTECTION_LEVELS.PREVENTABLE_FULLSCREEN;
-  return level;
+  return level as ProtectionLevel;
 };
 
 /**

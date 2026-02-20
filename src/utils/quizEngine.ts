@@ -2,7 +2,8 @@ import { detectOS } from './os';
 import { areShortcutsEquivalent } from '../constants/alternativeShortcuts';
 
 import { getCodeDisplayName, getUnshiftedKeyForSymbol } from './keyMapping'; // Import getCodeDisplayName and getUnshiftedKeyForSymbol
-import { AllShortcuts, ShortcutDetails, RichShortcut, App } from '../types';
+import { AllShortcuts, ShortcutDetails, RichShortcut, App, ShortcutDifficulty } from '../types';
+import { getLocalizedDescription } from './i18n';
 
 // OSを検出
 const currentOS = detectOS();
@@ -164,7 +165,7 @@ export const generateQuestion = (
   quizMode = 'default',
   isFullscreen = false,
   usedShortcuts = new Set<string>(),
-  difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard',
+  difficulty: ShortcutDifficulty = 'standard',
   richShortcuts: RichShortcut[] = [],
   apps: App[] = [],
   questionFormat = '[{app}] What is the shortcut for "{description}"?',
@@ -225,9 +226,9 @@ export const generateQuestion = (
 
       if (isDifficultyMatch) {
         // Get localized description
-        const description = language === 'en' && richShortcut?.description_en
-          ? richShortcut.description_en
-          : (richShortcut?.description || details.description);
+        const description = richShortcut
+          ? getLocalizedDescription(richShortcut, language)
+          : details.description;
 
         allPossibleQuestions.push({
           appId,

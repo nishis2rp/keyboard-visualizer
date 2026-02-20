@@ -4,7 +4,7 @@ import { useShortcutData } from '../context/ShortcutContext';
 import { useQuizInputHandler } from './useQuizInputHandler';
 import { useQuizProgress } from './useQuizProgress';
 import { useLanguage } from '../context/LanguageContext';
-import { QuizQuestion } from '../types';
+import { QuizQuestion, ShortcutDifficulty } from '../types';
 import { analytics } from '../utils/analytics';
 import { TIMINGS } from '../constants/timings';
 import {
@@ -39,7 +39,7 @@ export function useQuizGame() {
     keyboardLayout: string,
     selectedApp: string | null,
     isFullscreen: boolean,
-    difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange',
+    difficulty: ShortcutDifficulty,
     allowRetry = true
   ) => {
     if (!allShortcuts || !keyboardLayout) {
@@ -103,7 +103,7 @@ export function useQuizGame() {
     );
   }, [quizState.quizHistory.length, quizState.settings, quizState.usedShortcuts, quizState.keyboardLayout, quizState.selectedApp, getAndSetNextQuestion]);
 
-  const startQuiz = useCallback(async (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange' = 'standard') => {
+  const startQuiz = useCallback(async (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: ShortcutDifficulty = 'standard') => {
     if (!allShortcuts) {
       console.error('Shortcuts data not loaded yet');
       return;
@@ -128,23 +128,6 @@ export function useQuizGame() {
       }
     }
   }, [quizState.status, quizState.currentQuestion, getNextQuestion, quizState.settings.quizMode]);
-
-  // ★ Next Question on ArrowRight or Enter
-  useEffect(() => {
-    if (quizState.status !== 'playing' || !quizState.showAnswer) {
-      return;
-    }
-
-    const handleKeyPressEvent = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight' || event.key === 'Enter') {
-        event.preventDefault();
-        getNextQuestion();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPressEvent);
-    return () => window.removeEventListener('keydown', handleKeyPressEvent);
-  }, [quizState.status, quizState.showAnswer, getNextQuestion]);
 
   // Save session on completion
   useEffect(() => {

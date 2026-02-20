@@ -12,6 +12,7 @@ import { useKeyboardShortcuts } from '../hooks';
 import { useFullscreen } from '../hooks';
 import { detectOS } from '../constants';
 import { specialKeys } from '../constants/keys';
+import { ShortcutDifficulty } from '../types';
 import '../styles/quiz.css';
 
 const QuizModeView = () => {
@@ -46,7 +47,7 @@ const QuizModeView = () => {
     if (os === 'macos' && openMacWarningModalRef.current) {
       openMacWarningModalRef.current();
     }
-    startQuiz(quizApp || selectedApp, isFullscreenMode, keyboardLayout, (quizDifficulty as 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange') || 'standard');
+    startQuiz(quizApp || selectedApp, isFullscreenMode, keyboardLayout, (quizDifficulty as ShortcutDifficulty) || 'standard');
 
     return () => {
       dispatch({ type: 'RESET_QUIZ' });

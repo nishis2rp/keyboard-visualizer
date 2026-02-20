@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode, Dispatch } from 'react';
 import { useQuizGame } from '../hooks/useQuizGame';
+import { ShortcutDifficulty } from '../types';
 import {
   QuizState,
   QuizAction,
@@ -10,7 +11,7 @@ export type { QuizState, QuizAction };
 interface QuizContextType {
   quizState: QuizState;
   dispatch: Dispatch<QuizAction>;
-  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: 'basic' | 'standard' | 'hard' | 'madmax' | 'allrange') => void;
+  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: ShortcutDifficulty) => void;
   getNextQuestion: () => void;
   updateFullscreen: (isFullscreen: boolean) => void;
   handleKeyPress: (pressedKeys: Set<string>) => void;
