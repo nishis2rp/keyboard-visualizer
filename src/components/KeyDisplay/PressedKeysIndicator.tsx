@@ -9,6 +9,7 @@ import {
 } from '../../utils/keyUtils';
 import { AvailableShortcut } from '../../types';
 import { AppIcon } from '../common/AppIcon';
+import { DIFFICULTIES } from '../../constants';
 import styles from './KeyDisplay.module.css';
 
 interface PressedKeysIndicatorProps {
@@ -67,16 +68,16 @@ const PressedKeysIndicator = memo<PressedKeysIndicatorProps>(({
 
   // 完全なショートカットが押されている場合（説明がある）
   if (description && (!isOnlyModifierKeys || availableShortcuts.length === 0)) {
-    const difficulty = currentShortcut?.difficulty || 'basic';
+    const difficulty = currentShortcut?.difficulty || DIFFICULTIES.BASIC;
 
     const difficultyConfig = {
-      basic: { label: t.shortcutCard.basic, color: '#ecfdf5', text: '#059669' },
-      standard: { label: t.shortcutCard.standard, color: '#eff6ff', text: '#2563eb' },
-      hard: { label: t.shortcutCard.hard, color: '#fff7ed', text: '#d97706' },
-      madmax: { label: t.shortcutCard.madmax, color: '#fef2f2', text: '#dc2626' },
-      allrange: { label: 'ALL', color: '#f5f3ff', text: '#7c3aed' }
+      [DIFFICULTIES.BASIC]: { label: t.shortcutCard.basic, color: '#ecfdf5', text: '#059669' },
+      [DIFFICULTIES.STANDARD]: { label: t.shortcutCard.standard, color: '#eff6ff', text: '#2563eb' },
+      [DIFFICULTIES.HARD]: { label: t.shortcutCard.hard, color: '#fff7ed', text: '#d97706' },
+      [DIFFICULTIES.MADMAX]: { label: t.shortcutCard.madmax, color: '#fef2f2', text: '#dc2626' },
+      [DIFFICULTIES.ALLRANGE]: { label: 'ALL', color: '#f5f3ff', text: '#7c3aed' }
     };
-    const config = difficultyConfig[difficulty as keyof typeof difficultyConfig] || difficultyConfig.basic;
+    const config = difficultyConfig[difficulty as keyof typeof difficultyConfig] || difficultyConfig[DIFFICULTIES.BASIC];
 
     return (
       <div className={`${styles.container} ${styles.containerPressedKeys} ${styles.active}`}>

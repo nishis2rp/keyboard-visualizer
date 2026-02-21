@@ -19,7 +19,6 @@ interface SetupScreenProps {
 }
 
 const SetupScreen = ({ onSetupComplete }: SetupScreenProps) => {
-  const { setSetup, setDifficulty, setSelectedApp, setKeyboardLayout } = useSettings()
   const { isQuizMode } = useUI()
   const { apps } = useShortcutData()
   const { user } = useAuth()

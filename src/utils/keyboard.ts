@@ -3,7 +3,7 @@ import { MODIFIER_ORDER, MODIFIER_KEY_NAMES } from './keyUtils'
 import { AppShortcuts, ShortcutDetails, RichShortcut, AvailableShortcut, ProtectionLevel } from '../types' // ★ RichShortcut, AvailableShortcutを追加
 import { detectOS } from './os' // ★ detectOSを追加
 import { getSequentialKeys } from './sequentialShortcuts' // ★ 追加
-import { normalizeProtectionLevel, PROTECTION_LEVELS } from '../constants/protectionLevels' // ★ 保護レベル定数
+import { normalizeProtectionLevel, PROTECTION_LEVELS, PRESS_TYPES } from '../constants' // ★ 定数
 import { sortByModifierAndKeyboard } from './shortcutSort'
 
 // Detect OS once at module level (value never changes during session)
@@ -409,7 +409,7 @@ export const getBrowserConflictShortcuts = (pressedCodes: string[], layout: stri
         return false;
       }
 
-      const shortcutKeys = item.press_type === 'sequential'
+      const shortcutKeys = item.press_type === PRESS_TYPES.SEQUENTIAL
         ? getSequentialKeys(normalizedTargetShortcut)
         : normalizedTargetShortcut.split(' + ');
 
@@ -466,7 +466,7 @@ export const getAvailableShortcuts = (pressedCodes: string[], layout: string, ri
       }
       const normalizedTargetShortcut = normalizeShortcutCombo(targetShortcutString); // ここで正規化
 
-      const shortcutKeys = item.press_type === 'sequential'
+      const shortcutKeys = item.press_type === PRESS_TYPES.SEQUENTIAL
         ? getSequentialKeys(normalizedTargetShortcut)
         : normalizedTargetShortcut.split(' + ');
 
@@ -565,7 +565,7 @@ export const getSingleKeyShortcuts = (richShortcuts: RichShortcut[], selectedApp
   
   const filtered = appShortcuts.filter(item => {
       // 1. まず press_type をチェック。sequential のものは除外（単独キーではない）
-      if (item.press_type === 'sequential') {
+      if (item.press_type === PRESS_TYPES.SEQUENTIAL) {
         return false;
       }
 

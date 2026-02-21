@@ -1,8 +1,10 @@
 import React from 'react';
 import { WeakShortcut } from '../../types';
-import { useShortcutData } from '../../context';
+import { useShortcutData, useQuiz, useUI, useSettings } from '../../context';
 import { useLanguage } from '../../context/LanguageContext';
 import { getLocalizedDescription } from '../../utils/i18n';
+import { DIFFICULTIES } from '../../constants/shortcuts';
+import { useNavigate } from 'react-router-dom';
 
 interface WeakShortcutsProps {
   weakShortcuts: WeakShortcut[];
@@ -12,6 +14,10 @@ interface WeakShortcutsProps {
 const WeakShortcuts: React.FC<WeakShortcutsProps> = ({ weakShortcuts, loading }) => {
   const { appMap } = useShortcutData();
   const { t, language } = useLanguage();
+  const { startQuiz } = useQuiz();
+  const { setIsQuizMode } = useUI();
+  const { setup, keyboardLayout } = useSettings();
+  const navigate = useNavigate();
 
   if (loading) {
     return <div className="text-center py-4 text-sf-gray text-sm animate-pulse">{t.myPage.analyzing}</div>;
@@ -25,8 +31,32 @@ const WeakShortcuts: React.FC<WeakShortcutsProps> = ({ weakShortcuts, loading })
     );
   }
 
+  const handleStartPractice = () => {
+    const ids = weakShortcuts.map(ws => ws.id);
+    // 苦手な項目のアプリ名を特定（最初の一つのアプリをベースにするか、'custom'とする）
+    const app = weakShortcuts[0]?.application || 'all';
+
+    startQuiz(
+      app,
+      false, // isFullscreen - use default value
+      keyboardLayout,
+      DIFFICULTIES.ALLRANGE,
+      ids
+    );
+    setIsQuizMode(true);
+    navigate('/');
+  };
+
   return (
     <div className="flex flex-col gap-3">
+      <button
+        onClick={handleStartPractice}
+        className="w-full py-3 px-4 bg-sf-red text-white font-bold rounded-apple-lg shadow-sm hover:bg-sf-red-dark transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 mb-2"
+      >
+        <span className="text-xl">🔥</span>
+        {t.myPage.startDrill}
+      </button>
+
       {weakShortcuts.map((shortcut) => {
         const app = appMap[shortcut.application];
         const appName = language === 'en' && app?.name_en ? app.name_en : (app?.name || shortcut.application);

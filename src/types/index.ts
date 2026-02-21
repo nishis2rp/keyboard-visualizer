@@ -51,9 +51,11 @@ export type ShortcutDifficulty = 'basic' | 'standard' | 'hard' | 'madmax' | 'all
  * 保護レベルの型定義
  * - none: 保護なし
  * - preventable_fullscreen: 全画面モードでキャプチャ可能
+ * - fullscreen-preventable: preventable_fullscreenのレガシー名（正規化される）
  * - always-protected: 常に保護されている（キャプチャ不可）
+ * - browser-conflict: ブラウザショートカットと競合（全画面モードで解消）
  */
-export type ProtectionLevel = 'none' | 'preventable_fullscreen' | 'fullscreen-preventable' | 'always-protected';
+export type ProtectionLevel = 'none' | 'preventable_fullscreen' | 'fullscreen-preventable' | 'always-protected' | 'browser-conflict';
 
 /**
  * OS種別
@@ -180,6 +182,13 @@ export interface WeakShortcut extends RichShortcut {
   wrong_count: number;
   correct_count: number;
   accuracy: number;
+}
+
+export interface Bookmark {
+  id: number;
+  user_id: string;
+  shortcut_id: number;
+  created_at: string;
 }
 
 export interface UserProfile {

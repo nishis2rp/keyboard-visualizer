@@ -1,18 +1,32 @@
 import React, { useMemo } from 'react';
 import { useQuiz } from '../../context/QuizContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { getKeyComboText } from '../../utils/keyboard'; // 追加
+import { useShortcutData } from '../../context';
+import { getKeyComboText } from '../../utils/keyboard';
 import { formatSequentialShortcut, getSequentialKeys } from '../../utils/sequentialShortcuts';
 import { getAlternativeShortcuts } from '../../constants/alternativeShortcuts';
-import { normalizeShortcut } from '../../utils/quizEngine';
+import { normalizeShortcut, compareShortcuts } from '../../utils/quizEngine';
 import styles from './QuestionCard.module.css';
 
 function QuestionCard() {
   const { quizState, getNextQuestion } = useQuiz();
   const { currentQuestion, status, timeRemaining, settings, lastAnswerResult, showAnswer, lastWrongAnswer, currentSequentialProgress, pressedKeys, keyboardLayout } = quizState;
   const { t } = useLanguage();
+  const { richShortcuts } = useShortcutData();
 
-  // 代替ショートカット表示ロジックをuseMemoで抽出（Hooksは条件分岐の前に配置する必要がある）
+  // 詳細なエラー分析
+  const errorComparison = useMemo(() => {
+    if (lastAnswerResult === 'incorrect' && lastWrongAnswer && currentQuestion) {
+      return compareShortcuts(
+        lastWrongAnswer,
+        currentQuestion.correctShortcut,
+        richShortcuts || []
+      );
+    }
+    return null;
+  }, [lastAnswerResult, lastWrongAnswer, currentQuestion, richShortcuts]);
+
+  // 代替ショートカット表示ロジック
   const alternativeShortcutsDisplay = useMemo(() => {
     if (!currentQuestion) return null;
 
@@ -159,7 +173,37 @@ function QuestionCard() {
             {lastAnswerResult === 'incorrect' && lastWrongAnswer && (
               <div className={styles.wrongAnswer}>
                 <div className={styles.wrongAnswerLabel}>{t.quiz.yourAnswer}</div>
-                <div className={styles.wrongAnswerValue}>{lastWrongAnswer}</div>
+                <div className={styles.comparisonContainer}>
+                  {errorComparison ? (
+                    <>
+                      {/* 正解のキー（ユーザーも入力したもの） */}
+                      {errorComparison.correct.map((key, i) => (
+                        <React.Fragment key={`correct-${i}`}>
+                          {i > 0 && <span className={styles.separator}>+</span>}
+                          <kbd className={`${styles.kbd} ${styles.kbdCorrect}`}>{key}</kbd>
+                        </React.Fragment>
+                      ))}
+                      
+                      {/* 余計なキー（ユーザーが入力したが正解にはないもの） */}
+                      {errorComparison.extra.map((key, i) => (
+                        <React.Fragment key={`extra-${i}`}>
+                          {(errorComparison.correct.length > 0 || i > 0) && <span className={styles.separator}>+</span>}
+                          <kbd className={`${styles.kbd} ${styles.kbdExtra}`}>{key}</kbd>
+                        </React.Fragment>
+                      ))}
+
+                      {/* 不足しているキー */}
+                      {errorComparison.missing.map((key, i) => (
+                        <React.Fragment key={`missing-${i}`}>
+                          {(errorComparison.correct.length > 0 || errorComparison.extra.length > 0 || i > 0) && <span className={styles.separator}>+</span>}
+                          <kbd className={`${styles.kbd} ${styles.kbdMissing}`}>{key}</kbd>
+                        </React.Fragment>
+                      ))}
+                    </>
+                  ) : (
+                    <div className={styles.wrongAnswerValue}>{lastWrongAnswer}</div>
+                  )}
+                </div>
               </div>
             )}
 

@@ -62,6 +62,7 @@ const ShortcutsList = memo<ShortcutsListProps>(({
             {singleKeyShortcuts.map((item, index) => (
               <ShortcutCard
                 key={`${item.id}-${index}`}
+                id={item.id}
                 shortcut={item.shortcut}
                 description={getLocalizedDescription(item, language)}
                 appContext={selectedApp}
@@ -105,6 +106,7 @@ const ShortcutsList = memo<ShortcutsListProps>(({
               {browserConflicts.map((item, index) => (
                 <ShortcutCard
                   key={`conflict-${item.id}-${index}`}
+                  id={item.id}
                   shortcut={item.shortcut}
                   description={getLocalizedDescription(item, language)}
                   appContext="chrome"
@@ -148,6 +150,7 @@ const ShortcutsList = memo<ShortcutsListProps>(({
               {availableShortcuts.map((item, index) => (
                 <ShortcutCard
                   key={`${item.id}-${index}`}
+                  id={item.id}
                   shortcut={item.shortcut}
                   description={getLocalizedDescription(item, language)}
                   appContext={selectedApp}

@@ -11,7 +11,7 @@ export type { QuizState, QuizAction };
 interface QuizContextType {
   quizState: QuizState;
   dispatch: Dispatch<QuizAction>;
-  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: ShortcutDifficulty) => void;
+  startQuiz: (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty?: ShortcutDifficulty, customShortcutIds?: number[]) => void;
   getNextQuestion: () => void;
   updateFullscreen: (isFullscreen: boolean) => void;
   handleKeyPress: (pressedKeys: Set<string>) => void;

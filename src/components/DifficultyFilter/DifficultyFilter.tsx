@@ -3,6 +3,7 @@ import { ShortcutDifficulty } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { AppIcon } from '../common/AppIcon';
 import { analytics } from '../../utils/analytics';
+import { DIFFICULTIES } from '../../constants';
 import styles from './DifficultyFilter.module.css';
 
 interface DifficultyOption {
@@ -23,10 +24,10 @@ const DifficultyFilter = memo<DifficultyFilterProps>(({
   const { t } = useLanguage();
 
   const difficultyOptions: DifficultyOption[] = useMemo(() => [
-    { id: 'basic', name: 'basic', description: t.normalMode.difficultyDescriptions.basic },
-    { id: 'standard', name: 'standard', description: t.normalMode.difficultyDescriptions.standard },
-    { id: 'hard', name: 'hard', description: t.normalMode.difficultyDescriptions.hard },
-    { id: 'madmax', name: 'madmax', description: t.normalMode.difficultyDescriptions.madmax },
+    { id: DIFFICULTIES.BASIC, name: DIFFICULTIES.BASIC, description: t.normalMode.difficultyDescriptions.basic },
+    { id: DIFFICULTIES.STANDARD, name: DIFFICULTIES.STANDARD, description: t.normalMode.difficultyDescriptions.standard },
+    { id: DIFFICULTIES.HARD, name: DIFFICULTIES.HARD, description: t.normalMode.difficultyDescriptions.hard },
+    { id: DIFFICULTIES.MADMAX, name: DIFFICULTIES.MADMAX, description: t.normalMode.difficultyDescriptions.madmax },
   ], [t.normalMode.difficultyDescriptions]);
 
   const handleToggle = (difficulty: ShortcutDifficulty) => {

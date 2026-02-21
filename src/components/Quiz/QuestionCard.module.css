@@ -381,6 +381,65 @@
   border: 2px solid rgba(255, 100, 100, 0.5);
 }
 
+.comparisonContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 24px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.separator {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.kbd {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 20px;
+  font-weight: bold;
+  font-family: var(--font-mono);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.kbdCorrect {
+  background: rgba(52, 199, 89, 0.2);
+  color: #34c759;
+  border-color: rgba(52, 199, 89, 0.5);
+  box-shadow: 0 4px 0 rgba(52, 199, 89, 0.3), 0 0 15px rgba(52, 199, 89, 0.2);
+}
+
+.kbdExtra {
+  background: rgba(255, 59, 48, 0.2);
+  color: #ff453a;
+  border-color: rgba(255, 59, 48, 0.5);
+  box-shadow: 0 4px 0 rgba(255, 59, 48, 0.3), 0 0 15px rgba(255, 59, 48, 0.2);
+  text-decoration: line-through;
+  opacity: 0.9;
+}
+
+.kbdMissing {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  box-shadow: none;
+  animation: pulse-missing 2s infinite ease-in-out;
+}
+
+@keyframes pulse-missing {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
 /* Alternative Shortcuts */
 .alternativeShortcuts {
   margin-top: 12px;

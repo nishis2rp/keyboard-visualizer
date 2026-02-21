@@ -2,6 +2,7 @@ import React from 'react';
 import { QuizSession, ShortcutDifficulty } from '../../types';
 import { useShortcutData } from '../../context';
 import { useLanguage } from '../../context/LanguageContext';
+import { DIFFICULTIES } from '../../constants';
 
 interface RecentSessionsProps {
   sessions: QuizSession[];
@@ -14,10 +15,10 @@ const RecentSessions: React.FC<RecentSessionsProps> = ({ sessions, onSelectSessi
 
   const getDifficultyBadgeColor = (difficulty: ShortcutDifficulty | null) => {
     switch (difficulty) {
-      case 'basic': return 'bg-sf-blue-ultralight text-sf-blue border-sf-blue/20';
-      case 'standard': return 'bg-sf-green-ultralight text-sf-green border-sf-green/20';
-      case 'hard': return 'bg-orange-50 text-orange-600 border-orange-200';
-      case 'madmax': return 'bg-sf-red-light/10 text-sf-red border-sf-red/20';
+      case DIFFICULTIES.BASIC: return 'bg-sf-blue-ultralight text-sf-blue border-sf-blue/20';
+      case DIFFICULTIES.STANDARD: return 'bg-sf-green-ultralight text-sf-green border-sf-green/20';
+      case DIFFICULTIES.HARD: return 'bg-orange-50 text-orange-600 border-orange-200';
+      case DIFFICULTIES.MADMAX: return 'bg-sf-red-light/10 text-sf-red border-sf-red/20';
       default: return 'bg-sf-gray-light text-sf-gray border-gray-200';
     }
   };

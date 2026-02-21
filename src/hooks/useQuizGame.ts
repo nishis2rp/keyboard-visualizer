@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { QuizQuestion, ShortcutDifficulty } from '../types';
 import { analytics } from '../utils/analytics';
 import { TIMINGS } from '../constants/timings';
+import { DIFFICULTIES } from '../constants/shortcuts';
 import {
   QuizState,
   QuizAction,
@@ -40,7 +41,8 @@ export function useQuizGame() {
     selectedApp: string | null,
     isFullscreen: boolean,
     difficulty: ShortcutDifficulty,
-    allowRetry = true
+    allowRetry = true,
+    customIds?: number[]
   ) => {
     if (!allShortcuts || !keyboardLayout) {
       console.error('Cannot generate question: missing allShortcuts or keyboardLayout');
@@ -67,7 +69,8 @@ export function useQuizGame() {
       richShortcuts || [],
       apps || [],
       t.quiz.questionFormat,
-      language
+      language,
+      customIds
     );
 
     if (newQuestion) {
@@ -75,7 +78,7 @@ export function useQuizGame() {
     } else if (allowRetry && currentUsedShortcuts.size > 0) {
       dispatch({ type: 'CLEAR_USED_SHORTCUTS' });
       setTimeout(() => {
-        getAndSetNextQuestion(new Set(), quizMode, keyboardLayout, selectedApp, isFullscreen, difficulty, false);
+        getAndSetNextQuestion(new Set(), quizMode, keyboardLayout, selectedApp, isFullscreen, difficulty, false, customIds);
       }, 0);
     } else {
       dispatch({ type: 'FINISH_QUIZ' });
@@ -99,23 +102,31 @@ export function useQuizGame() {
       quizState.keyboardLayout!,
       quizState.selectedApp,
       quizState.settings.isFullscreen,
-      quizState.settings.difficulty
+      quizState.settings.difficulty,
+      true,
+      quizState.settings.customShortcutIds || undefined
     );
   }, [quizState.quizHistory.length, quizState.settings, quizState.usedShortcuts, quizState.keyboardLayout, quizState.selectedApp, getAndSetNextQuestion]);
 
-  const startQuiz = useCallback(async (app: string, isFullscreen: boolean, keyboardLayout: string, difficulty: ShortcutDifficulty = 'standard') => {
+  const startQuiz = useCallback(async (
+    app: string, 
+    isFullscreen: boolean, 
+    keyboardLayout: string, 
+    difficulty: ShortcutDifficulty = DIFFICULTIES.STANDARD,
+    customShortcutIds?: number[]
+  ) => {
     if (!allShortcuts) {
       console.error('Shortcuts data not loaded yet');
       return;
     }
-    dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty } });
+    dispatch({ type: 'START_QUIZ', payload: { app, isFullscreen, keyboardLayout, difficulty, customShortcutIds } });
     await startQuizSession(app, difficulty);
     
     // Analytics
     analytics.quizStarted(app, difficulty);
 
     setTimeout(() => {
-      getAndSetNextQuestion(new Set(), 'default', keyboardLayout, app, isFullscreen, difficulty, true);
+      getAndSetNextQuestion(new Set(), 'default', keyboardLayout, app, isFullscreen, difficulty, true, customShortcutIds);
     }, 0);
   }, [allShortcuts, startQuizSession, getAndSetNextQuestion]);
 

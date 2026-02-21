@@ -1,5 +1,6 @@
 import { QuizQuestion, ShortcutDifficulty } from '../types';
 import { TIMINGS } from '../constants/timings';
+import { DIFFICULTIES } from '../constants/shortcuts';
 
 export interface QuizSettings {
   quizMode: 'default' | 'hardcore';
@@ -7,6 +8,7 @@ export interface QuizSettings {
   timeLimit: number;
   totalQuestions: number;
   isFullscreen: boolean;
+  customShortcutIds?: number[] | null;
 }
 
 export interface QuizHistoryEntry {
@@ -39,7 +41,7 @@ export interface QuizState {
 }
 
 export type QuizAction =
-  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: ShortcutDifficulty } }
+  | { type: 'START_QUIZ'; payload: { app: string; keyboardLayout: string; isFullscreen: boolean; difficulty: ShortcutDifficulty; customShortcutIds?: number[] | null } }
   | { type: 'SET_QUESTION'; payload: { question: QuizQuestion } }
   | { type: 'ANSWER_QUESTION'; payload: { userAnswer: string; isCorrect: boolean; answerTimeMs: number } }
   | { type: 'SKIP_QUESTION' }
@@ -72,10 +74,11 @@ export const initialQuizState: QuizState = {
   endTime: null,
   settings: {
     quizMode: 'default',
-    difficulty: 'standard',
+    difficulty: DIFFICULTIES.STANDARD,
     timeLimit: TIMINGS.DEFAULT_TIME_LIMIT_S,
     totalQuestions: 10,
     isFullscreen: false,
+    customShortcutIds: null,
   },
   pressedKeys: new Set(),
   currentSequentialProgress: [],
@@ -93,6 +96,10 @@ export function quizReducer(state: QuizState, action: QuizAction): QuizState {
           ...state.settings,
           isFullscreen: action.payload.isFullscreen,
           difficulty: action.payload.difficulty,
+          customShortcutIds: action.payload.customShortcutIds || null,
+          totalQuestions: action.payload.customShortcutIds 
+            ? action.payload.customShortcutIds.length 
+            : state.settings.totalQuestions,
         },
         startTime: Date.now(),
       };

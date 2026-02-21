@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import SetupScreen from '../components/SetupScreen';
 import NormalModeView from '../components/NormalModeView';
 import QuizModeView from '../components/QuizModeView';
@@ -8,7 +8,7 @@ import { useFullscreen } from '../hooks';
 import { SetupCompleteOptions } from '../types';
 
 const Home: React.FC = () => {
-  const { setSelectedApp, setKeyboardLayout, setSetup, setDifficulty, setShowLandingVisualizer } = useSettings();
+  const { setup, setSelectedApp, setKeyboardLayout, setSetup, setDifficulty, setShowLandingVisualizer } = useSettings();
   const {
     showSetup,
     setShowSetup,
@@ -20,6 +20,13 @@ const Home: React.FC = () => {
   const { t } = useLanguage();
 
   const { isFullscreenMode, toggleFullscreenMode } = useFullscreen();
+
+  // セットアップが完了していない場合は、自動的にSetupScreenを表示
+  useEffect(() => {
+    if (!setup.setupCompleted) {
+      setShowSetup(true);
+    }
+  }, [setup.setupCompleted, setShowSetup]);
 
 
   const handleSetupCompleteWithFullscreen = ({

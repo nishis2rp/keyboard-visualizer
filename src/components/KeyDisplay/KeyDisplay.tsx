@@ -12,6 +12,7 @@ import { AvailableShortcut, RichShortcut } from '../../types';
 import { AppIcon } from '../common/AppIcon';
 import { getLocalizedDescription } from '../../utils/i18n';
 import { useLanguage } from '../../context/LanguageContext';
+import { DIFFICULTIES, DIFFICULTY_CONFIG } from '../../constants';
 import styles from './KeyDisplay.module.css';
 
 interface KeyDisplayProps {
@@ -87,6 +88,7 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
             {singleKeyShortcuts.map((item, index) => (
               <ShortcutCard
                 key={index}
+                id={item.id}
                 shortcut={item.shortcut}
                 description={getLocalizedDescription(item, language)}
                 appContext={selectedApp}
@@ -114,16 +116,9 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
   // ただし、修飾キーのみの場合は、利用可能なショートカット一覧も表示
   if (description && (!isOnlyModifierKeys || availableShortcuts.length === 0)) {
     const currentShortcut = availableShortcuts.find(s => s.description === description);
-    const difficulty = currentShortcut?.difficulty || 'basic';
+    const difficulty = currentShortcut?.difficulty || DIFFICULTIES.BASIC;
 
-    const difficultyConfig = {
-      basic: { label: 'BASIC', color: '#ecfdf5', text: '#059669' },
-      standard: { label: 'STANDARD', color: '#eff6ff', text: '#2563eb' },
-      hard: { label: 'HARD', color: '#fff7ed', text: '#d97706' },
-      madmax: { label: 'MADMAX', color: '#fef2f2', text: '#dc2626' },
-      allrange: { label: 'ALL', color: '#f5f3ff', text: '#7c3aed' }
-    };
-    const config = difficultyConfig[difficulty as keyof typeof difficultyConfig] || difficultyConfig.basic;
+    const config = DIFFICULTY_CONFIG[difficulty as keyof typeof DIFFICULTY_CONFIG] || DIFFICULTY_CONFIG[DIFFICULTIES.BASIC];
 
     return (
       <div className={`${styles.container} ${styles.active}`}>
@@ -204,6 +199,7 @@ const KeyDisplay = memo<KeyDisplayProps>(({ pressedKeys = new Set(), specialKeys
             {availableShortcuts.map((item, index) => (
               <ShortcutCard
                 key={index}
+                id={item.id}
                 shortcut={item.shortcut}
                 description={getLocalizedDescription(item, language)}
                 appContext={selectedApp}

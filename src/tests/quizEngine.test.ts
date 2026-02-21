@@ -5,6 +5,7 @@ import {
   generateQuestion,
   checkAnswer,
   isShortcutSafe,
+  compareShortcuts,
 } from '../utils/quizEngine';
 import { detectOS } from '../utils/os';
 import { RichShortcut, App, ShortcutDetails } from '../types';
@@ -20,6 +21,50 @@ describe('quizEngine', () => {
   beforeEach(() => {
     // Reset mocks before each test
     (detectOS as any).mockReturnValue('windows');
+  });
+
+  describe('compareShortcuts', () => {
+    it('should identify perfectly matching shortcuts', () => {
+      const result = compareShortcuts('Ctrl + C', 'Ctrl + C');
+      expect(result.correct).toEqual(['Ctrl', 'C']);
+      expect(result.missing).toEqual([]);
+      expect(result.extra).toEqual([]);
+    });
+
+    it('should identify missing keys', () => {
+      const result = compareShortcuts('Ctrl', 'Ctrl + C');
+      expect(result.correct).toEqual(['Ctrl']);
+      expect(result.missing).toEqual(['C']);
+      expect(result.extra).toEqual([]);
+    });
+
+    it('should identify extra keys', () => {
+      const result = compareShortcuts('Ctrl + Shift + C', 'Ctrl + C');
+      expect(result.correct).toEqual(['Ctrl', 'C']);
+      expect(result.missing).toEqual([]);
+      expect(result.extra).toEqual(['Shift']);
+    });
+
+    it('should handle completely wrong answers', () => {
+      const result = compareShortcuts('Alt + F4', 'Ctrl + C');
+      expect(result.correct).toEqual([]);
+      expect(result.missing).toEqual(['Ctrl', 'C']);
+      expect(result.extra).toEqual(['Alt', 'F4']);
+    });
+
+    it('should handle different modifier order (thanks to normalization)', () => {
+      const result = compareShortcuts('Shift + Ctrl + A', 'Ctrl + Shift + A');
+      expect(result.correct).toEqual(['Ctrl', 'Shift', 'A']);
+      expect(result.missing).toEqual([]);
+      expect(result.extra).toEqual([]);
+    });
+
+    it('should handle sequential shortcuts', () => {
+      const result = compareShortcuts('Alt + H + O', 'Alt + H + O + I');
+      expect(result.correct).toEqual(['Alt', 'H', 'O']);
+      expect(result.missing).toEqual(['I']);
+      expect(result.extra).toEqual([]);
+    });
   });
 
   describe('normalizeShortcut', () => {

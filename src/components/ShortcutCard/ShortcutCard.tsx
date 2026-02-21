@@ -6,11 +6,20 @@ import { ShortcutDifficulty, ProtectionLevel } from '../../types'
 import { getSequentialKeys } from '../../utils/sequentialShortcuts'
 import { AppIcon } from '../common/AppIcon'
 import { useLanguage } from '../../context/LanguageContext'
+import { useBookmarks } from '../../hooks'
+import { useAuth } from '../../context/AuthContext'
+import { 
+  DIFFICULTIES, 
+  PROTECTION_LEVELS, 
+  PRESS_TYPES, 
+  normalizeProtectionLevel 
+} from '../../constants'
 import styles from './ShortcutCard.module.css'
 
 const CURRENT_OS = detectOS();
 
 interface ShortcutCardProps {
+  id?: number;
   shortcut: string;
   description: string;
   appContext?: string | null;
@@ -23,22 +32,26 @@ interface ShortcutCardProps {
   compact?: boolean;
 }
 
-const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none', difficulty, press_type, isBrowserConflict = false, compact = false }) => {
+const ShortcutCard = memo<ShortcutCardProps>(({ id, shortcut, description, appContext = null, showDebugLog = false, windows_protection_level = 'none', macos_protection_level = 'none', difficulty, press_type, isBrowserConflict = false, compact = false }) => {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { isBookmarked, toggleBookmark } = useBookmarks();
+
+  const bookmarked = useMemo(() => id ? isBookmarked(id) : false, [id, isBookmarked]);
 
   // 難易度表示のテキストとクラスを取得（オブジェクトマッピングで簡略化）
   const difficultyInfo = useMemo(() => {
     const difficultyMap = {
-      basic: { label: t.shortcutCard.basic.toUpperCase(), class: styles.basic },
-      standard: { label: t.shortcutCard.standard.toUpperCase(), class: styles.standard },
-      hard: { label: t.shortcutCard.hard.toUpperCase(), class: styles.hard },
-      madmax: { label: t.shortcutCard.madmax.toUpperCase(), class: styles.madmax },
-      allrange: { label: 'ALL', class: styles.allrange }
+      [DIFFICULTIES.BASIC]: { label: t.shortcutCard.basic.toUpperCase(), class: styles.basic },
+      [DIFFICULTIES.STANDARD]: { label: t.shortcutCard.standard.toUpperCase(), class: styles.standard },
+      [DIFFICULTIES.HARD]: { label: t.shortcutCard.hard.toUpperCase(), class: styles.hard },
+      [DIFFICULTIES.MADMAX]: { label: t.shortcutCard.madmax.toUpperCase(), class: styles.madmax },
+      [DIFFICULTIES.ALLRANGE]: { label: 'ALL', class: styles.allrange }
     };
     return difficulty ? difficultyMap[difficulty] || { label: '', class: '' } : { label: '', class: '' };
   }, [difficulty, t.shortcutCard]);
 
-  const effectiveProtectionLevel = useMemo((): 'none' | 'preventable_fullscreen' | 'always-protected' | 'browser-conflict' => {
+  const effectiveProtectionLevel = useMemo((): ProtectionLevel => {
     // 明示的にブラウザ競合として指定されている場合
     if (isBrowserConflict) {
       return 'browser-conflict';
@@ -46,19 +59,21 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
 
     // Excel app内では安全なショートカットは保護レベルをnoneにする
     if (appContext === 'excel' && EXCEL_APP_SAFE_SHORTCUTS.has(shortcut)) {
-      return 'none';
+      return PROTECTION_LEVELS.NONE;
     }
 
     // OS別の保護レベルを取得（macOS以外はWindowsの保護レベルを使用）
-    const protectionLevel = CURRENT_OS === 'macos' ? macos_protection_level : windows_protection_level;
+    const protectionLevel = normalizeProtectionLevel(
+      CURRENT_OS === 'macos' ? macos_protection_level : windows_protection_level
+    );
 
     // 常時保護されているショートカットは最優先
-    if (protectionLevel === 'always-protected') {
-      return 'always-protected';
+    if (protectionLevel === PROTECTION_LEVELS.ALWAYS_PROTECTED) {
+      return PROTECTION_LEVELS.ALWAYS_PROTECTED;
     }
 
-    // 表記の正規化: fullscreen-preventable → preventable_fullscreen
-    return protectionLevel === 'fullscreen-preventable' ? 'preventable_fullscreen' : (protectionLevel || 'none');
+    // 正規化された保護レベルを返す
+    return protectionLevel || PROTECTION_LEVELS.NONE;
   }, [shortcut, appContext, windows_protection_level, macos_protection_level, isBrowserConflict]);
 
   // カードのスタイルクラス（簡略化）
@@ -66,29 +81,29 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
     [
       styles.card,
       compact && styles.compact,
-      effectiveProtectionLevel === 'preventable_fullscreen' && styles.preventableFullscreen,
-      effectiveProtectionLevel === 'always-protected' && styles.alwaysProtected,
+      effectiveProtectionLevel === PROTECTION_LEVELS.PREVENTABLE_FULLSCREEN && styles.preventableFullscreen,
+      effectiveProtectionLevel === PROTECTION_LEVELS.ALWAYS_PROTECTED && styles.alwaysProtected,
       effectiveProtectionLevel === 'browser-conflict' && styles.browserConflict
     ].filter(Boolean).join(' ')
   , [effectiveProtectionLevel, compact]);
 
   // ツールチップテキスト
   const tooltipText = useMemo(() => {
-    if (effectiveProtectionLevel === 'always-protected') return `⚠️ ${t.shortcutCard.protected}`;
+    if (effectiveProtectionLevel === PROTECTION_LEVELS.ALWAYS_PROTECTED) return `⚠️ ${t.shortcutCard.protected}`;
     if (effectiveProtectionLevel === 'browser-conflict') return `🌐 ${t.shortcutCard.browserConflict || 'ブラウザショートカットと競合（全画面モードで解消）'}`;
-    if (effectiveProtectionLevel === 'preventable_fullscreen') return `ℹ️ ${t.shortcutCard.preventableInFullscreen}`;
+    if (effectiveProtectionLevel === PROTECTION_LEVELS.PREVENTABLE_FULLSCREEN) return `ℹ️ ${t.shortcutCard.preventableInFullscreen}`;
     return '';
   }, [effectiveProtectionLevel, t.shortcutCard]);
 
   // ショートカットキーのパーツ分割
   const keyParts = useMemo(() => {
-    if (press_type === 'sequential') {
+    if (press_type === PRESS_TYPES.SEQUENTIAL) {
       return getSequentialKeys(shortcut);
     }
     return shortcut.split(' + ');
   }, [shortcut, press_type]);
 
-  const isSequential = press_type === 'sequential';
+  const isSequential = press_type === PRESS_TYPES.SEQUENTIAL;
 
   return (
     <div className={cardClassName} title={tooltipText}>
@@ -117,6 +132,21 @@ const ShortcutCard = memo<ShortcutCardProps>(({ shortcut, description, appContex
             </div>
           ))}
         </div>
+
+        {/* ブックマークボタン */}
+        {user && id && (
+          <button 
+            className={`${styles.bookmarkButton} ${bookmarked ? styles.isBookmarked : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleBookmark(id);
+            }}
+            aria-label={bookmarked ? "ブックマーク解除" : "ブックマーク"}
+          >
+            {bookmarked ? '★' : '☆'}
+          </button>
+        )}
       </div>
 
       {!compact && (

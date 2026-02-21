@@ -9,13 +9,16 @@ import StatCards from '../components/MyPage/StatCards';
 import AppStatsTable from '../components/MyPage/AppStatsTable';
 import RecentSessions from '../components/MyPage/RecentSessions';
 import WeakShortcuts from '../components/MyPage/WeakShortcuts';
+import BookmarkedShortcuts from '../components/MyPage/BookmarkedShortcuts';
 import ProfileSection from '../components/MyPage/ProfileSection';
 import AccountSettings from '../components/MyPage/AccountSettings';
 import AppPerformanceChart from '../components/MyPage/AppPerformanceChart';
+import { useBookmarks } from '../hooks';
 
 const MyPage: React.FC = () => {
   const { user, profile, loading, updateProfile, updateEmail, deleteAccount } = useAuth();
   const { t } = useLanguage();
+  const { bookmarkedShortcuts, loading: bookmarksLoading } = useBookmarks();
   
   // Profile State
   const [displayName, setDisplayName] = useState('');
@@ -324,15 +327,16 @@ const MyPage: React.FC = () => {
             />
           </section>
 
-          {/* Performance Visualization & Weak Shortcuts Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100">
-              <h2 className="text-xl font-bold text-sf-primary mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <span className="text-2xl">📈</span> {t.myPage.appPerformanceTitle || 'App Performance'}
-              </h2>
-              <AppPerformanceChart stats={quizStats} />
-            </section>
+          {/* Performance Visualization Section */}
+          <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100">
+            <h2 className="text-xl font-bold text-sf-primary mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
+              <span className="text-2xl">📈</span> {t.myPage.appPerformanceTitle || 'App Performance'}
+            </h2>
+            <AppPerformanceChart stats={quizStats} />
+          </section>
 
+          {/* Weak Shortcuts & Bookmarks Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100">
               <h2 className="text-xl font-bold text-sf-primary mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
                 <span className="text-2xl">⚠️</span> {t.myPage.weakShortcutsTitle}
@@ -340,6 +344,16 @@ const MyPage: React.FC = () => {
               <WeakShortcuts 
                 weakShortcuts={weakShortcuts} 
                 loading={weakShortcutsLoading} 
+              />
+            </section>
+
+            <section className="bg-white rounded-apple-xl p-8 shadow-apple-md border border-gray-100">
+              <h2 className="text-xl font-bold text-sf-primary mb-6 flex items-center gap-2 border-b border-gray-100 pb-3">
+                <span className="text-2xl">⭐</span> {t.myPage.bookmarkedShortcutsTitle}
+              </h2>
+              <BookmarkedShortcuts 
+                shortcuts={bookmarkedShortcuts} 
+                loading={bookmarksLoading} 
               />
             </section>
           </div>

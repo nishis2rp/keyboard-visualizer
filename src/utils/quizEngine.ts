@@ -100,6 +100,60 @@ export const normalizePressedKeys = (pressedCodes: Set<string>, keyboardLayout: 
 };
 
 /**
+ * Comparison result for detailed feedback
+ */
+export interface ShortcutComparison {
+  correct: string[];
+  missing: string[];
+  extra: string[];
+  isEquivalent: boolean;
+}
+
+/**
+ * Compares two shortcut strings and returns a detailed breakdown of the differences.
+ */
+export const compareShortcuts = (
+  userAnswer: string,
+  correctAnswer: string,
+  richShortcuts?: RichShortcut[]
+): ShortcutComparison => {
+  const normalizedUser = normalizeShortcut(userAnswer);
+  const normalizedCorrect = normalizeShortcut(correctAnswer);
+
+  const userKeys = normalizedUser ? normalizedUser.split(' + ') : [];
+  const correctKeys = normalizedCorrect ? normalizedCorrect.split(' + ') : [];
+
+  const correct: string[] = [];
+  const missing: string[] = [];
+  const extra: string[] = [];
+
+  // 一致するキーと不足しているキーを特定
+  correctKeys.forEach(key => {
+    if (userKeys.includes(key)) {
+      correct.push(key);
+    } else {
+      missing.push(key);
+    }
+  });
+
+  // 余計なキーを特定
+  userKeys.forEach(key => {
+    if (!correctKeys.includes(key)) {
+      extra.push(key);
+    }
+  });
+
+  const isEquivalent = areShortcutsEquivalent(normalizedUser, normalizedCorrect, richShortcuts);
+
+  return {
+    correct,
+    missing,
+    extra,
+    isEquivalent
+  };
+};
+
+/**
  * Checks if a shortcut can be safely presented as a question.
  */
 const isShortcutSafe = (
@@ -174,7 +228,8 @@ export const generateQuestion = (
   richShortcuts: RichShortcut[] = [],
   apps: App[] = [],
   questionFormat = '[{app}] What is the shortcut for "{description}"?',
-  language: 'ja' | 'en' = 'ja'
+  language: 'ja' | 'en' = 'ja',
+  customIds?: number[]
 ) => {
   // 全ての許可されたアプリのショートカットを収集
   if (!allowedApps || !Array.isArray(allowedApps)) return null;
@@ -188,9 +243,11 @@ export const generateQuestion = (
 
   // richShortcutsからマップを作成（application + keys でルックアップ）
   const protectionLevelMap = new Map<string, RichShortcut>();
+  const idMap = new Map<number, RichShortcut>();
   richShortcuts.forEach(rs => {
     const key = `${rs.application}:${rs.keys}`;
     protectionLevelMap.set(key, rs);
+    idMap.set(rs.id, rs);
   });
 
   const allPossibleQuestions: Array<{
@@ -198,54 +255,80 @@ export const generateQuestion = (
     appName: string;
     shortcut: string;
     description: string;
-    normalizedShortcut: string; // 正規化されたショートカットを追加
-    press_type: 'sequential' | 'simultaneous'; // 追加
+    normalizedShortcut: string;
+    press_type: 'sequential' | 'simultaneous';
   }> = [];
 
-  allowedApps.forEach(appId => {
-    const appShortcuts = allShortcuts[appId];
-    if (!appShortcuts) {
-      return;
-    }
+  // customIdsが指定されている場合は、それらのみを対象にする
+  if (customIds && customIds.length > 0) {
+    customIds.forEach(id => {
+      const rs = idMap.get(id);
+      if (!rs) return;
 
-    Object.entries(appShortcuts).forEach(([shortcut, details]) => {
-      const normalized = normalizeShortcut(shortcut);
-
-      // 既に出題済みのショートカットは除外
-      if (usedShortcuts.has(normalized)) {
-        return;
-      }
-
-      // richShortcutsから情報を取得
-      const lookupKey = `${appId}:${shortcut}`;
-      const richShortcut = protectionLevelMap.get(lookupKey);
+      const normalized = normalizeShortcut(rs.keys);
+      if (usedShortcuts.has(normalized)) return;
 
       // 安全なショートカットのみを考慮
-      if (!isShortcutSafe(shortcut, quizMode, isFullscreen, richShortcut)) {
+      if (!isShortcutSafe(rs.keys, quizMode, isFullscreen, rs)) {
         return;
       }
 
-      // 難易度フィルタリング
-      const shortcutDifficulty = richShortcut?.difficulty || DIFFICULTIES.STANDARD;
-      const isDifficultyMatch = difficulty === DIFFICULTIES.ALLRANGE || shortcutDifficulty === difficulty;
-
-      if (isDifficultyMatch) {
-        // Get localized description
-        const description = richShortcut
-          ? getLocalizedDescription(richShortcut, language)
-          : details.description;
-
-        allPossibleQuestions.push({
-          appId,
-          appName: appNameMap.get(appId) || appId,
-          shortcut,
-          description,
-          normalizedShortcut: normalized,
-          press_type: richShortcut?.press_type || PRESS_TYPES.SIMULTANEOUS, // ★ 追加
-        });
-      }
+      const description = getLocalizedDescription(rs, language);
+      allPossibleQuestions.push({
+        appId: rs.application,
+        appName: appNameMap.get(rs.application) || rs.application,
+        shortcut: rs.keys,
+        description,
+        normalizedShortcut: normalized,
+        press_type: rs.press_type || PRESS_TYPES.SIMULTANEOUS,
+      });
     });
-  });
+  } else {
+    allowedApps.forEach(appId => {
+      const appShortcuts = allShortcuts[appId];
+      if (!appShortcuts) {
+        return;
+      }
+
+      Object.entries(appShortcuts).forEach(([shortcut, details]) => {
+        const normalized = normalizeShortcut(shortcut);
+
+        // 既に出題済みのショートカットは除外
+        if (usedShortcuts.has(normalized)) {
+          return;
+        }
+
+        // richShortcutsから情報を取得
+        const lookupKey = `${appId}:${shortcut}`;
+        const richShortcut = protectionLevelMap.get(lookupKey);
+
+        // 安全なショートカットのみを考慮
+        if (!isShortcutSafe(shortcut, quizMode, isFullscreen, richShortcut)) {
+          return;
+        }
+
+        // 難易度フィルタリング
+        const shortcutDifficulty = richShortcut?.difficulty || DIFFICULTIES.STANDARD;
+        const isDifficultyMatch = difficulty === DIFFICULTIES.ALLRANGE || shortcutDifficulty === difficulty;
+
+        if (isDifficultyMatch) {
+          // Get localized description
+          const description = richShortcut
+            ? getLocalizedDescription(richShortcut, language)
+            : details.description;
+
+          allPossibleQuestions.push({
+            appId,
+            appName: appNameMap.get(appId) || appId,
+            shortcut,
+            description,
+            normalizedShortcut: normalized,
+            press_type: richShortcut?.press_type || PRESS_TYPES.SIMULTANEOUS,
+          });
+        }
+      });
+    });
+  }
 
   if (allPossibleQuestions.length === 0) {
     return null;
