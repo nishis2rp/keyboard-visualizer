@@ -1,4 +1,4 @@
-# Release Notes - v2.10.0
+# Release Notes - v3.22.0
 
 **リリース日**: 2026年2月20日
 
@@ -161,4 +161,4 @@ npm run build
 
 ---
 
-**前回のリリース**: [v2.9.0](RELEASE_NOTES_v2.9.0.md)
+**前回のリリース**: [v3.21.0](RELEASE_NOTES_v3.21.0.md)

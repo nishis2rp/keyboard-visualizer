@@ -1,4 +1,4 @@
-# Release Notes - v2.9.0
+# Release Notes - v3.21.0
 
 **リリース日**: 2026年2月19日
 

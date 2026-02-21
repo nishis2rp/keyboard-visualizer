@@ -74,7 +74,9 @@
       "Bash(cmd //c move:*)",
       "Bash(start public/create-og-image.html)",
       "Bash(npx playwright install:*)",
-      "Bash(cmd:*)"
+      "Bash(cmd:*)",
+      "Bash(paste - -)",
+      "Bash(sort:*)"
     ],
     "deny": [],
     "ask": []
