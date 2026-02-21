@@ -31,7 +31,7 @@ export function useApplications(): UseApplicationsReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchApps = useCallback(async (isActive: { current: boolean } = { current: true }) => {
+  const fetchApps = useCallback(async () => {
     try {
       if (import.meta.env.DEV) {
         console.log('🔵 fetchApps: Starting...');
@@ -39,24 +39,11 @@ export function useApplications(): UseApplicationsReturn {
       setLoading(true);
       const data = await performAppFetch();
 
-      if (!isActive.current) {
-        if (import.meta.env.DEV) {
-          console.log('⏭️ fetchApps: Component unmounted, ignoring result');
-        }
-        return;
-      }
-
       if (import.meta.env.DEV) {
         console.log('✅ fetchApps: Success', data?.length, 'apps');
       }
       setApps(data);
     } catch (err: unknown) {
-      if (!isActive.current) {
-        if (import.meta.env.DEV) {
-          console.log('⏭️ fetchApps: Component unmounted, ignoring error');
-        }
-        return;
-      }
       const error = err as Error;
       if (error.name === 'AbortError' || error.message?.includes('AbortError')) {
         if (import.meta.env.DEV) {
@@ -67,27 +54,24 @@ export function useApplications(): UseApplicationsReturn {
       console.error('❌ fetchApps: Error', error);
       setError(error instanceof Error ? error : new Error('Failed to fetch applications'));
     } finally {
-      if (isActive.current) {
-        if (import.meta.env.DEV) {
-          console.log('🔵 fetchApps: setLoading(false)');
-        }
-        setLoading(false);
+      if (import.meta.env.DEV) {
+        console.log('🔵 fetchApps: setLoading(false)');
       }
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    const isActiveRef = { current: true };
-
-    fetchApps(isActiveRef);
+    fetchApps();
 
     return () => {
       if (import.meta.env.DEV) {
         console.log('🧹 fetchApps (useEffect): Cleanup');
       }
-      isActiveRef.current = false;
     };
-  }, [fetchApps]);
+    // fetchAppsはuseCallbackで空の依存配列なので、依存配列から除外
+    // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     apps,

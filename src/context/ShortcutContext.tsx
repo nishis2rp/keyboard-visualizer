@@ -94,7 +94,7 @@ export const ShortcutProvider: React.FC<{ children: ReactNode }> = ({ children }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedApp, isQuizMode, quizApp]);
 
-  const value = {
+  const value = useMemo(() => ({
     allShortcuts,
     richShortcuts,
     apps,
@@ -102,7 +102,7 @@ export const ShortcutProvider: React.FC<{ children: ReactNode }> = ({ children }
     loading,
     error,
     loadShortcuts: fetchShortcutsForApp
-  };
+  }), [allShortcuts, richShortcuts, apps, appMap, loading, error, fetchShortcutsForApp]);
 
   // エラーUIの表示
   const handleRetry = async () => {

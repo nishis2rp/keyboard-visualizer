@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect, useCallback } from 'react';
 import { useLocalStorage, useUserSettings } from '../hooks';
 import { useAuth } from './AuthContext';
 import { STORAGE_KEYS, DEFAULTS, SETUP_VERSION } from '../constants';
@@ -103,26 +103,26 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
-  const setSelectedApp = (app: string) => {
+  const setSelectedApp = useCallback((app: string) => {
     updateLocalAndRemote({ app });
     analytics.appSelected(app);
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const setKeyboardLayout = (layout: string) => {
+  const setKeyboardLayout = useCallback((layout: string) => {
     updateLocalAndRemote({ layout });
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const setDifficulty = (diff: ShortcutDifficulty) => {
+  const setDifficulty = useCallback((diff: ShortcutDifficulty) => {
     updateLocalAndRemote({ difficulty: diff });
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const setTheme = (t: 'light' | 'dark' | 'system') => {
+  const setTheme = useCallback((t: 'light' | 'dark' | 'system') => {
     updateLocalAndRemote({ theme: t });
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const setShowLandingVisualizer = (show: boolean) => {
+  const setShowLandingVisualizer = useCallback((show: boolean) => {
     updateLocalAndRemote({ showLandingVisualizer: show });
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const value = useMemo(() => ({
     setup,
@@ -139,7 +139,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     setTheme,
     setShowLandingVisualizer,
     loading: remoteLoading
-  }), [setup, selectedApp, keyboardLayout, difficulty, theme, showLandingVisualizer, remoteLoading]);
+  }), [setup, selectedApp, keyboardLayout, difficulty, theme, showLandingVisualizer, remoteLoading, setSelectedApp, setKeyboardLayout, setDifficulty, setTheme, setShowLandingVisualizer]);
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 };
