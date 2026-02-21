@@ -16,6 +16,45 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '2.11.0',
+    date: '2026-02-21',
+    titleKey: 'v2.11.0',
+    titleEn: 'Learning Enhancement Features',
+    titleJa: '学習強化機能の追加',
+    changes: [
+      {
+        category: 'feature',
+        descriptionKey: 'v2.11.0-weakness-drill',
+        descriptionEn: 'Added Weakness Drill mode for focused practice on user\'s weak shortcuts',
+        descriptionJa: '苦手克服ドリル機能を追加：間違えたショートカットに特化した集中練習モード'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v2.11.0-detailed-feedback',
+        descriptionEn: 'Implemented detailed feedback visualization with color-coded key comparison (correct/extra/missing)',
+        descriptionJa: '入力ミスの可視化機能を追加：キーごとに正誤を色分けして表示（一致/余計/不足）'
+      },
+      {
+        category: 'feature',
+        descriptionKey: 'v2.11.0-bookmarks',
+        descriptionEn: 'Added bookmark feature to save favorite shortcuts and practice them separately',
+        descriptionJa: 'ブックマーク機能を追加：お気に入りショートカットを保存して個別に練習可能'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v2.11.0-custom-ids',
+        descriptionEn: 'Enhanced quiz engine to support custom shortcut ID lists for targeted practice',
+        descriptionJa: 'クイズエンジンを拡張：カスタムショートカットIDリストによる的を絞った練習に対応'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v2.11.0-typescript-fixes',
+        descriptionEn: 'Fixed TypeScript type errors in BookmarkedShortcuts, WeakShortcuts, and ShortcutCard components',
+        descriptionJa: 'BookmarkedShortcuts、WeakShortcuts、ShortcutCardコンポーネントのTypeScript型エラーを修正'
+      }
+    ]
+  },
+  {
     version: '3.5.0',
     date: '2026-02-20',
     titleKey: 'v3.5.0',
