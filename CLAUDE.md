@@ -304,14 +304,42 @@ App.tsx
 
 ### Key Architectural Patterns
 
-1. **Context API for State Management:**
-   - `AppContext.tsx`: Global app state (shortcuts data, app selection, layout)
-   - `QuizContext.tsx`: Quiz-specific state with reducer pattern
+1. **Context API for State Management with Provider Hierarchy:**
+
+   The application uses multiple Context providers in a specific dependency order to prevent circular dependencies and ensure proper initialization:
+
+   ```typescript
+   // From main.tsx - Provider nesting order is critical
+   <LanguageProvider>           {/* Layer 1: Base - used by all */}
+     <AuthProvider>             {/* Layer 2: User authentication */}
+       <SettingsProvider>       {/* Layer 3: App settings (depends on Auth) */}
+         <UIProvider>           {/* Layer 4: UI state */}
+           <ShortcutProvider>   {/* Layer 5: Data layer (depends on Settings) */}
+             <QuizProvider>     {/* Layer 6: Quiz logic (depends on Shortcuts) */}
+               <App />
+   ```
+
+   **Provider Roles:**
+   - `LanguageContext`: Language selection ('en' | 'ja'), locale data, `t()` translation function
+   - `AuthContext`: User session, profile, login/logout methods, authentication state
+   - `SettingsContext`: User preferences, layout, theme, keyboard settings
+   - `UIContext`: Modal state, loading state, toast notifications, UI flags
+   - `ShortcutContext`: All shortcuts data, applications list, data fetching from Supabase
+   - `QuizContext`: Quiz state machine, current question, score, history
+
+   **Critical Performance Rule:**
+   - ALL Context `value` objects MUST be wrapped in `useMemo` to prevent infinite re-renders
+   - Dependencies should only include state variables, NOT setter functions
+   - See "Critical Performance Issues" section for detailed patterns
 
 2. **Custom Hooks for Logic:**
    - `useShortcuts.ts`: Fetches data from Supabase, transforms to `RichShortcut[]` and `AllShortcuts` formats
    - `useKeyboardShortcuts.ts`: Handles keyboard events, normalizes input, returns matched shortcuts
    - `useQuizInputHandler.ts`: Validates quiz answers, handles sequential shortcuts
+   - `useQuizProgress.ts`: Manages quiz sessions and history in database
+   - `useLocalizedData.ts`: Fetches CMS content with current language
+   - `useUserSettings.ts`: Fetches/updates user preferences from JSONB table
+   - `useBookmarks.ts`: Manages user shortcut bookmarks
 
 3. **Normalization First:**
    - All shortcuts are normalized before comparison: `normalizeShortcut("ctrl + A")` → `"Ctrl+A"`
@@ -319,6 +347,14 @@ App.tsx
 
 4. **Set-based Lookups:**
    - `ALWAYS_PROTECTED`, `FULLSCREEN_PREVENTABLE` as Sets for O(1) lookup performance
+   - `pressedKeys: Set<string>` for keyboard input tracking
+   - `usedShortcuts: Set<string>` for quiz question history
+
+5. **Bilingual Content Pattern:**
+   - All CMS tables use `_en` and `_ja` field suffixes
+   - Single query fetches both languages
+   - Component selects field dynamically: `data[`field_${language}`]`
+   - No JOIN complexity, easy to validate completeness
 
 ## Important Concepts
 
@@ -447,6 +483,141 @@ CREATE INDEX idx_shortcuts_keys ON shortcuts(keys);
 
 **Row-level security:** Public read-only access enabled
 
+### CMS and Feature Tables
+
+**releases** (database-driven release notes):
+```sql
+CREATE TABLE releases (
+  id BIGSERIAL PRIMARY KEY,
+  version VARCHAR(20) NOT NULL UNIQUE,
+  release_date DATE NOT NULL,
+  title_en VARCHAR(200) NOT NULL,
+  title_ja VARCHAR(200) NOT NULL,
+  display_order INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**release_changes** (individual changes within a release):
+```sql
+CREATE TABLE release_changes (
+  id BIGSERIAL PRIMARY KEY,
+  release_id BIGINT NOT NULL REFERENCES releases(id) ON DELETE CASCADE,
+  category VARCHAR(20) NOT NULL CHECK (category IN ('feature', 'improvement', 'fix', 'breaking')),
+  description_en TEXT NOT NULL,
+  description_ja TEXT NOT NULL,
+  display_order INTEGER NOT NULL DEFAULT 0
+);
+```
+
+**translations** (internationalization):
+```sql
+CREATE TABLE translations (
+  id BIGSERIAL PRIMARY KEY,
+  translation_key VARCHAR(200) NOT NULL UNIQUE,
+  context VARCHAR(100),
+  en_text TEXT NOT NULL,
+  ja_text TEXT NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**user_bookmarks** (user-saved shortcuts):
+```sql
+CREATE TABLE user_bookmarks (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE,
+  shortcut_id BIGINT NOT NULL REFERENCES shortcuts(id) ON DELETE CASCADE,
+  created_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(user_id, shortcut_id)
+);
+```
+
+**user_settings** (user preferences):
+```sql
+CREATE TABLE user_settings (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID NOT NULL UNIQUE REFERENCES user_profiles(id) ON DELETE CASCADE,
+  settings JSONB NOT NULL DEFAULT '{}',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Default settings structure:
+{
+  "layout": "windows-jis",
+  "difficulty": "standard",
+  "theme": "system",
+  "showLandingVisualizer": true,
+  "selectedApp": null
+}
+```
+
+**Landing Page CMS Tables:**
+
+```sql
+-- FAQs
+CREATE TABLE faqs (
+  id BIGSERIAL PRIMARY KEY,
+  question_en TEXT NOT NULL,
+  question_ja TEXT NOT NULL,
+  answer_en TEXT NOT NULL,
+  answer_ja TEXT NOT NULL,
+  category VARCHAR(50),
+  display_order INTEGER NOT NULL DEFAULT 0,
+  is_active BOOLEAN DEFAULT true
+);
+
+-- Testimonials
+CREATE TABLE testimonials (
+  id BIGSERIAL PRIMARY KEY,
+  name_en VARCHAR(100) NOT NULL,
+  name_ja VARCHAR(100) NOT NULL,
+  role_en VARCHAR(100),
+  role_ja VARCHAR(100),
+  comment_en TEXT NOT NULL,
+  comment_ja TEXT NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  display_order INTEGER NOT NULL DEFAULT 0,
+  is_active BOOLEAN DEFAULT true
+);
+
+-- Landing Page Sections
+CREATE TABLE landing_sections (
+  id BIGSERIAL PRIMARY KEY,
+  section_key VARCHAR(100) NOT NULL UNIQUE,
+  section_type VARCHAR(50) NOT NULL,
+  title_en VARCHAR(200),
+  title_ja VARCHAR(200),
+  subtitle_en TEXT,
+  subtitle_ja TEXT,
+  content_en TEXT,
+  content_ja TEXT,
+  metadata JSONB,
+  display_order INTEGER NOT NULL DEFAULT 0,
+  is_active BOOLEAN DEFAULT true
+);
+
+-- Landing Features
+CREATE TABLE landing_features (
+  id BIGSERIAL PRIMARY KEY,
+  icon VARCHAR(50),
+  title_en VARCHAR(200) NOT NULL,
+  title_ja VARCHAR(200) NOT NULL,
+  description_en TEXT NOT NULL,
+  description_ja TEXT NOT NULL,
+  display_order INTEGER NOT NULL DEFAULT 0,
+  is_active BOOLEAN DEFAULT true
+);
+```
+
+**Row-level security:**
+- CMS tables (releases, translations, FAQs, testimonials, sections, features): Public read-only
+- User-specific tables (user_bookmarks, user_settings): RLS enforced - users can only access their own data
+
 ### Migration System
 
 Migrations are in `supabase/migrations/` with sequential numbering:
@@ -460,9 +631,21 @@ Migrations are in `supabase/migrations/` with sequential numbering:
 - `022_set_word_powerpoint_protection_levels.sql`: Set protection levels for Word/PowerPoint
 - `023_normalize_pageup_pagedown.sql`: Normalize PageUp/PageDown key names
 - `024_fix_protection_levels.sql`: Fix protection level inconsistencies
+- `025_add_user_authentication_tables.sql`: User profiles, quiz sessions, quiz history
 - `037-042_*.sql`: Update requested shortcuts and difficulty levels
 - `044_add_alternative_group_id.sql`: Add alternative shortcut grouping
 - `045_create_applications_table.sql`: Create applications table for database-driven app config
+- `046-050_*.sql`: Various shortcut updates and refinements
+- `051-053_*.sql`: Chrome protection levels and zoom shortcuts
+- `054_extend_user_profile.sql`: Add bio and goal fields to user profiles
+- `055-056_*.sql`: App settings and global settings tables
+- `057_create_user_settings_table.sql`: User preferences with JSONB
+- `058_create_user_bookmarks_table.sql`: User shortcut bookmarks
+- `059_create_releases_table.sql`: Database-driven release notes system
+- `060_create_translations_table.sql`: Internationalization translations table
+- `061_create_alternative_shortcuts_table.sql`: Alternative shortcut mappings
+- `062_create_app_settings_table.sql`: Application-specific settings (CMS)
+- `063_create_landing_page_tables.sql`: CMS tables for landing page (FAQs, testimonials, sections)
 
 **Running migrations:**
 1. Set `.env` with `DATABASE_URL=postgresql://postgres:...`
@@ -472,6 +655,184 @@ Migrations are in `supabase/migrations/` with sequential numbering:
 - Use sequential numbers (001, 002, etc.)
 - Use descriptive names with underscores
 - Prefix with action verb (add, create, update, fix, etc.)
+
+## Routing Architecture
+
+The application uses React Router v7 for client-side routing with base URL configuration.
+
+### Route Structure
+
+**Public Routes (no authentication required):**
+- `/` - `LandingPage.tsx` - Marketing homepage with CMS content, features, testimonials
+- `/release-notes` - `ReleaseNotes.tsx` - Database-driven version history
+- `/password-reset` - `PasswordReset.tsx` - Password recovery flow for authenticated users
+
+**Application Routes (authentication optional):**
+- `/app` - `Home.tsx` - Main keyboard visualizer (works without login, quiz progress saved if logged in)
+
+**Protected Routes (authentication required):**
+- `/mypage` - `MyPage.tsx` - User dashboard with quiz statistics, weak shortcuts analysis, bookmarks
+
+### Route Configuration
+
+From `main.tsx`:
+```typescript
+<BrowserRouter basename={import.meta.env.BASE_URL}>
+  <Routes>
+    <Route path="/" element={<LandingPage />} />
+    <Route path="/release-notes" element={<ReleaseNotes />} />
+    <Route path="/app" element={<Home />} />
+    <Route path="/mypage" element={
+      <ProtectedRoute>
+        <MyPage />
+      </ProtectedRoute>
+    } />
+    <Route path="/password-reset" element={<PasswordReset />} />
+  </Routes>
+</BrowserRouter>
+```
+
+**Base URL Handling:**
+- Development (Docker): `basename='/'`
+- Production (GitHub Pages): `basename='/keyboard-visualizer/'`
+- Configured in `vite.config.ts` via `base: process.env.VITE_BASE_PATH || '/keyboard-visualizer/'`
+
+**ProtectedRoute Component:**
+- Checks `AuthContext` for authenticated user
+- Redirects to `/app` with auth modal if not logged in
+- Used for pages requiring user data (quiz history, bookmarks, settings)
+
+### Navigation Patterns
+
+**AppHeader Navigation:**
+```typescript
+// Logo click → navigate to '/'
+// "アプリを使う" button → navigate to '/app'
+// "マイページ" link → navigate to '/mypage' (requires auth)
+// "リリースノート" link → navigate to '/release-notes'
+```
+
+**Service Worker Auto-Update:**
+The app checks for updates every 60 seconds in production:
+```typescript
+// main.tsx
+setInterval(() => {
+  registration.update(); // Check for new version
+}, 60000);
+
+registration.addEventListener('updatefound', () => {
+  // Prompt user to reload when new version available
+});
+```
+
+## Internationalization Architecture
+
+### Two-Layer Translation System
+
+The application supports English (en) and Japanese (ja) with dual-source translations:
+
+**1. Frontend Static Translations** (`src/locales/`):
+- `en.ts`, `ja.ts` - UI labels, buttons, navigation, form fields
+- Type-safe with TypeScript interfaces
+- Fast lookup, no database queries
+- Used via `LanguageContext` provider
+
+**2. Database Dynamic Translations** (CMS content):
+- `translations` table - Generic key-value translations
+- Bilingual fields (`_en`, `_ja` suffixes) in CMS tables: releases, FAQs, testimonials, landing_sections, landing_features
+- Enables content updates without code deployment
+
+### LanguageContext Provider
+
+**Provider hierarchy** (from `main.tsx`):
+```typescript
+<LanguageProvider>  {/* Base layer - used by all other providers */}
+  <AuthProvider>
+    <SettingsProvider>
+      <UIProvider>
+        <ShortcutProvider>
+          <QuizProvider>
+            <App />
+```
+
+**Usage in components:**
+```typescript
+import { useLanguage } from '../context/LanguageContext';
+
+function MyComponent() {
+  const { language, setLanguage, t } = useLanguage();
+
+  // Static UI translation
+  return <button>{t('common.login')}</button>;
+
+  // Dynamic CMS content
+  const faqText = faq[`question_${language}`]; // 'question_en' or 'question_ja'
+}
+```
+
+### Language Detection Flow
+
+1. Check `localStorage.getItem('language')` for saved preference
+2. Fall back to browser language: `navigator.language.startsWith('ja')` → 'ja', else 'en'
+3. Default to 'ja' if not explicitly 'en' or 'ja'
+4. Persist selection to localStorage on change
+
+### Database Query Pattern
+
+All CMS tables use `_en` and `_ja` field suffixes:
+
+```typescript
+// Fetch data once, select fields dynamically
+const { data: faqs } = await supabase
+  .from('faqs')
+  .select('*')
+  .eq('is_active', true)
+  .order('display_order');
+
+// In component render
+faqs.map(faq => ({
+  question: faq[`question_${language}`],
+  answer: faq[`answer_${language}`]
+}));
+```
+
+### Translation Table Schema
+
+```sql
+CREATE TABLE translations (
+  translation_key VARCHAR(200) NOT NULL UNIQUE,  -- 'header.login'
+  context VARCHAR(100),                          -- 'navigation'
+  en_text TEXT NOT NULL,                         -- 'Log In'
+  ja_text TEXT NOT NULL,                         -- 'ログイン'
+  description TEXT                               -- For translators
+);
+```
+
+**Use cases:**
+- Generic i18n strings not tied to specific content
+- Shared labels across multiple pages
+- Dynamic configuration text
+
+### Bilingual Field Pattern in CMS
+
+All user-facing content tables use paired fields:
+
+```sql
+-- Example: releases table
+title_en VARCHAR(200) NOT NULL,
+title_ja VARCHAR(200) NOT NULL,
+-- FAQs table
+question_en TEXT NOT NULL,
+question_ja TEXT NOT NULL,
+answer_en TEXT NOT NULL,
+answer_ja TEXT NOT NULL
+```
+
+**Benefits:**
+- Single query returns both languages
+- No JOIN complexity
+- Easy to validate completeness (both fields required)
+- Simple to add new languages (add `_es`, `_fr` columns)
 
 ## Component Architecture
 
@@ -514,6 +875,107 @@ Migrations are in `supabase/migrations/` with sequential numbering:
 - Blue border (🔵) for `preventable_fullscreen` shortcuts
 - Red border (🔒) for `always-protected` shortcuts
 - Uses className-based styling (not inline styles)
+
+## Custom Hooks Reference
+
+The application uses custom hooks extensively to separate business logic from UI components.
+
+### Data Fetching Hooks
+
+**useShortcuts** (`src/hooks/useShortcuts.ts`):
+- Fetches shortcuts and applications from Supabase
+- Returns: `richShortcuts` (RichShortcut[]), `allShortcuts` (grouped by app), `apps` (Application[])
+- Uses `useRef` for synchronous state access to prevent infinite loops
+- Memoized callbacks with empty dependency arrays for stable references
+
+**useQuizProgress** (`src/hooks/useQuizProgress.ts`):
+- Manages quiz session lifecycle (start, record answers, complete)
+- Database operations: `quiz_sessions`, `quiz_history` tables
+- Methods: `startQuizSession()`, `recordAnswer()`, `completeQuizSession()`, `getQuizStats()`
+- Returns user's quiz history and statistics
+
+**useLocalizedData** (`src/hooks/useLocalizedData.ts`):
+- Fetches CMS content with current language
+- Queries: `faqs`, `testimonials`, `landing_sections`, `landing_features`, `releases`
+- Returns bilingual content with `_en`/`_ja` field selection based on `LanguageContext`
+
+**useBookmarks** (inferred from database schema):
+- Manages user shortcut bookmarks
+- Database: `user_bookmarks` table with user_id → shortcut_id foreign keys
+- Methods: `addBookmark()`, `removeBookmark()`, `getBookmarks()`, `isBookmarked()`
+
+**useUserSettings** (inferred from database schema):
+- Fetches and updates user preferences from `user_settings` JSONB table
+- Settings: layout, difficulty, theme, showLandingVisualizer, selectedApp
+- Auto-initialized on user creation via database trigger
+
+### Keyboard and Input Hooks
+
+**useKeyboardShortcuts** (`src/hooks/useKeyboardShortcuts.ts`):
+- Core keyboard event listener
+- Tracks pressed keys in a Set
+- Normalizes key combinations using `normalizeShortcut()`
+- Returns: `pressedKeys`, `currentDescription`, `availableShortcuts`
+- Detects modifier keys (Ctrl, Alt, Shift, Meta)
+- Handles both simultaneous and sequential shortcuts
+
+**useQuizInputHandler** (`src/hooks/useQuizInputHandler.ts`):
+- Validates quiz answers against correct shortcuts
+- Handles sequential shortcuts with `SequentialKeyRecorder`
+- Returns: `handleKeyPress()`, `resetInput()`, `currentInput`, `isCorrect`
+- Integrates with `QuizContext` for state updates
+
+### UI and Performance Hooks
+
+**useFullscreen** (`src/hooks/useFullscreen.ts`):
+- Manages fullscreen mode and Keyboard Lock API
+- Returns: `isFullscreen`, `toggleFullscreen()`, `exitFullscreen()`
+- Enables capturing system shortcuts (F11, Win key) in fullscreen mode
+- Browser compatibility checks for Keyboard Lock API
+
+**useAdaptivePerformance** (`src/hooks/useAdaptivePerformance.ts`):
+- Detects device performance capabilities
+- Adjusts animation complexity based on FPS
+- Returns: `performanceStyles` object with CSS variable overrides
+- Used for responsive animation performance (--animation-speed)
+
+**useLocalStorage** (`src/hooks/useLocalStorage.ts`):
+- Generic hook for persisting state to localStorage
+- Automatically serializes/deserializes JSON
+- Returns: `[value, setValue]` like `useState`
+- Used for: language preference, onboarding completion, last selected app
+
+### Usage Patterns
+
+**Hook Dependency Best Practices:**
+
+1. **Empty dependency arrays for stable callbacks:**
+```typescript
+const fetchData = useCallback(async (id: string) => {
+  setData(prev => {
+    // Use functional setState to avoid adding data to dependencies
+  });
+}, []); // Empty - function reference never changes
+```
+
+2. **useRef for synchronous state access:**
+```typescript
+const [shortcuts, setShortcuts] = useState<RichShortcut[]>([]);
+const shortcutsRef = useRef<RichShortcut[]>([]);
+
+setShortcuts(newData);
+shortcutsRef.current = newData; // Keep ref in sync for callbacks
+```
+
+3. **useMemo for Context values:**
+```typescript
+const value = useMemo(() => ({
+  shortcuts,
+  apps,
+  selectedApp,
+  setSelectedApp
+}), [shortcuts, apps, selectedApp]); // Only state, not setters
+```
 
 ## Important Files & Their Roles
 
@@ -991,6 +1453,11 @@ npm run preview  # Preview locally
 10. **Database-driven app configuration** (2026-02): Migrated from hardcoded `apps.ts` and `shortcutDifficulty.ts` to database tables. Created `applications` table for app metadata. Frontend now dynamically fetches app list from database via `useShortcuts()` hook
 11. **Tailwind CSS v4 migration** (2026-02): Migrated from Tailwind CSS v3 to v4. Replaced `@tailwind` directives with `@import "tailwindcss"`, migrated to `@theme` for CSS variables, removed `@apply` directives in favor of vanilla CSS, and installed `@tailwindcss/postcss` plugin for PostCSS integration
 12. **Context Provider Performance Optimization** (2026-02): Fixed infinite re-render loops by wrapping all Context `value` objects with `useMemo`, using `useRef` for synchronous state access in `useShortcuts` hook, and removing function dependencies from `useEffect` dependency arrays. Ensures stable callback references and prevents unnecessary re-renders
+13. **Landing Page CMS System** (2026-02): Built database-driven content management for landing page with tables for FAQs, testimonials, landing sections, and features. All content is bilingual (en/ja) and editable without code deployment. Added LandingPage component with dynamic Canvas background animation
+14. **Database-driven Release Notes** (2026-02): Replaced hardcoded releases.ts with `releases` and `release_changes` tables. Release notes are now fully manageable from Supabase with version tracking, categorized changes (feature/improvement/fix/breaking), and bilingual descriptions
+15. **Internationalization Architecture** (2026-02): Implemented two-layer i18n system with LanguageContext for static UI strings and database tables with `_en`/`_ja` fields for CMS content. Added language detection, localStorage persistence, and bilingual field pattern across all CMS tables
+16. **User Bookmarks & Settings** (2026-02): Added `user_bookmarks` table for saving favorite shortcuts and `user_settings` table with JSONB for user preferences (layout, difficulty, theme). Settings auto-initialize on user creation via database trigger and sync across sessions
+17. **React Router v7 Integration** (2026-02): Implemented client-side routing with public routes (/, /release-notes, /password-reset), app routes (/app), and protected routes (/mypage). Added ProtectedRoute component and service worker auto-update mechanism checking for new versions every 60 seconds
 
 ## Git Workflow
 

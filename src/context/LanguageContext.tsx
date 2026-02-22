@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useMemo, useCallback, ReactNode } from 'react';
 import { translations, Translations } from '../locales';
 import { analytics } from '../utils/analytics';
 
@@ -32,18 +32,23 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
   const [language, setLanguageState] = useState<Language>(getInitialLanguage);
 
-  const setLanguage = (lang: Language) => {
+  const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
     // Analytics: Track language change
     analytics.languageChanged(lang);
-  };
+  }, []);
 
   // Get translations for current language
-  const t = translations[language];
+  const t = useMemo(() => translations[language], [language]);
+
+  const value = useMemo(
+    () => ({ language, setLanguage, t }),
+    [language, setLanguage, t]
+  );
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );

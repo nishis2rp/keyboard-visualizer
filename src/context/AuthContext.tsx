@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { parseOAuthCallbackError, clearOAuthErrorFromUrl, mapOAuthErrorToMessage } from '../utils/authErrors';
@@ -111,17 +111,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   // Sign in with email and password
-  const signInWithEmail = async (email: string, password: string) => {
+  const signInWithEmail = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
     return { error };
-  };
+  }, []);
 
   // Sign up with email and password
-  const signUpWithEmail = async (
+  const signUpWithEmail = useCallback(async (
     email: string,
     password: string,
     displayName?: string
@@ -137,10 +137,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
 
     return { error };
-  };
+  }, []);
 
   // Sign out
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     console.log('🟢 AuthContext: signOut() called');
 
     const clearAllAuthData = () => {
@@ -195,10 +195,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Force clear everything even on error
       clearAllAuthData();
     }
-  };
+  }, []);
 
   // Update user profile
-  const updateProfile = async (updates: Partial<UserProfile>) => {
+  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
     if (!user) {
       return { error: new Error('No user logged in') };
     }
@@ -223,18 +223,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Error updating profile:', error);
       return { error: error as Error };
     }
-  };
+  }, [user]);
 
   // Send password reset email
-  const sendPasswordResetEmail = async (email: string, redirectTo: string) => {
+  const sendPasswordResetEmail = useCallback(async (email: string, redirectTo: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo,
     });
     return { error };
-  };
+  }, []);
 
   // Sign in with OAuth provider
-  const signInWithOAuth = async (
+  const signInWithOAuth = useCallback(async (
     provider: 'google',
     redirectTo?: string
   ): Promise<{ error: AuthError | null }> => {
@@ -257,22 +257,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } as AuthError,
       };
     }
-  };
+  }, []);
 
   // Update user email
-  const updateEmail = async (newEmail: string) => {
+  const updateEmail = useCallback(async (newEmail: string) => {
     const { error } = await supabase.auth.updateUser({ email: newEmail });
     return { error };
-  };
+  }, []);
 
   // Update user password
-  const updatePassword = async (newPassword: string) => {
+  const updatePassword = useCallback(async (newPassword: string) => {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     return { error };
-  };
+  }, []);
 
   // Delete user account
-  const deleteAccount = async () => {
+  const deleteAccount = useCallback(async () => {
     if (!user) {
       return { error: new Error('No user logged in') };
     }
@@ -305,23 +305,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Error deleting account:', error);
       return { error: error as Error };
     }
-  };
+  }, [user, signOut]);
 
-  const value = {
-    user,
-    profile,
-    session,
-    loading,
-    signInWithEmail,
-    signUpWithEmail,
-    signOut,
-    updateProfile,
-    sendPasswordResetEmail,
-    signInWithOAuth,
-    updateEmail,
-    updatePassword,
-    deleteAccount,
-  };
+  const value = useMemo(
+    () => ({
+      user,
+      profile,
+      session,
+      loading,
+      signInWithEmail,
+      signUpWithEmail,
+      signOut,
+      updateProfile,
+      sendPasswordResetEmail,
+      signInWithOAuth,
+      updateEmail,
+      updatePassword,
+      deleteAccount,
+    }),
+    [
+      user,
+      profile,
+      session,
+      loading,
+      signInWithEmail,
+      signUpWithEmail,
+      signOut,
+      updateProfile,
+      sendPasswordResetEmail,
+      signInWithOAuth,
+      updateEmail,
+      updatePassword,
+      deleteAccount,
+    ]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
