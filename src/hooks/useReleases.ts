@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { releases as localReleases } from '../constants/releases';
 
 export interface ReleaseChange {
   category: 'feature' | 'improvement' | 'fix' | 'breaking';
@@ -80,7 +81,24 @@ export function useReleases() {
           changes: changesByRelease[release.id] || [],
         }));
 
-        setReleases(transformedReleases);
+        // If no database releases found, use local releases.ts as fallback
+        if (transformedReleases.length === 0) {
+          const fallbackReleases = localReleases.map(release => ({
+            version: release.version,
+            date: release.date,
+            titleEn: release.titleEn,
+            titleJa: release.titleJa,
+            changes: release.changes.map(change => ({
+              category: change.category,
+              descriptionEn: change.descriptionEn,
+              descriptionJa: change.descriptionJa,
+            })),
+          }));
+          setReleases(fallbackReleases);
+        } else {
+          setReleases(transformedReleases);
+        }
+
         setError(null);
       } catch (err) {
         console.error('Error fetching releases:', err);
