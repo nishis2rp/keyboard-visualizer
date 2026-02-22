@@ -8,9 +8,15 @@ import LandingSection from './LandingSection';
 const ReleaseNotesSection: React.FC = () => {
   const { t, language } = useLanguage();
   const { releases, loading } = useReleases();
-  const latestRelease = releases[0];
 
-  if (loading || !latestRelease) return null;
+  const TARGET_VERSION = '3.7.0'; // The version the user wants to highlight on LP
+
+  // Find the target release (v3.7.0)
+  const targetRelease = releases.find(release => release.version === TARGET_VERSION);
+  // Use the target release if found, otherwise fall back to the actual latest release
+  const displayRelease = targetRelease || releases[0];
+
+  if (loading || !displayRelease) return null;
 
   return (
     <LandingSection className={styles.releaseNotesSection}>
@@ -20,21 +26,21 @@ const ReleaseNotesSection: React.FC = () => {
       </p>
       <div className={styles.releaseNotesCard}>
         <div className={styles.releaseNotesHeader}>
-          <span className={styles.releaseVersion}>v{latestRelease.version}</span>
-          <span className={styles.releaseDate}>{latestRelease.date}</span>
+          <span className={styles.releaseVersion}>v{displayRelease.version}</span>
+          <span className={styles.releaseDate}>{displayRelease.date}</span>
         </div>
         <h3 className={styles.releaseNotesTitle}>
-          {language === 'ja' ? latestRelease.titleJa : latestRelease.titleEn}
+          {language === 'ja' ? displayRelease.titleJa : displayRelease.titleEn}
         </h3>
         <ul className={styles.releaseNotesList}>
-          {latestRelease.changes.slice(0, 5).map((change, index) => (
+          {displayRelease.changes.slice(0, 5).map((change, index) => (
             <li key={index}>
               {language === 'ja' ? change.descriptionJa : change.descriptionEn}
             </li>
           ))}
-          {latestRelease.changes.length > 5 && (
+          {displayRelease.changes.length > 5 && (
             <li className={styles.moreChanges}>
-              ...and {latestRelease.changes.length - 5} more improvements
+              ...and {displayRelease.changes.length - 5} more improvements
             </li>
           )}
         </ul>
