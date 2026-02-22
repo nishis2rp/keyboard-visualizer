@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import { ShortcutDifficulty } from '../types';
 
 interface UIContextType {
@@ -15,9 +15,25 @@ const UIContext = createContext<UIContextType | undefined>(undefined);
 
 export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Sets showSetup to true by default (session-based)
-  const [showSetup, setShowSetup] = useState(true);
-  const [isQuizMode, setIsQuizMode] = useState(false);
-  const [quizApp, setQuizApp] = useState<string | null>(null);
+  const [showSetup, setShowSetupState] = useState(true);
+  const [isQuizMode, setIsQuizModeState] = useState(false);
+  const [quizApp, setQuizAppState] = useState<string | null>(null);
+
+  const setShowSetup = useCallback((show: boolean) => {
+    setShowSetupState(show);
+  }, []);
+
+  const setIsQuizMode = useCallback((mode: boolean) => {
+    setIsQuizModeState(mode);
+  }, []);
+
+  const setQuizApp = useCallback((app: string | null) => {
+    setQuizAppState(app);
+  }, []);
+
+  const setShowLandingVisualizer = useCallback(() => {
+    // No-op as it's moved to SettingsContext
+  }, []);
 
   const value = useMemo(() => ({
     showSetup,
@@ -26,8 +42,8 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     setShowSetup,
     setIsQuizMode,
     setQuizApp,
-    setShowLandingVisualizer: () => {}, // No-op as it's moved to SettingsContext
-  }), [showSetup, isQuizMode, quizApp]);
+    setShowLandingVisualizer,
+  }), [showSetup, isQuizMode, quizApp, setShowSetup, setIsQuizMode, setQuizApp, setShowLandingVisualizer]);
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 };

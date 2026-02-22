@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useEffect, ReactNode, useState } from 'react';
+import React, { createContext, useContext, useMemo, useEffect, useCallback, ReactNode, useState } from 'react';
 import { useShortcuts } from '../hooks/useShortcuts';
 import { useSettings } from './SettingsContext';
 import { useUI } from './UIContext';
@@ -105,7 +105,7 @@ export const ShortcutProvider: React.FC<{ children: ReactNode }> = ({ children }
   }), [allShortcuts, richShortcuts, apps, appMap, loading, error, fetchShortcutsForApp]);
 
   // エラーUIの表示
-  const handleRetry = async () => {
+  const handleRetry = useCallback(async () => {
     setShowError(true);
     const targetApp = isQuizMode ? quizApp : selectedApp;
     if (targetApp) {
@@ -113,7 +113,7 @@ export const ShortcutProvider: React.FC<{ children: ReactNode }> = ({ children }
     } else {
       await fetchApps();
     }
-  };
+  }, [isQuizMode, quizApp, selectedApp, fetchShortcutsForApp, fetchApps]);
 
   return (
     <ShortcutContext.Provider value={value}>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, Dispatch } from 'react';
+import React, { createContext, useContext, useMemo, ReactNode, Dispatch } from 'react';
 import { useQuizGame } from '../hooks/useQuizGame';
 import { ShortcutDifficulty } from '../types';
 import {
@@ -26,8 +26,13 @@ interface QuizProviderProps {
 export function QuizProvider({ children }: QuizProviderProps) {
   const quizGame = useQuizGame();
 
+  const value = useMemo(
+    () => quizGame,
+    [quizGame.quizState, quizGame.dispatch, quizGame.startQuiz, quizGame.getNextQuestion, quizGame.updateFullscreen, quizGame.handleKeyPress]
+  );
+
   return (
-    <QuizContext.Provider value={quizGame}>
+    <QuizContext.Provider value={value}>
       {children}
     </QuizContext.Provider>
   );

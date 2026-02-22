@@ -79,7 +79,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, [user, remoteSettings, setup]);
 
   // Handle setting updates
-  const updateLocalAndRemote = async (updates: Partial<SetupData>) => {
+  const updateLocalAndRemote = useCallback(async (updates: Partial<SetupData>) => {
     // Update local state first for immediate UI response
     if (updates.app !== undefined) setSelectedAppInternal(updates.app);
     if (updates.layout !== undefined) setKeyboardLayoutInternal(updates.layout);
@@ -98,31 +98,31 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       if (updates.difficulty !== undefined) remoteUpdates.difficulty = updates.difficulty;
       if (updates.theme !== undefined) remoteUpdates.theme = updates.theme;
       if (updates.showLandingVisualizer !== undefined) remoteUpdates.showLandingVisualizer = updates.showLandingVisualizer;
-      
+
       await saveSettings(remoteUpdates);
     }
-  };
+  }, [user, setSetup, saveSettings]);
 
   const setSelectedApp = useCallback((app: string) => {
     updateLocalAndRemote({ app });
     analytics.appSelected(app);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [updateLocalAndRemote]);
 
   const setKeyboardLayout = useCallback((layout: string) => {
     updateLocalAndRemote({ layout });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [updateLocalAndRemote]);
 
   const setDifficulty = useCallback((diff: ShortcutDifficulty) => {
     updateLocalAndRemote({ difficulty: diff });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [updateLocalAndRemote]);
 
   const setTheme = useCallback((t: 'light' | 'dark' | 'system') => {
     updateLocalAndRemote({ theme: t });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [updateLocalAndRemote]);
 
   const setShowLandingVisualizer = useCallback((show: boolean) => {
     updateLocalAndRemote({ showLandingVisualizer: show });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [updateLocalAndRemote]);
 
   const value = useMemo(() => ({
     setup,
