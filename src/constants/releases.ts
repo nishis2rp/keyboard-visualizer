@@ -16,27 +16,6 @@ export interface Release {
 
 export const releases: Release[] = [
   {
-    version: '3.25.0',
-    date: '2026-02-22',
-    titleKey: 'v3.25.0',
-    titleEn: 'Release Notes Sorting Improvement & LP Display Flexibility',
-    titleJa: 'リリースノートのソート改善とLP表示の柔軟化',
-    changes: [
-      {
-        category: 'improvement',
-        descriptionKey: 'v3.25.0-semantic-sort',
-        descriptionEn: 'Improved release notes version sorting to support semantic versioning, ensuring the latest release is always correctly displayed.',
-        descriptionJa: 'リリースノートのバージョン順ソートを意味的バージョン付けに対応させ、最新リリースが常に正しく表示されるように改善'
-      },
-      {
-        category: 'feature',
-        descriptionKey: 'v3.25.0-lp-version-override',
-        descriptionEn: 'Added functionality to explicitly display a specific release version (v3.7.0) on the Landing Page.',
-        descriptionJa: 'ランディングページで特定のリリースバージョン（v3.7.0）を明示的に表示する機能を追加'
-      }
-    ]
-  },
-  {
     version: '3.24.0',
     date: '2026-02-22',
     titleKey: 'v3.24.0',
