@@ -16,11 +16,11 @@ export interface Release {
 
 export const releases: Release[] = [
   {
-    version: '3.25.0',
+    version: '3.8.0',
     date: '2026-02-22',
-    titleKey: 'v3.25.0',
-    titleEn: 'Release Notes Sorting Improvement & LP Display Flexibility',
-    titleJa: 'リリースノートのソート改善とLP表示の柔軟化',
+    titleKey: 'v3.8.0',
+    titleEn: 'Performance Improvements, Release Management Enhancement, LP Display Flexibility',
+    titleJa: 'パフォーマンス改善、リリース管理強化、LP表示柔軟化',
     changes: [
       {
         category: 'improvement',
@@ -33,16 +33,7 @@ export const releases: Release[] = [
         descriptionKey: 'v3.25.0-lp-version-override',
         descriptionEn: 'Added functionality to explicitly display a specific release version (v3.7.0) on the Landing Page.',
         descriptionJa: 'ランディングページで特定のリリースバージョン（v3.7.0）を明示的に表示する機能を追加'
-      }
-    ]
-  },
-  {
-    version: '3.24.0',
-    date: '2026-02-22',
-    titleKey: 'v3.24.0',
-    titleEn: 'Performance Optimization & Architecture Improvements',
-    titleJa: 'パフォーマンス最適化とアーキテクチャ改善',
-    changes: [
+      },
       {
         category: 'improvement',
         descriptionKey: 'v3.24.0-context-optimization',
@@ -458,16 +449,16 @@ export const releases: Release[] = [
         descriptionJa: 'Windows US配列キーボードレイアウトを新規実装（CommandキーをWindowsキーに修正）'
       },
       {
-        category: 'fix',
-        descriptionKey: 'v2.14.0-mac-us',
-        descriptionEn: 'Fixed Mac US keyboard layout alignment and key width issues for consistent rendering',
-        descriptionJa: 'Mac US配列キーボードの配置崩れとキー幅の問題を修正'
-      },
-      {
         category: 'improvement',
         descriptionKey: 'v2.14.0-refactor',
         descriptionEn: 'Code optimization: Removed 111 lines of redundant code and simplified component logic',
         descriptionJa: 'コード最適化：冗長なコード111行を削減し、コンポーネントロジックを簡略化'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v2.14.0-mac-us',
+        descriptionEn: 'Fixed Mac US keyboard layout alignment and key width issues for consistent rendering',
+        descriptionJa: 'Mac US配列キーボードの配置崩れとキー幅の問題を修正'
       }
     ]
   },
@@ -913,7 +904,7 @@ export const releases: Release[] = [
       {
         category: 'feature',
         descriptionKey: 'v1.0.0-gmail-single',
-        descriptionEn: 'Gmail single-key shortcut support (g, i, etc.)',
+        descriptionEn: 'Gmail単一キーショートカット対応（g、iなど）',
         descriptionJa: 'Gmail単一キーショートカット対応（g、iなど）'
       },
       {
