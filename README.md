@@ -4,7 +4,7 @@
 
 1,300以上のショートカットデータを Supabase で管理し、タイピング体験を通じて効率的な学習をサポートします。
 
-[![Version](https://img.shields.io/badge/version-2.9.0-blue)](https://github.com/nishis2rp/keyboard-visualizer)
+[![Version](https://img.shields.io/badge/version-3.24.0-blue)](https://github.com/nishis2rp/keyboard-visualizer)
 [![GitHub Pages](https://img.shields.io/badge/demo-live-success)](https://nishis2rp.github.io/keyboard-visualizer/)
 [![React](https://img.shields.io/badge/React-18.3-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)

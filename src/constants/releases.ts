@@ -16,6 +16,51 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '3.24.0',
+    date: '2026-02-22',
+    titleKey: 'v3.24.0',
+    titleEn: 'Performance Optimization & Architecture Improvements',
+    titleJa: 'パフォーマンス最適化とアーキテクチャ改善',
+    changes: [
+      {
+        category: 'improvement',
+        descriptionKey: 'v3.24.0-context-optimization',
+        descriptionEn: 'Optimized all Context providers with useMemo and useCallback to prevent unnecessary re-renders',
+        descriptionJa: '全ContextプロバイダーをuseMemoとuseCallbackで最適化し、不要な再レンダリングを防止'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v3.24.0-stable-references',
+        descriptionEn: 'Ensured stable function references across LanguageContext, AuthContext, SettingsContext, UIContext, ShortcutContext, and QuizContext',
+        descriptionJa: 'LanguageContext、AuthContext、SettingsContext、UIContext、ShortcutContext、QuizContextで安定した関数参照を保証'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v3.24.0-test-separation',
+        descriptionEn: 'Separated unit tests and E2E tests: Vitest for unit tests, Playwright for E2E tests',
+        descriptionJa: 'ユニットテストとE2Eテストを分離：Vitestでユニットテスト、PlaywrightでE2Eテスト'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v3.24.0-documentation',
+        descriptionEn: 'Enhanced CLAUDE.md with 470+ lines of documentation covering CMS tables, routing, i18n architecture, and custom hooks',
+        descriptionJa: 'CLAUDE.mdを470行以上のドキュメントで強化：CMSテーブル、ルーティング、i18nアーキテクチャ、カスタムフックをカバー'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v3.24.0-migration-numbering',
+        descriptionEn: 'Fixed critical migration numbering conflict by renaming CMS migrations from 046-050 to 059-063',
+        descriptionJa: 'CMSマイグレーションを046-050から059-063に変更し、重大なマイグレーション番号の競合を修正'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v3.24.0-performance-impact',
+        descriptionEn: 'Performance improvements: Eliminated infinite loop risks and reduced unnecessary component updates',
+        descriptionJa: 'パフォーマンス向上：無限ループのリスクを排除し、不要なコンポーネント更新を削減'
+      }
+    ]
+  },
+  {
     version: '3.7.0',
     date: '2026-02-21',
     titleKey: 'v3.7.0',
