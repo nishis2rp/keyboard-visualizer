@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { releases } from '../constants/releases';
+import { useReleases } from '../hooks/useReleases';
 import styles from './ReleaseNotes.module.css';
 
 const categoryIcons: Record<'feature' | 'improvement' | 'fix' | 'breaking', string> = {
@@ -13,6 +13,29 @@ const categoryIcons: Record<'feature' | 'improvement' | 'fix' | 'breaking', stri
 
 export default function ReleaseNotes() {
   const { t, language } = useLanguage();
+  const { releases, loading, error } = useReleases();
+
+  if (loading) {
+    return (
+      <div className={styles.releaseNotesWrapper}>
+        <div className={styles.container}>
+          <p style={{ textAlign: 'center', padding: '2rem' }}>Loading releases...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.releaseNotesWrapper}>
+        <div className={styles.container}>
+          <p style={{ textAlign: 'center', padding: '2rem', color: '#ff3b30' }}>
+            Error loading releases: {error}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.releaseNotesWrapper}>

@@ -2,14 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../../pages/LandingPage.module.css';
 import { useLanguage } from '../../context/LanguageContext';
-import { releases } from '../../constants/releases';
+import { useReleases } from '../../hooks/useReleases';
 import LandingSection from './LandingSection';
 
 const ReleaseNotesSection: React.FC = () => {
   const { t, language } = useLanguage();
+  const { releases, loading } = useReleases();
   const latestRelease = releases[0];
 
-  if (!latestRelease) return null;
+  if (loading || !latestRelease) return null;
 
   return (
     <LandingSection className={styles.releaseNotesSection}>
