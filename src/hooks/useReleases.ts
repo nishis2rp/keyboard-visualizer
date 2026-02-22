@@ -43,11 +43,10 @@ export function useReleases() {
       try {
         setLoading(true);
 
-        // Fetch releases ordered by display_order (0 = latest)
+        // Fetch releases ordered by release_date (descending) initially
         const { data: releasesData, error: releasesError } = await supabase
           .from('releases')
-          .select('*')
-          .order('display_order', { ascending: true });
+          .select('id, version, release_date, title_en, title_ja'); // Removed display_order from select
 
         if (releasesError) throw releasesError;
 
@@ -73,13 +72,33 @@ export function useReleases() {
         }, {} as Record<number, ReleaseChange[]>);
 
         // Transform to Release format
-        const transformedReleases: Release[] = (releasesData as DbRelease[]).map(release => ({
+        let transformedReleases: Release[] = (releasesData as DbRelease[]).map(release => ({
           version: release.version,
           date: release.release_date,
           titleEn: release.title_en,
           titleJa: release.title_ja,
           changes: changesByRelease[release.id] || [],
         }));
+        
+        // Custom sort function for semantic versioning (v3.10.0 should be after v3.2.0)
+        const sortReleasesByVersion = (a: Release, b: Release): number => {
+          const parseVersion = (version: string) => {
+            return version.replace(/^v/, '').split('.').map(Number);
+          };
+
+          const aParts = parseVersion(a.version);
+          const bParts = parseVersion(b.version);
+
+          for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+            const a = aParts[i] || 0;
+            const b = bParts[i] || 0;
+            if (a > b) return -1; // Descending order (latest first)
+            if (a < b) return 1;
+          }
+          return 0;
+        };
+
+        transformedReleases.sort(sortReleasesByVersion);
 
         // If no database releases found, use local releases.ts as fallback
         if (transformedReleases.length === 0) {
@@ -93,7 +112,7 @@ export function useReleases() {
               descriptionEn: change.descriptionEn,
               descriptionJa: change.descriptionJa,
             })),
-          }));
+          })).sort(sortReleasesByVersion); // Also sort fallback releases
           setReleases(fallbackReleases);
         } else {
           setReleases(transformedReleases);
