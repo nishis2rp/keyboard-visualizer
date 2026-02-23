@@ -76,7 +76,10 @@
       "Bash(npx playwright install:*)",
       "Bash(cmd:*)",
       "Bash(paste - -)",
-      "Bash(sort:*)"
+      "Bash(sort:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm:*)",
+      "Bash(npx vitest run)"
     ],
     "deny": [],
     "ask": []

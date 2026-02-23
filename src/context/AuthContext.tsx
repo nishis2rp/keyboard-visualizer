@@ -141,14 +141,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Sign out
   const signOut = useCallback(async () => {
-    console.log('🟢 AuthContext: signOut() called');
-
     const clearAllAuthData = () => {
       // Clear local state
       setUser(null);
       setProfile(null);
       setSession(null);
-      console.log('🟢 AuthContext: Local state cleared');
 
       // Clear all Supabase-related data from localStorage and sessionStorage
       const clearStorage = (storage: Storage) => {
@@ -156,7 +153,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const supabaseKeys = keys.filter(key => key.includes('supabase') || key.startsWith('sb-'));
         supabaseKeys.forEach(key => {
           storage.removeItem(key);
-          console.log('🟢 AuthContext: Removed storage key:', key);
         });
       };
 
@@ -165,12 +161,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     try {
-      // Try to call Supabase signOut with a timeout
-      console.log('🟢 AuthContext: Calling supabase.auth.signOut()...');
-
-      const timeoutPromise = new Promise<any>((resolve) => {
+      const timeoutPromise = new Promise<{ error: null }>((resolve) => {
         setTimeout(() => {
-          console.warn('🟢 AuthContext: Supabase signOut timed out after 2 seconds');
           resolve({ error: null });
         }, 2000);
       });
@@ -180,17 +172,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await Promise.race([signOutPromise, timeoutPromise]);
 
       if (result.error) {
-        console.error('🟢 AuthContext: Supabase signOut error:', result.error);
-      } else {
-        console.log('🟢 AuthContext: Supabase signOut completed');
+        console.error('AuthContext: Supabase signOut error:', result.error);
       }
 
       // Always clear everything regardless of Supabase response
       clearAllAuthData();
-
-      console.log('🟢 AuthContext: signOut() completed');
     } catch (error) {
-      console.error('🟢 AuthContext: Exception in signOut:', error);
+      console.error('AuthContext: Exception in signOut:', error);
 
       // Force clear everything even on error
       clearAllAuthData();

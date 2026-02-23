@@ -16,6 +16,63 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    version: '3.9.0',
+    date: '2026-02-23',
+    titleKey: 'v3.9.0',
+    titleEn: 'Code Quality & Bug Fixes',
+    titleJa: 'コード品質改善・バグ修正',
+    changes: [
+      {
+        category: 'fix',
+        descriptionKey: 'v3.9.0-race-condition',
+        descriptionEn: 'Fixed concurrent fetch race condition in shortcut cache — duplicate requests for the same app are now blocked',
+        descriptionJa: 'ショートカットキャッシュの並行フェッチ競合状態を修正 — 同じアプリへの重複リクエストをブロック'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v3.9.0-dedup-performance',
+        descriptionEn: 'Improved shortcut deduplication from O(n²) to O(1) using Map lookup for faster cache merging',
+        descriptionJa: 'ショートカット重複排除をO(n²)からO(1)に改善 — Mapルックアップによりキャッシュマージが高速化'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v3.9.0-localstorage-spread',
+        descriptionEn: 'Fixed data corruption bug in useLocalStorage when versioning non-object values',
+        descriptionJa: 'useLocalStorageで非オブジェクト値にバージョンを付与した際のデータ破損バグを修正'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v3.9.0-animation-frame',
+        descriptionEn: 'Fixed stale animation frame accumulation in adaptive performance hook on rapid re-renders',
+        descriptionJa: '適応パフォーマンスフックで高速再レンダリング時に古いアニメーションフレームが蓄積するバグを修正'
+      },
+      {
+        category: 'fix',
+        descriptionKey: 'v3.9.0-normalize-case',
+        descriptionEn: 'Unified shortcut key letter casing between normalizeShortcutCombo and normalizeShortcut to prevent false mismatches',
+        descriptionJa: 'normalizeShortcutComboとnormalizeShortcutのアルファベット大文字小文字を統一し、誤不一致を防止'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v3.9.0-error-types',
+        descriptionEn: 'Improved error type safety across quiz progress hooks — removed unsafe type casts',
+        descriptionJa: 'クイズ進捗フックのエラー型安全性を向上 — 安全でない型キャストを除去'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v3.9.0-cleanup-logs',
+        descriptionEn: 'Removed debug console.log statements from production code in AuthContext and UserMenu',
+        descriptionJa: 'AuthContextとUserMenuの本番コードからデバッグ用console.logを削除'
+      },
+      {
+        category: 'improvement',
+        descriptionKey: 'v3.9.0-typescript',
+        descriptionEn: 'Added TypeScript types to sortKeys utility function in keyboard.ts',
+        descriptionJa: 'keyboard.tsのsortKeysユーティリティ関数にTypeScript型を追加'
+      }
+    ]
+  },
+  {
     version: '3.8.0',
     date: '2026-02-22',
     titleKey: 'v3.8.0',

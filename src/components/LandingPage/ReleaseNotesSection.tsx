@@ -9,9 +9,9 @@ const ReleaseNotesSection: React.FC = () => {
   const { t, language } = useLanguage();
   const { releases, loading } = useReleases();
 
-  const TARGET_VERSION = '3.8.0'; // The version the user wants to highlight on LP
+  const TARGET_VERSION = '3.9.0'; // The version the user wants to highlight on LP
 
-  // Find the target release (v3.7.0)
+  // Find the target release
   const targetRelease = releases.find(release => release.version === TARGET_VERSION);
   // Use the target release if found, otherwise fall back to the actual latest release
   const displayRelease = targetRelease || releases[0];

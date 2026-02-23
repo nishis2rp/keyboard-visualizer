@@ -30,7 +30,6 @@ export const useQuizProgress = () => {
   const startQuizSession = useCallback(
     async (application: string, difficulty?: string | null) => {
       if (!user) {
-        console.log('User not logged in, skipping quiz session creation');
         return null;
       }
 
@@ -53,7 +52,7 @@ export const useQuizProgress = () => {
 
         if (error) {
           console.error('Error creating quiz session:', error);
-          setError(error);
+          setError(new Error(error.message));
           return null;
         }
 
@@ -61,7 +60,7 @@ export const useQuizProgress = () => {
         return data.id;
       } catch (err) {
         console.error('Error creating quiz session:', err);
-        setError(err as Error);
+        setError(err instanceof Error ? err : new Error('Failed to create quiz session'));
         return null;
       } finally {
         setSaving(false);
@@ -104,7 +103,6 @@ export const useQuizProgress = () => {
   const completeQuizSession = useCallback(
     async (score: number, totalQuestions: number, correctAnswers: number) => {
       if (!user || !currentSessionId) {
-        console.log('No active session to complete');
         return;
       }
 
@@ -124,13 +122,13 @@ export const useQuizProgress = () => {
 
         if (error) {
           console.error('Error completing quiz session:', error);
-          setError(error);
+          setError(new Error(error.message));
         } else {
           setCurrentSessionId(null);
         }
       } catch (err) {
         console.error('Error completing quiz session:', err);
-        setError(err as Error);
+        setError(err instanceof Error ? err : new Error('Failed to complete quiz session'));
       } finally {
         setSaving(false);
       }

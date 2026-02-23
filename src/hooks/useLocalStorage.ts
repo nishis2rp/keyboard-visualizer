@@ -53,7 +53,10 @@ export const useLocalStorage = <T>(
 
   useEffect(() => {
     try {
-      const valueToStore = version ? { ...value, version } : value;
+      const valueToStore =
+        version && typeof value === 'object' && value !== null && !Array.isArray(value)
+          ? { ...(value as object), version }
+          : value;
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
       console.error(`Error writing localStorage key "${key}":`, error);

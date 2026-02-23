@@ -42,9 +42,10 @@ export const normalizeShortcutCombo = (combo: string): string => {
     // 修飾キーの正規化（記号または別名を標準名称に変換）
     const normalizedPart = symbolMap[part] || part;
 
-    // アルファベット1文字で、かつ修飾キーや特殊シンボルでない場合のみ小文字にする
+    // アルファベット1文字で、かつ修飾キーや特殊シンボルでない場合は大文字に統一
+    // （quizEngine.normalizeShortcut と一貫性を保つ）
     if (normalizedPart.length === 1 && /[a-zA-Z]/.test(normalizedPart) && !MODIFIER_KEY_NAMES.has(normalizedPart) && !/^[!@#$%^&*()_+{}|:"<>?~]$/.test(normalizedPart)) {
-      return normalizedPart.toLowerCase();
+      return normalizedPart.toUpperCase();
     }
     return normalizedPart;
   }).join(' + ');
@@ -153,7 +154,7 @@ const shouldIncludeShortcutAsCandidate = (
  * @param {Array<string>} codes - ソートするキーの配列 (KeyboardEvent.code)
  * @returns {Array<string>} ソート済みのキー配列
  */
-export const sortKeys = (codes) => {
+export const sortKeys = (codes: string[]): string[] => {
   return codes.sort((a, b) => {
     const aOrder = MODIFIER_ORDER[a] || 999
     const bOrder = MODIFIER_ORDER[b] || 999

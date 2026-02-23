@@ -30,20 +30,15 @@ const UserMenu: React.FC = () => {
   }, [isOpen]);
 
   const handleSignOut = async () => {
-    console.log('🔴 Logout button clicked');
     try {
-      console.log('🔴 Calling signOut()...');
       await signOut();
-      console.log('🔴 signOut() completed successfully');
       setIsOpen(false);
 
       // Wait a bit for the auth state change to propagate, then reload
-      console.log('🔴 Waiting before reload...');
       await new Promise(resolve => setTimeout(resolve, 300));
-      console.log('🔴 Reloading page...');
       window.location.reload();
     } catch (error) {
-      console.error('🔴 Error signing out:', error);
+      console.error('Error signing out:', error);
       alert(t.auth.signOutError);
     }
   };

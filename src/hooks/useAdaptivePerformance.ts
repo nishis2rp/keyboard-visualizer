@@ -10,15 +10,19 @@ export const useAdaptivePerformance = () => {
   const startTime = useRef<number>(performance.now());
 
   useEffect(() => {
-    let animationFrameId: number;
+    // Ref で常に最新の frameId を追跡し、クリーンアップ時に確実にキャンセルできるようにする
+    const frameIdRef = { current: 0 };
+    let cancelled = false;
 
     const measure = (time: number) => {
+      if (cancelled) return;
+
       const delta = time - lastTime.current;
       lastTime.current = time;
 
       // Ignore the first 3 seconds to allow for page load/rendering stabilization
       if (time - startTime.current < 3000) {
-        animationFrameId = requestAnimationFrame(measure);
+        frameIdRef.current = requestAnimationFrame(measure);
         return;
       }
 
@@ -27,13 +31,13 @@ export const useAdaptivePerformance = () => {
         // Increase window to 180 frames (~3 seconds) for more stable average
         if (frameTimes.current.length > 180) {
           frameTimes.current.shift();
-          
+
           // 平均FPSを計算
           const avgDelta = frameTimes.current.reduce((a, b) => a + b, 0) / frameTimes.current.length;
-          
+
           // 閾値判定 (AI Optimization logic) - Much more lenient thresholds
           // If the average delta is > 50ms (less than 20fps), then drop to low
-          if (avgDelta > 50) { 
+          if (avgDelta > 50) {
             setQualityLevel('low');
           } else if (avgDelta > 33) { // < 30fps
             setQualityLevel('medium');
@@ -42,11 +46,14 @@ export const useAdaptivePerformance = () => {
           }
         }
       }
-      animationFrameId = requestAnimationFrame(measure);
+      frameIdRef.current = requestAnimationFrame(measure);
     };
 
-    animationFrameId = requestAnimationFrame(measure);
-    return () => cancelAnimationFrame(animationFrameId);
+    frameIdRef.current = requestAnimationFrame(measure);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frameIdRef.current);
+    };
   }, []);
 
   // クオリティに応じたCSS変数の値を定義

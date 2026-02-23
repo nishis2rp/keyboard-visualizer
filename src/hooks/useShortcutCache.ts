@@ -21,6 +21,7 @@ export function useShortcutCache(): UseShortcutCacheReturn {
   const [richShortcuts, setRichShortcuts] = useState<RichShortcut[]>([]);
   const [loadedApps, setLoadedApps] = useState<Set<string>>(new Set());
   const loadedAppsRef = useRef<Set<string>>(new Set()); // Ref for synchronous access
+  const inFlightRef = useRef<Set<string>>(new Set()); // Track in-progress fetches
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -36,6 +37,15 @@ export function useShortcutCache(): UseShortcutCacheReturn {
       }
       return;
     }
+
+    // Check if already in-flight to prevent duplicate concurrent fetches
+    if (inFlightRef.current.has(appId)) {
+      if (import.meta.env.DEV) {
+        console.log('⏭️ fetchShortcutsForApp: Already in-flight, skipping');
+      }
+      return;
+    }
+    inFlightRef.current.add(appId);
 
     try {
       if (import.meta.env.DEV) {
@@ -125,15 +135,11 @@ export function useShortcutCache(): UseShortcutCacheReturn {
         console.log('✅ fetchShortcutsForApp: Loaded', data?.length, 'shortcuts');
       }
 
-      // Use functional setState to merge with existing shortcuts
+      // Use functional setState to merge with existing shortcuts (O(1) lookup with Map)
       setRichShortcuts(prev => {
-        const merged = [...prev];
-        newShortcuts.forEach(newShortcut => {
-          if (!merged.some(rs => rs.id === newShortcut.id)) {
-            merged.push(newShortcut);
-          }
-        });
-        return merged;
+        const existingIds = new Map(prev.map(rs => [rs.id, true]));
+        const toAdd = newShortcuts.filter(s => !existingIds.has(s.id));
+        return toAdd.length > 0 ? [...prev, ...toAdd] : prev;
       });
 
       setLoadedApps(prev => {
@@ -161,6 +167,7 @@ export function useShortcutCache(): UseShortcutCacheReturn {
       console.error('❌ fetchShortcutsForApp: Error', error);
       setError(error instanceof Error ? error : new Error(`Failed to fetch shortcuts for ${appId}`));
     } finally {
+      inFlightRef.current.delete(appId);
       if (import.meta.env.DEV) {
         console.log('🔵 fetchShortcutsForApp: setLoading(false)');
       }
